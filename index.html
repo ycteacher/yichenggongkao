@@ -782,8 +782,8 @@ document.addEventListener('click', function(e){
           btn.disabled=false;
           card.innerHTML='<h3>你的专属学习码</h3>'+
             '<div class="yc-sync-code">'+code+'</div>'+
-            '<div class="yc-sync-tip">请截图或抄写保存。换手机、换平板时，输入这个码就能接着同步，进度不丢。</div>'+
-            '<button class="yc-sync-btn main" id="ycSyncSave">保存并开启同步</button>';
+            '<div class="yc-sync-tip"><b>这个码就是你的专属账号！</b>换手机、换平板全靠它，弄丢了就找不回刷题进度。请立刻截图保存！</div>'+
+            '<button class="yc-sync-btn main" id="ycSyncSave">我已保存，开启同步</button>';
           card.querySelector("#ycSyncSave").addEventListener("click",function(){
             setSync({code:code,appliedTs:0,lastLocalTs:Date.now()});
             ov.classList.remove("on");setChip("ok");push();
@@ -808,7 +808,7 @@ document.addEventListener('click', function(e){
       var t=s.lastPush?new Date(s.lastPush).toLocaleString("zh-CN",{hour12:false}):"尚未同步";
       card.innerHTML='<h3>学习账号</h3>'+
         '<div class="yc-sync-code">'+esc(c)+'</div>'+
-        '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。</div>'+
+        '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。</div>'+
         '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
       card.querySelector("#ycSyncNow").addEventListener("click",function(){
@@ -837,15 +837,27 @@ document.addEventListener('click', function(e){
     bar.insertBefore(chip,bar.firstChild);
     setChip(chipState);return true;
   }
+  var REMIND_GAP=3*24*3600*1000;
+  function tsFlag(k){try{var v=parseInt(localStorage.getItem(k),10);return isNaN(v)?0:v}catch(e){return 0}}
+  function showBar(html,cls,onClose){
+    var b=document.createElement("div");b.className="yc-sync-hint"+(cls?" "+cls:"");
+    b.innerHTML=html+'<i>知道了</i>';
+    b.querySelector("i").addEventListener("click",function(){b.remove();onClose&&onClose()});
+    document.body.appendChild(b);
+    setTimeout(function(){try{if(b.parentNode)onClose&&onClose();b.remove()}catch(e){}},20000);
+  }
   function hint(){
-    try{if(localStorage.getItem(HINT_FLAG)||myCode())return}catch(e){}
     setTimeout(function(){
-      if(myCode())return;
-      var b=document.createElement("div");b.className="yc-sync-hint";
-      b.innerHTML='<span>想让手机和平板的进度同步？点右上角「登录同步」</span><i>知道了</i>';
-      b.querySelector("i").addEventListener("click",function(){b.remove();try{localStorage.setItem(HINT_FLAG,"1")}catch(e){}});
-      document.body.appendChild(b);
-      setTimeout(function(){try{if(b.parentNode&&!localStorage.getItem(HINT_FLAG)){localStorage.setItem(HINT_FLAG,"1")}b.remove()}catch(e){}},15000);
+      try{if(document.querySelector(".yc-sync-hint"))return}catch(e){}
+      var c=myCode();
+      if(c){
+        var s=getSync();
+        if(Date.now()-(s.lastRemind||0)<REMIND_GAP)return;
+        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
+      }else{
+        if(Date.now()-tsFlag(HINT_FLAG)<REMIND_GAP)return;
+        showBar('<span>想让手机和平板的进度同步？点右上角「登录同步」领学习码</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
+      }
     },4000);
   }
   /* ---- engine ---- */
@@ -884,7 +896,7 @@ document.addEventListener('click', function(e){
     });
   }
   var css=document.createElement("style");
-  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
+  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
   document.head.appendChild(css);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
