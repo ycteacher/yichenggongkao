@@ -108,6 +108,11 @@ body.yc-ui { padding-top: 60px !important; }
 @media (min-width: 820px) {
   .page-shell { margin-left: auto !important; margin-right: auto !important; }
 }
+@media (min-width: 1024px) {
+  .page-shell { max-width: 1000px !important; }
+  .yc-topbar { padding-left: max(14px, calc((100% - 1000px) / 2)) !important; padding-right: max(14px, calc((100% - 1000px) / 2)) !important; }
+  .yc-grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+}
 .yc-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .yc-logo {
   width: 36px; height: 36px; border-radius: 11px; flex: none;
@@ -493,7 +498,12 @@ document.addEventListener('click', function(e){
   /* ---------- 启动 ---------- */
   function boot(){
     replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers();
-    var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); });
+    function tagGrids(){
+    document.querySelectorAll(".page-shell .grid.grid-cols-2").forEach(function(g){
+      if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
+    });
+  }
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); });
     mo.observe(document.body, {childList: true, subtree: true});
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
