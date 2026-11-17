@@ -1,6 +1,26 @@
 <!DOCTYPE html><html data-framework="react" data-version="12" data-localstorage-bridge="kv-v1"><head>
     <meta name="asap-build-time" content="2026-11-16T21:59:02.533Z">
     <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+    (function(){
+      var V="ttfix3";
+      try{
+        var K="yc-page-ver";
+        var prev=localStorage.getItem(K);
+        if(prev&&prev!==V){localStorage.setItem(K,V);var p=location.pathname;location.replace(p+"?ycv="+V+"_"+Date.now());return;}
+        if(!prev){localStorage.setItem(K,V);}
+        if(location.search.indexOf("ycv=")===-1){
+          fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+            var m=t.match(/index-b25\.js\?v=([a-z0-9]+)/);
+            if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
+          }).catch(function(){});
+        }
+      }catch(e){}
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-title" content="亿成公考">
     <meta name="apple-mobile-web-app-capable" content="yes">
