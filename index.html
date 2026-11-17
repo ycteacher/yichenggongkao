@@ -295,7 +295,7 @@ document.addEventListener('click', function(e){
   /* ---------- 隐藏旧备考档案卡 ---------- */
   function hideProfileCard(){
     document.querySelectorAll(".page-shell > *").forEach(function(el){
-      if (el.textContent.indexOf("备考档案") > -1 && el.textContent.indexOf("专项刷题") === -1) {
+      if (el.textContent.indexOf("备考档案") > -1) {
         el.classList.add("yc-hide-profile");
         el.style.display = "none";
       }
