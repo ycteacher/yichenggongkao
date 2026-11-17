@@ -1,104 +1,16 @@
 {
- "updated_at": "2026-11-18T00:58:21+08:00",
+ "updated_at": "2026-11-18T00:58:32+08:00",
  "totals": {
-  "open": 51,
-  "start": 6,
-  "guide": 6,
-  "materials": 35
+  "open": 52,
+  "start": 7,
+  "guide": 7,
+  "materials": 36
  },
- "today_uv": 9,
+ "today_uv": 10,
  "days": [
   {
-   "date": "2026-11-05",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-06",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-07",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-08",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-09",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-10",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-11",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-12",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-13",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-14",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-15",
-   "uv": 2,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
    "date": "2026-11-16",
-   "uv": 4,
+   "uv": 5,
    "open": null,
    "start": null,
    "guide": null,
@@ -106,7 +18,7 @@
   },
   {
    "date": "2026-11-17",
-   "uv": 19,
+   "uv": 20,
    "open": null,
    "start": null,
    "guide": null,
@@ -114,7 +26,7 @@
   },
   {
    "date": "2026-11-18",
-   "uv": 9,
+   "uv": 10,
    "open": null,
    "start": null,
    "guide": null,
