@@ -635,7 +635,7 @@ document.addEventListener('click', function(e){
 /* cloud sync layer v1: 学习码多设备同步 */
 (function(){
   var SYNC_FLAG="yicheng-gk-sync-v1", HINT_FLAG="yicheng-gk-sync-hint-v1";
-  var BASE="https://textdb.online", PRE="ycgkS1-", CHUNK_ENC=6000;
+  var BASE="https://textdb.online", PRE="ycgkS1-", CHUNK_ENC=5000;
   var KEYS=["yicheng-gk-fav-v1","yicheng-gk-last-v1","yicheng-gk-profile-v1","yicheng-gk-study-v1","yicheng-gk-speed-v1","yicheng-gk-points-v1"];
   var CODE_CHARS="23456789ABCDEFGHJKMNPQRSTUVWXYZ";
   function rd(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
@@ -670,13 +670,11 @@ document.addEventListener('click', function(e){
     fetch(BASE+"/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val))
       .then(function(r){return r.json()}).then(function(j){cb(null,j)}).catch(function(e){cb(e)});
   }
-  function chunkEnc(s,max){
-    var out=[],cur="";
-    for(var i=0;i<s.length;i++){
-      var e=encodeURIComponent(s[i]);
-      if((cur+e).length>max){out.push(cur);cur=e}else cur+=e;
-    }
-    if(cur)out.push(cur);
+  function toB64(s){try{return btoa(unescape(encodeURIComponent(s)))}catch(e){return s}}
+  function fromB64(s){try{return decodeURIComponent(escape(atob(s)))}catch(e){return null}}
+  function chunkStr(s,size){
+    var out=[];
+    for(var i=0;i<s.length;i+=size)out.push(s.slice(i,i+size));
     return out;
   }
   var pushing=false,pullBusy=false;
@@ -684,8 +682,8 @@ document.addEventListener('click', function(e){
     var c=myCode();if(!c){cb&&cb("nocode");return}
     if(pushing){cb&&cb("busy");return}
     pushing=true;
-    var payload;try{payload=JSON.stringify({v:1,ts:Date.now(),d:snapshot()})}catch(e){pushing=false;cb&&cb(e);return}
-    var parts=chunkEnc(payload,CHUNK_ENC),meta={v:1,ts:Date.now(),n:parts.length};
+    var payload;try{payload=toB64(JSON.stringify({v:1,ts:Date.now(),d:snapshot()}))}catch(e){pushing=false;cb&&cb(e);return}
+    var parts=chunkStr(payload,CHUNK_ENC),meta={v:1,ts:Date.now(),n:parts.length};
     var done=0,failed=null;
     function fin(){pushing=false;if(failed){cb&&cb(failed)}else{var s=getSync();s.lastPush=Date.now();setSync(s);setChip("ok");cb&&cb(null)}}
     for(var i=0;i<parts.length;i++){
@@ -711,7 +709,9 @@ document.addEventListener('click', function(e){
             if(got===meta.n){
               pullBusy=false;
               if(failed){cb&&cb(failed,null);return}
-              try{cb&&cb(null,JSON.parse(parts.join("")))}catch(e3){cb&&cb(e3,null)}
+              var raw=fromB64(parts.join(""));
+              if(raw===null){cb&&cb("decode",null);return}
+              try{cb&&cb(null,JSON.parse(raw))}catch(e3){cb&&cb(e3,null)}
             }
           });
         })(i);
