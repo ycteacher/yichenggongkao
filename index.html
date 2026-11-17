@@ -510,4 +510,25 @@ document.addEventListener('click', function(e){
   else boot();
 })();
 </script>
+<script>
+/* usage stats beacon v1 */
+(function(){
+  try{
+    var B='https://visitor-badge.laobi.icu/badge?page_id=';
+    function hit(id){ try{ new Image().src=B+id+'&r='+Date.now(); }catch(e){} }
+    hit('ycgk.open');
+    var d=new Date(),p=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    try{ if(!localStorage.getItem('ycgk.d'+p)){ localStorage.setItem('ycgk.d'+p,'1'); hit('ycgk.uv.'+p); } }catch(e){}
+    document.addEventListener('click',function(e){
+      try{
+        var el=e.target;
+        while(el&&el!==document.body&&el.tagName!=='BUTTON'){el=el.parentElement;}
+        if(!el||el===document.body)return;
+        var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+        if(/(顺序刷|随机刷|第\d+套$)/.test(t)) hit('ycgk.start');
+      }catch(e){}
+    },true);
+  }catch(e){}
+})();
+</script>
 </body></html>
