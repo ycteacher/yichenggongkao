@@ -631,4 +631,262 @@ document.addEventListener('click', function(e){
   }catch(e){}
 })();
 </script>
+<script>
+/* cloud sync layer v1: 学习码多设备同步 */
+(function(){
+  var SYNC_FLAG="yicheng-gk-sync-v1", HINT_FLAG="yicheng-gk-sync-hint-v1";
+  var BASE="https://textdb.online", PRE="ycgkS1-", CHUNK_ENC=6000;
+  var KEYS=["yicheng-gk-fav-v1","yicheng-gk-last-v1","yicheng-gk-profile-v1","yicheng-gk-study-v1","yicheng-gk-speed-v1","yicheng-gk-points-v1"];
+  var CODE_CHARS="23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+  function rd(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+  function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function getSync(){return rd(SYNC_FLAG)||{}}
+  function setSync(o){wr(SYNC_FLAG,o)}
+  function myCode(){var s=getSync();return (s&&s.code)||""}
+  function genCode(){var r="";for(var i=0;i<8;i++)r+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return r}
+  function snapshot(){var o={};KEYS.forEach(function(k){o[k]=rd(k)});return o}
+  function snapStr(){try{return JSON.stringify(snapshot())}catch(e){return""}}
+  function num(a,b){return Math.max(a||0,b||0)}
+  function arrUnion(){
+    var s=[],seen={};
+    [].forEach.call(arguments,function(a){(a||[]).forEach(function(x){var k=typeof x==="string"?x:JSON.stringify(x);if(!seen[k]){seen[k]=1;s.push(x)}})});
+    return s;
+  }
+  function deepMax(a,b){
+    if(a===null||a===undefined)return b;
+    if(b===null||b===undefined)return a;
+    if(typeof a==="number"&&typeof b==="number")return Math.max(a,b);
+    if(Array.isArray(a)||Array.isArray(b))return arrUnion(a,b);
+    if(typeof a==="object"&&typeof b==="object"){
+      var o={},k;for(k in a)o[k]=a[k];for(k in b)o[k]=deepMax(o[k],b[k]);return o;
+    }
+    return b;
+  }
+  /* ---- cloud io ---- */
+  function cloudGet(key,cb){
+    fetch(BASE+"/"+key,{method:"GET"}).then(function(r){return r.text()}).then(function(t){cb(null,t)}).catch(function(e){cb(e)});
+  }
+  function cloudPut(key,val,cb){
+    fetch(BASE+"/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val))
+      .then(function(r){return r.json()}).then(function(j){cb(null,j)}).catch(function(e){cb(e)});
+  }
+  function chunkEnc(s,max){
+    var out=[],cur="";
+    for(var i=0;i<s.length;i++){
+      var e=encodeURIComponent(s[i]);
+      if((cur+e).length>max){out.push(cur);cur=e}else cur+=e;
+    }
+    if(cur)out.push(cur);
+    return out;
+  }
+  var pushing=false,pullBusy=false;
+  function push(cb){
+    var c=myCode();if(!c){cb&&cb("nocode");return}
+    if(pushing){cb&&cb("busy");return}
+    pushing=true;
+    var payload;try{payload=JSON.stringify({v:1,ts:Date.now(),d:snapshot()})}catch(e){pushing=false;cb&&cb(e);return}
+    var parts=chunkEnc(payload,CHUNK_ENC),meta={v:1,ts:Date.now(),n:parts.length};
+    var done=0,failed=null;
+    function fin(){pushing=false;if(failed){cb&&cb(failed)}else{var s=getSync();s.lastPush=Date.now();setSync(s);setChip("ok");cb&&cb(null)}}
+    for(var i=0;i<parts.length;i++){
+      cloudPut(PRE+c+"-c"+i,parts[i],function(e){if(e)failed=e;done++;if(done===parts.length)cloudPut(PRE+c,JSON.stringify(meta),function(e2){if(e2)failed=e2;fin()})});
+    }
+    if(parts.length===0)fin();
+  }
+  function pull(cb){
+    var c=myCode();if(!c){cb&&cb("nocode",null);return}
+    if(pullBusy){cb&&cb("busy",null);return}
+    pullBusy=true;
+    cloudGet(PRE+c,function(e,metaTxt){
+      if(e){pullBusy=false;cb&&cb(e,null);return}
+      var meta=null;try{meta=metaTxt?JSON.parse(metaTxt):null}catch(err){}
+      if(!meta||!meta.n){pullBusy=false;cb&&cb(null,null);return}
+      var parts=new Array(meta.n),got=0,failed=null;
+      if(meta.n===0){pullBusy=false;cb&&cb(null,null);return}
+      for(var i=0;i<meta.n;i++){
+        (function(i){
+          cloudGet(PRE+c+"-c"+i,function(e2,t2){
+            if(e2)failed=e2;else parts[i]=t2;
+            got++;
+            if(got===meta.n){
+              pullBusy=false;
+              if(failed){cb&&cb(failed,null);return}
+              try{cb&&cb(null,JSON.parse(parts.join("")))}catch(e3){cb&&cb(e3,null)}
+            }
+          });
+        })(i);
+      }
+    });
+  }
+  /* ---- merge ---- */
+  function applyCloud(cloud){
+    var before=snapStr(),loc=snapshot(),d=(cloud&&cloud.d)||{};
+    var out={};
+    out["yicheng-gk-fav-v1"]=arrUnion(loc["yicheng-gk-fav-v1"],d["yicheng-gk-fav-v1"]);
+    var ls=loc["yicheng-gk-study-v1"]||{},cs=d["yicheng-gk-study-v1"]||{};
+    var study={totalAnswered:num(ls.totalAnswered,cs.totalAnswered),totalCorrect:num(ls.totalCorrect,cs.totalCorrect),streakDays:num(ls.streakDays,cs.streakDays),moduleProgress:deepMax(ls.moduleProgress||{},cs.moduleProgress||{}),wrongQuestions:arrUnion(ls.wrongQuestions,cs.wrongQuestions)};
+    var cd=cs.todayDate||"",ld=ls.todayDate||"";
+    if(cd&&(!ld||cd>=ld)){
+      study.todayDate=cd;
+      study.todayAnswered=ld===cd?num(ls.todayAnswered,cs.todayAnswered):(cs.todayAnswered||0);
+      study.todayCorrect=ld===cd?num(ls.todayCorrect,cs.todayCorrect):(cs.todayCorrect||0);
+    }else{
+      study.todayDate=ld;study.todayAnswered=ls.todayAnswered||0;study.todayCorrect=ls.todayCorrect||0;
+    }
+    var lsd=ls.lastStudyDate||"",csd=cs.lastStudyDate||"";
+    study.lastStudyDate=(cs.streakDays||0)>(ls.streakDays||0)?(csd||lsd):(lsd||csd);
+    out["yicheng-gk-study-v1"]=study;
+    var lp=loc["yicheng-gk-last-v1"],cp=d["yicheng-gk-last-v1"];
+    out["yicheng-gk-last-v1"]=(cp&&(!lp||(cloud.ts||0)>=(getSync().lastLocalTs||0)))?cp:(lp||cp);
+    var lpr=loc["yicheng-gk-profile-v1"],cpr=d["yicheng-gk-profile-v1"];
+    out["yicheng-gk-profile-v1"]=cpr||lpr;
+    var lsp=loc["yicheng-gk-speed-v1"]||{doneIds:[],attempted:0},csp=d["yicheng-gk-speed-v1"]||{doneIds:[],attempted:0};
+    out["yicheng-gk-speed-v1"]={doneIds:arrUnion(lsp.doneIds,csp.doneIds),attempted:num(lsp.attempted,csp.attempted)};
+    var lpt=loc["yicheng-gk-points-v1"]||{balance:0,ledger:[]},cpt=d["yicheng-gk-points-v1"]||{balance:0,ledger:[]};
+    out["yicheng-gk-points-v1"]={balance:num(lpt.balance,cpt.balance),ledger:arrUnion(lpt.ledger,cpt.ledger).slice(-500)};
+    KEYS.forEach(function(k){if(out[k]!==null&&out[k]!==undefined)wr(k,out[k])});
+    var s=getSync();s.appliedTs=cloud.ts||Date.now();s.lastLocalTs=Date.now();setSync(s);
+    return snapStr()!==before;
+  }
+  /* ---- ui ---- */
+  var chip=null,chipState="";
+  function setChip(st){
+    chipState=st;if(!chip)return;
+    if(!myCode()){chip.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2h1V8a5 5 0 0 1 5-5z"/></svg><span>登录同步</span>';return}
+    chip.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 19a4.5 4.5 0 1 1 .42-8.98 6 6 0 0 1 11.7 1.6A3.5 3.5 0 0 1 17.5 19z"/></svg><span>'+(st==="busy"?"同步中…":st==="err"?"重试同步":"已同步")+'</span>';
+  }
+  var ov=null,card=null;
+  function ensureUI(){
+    if(ov)return;
+    ov=document.createElement("div");ov.className="yc-sync-ov";
+    card=document.createElement("div");card.className="yc-sync-card";
+    ov.appendChild(card);document.body.appendChild(ov);
+    ov.addEventListener("click",function(e){if(e.target===ov)ov.classList.remove("on")});
+  }
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function openModal(){
+    ensureUI();
+    var c=myCode();
+    if(!c){
+      card.innerHTML='<h3>学习账号 · 多设备同步</h3>'+
+        '<div class="yc-sync-tip">生成一个专属学习码，手机、平板登录同一个码，刷题记录、错题本、积分自动同步。</div>'+
+        '<input class="yc-sync-in" id="ycSyncIn" placeholder="输入学习码" maxlength="12" autocomplete="off">'+
+        '<button class="yc-sync-btn main" id="ycSyncLogin">用学习码登录</button>'+
+        '<div class="yc-sync-div"><span>或</span></div>'+
+        '<button class="yc-sync-btn" id="ycSyncGen">生成我的学习码</button>'+
+        '<div class="yc-sync-err" id="ycSyncErr"></div>';
+      card.querySelector("#ycSyncGen").addEventListener("click",function(){
+        var btn=this;btn.disabled=true;btn.textContent="生成中…";
+        tryGen(0,function(code){
+          btn.disabled=false;
+          card.innerHTML='<h3>你的专属学习码</h3>'+
+            '<div class="yc-sync-code">'+code+'</div>'+
+            '<div class="yc-sync-tip">请截图或抄写保存。换手机、换平板时，输入这个码就能接着同步，进度不丢。</div>'+
+            '<button class="yc-sync-btn main" id="ycSyncSave">保存并开启同步</button>';
+          card.querySelector("#ycSyncSave").addEventListener("click",function(){
+            setSync({code:code,appliedTs:0,lastLocalTs:Date.now()});
+            ov.classList.remove("on");setChip("ok");push();
+          });
+        });
+      });
+      card.querySelector("#ycSyncLogin").addEventListener("click",function(){
+        var v=(card.querySelector("#ycSyncIn").value||"").replace(/\s/g,"").toUpperCase();
+        var err=card.querySelector("#ycSyncErr");
+        if(v.length<6){err.textContent="学习码至少 6 位";return}
+        err.textContent="登录中…";
+        setSync({code:v,appliedTs:0,lastLocalTs:Date.now()});
+        pull(function(e,cloud){
+          if(e){err.textContent="网络没连上，稍后再试";setSync({});return}
+          var changed=cloud?applyCloud(cloud):false;
+          ov.classList.remove("on");setChip("ok");
+          if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+        });
+      });
+    }else{
+      var s=getSync();
+      var t=s.lastPush?new Date(s.lastPush).toLocaleString("zh-CN",{hour12:false}):"尚未同步";
+      card.innerHTML='<h3>学习账号</h3>'+
+        '<div class="yc-sync-code">'+esc(c)+'</div>'+
+        '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。</div>'+
+        '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
+        '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
+      card.querySelector("#ycSyncNow").addEventListener("click",function(){
+        this.textContent="同步中…";this.disabled=true;
+        push(function(e){openModal()});
+      });
+      card.querySelector("#ycSyncOut").addEventListener("click",function(){
+        if(confirm("退出后本机数据保留，但不再同步到云端。确定退出？")){setSync({});ov.classList.remove("on");setChip("")}
+      });
+    }
+    ov.classList.add("on");
+  }
+  function tryGen(n,cb){
+    if(n>5){cb(genCode());return}
+    var code=genCode();
+    cloudGet(PRE+code,function(e,t){
+      if(e||t){tryGen(n+1,cb);return}
+      cb(code);
+    });
+  }
+  function addChip(){
+    var bar=document.querySelector(".yc-top-actions");
+    if(!bar||document.getElementById("ycChipAcc"))return false;
+    chip=document.createElement("div");chip.className="yc-chip";chip.id="ycChipAcc";
+    chip.addEventListener("click",openModal);
+    bar.insertBefore(chip,bar.firstChild);
+    setChip(chipState);return true;
+  }
+  function hint(){
+    try{if(localStorage.getItem(HINT_FLAG)||myCode())return}catch(e){}
+    setTimeout(function(){
+      if(myCode())return;
+      var b=document.createElement("div");b.className="yc-sync-hint";
+      b.innerHTML='<span>想让手机和平板的进度同步？点右上角「登录同步」</span><i>知道了</i>';
+      b.querySelector("i").addEventListener("click",function(){b.remove();try{localStorage.setItem(HINT_FLAG,"1")}catch(e){}});
+      document.body.appendChild(b);
+      setTimeout(function(){try{if(b.parentNode&&!localStorage.getItem(HINT_FLAG)){localStorage.setItem(HINT_FLAG,"1")}b.remove()}catch(e){}},15000);
+    },4000);
+  }
+  /* ---- engine ---- */
+  var lastPushed=snapStr(),pushTimer=null;
+  function loop(){
+    if(myCode()&&!pushing&&!pullBusy){
+      var cur=snapStr();
+      if(cur!==lastPushed){
+        if(!pushTimer)pushTimer=setTimeout(function(){
+          pushTimer=null;
+          if(myCode()){setChip("busy");push(function(e){if(!e)lastPushed=snapStr();else setChip("err")})}
+        },4000);
+      }
+    }
+  }
+  function bootPull(){
+    if(!myCode())return;
+    setTimeout(function(){
+      pull(function(e,cloud){
+        if(e||!cloud)return;
+        var s=getSync();
+        if((cloud.ts||0)>(s.appliedTs||0)){
+          var changed=applyCloud(cloud);
+          if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+        }
+      });
+    },2500);
+  }
+  function boot(){
+    var tries=0;
+    var t=setInterval(function(){if(addChip()||++tries>20)clearInterval(t)},300);
+    hint();bootPull();
+    setInterval(loop,6000);
+    document.addEventListener("visibilitychange",function(){
+      if(document.hidden&&myCode()&&snapStr()!==lastPushed){setChip("busy");push(function(e){if(!e)lastPushed=snapStr();setChip("")})}
+    });
+  }
+  var css=document.createElement("style");
+  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}";
+  document.head.appendChild(css);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
+</script>
+
 </body></html>
