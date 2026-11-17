@@ -28,21 +28,26 @@
   .item {
     display:flex; align-items:center; gap:12px;
     background:#fff; border:1px solid #ECE8DF; border-radius:14px;
-    padding:14px; margin-bottom:10px; text-decoration:none; color:inherit;
+    padding:14px; margin-bottom:10px;
     box-shadow:0 1px 2px rgba(32,32,32,.04);
   }
-  .item:active { transform:scale(.985); }
   .item .ic {
     width:40px; height:40px; border-radius:11px; flex:none;
     display:flex; align-items:center; justify-content:center;
     font-size:20px; color:#fff; font-weight:700;
   }
   .ic-pdf { background:linear-gradient(135deg,#DC2626,#B91C1C); }
-  .ic-fl { background:linear-gradient(135deg,#2563EB,#1D4ED8); }
   .item .tx { flex:1; min-width:0; }
   .item .t { font-size:14px; font-weight:700; line-height:1.4; }
   .item .s { font-size:11px; color:#8A8378; margin-top:3px; line-height:1.5; }
-  .item .go { flex:none; font-size:11px; font-weight:700; color:#15803D; background:rgba(21,128,61,.08); border-radius:999px; padding:5px 10px; }
+  .ops { display:flex; flex-direction:column; gap:6px; flex:none; }
+  .op {
+    display:block; text-align:center; font-size:12px; font-weight:700;
+    border-radius:999px; padding:7px 14px; cursor:pointer; white-space:nowrap;
+  }
+  .op-save { background:#15803D; color:#fff; }
+  .op-open { background:rgba(21,128,61,.08); color:#15803D; }
+  .op:active { transform:scale(.95); }
   .placeholder {
     display:flex; align-items:center; gap:12px;
     background:#FAFAF7; border:1px dashed #E0DBD0; border-radius:14px;
@@ -70,55 +75,70 @@
   <div class="hero">
     <a class="back" href="./index.html">‹ 返回刷题</a>
     <h1>资料领取专区</h1>
-    <p>亿成老师整理的备考资料，全部免费领取 · 持续更新中</p>
+    <p>点「保存」存到手机/电脑，点「打开」直接预览打印 · 全部免费</p>
   </div>
 
   <div class="sec-t">国考 · 27国考行政执法卷</div>
 
-  <a class="item" href="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" target="_blank" rel="noopener">
+  <div class="item">
     <div class="ic ic-pdf">卷</div>
     <div class="tx">
       <div class="t">《27国考执法卷预测·行测申论全卷》第1套</div>
-      <div class="s">行测＋申论全卷 · 含答案与解析 · PDF可直接保存打印</div>
+      <div class="s">行测＋申论全卷 · 含答案与解析</div>
     </div>
-    <div class="go">领取 ›</div>
-  </a>
+    <div class="ops">
+      <span class="op op-save" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf">保存</span>
+      <span class="op op-open" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf">打开</span>
+    </div>
+  </div>
 
-  <a class="item" href="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" target="_blank" rel="noopener">
+  <div class="item">
     <div class="ic ic-pdf">卷</div>
     <div class="tx">
       <div class="t">《27国考执法卷预测·第2套（行测申论全卷）》</div>
-      <div class="s">行测＋申论全卷 · 含答案与解析 · PDF可直接保存打印</div>
+      <div class="s">行测＋申论全卷 · 含答案与解析</div>
     </div>
-    <div class="go">领取 ›</div>
-  </a>
+    <div class="ops">
+      <span class="op op-save" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf">保存</span>
+      <span class="op op-open" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf">打开</span>
+    </div>
+  </div>
 
-  <a class="item" href="files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" target="_blank" rel="noopener">
+  <div class="item">
     <div class="ic ic-pdf">册</div>
     <div class="tx">
       <div class="t">《国考倒计时13天·数量资料临阵磨枪手册》</div>
-      <div class="s">数量关系＋资料分析冲刺 · 34页 · PDF可直接保存打印</div>
+      <div class="s">数量关系＋资料分析冲刺 · 34页</div>
     </div>
-    <div class="go">领取 ›</div>
-  </a>
+    <div class="ops">
+      <span class="op op-save" data-file="files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf">保存</span>
+      <span class="op op-open" data-file="files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf">打开</span>
+    </div>
+  </div>
 
-  <a class="item" href="files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" target="_blank" rel="noopener">
+  <div class="item">
     <div class="ic ic-pdf">常</div>
     <div class="tx">
       <div class="t">《常识100考点·亿成老师亲编》</div>
-      <div class="s">常识高频考点精编 · PDF点开即存，可直接打印</div>
+      <div class="s">常识高频考点精编</div>
     </div>
-    <div class="go">领取 ›</div>
-  </a>
+    <div class="ops">
+      <span class="op op-save" data-file="files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf">保存</span>
+      <span class="op op-open" data-file="files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf">打开</span>
+    </div>
+  </div>
 
-  <a class="item" href="files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" target="_blank" rel="noopener">
+  <div class="item">
     <div class="ic ic-pdf">图</div>
     <div class="tx">
       <div class="t">《行测知识地图·附预测题300道》</div>
-      <div class="s">五大模块知识体系＋300题 · PDF点开即存，可直接打印</div>
+      <div class="s">五大模块知识体系＋300题</div>
     </div>
-    <div class="go">领取 ›</div>
-  </a>
+    <div class="ops">
+      <span class="op op-save" data-file="files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf">保存</span>
+      <span class="op op-open" data-file="files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf">打开</span>
+    </div>
+  </div>
 
   <div class="sec-t">其他考试 · 整理中</div>
 
@@ -128,7 +148,7 @@
   <div class="placeholder"><div class="ic">支</div><div class="tx"><div class="t">三支一扶资料</div><div class="s">整理中，敬请期待</div></div></div>
 
   <div class="tip">
-    <b>领取小贴士：</b>点开 PDF 资料后，可保存到手机或电脑随时打印；资料会持续更新，记得常回来看看。
+    <b>怎么保存：</b>点绿色「保存」按钮，iPhone/iPad 会提示下载，选「存储到文件」就行；电脑会直接下载。想先看看再存，点「打开」预览后，点右上角分享图标也能存。
   </div>
 
   <a class="back-big" href="./index.html">‹ 返回亿成公考，继续刷题</a>
@@ -137,6 +157,29 @@
 (function(){
   try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.materials&r=" + Date.now(); }catch(e){}
 })();
+document.addEventListener('click', function(e){
+  var el = e.target.closest ? e.target.closest('.op') : null;
+  if (!el) return;
+  var url = el.dataset.file;
+  if (el.classList.contains('op-open')) { window.open(url, '_blank'); return; }
+  var old = el.textContent;
+  el.textContent = '保存中…';
+  fetch(url).then(function(r){ return r.blob(); }).then(function(b){
+    var u = URL.createObjectURL(b);
+    var a = document.createElement('a');
+    a.href = u;
+    a.download = decodeURIComponent(url.split('/').pop());
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 30000);
+    el.textContent = '开始保存 ✓';
+    setTimeout(function(){ el.textContent = old; }, 2500);
+  }).catch(function(){
+    window.open(url, '_blank');
+    el.textContent = old;
+  });
+});
 </script>
 </body>
 </html>
