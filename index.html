@@ -63,14 +63,14 @@
 .page-shell-bottom { padding-bottom: 78px !important; }
 .yc-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: flex; background: rgba(255,255,255,.97); border-top: 1px solid #E8E4DB; padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
 .yc-tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0 2px; border: none; background: none; font-size: 11px; line-height: 1.2; color: #8A8378; cursor: pointer; }
-.yc-tabbar button.on { color: #15803D; font-weight: 600; }
+.yc-tabbar button.on { color: #DC2626; font-weight: 600; }
 .yc-tabbar .material-icons { font-size: 22px; }
 /* 宽屏：底栏收窄居中悬浮，网页端更精致 */
 @media (min-width: 768px) {
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix4"></script>
+</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix5"></script>
     <link rel="modulepreload" href="./assets/index-b21.js">
     <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
@@ -172,10 +172,10 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .yc-logo {
   width: 36px; height: 36px; border-radius: 11px; flex: none;
-  background: linear-gradient(135deg, #1B8A44, #0E6B3C);
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-weight: 700; font-size: 17px;
-  box-shadow: 0 2px 8px rgba(21,128,61,.3);
+  box-shadow: 0 2px 8px rgba(220,38,38,.3);
 }
 .yc-brand-name { font-size: 16px; font-weight: 800; color: var(--yc-ink); letter-spacing: .5px; line-height: 1.1; }
 .yc-brand-sub { font-size: 10px; color: var(--yc-mut); margin-top: 1px; line-height: 1.2; }
@@ -216,7 +216,7 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-types .yc-opt { padding: 8px 14px; border-radius: 999px; }
 .yc-save {
   margin-top: 20px; width: 100%; border: none; border-radius: 14px;
-  background: linear-gradient(135deg, #1B8A44, #0E6B3C); color: #fff;
+  background: linear-gradient(135deg, #DC2626, #B91C1C); color: #fff;
   font-size: 15px; font-weight: 700; padding: 13px; cursor: pointer;
   box-shadow: 0 4px 14px rgba(21,128,61,.3);
 }
@@ -293,7 +293,7 @@ body.yc-ui { padding-top: 60px !important; }
 /* ===== 秒开加载页 ===== */
 #yc-skeleton{position:fixed;inset:0;z-index:2000;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s}
 #yc-skeleton.off{opacity:0;pointer-events:none}
-.yc-sk-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1B8A44,#0E6B3C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:800;box-shadow:0 6px 20px rgba(21,128,61,.3)}
+.yc-sk-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#DC2626,#B91C1C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:800;box-shadow:0 6px 20px rgba(220,38,38,.3)}
 .yc-sk-name{font-size:15px;font-weight:700;color:#202020;letter-spacing:1px}
 .yc-sk-sub{font-size:11px;color:#8A8378}
 .yc-sk-dots{display:flex;gap:6px;margin-top:4px}
@@ -305,7 +305,7 @@ body.yc-ui { padding-top: 60px !important; }
   <body>
     <div id="root"></div>
     <div id="yc-skeleton">
-      <div class="yc-sk-logo">亿</div>
+      <div class="yc-sk-logo">刷</div>
       <div class="yc-sk-name">亿成公考 · 备考神器</div>
       <div class="yc-sk-sub">题库加载中，马上就好</div>
       <div class="yc-sk-dots"><i></i><i></i><i></i></div>
@@ -418,7 +418,7 @@ document.addEventListener('click', function(e){
   var topbar = document.createElement("div");
   topbar.className = "yc-topbar";
   topbar.innerHTML =
-    '<div class="yc-brand"><div class="yc-logo">亿</div>' +
+    '<div class="yc-brand"><div class="yc-logo">刷</div>' +
     '<div><div class="yc-brand-name">亿成公考 · 备考神器</div>' +
     '<div class="yc-brand-sub">亿成老师团队倾心打造 · 题库持续更新</div></div></div>' +
     '<div class="yc-top-actions">' +
