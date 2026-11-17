@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix6";
+      var V="ttfix7";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
@@ -70,9 +70,9 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix6"></script>
+</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix7"></script>
     <link rel="modulepreload" href="./assets/index-b21.js">
-    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix6">
+    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix7">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
     <meta name="asap-vite-contract" content="a4167c51ba36d6fb9d742332">
   <script>
@@ -83,7 +83,7 @@
 <meta http-equiv="Content-Security-Policy" content="
   script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
   frame-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
-  connect-src 'self' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com;
+  connect-src 'self' data: blob: https://textdb.online *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com;
   child-src 'self' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
   object-src 'self' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
   base-uri 'self' *.alipay.com *.alipayobjects.com *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
@@ -657,13 +657,13 @@ document.addEventListener('click', function(e){
   var SYNC_FLAG="yicheng-gk-sync-v1", HINT_FLAG="yicheng-gk-sync-hint-v1";
   var BASE="https://textdb.online", PRE="ycgkS1-", CHUNK_ENC=5000;
   var KEYS=["yicheng-gk-fav-v1","yicheng-gk-last-v1","yicheng-gk-profile-v1","yicheng-gk-study-v1","yicheng-gk-speed-v1","yicheng-gk-points-v1"];
-  var CODE_CHARS="23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+  var CODE_CHARS="0123456789";
   function rd(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
   function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   function getSync(){return rd(SYNC_FLAG)||{}}
   function setSync(o){wr(SYNC_FLAG,o)}
   function myCode(){var s=getSync();return (s&&s.code)||""}
-  function genCode(){var r="";for(var i=0;i<8;i++)r+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return r}
+  function genCode(){var r="";for(var i=0;i<6;i++)r+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return r}
   function snapshot(){var o={};KEYS.forEach(function(k){o[k]=rd(k)});return o}
   function snapStr(){try{return JSON.stringify(snapshot())}catch(e){return""}}
   function num(a,b){return Math.max(a||0,b||0)}
