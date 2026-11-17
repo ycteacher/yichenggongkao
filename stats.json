@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-11-18T00:58:45+08:00",
+ "updated_at": "2026-11-18T00:59:02+08:00",
  "totals": {
-  "open": 53,
-  "start": 8,
-  "guide": 8,
-  "materials": 37
+  "open": 54,
+  "start": 9,
+  "guide": 9,
+  "materials": 38
  },
- "today_uv": 11,
+ "today_uv": 12,
  "days": [
   {
    "date": "2026-11-16",
-   "uv": 6,
+   "uv": 7,
    "open": null,
    "start": null,
    "guide": null,
@@ -18,19 +18,19 @@
   },
   {
    "date": "2026-11-17",
-   "uv": 21,
-   "open": null,
-   "start": null,
-   "guide": null,
-   "materials": null
-  },
-  {
-   "date": "2026-11-18",
-   "uv": 11,
+   "uv": 22,
    "open": 53,
    "start": 8,
    "guide": 8,
    "materials": 37
+  },
+  {
+   "date": "2026-11-18",
+   "uv": 12,
+   "open": 54,
+   "start": 9,
+   "guide": 9,
+   "materials": 38
   }
  ]
 }
