@@ -214,6 +214,25 @@ body.yc-ui { padding-top: 60px !important; }
 /* 新图标 */
 .yc-svg { width: 20px; height: 20px; display: block; }
 .page-shell .mt-3.grid > button .yc-svg { width: 21px; height: 21px; }
+</style><style id="yc-fix">
+/* ===== 补缺失渐变类（修复紫卡/绿卡白字） ===== */
+.from-\[\#7C3AED\]{--tw-gradient-from: #7C3AED var(--tw-gradient-from-position);--tw-gradient-to: rgb(124 58 237 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.to-\[\#5B21B6\]{--tw-gradient-to: #5B21B6 var(--tw-gradient-to-position)}
+.from-\[\#16A34A\]{--tw-gradient-from: #16A34A var(--tw-gradient-from-position);--tw-gradient-to: rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+
+/* ===== 资料领取专区卡片 ===== */
+#yc-materials-card{
+  display:flex; align-items:center; gap:12px;
+  margin:14px 0 4px; padding:14px 16px; border-radius:14px;
+  background:linear-gradient(90deg,#D97706,#B45309);
+  color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(180,83,9,.28);
+}
+#yc-materials-card:active{ transform:scale(.985); }
+#yc-materials-card .yc-mat-ic{ font-size:26px !important; flex:none; }
+#yc-materials-card .yc-mat-tx{ flex:1; min-width:0; }
+#yc-materials-card .yc-mat-t{ font-size:15px; font-weight:800; letter-spacing:.5px; }
+#yc-materials-card .yc-mat-s{ font-size:11px; opacity:.92; margin-top:2px; }
+#yc-materials-card .yc-mat-go{ font-size:12px; font-weight:700; flex:none; background:rgba(255,255,255,.18); border-radius:999px; padding:5px 10px; }
 </style></head>
   <body>
     <div id="root"></div>
@@ -495,6 +514,27 @@ document.addEventListener('click', function(e){
   }
   document.getElementById("ycChipPts").addEventListener("click", openPoints);
 
+  /* ---------- 资料领取专区卡片 ---------- */
+  function addMaterialsCard(){
+    if (document.getElementById("yc-materials-card")) return;
+    var entry = document.querySelector('[data-testid="yiliao-entry"]');
+    if (!entry) return;
+    var grid = entry.closest(".grid");
+    if (!grid || !grid.parentNode) return;
+    var card = document.createElement("div");
+    card.id = "yc-materials-card";
+    card.innerHTML =
+      '<span class="material-icons yc-mat-ic">redeem</span>' +
+      '<div class="yc-mat-tx"><div class="yc-mat-t">资料领取专区</div>' +
+      '<div class="yc-mat-s">预测卷 · 常识100考点 · 临阵磨枪手册 · 免费领取</div></div>' +
+      '<span class="yc-mat-go">领取 ›</span>';
+    card.addEventListener("click", function(){
+      try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.materials&r=" + Date.now(); }catch(e){}
+      window.location.href = "materials.html";
+    });
+    grid.parentNode.insertBefore(card, grid.nextSibling);
+  }
+
   /* ---------- 启动 ---------- */
   function boot(){
     replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers();
@@ -503,8 +543,9 @@ document.addEventListener('click', function(e){
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
     });
   }
-  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); });
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); });
     mo.observe(document.body, {childList: true, subtree: true});
+    addMaterialsCard();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
