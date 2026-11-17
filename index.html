@@ -670,8 +670,8 @@ document.addEventListener('click', function(e){
     fetch(BASE+"/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val))
       .then(function(r){return r.json()}).then(function(j){cb(null,j)}).catch(function(e){cb(e)});
   }
-  function toB64(s){try{return btoa(unescape(encodeURIComponent(s)))}catch(e){return s}}
-  function fromB64(s){try{return decodeURIComponent(escape(atob(s)))}catch(e){return null}}
+  function toB64(s){try{return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_")}catch(e){return s}}
+  function fromB64(s){try{var b=s.replace(/-/g,"+").replace(/_/g,"/");return decodeURIComponent(escape(atob(b)))}catch(e){return null}}
   function chunkStr(s,size){
     var out=[];
     for(var i=0;i<s.length;i+=size)out.push(s.slice(i,i+size));
