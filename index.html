@@ -15,8 +15,31 @@
     <link rel="apple-touch-icon" href="./assets/icon-C_T9bdLl.png">
     <link href="https://gw.alipayobjects.com/render/p/yuyan/180023180003946312/material-icons.css" rel="stylesheet" crossorigin="anonymous">
     <script defer="" src="base.js"></script>
-    <script type="module" crossorigin="" src="./assets/index-b18.js"></script>
-    <link rel="modulepreload" href="./assets/index-b18.js">
+    <script>window.YC_CS_BANK=window.YC_CS_BANK||[];</script>
+    <script src="./assets/cs-bank-1.js"></script>
+    <script>
+    (function(){
+      function loadRest(){
+        fetch('./assets/cs-banks.json?t='+Date.now()).then(function(r){return r.json()}).then(function(m){
+          var files=(m&&m.banks)||[]; var i=0;
+          function next(){
+            if(i>=files.length) return;
+            var f=files[i++];
+            var s=document.createElement('script');
+            s.src='./assets/'+f+'.js';
+            s.onload=function(){ try{ window.__ycMergeCs && window.__ycMergeCs(window.YC_CS_BANK.splice(0)); }catch(e){} next(); };
+            s.onerror=function(){ next(); };
+            document.head.appendChild(s);
+          }
+          next();
+        }).catch(function(){});
+      }
+      if(document.readyState==='complete') setTimeout(loadRest,1200);
+      else window.addEventListener('load',function(){ setTimeout(loadRest,1200); });
+    })();
+    </script>
+    <script type="module" crossorigin="" src="./assets/index-b19.js"></script>
+    <link rel="modulepreload" href="./assets/index-b19.js">
     <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
     <meta name="asap-vite-contract" content="a4167c51ba36d6fb9d742332">
