@@ -45,6 +45,11 @@
 .yc-tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0 2px; border: none; background: none; font-size: 11px; line-height: 1.2; color: #8A8378; cursor: pointer; }
 .yc-tabbar button.on { color: #15803D; font-weight: 600; }
 .yc-tabbar .material-icons { font-size: 22px; }
+/* 宽屏：底栏收窄居中悬浮，网页端更精致 */
+@media (min-width: 768px) {
+  .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
+  .page-shell-bottom { padding-bottom: 86px !important; }
+}
 </style><script type="module" crossorigin="" src="./assets/index-b22.js"></script>
     <link rel="modulepreload" href="./assets/index-b21.js">
     <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css">
