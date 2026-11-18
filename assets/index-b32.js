@@ -145,10 +145,10 @@ s.jsx("a",{href:u[1],download:"",className:"rounded-full bg-[#15803D] px-4 py-2 
 s.jsx("a",{href:u[1],target:"_blank",rel:"noreferrer",className:"rounded-full bg-[#F0EDE6] px-4 py-2 text-xs font-bold text-[#4A463F] transition active:scale-95",children:"打开"})
 ]},String(ui)))})
 ]},String(i));
-const itemRow=(it,ii)=>s.jsxs("button",{type:"button",onClick:()=>it.module?c({name:"pick",moduleKey:it.module}):c({name:"papers"}),className:"flex w-full items-center justify-between rounded-3xl bg-white p-4 text-left shadow-[0_2px_12px_rgba(32,32,32,0.06)] transition active:scale-[0.99]",children:[
+const itemRow=(it,ii)=>s.jsxs("button",{type:"button",onClick:()=>{if(it.module&&!Dr.some(q=>q.module===it.module))return; it.module?c({name:"pick",moduleKey:it.module}):c({name:"papers"})},className:"flex w-full items-center justify-between rounded-3xl bg-white p-4 text-left shadow-[0_2px_12px_rgba(32,32,32,0.06)] transition active:scale-[0.99]",children:[
 s.jsxs("div",{className:"min-w-0",children:[
 s.jsx("p",{className:"text-sm font-semibold text-[#202020]",children:it.label||it.papers}),
-s.jsx("p",{className:"mt-0.5 text-xs text-[#8A8378]",children:it.module?"题库内直接刷，答完出正确率":"套卷页打开，一套一套刷"})
+s.jsx("p",{className:"mt-0.5 text-xs text-[#8A8378]",children:it.module?(Dr.some(q=>q.module===it.module)?"题库内直接刷，答完出正确率":"题库加载中，稍等几秒再点"):"套卷页打开，一套一套刷"})
 ]}),
 s.jsx("span",{className:"material-icons text-[18px] text-[#B3AC9E]",children:"chevron_right"})
 ]},String(ii));
