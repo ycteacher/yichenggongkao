@@ -147,7 +147,7 @@ s.jsx("a",{href:u[1],target:"_blank",rel:"noreferrer",className:"rounded-full bg
 ]},String(i));
 const itemRow=(it,ii)=>s.jsxs("button",{type:"button",onClick:()=>it.module?c({name:"pick",moduleKey:it.module}):c({name:"papers"}),className:"flex w-full items-center justify-between rounded-3xl bg-white p-4 text-left shadow-[0_2px_12px_rgba(32,32,32,0.06)] transition active:scale-[0.99]",children:[
 s.jsxs("div",{className:"min-w-0",children:[
-s.jsx("p",{className:"text-sm font-semibold text-[#202020]",children:it.label}),
+s.jsx("p",{className:"text-sm font-semibold text-[#202020]",children:it.label||it.papers}),
 s.jsx("p",{className:"mt-0.5 text-xs text-[#8A8378]",children:it.module?"题库内直接刷，答完出正确率":"套卷页打开，一套一套刷"})
 ]}),
 s.jsx("span",{className:"material-icons text-[18px] text-[#B3AC9E]",children:"chevron_right"})
