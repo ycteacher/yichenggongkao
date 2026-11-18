@@ -73,19 +73,26 @@ li{margin:6px 0;padding-left:4px;list-style:none;font-size:13.5px;color:#CBD5E1}
 .rempty{font-size:13px;color:rgba(226,232,240,.5);padding:14px 0;text-align:center}
 @media (prefers-reduced-motion: reduce){.live i{animation:none}}
 
-html,body{width:100%;height:100%;overflow:hidden}
-#stage{position:fixed;left:0;top:0;width:100%;height:100%;padding:14px 24px 16px;display:flex;flex-direction:column;overflow:hidden}
-#stage .top{padding:2px 4px 10px;flex:none}
+#saveImgBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9998;padding:10px 20px;border-radius:99px;border:none;background:#FBBF24;color:#1F1300;font-size:14px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:pointer}
+#saveImgBtn:disabled{opacity:.6}
+#shotOverlay{display:none;position:fixed;inset:0;background:rgba(2,6,18,.92);z-index:9999;overflow:auto;padding:18px 14px 30px}
+#shotOverlay .shot-tip{color:#F8FAFC;text-align:center;font-size:15px;font-weight:700;line-height:1.7;margin-bottom:12px}
+#shotImg{width:100%;max-width:760px;display:block;margin:0 auto;border-radius:10px}
+#shotOverlay .shot-close{text-align:center;margin-top:14px}
+#shotCloseBtn{padding:10px 34px;border-radius:99px;border:none;background:#38BDF8;color:#04121F;font-size:15px;font-weight:800;cursor:pointer}
+
+#stage{padding:14px 24px 16px;display:flex;flex-direction:column}
+#stage .top{padding:2px 4px 10px}
 #stage h1{font-size:24px}
 #stage .clock{font-size:24px}
 #stage .cd .num{font-size:28px}
-#stage .kpis{gap:10px;margin:10px 0;flex:none}
+#stage .kpis{gap:10px;margin:10px 0}
 #stage .kpi{padding:8px 14px;border-radius:12px}
 #stage .kpi .n{font-size:27px}
 #stage .kpi .t{font-size:12px}
-#stage .judge{font-size:13px;margin:2px 2px 8px;flex:none}
-#stage .grid{flex:1;min-height:0;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(0,1fr);gap:10px}
-#stage .card{padding:10px 14px;overflow:hidden;border-radius:14px}
+#stage .judge{font-size:13px;margin:2px 2px 8px}
+#stage .grid{grid-template-columns:repeat(3,1fr);gap:10px}
+#stage .card{padding:10px 14px;border-radius:14px}
 #stage h2{font-size:14.5px}
 #stage .sub{font-size:11px;margin:2px 0 6px}
 #stage .brow{margin:4px 0}
@@ -113,9 +120,12 @@ html,body{width:100%;height:100%;overflow:hidden}
   #stage .grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:640px){
+  #stage{padding:12px 12px 20px}
   #stage .kpis{grid-template-columns:repeat(2,1fr)}
   #stage .grid{grid-template-columns:1fr}
   #stage .card.w2{grid-column:auto}
+  #stage h1{font-size:19px}
+  #stage .kpi .n{font-size:24px}
 }
 </style>
 </head>
@@ -228,6 +238,13 @@ html,body{width:100%;height:100%;overflow:hidden}
       </ul>
       <div class="foot">数据来源：metrics 每小时自动采集 + 问卷云端 · 亿成公考</div>
     </div>
+  </div>
+
+  <button id="saveImgBtn" type="button">保存长图</button>
+  <div id="shotOverlay">
+    <p class="shot-tip">长按下方图片 → 「存储图像 / 存到相册」<br>（电脑：右键 → 图片另存为）</p>
+    <img id="shotImg" alt="看板长图">
+    <p class="shot-close"><button id="shotCloseBtn" type="button">关闭</button></p>
   </div>
 
 </div>
@@ -435,6 +452,24 @@ function refreshFb(){
 setInterval(refreshMetrics,30000);
 setInterval(refreshFb,300000);
 setInterval(function(){var t=el('onlineBadge');if(t){var d0=new Date();var p=''+d0.getFullYear()+('0'+(d0.getMonth()+1)).slice(-2)+('0'+d0.getDate()).slice(-2)+('0'+d0.getHours()).slice(-2)+('0'+d0.getMinutes()).slice(-2);t.src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.hb.'+p+'&r='+Date.now();}},60000);
+
+/* ===== 保存长图 ===== */
+var saveBtn=el('saveImgBtn');
+if(saveBtn){saveBtn.addEventListener('click',function(){
+  var btn=saveBtn;btn.disabled=true;var old=btn.textContent;btn.textContent='正在生成…';
+  function done(){btn.disabled=false;btn.textContent=old;}
+  var load=(window.html2canvas&&window.html2canvas.call)?Promise.resolve():new Promise(function(res,rej){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';s.onload=res;s.onerror=function(){rej(new Error('cdn'));};document.head.appendChild(s);});
+  load.then(function(){
+    var badge=el('onlineBadge');var bd=badge?badge.style.display:'';if(badge)badge.style.display='none';
+    return html2canvas(document.body,{backgroundColor:'#0B1220',scale:Math.min(2,window.devicePixelRatio||1),useCORS:true,logging:false}).then(function(canvas){
+      if(badge)badge.style.display=bd;
+      el('shotImg').src=canvas.toDataURL('image/jpeg',0.92);
+      el('shotOverlay').style.display='block';done();
+    });
+  }).catch(function(){done();alert('生成失败，请改用手机截图：侧边键＋音量上键同时按。');});
+});}
+var shotClose=el('shotCloseBtn');
+if(shotClose){shotClose.addEventListener('click',function(){el('shotOverlay').style.display='none';});}
 
 </script>
 </body>
