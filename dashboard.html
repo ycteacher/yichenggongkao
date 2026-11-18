@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="亿成看板">
+<meta name="theme-color" content="#15803D">
+<title>亿成公考 · 数据看板</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+       background:#FAF8F3;color:#1F2937;min-height:100vh;padding:20px 16px 40px}
+  .wrap{max-width:480px;margin:0 auto}
+  h1{font-size:21px;font-weight:800;display:flex;align-items:center;gap:8px}
+  h1 .dot{width:10px;height:10px;border-radius:50%;background:#15803D;flex:none}
+  .sub{font-size:12px;color:#8A8378;margin-top:5px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .card{background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:16px 14px;
+        box-shadow:0 1px 8px rgba(31,41,55,.04)}
+  .card .num{font-size:28px;font-weight:800;color:#15803D;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .card .lab{font-size:12px;color:#8A8378;margin-top:4px}
+  .card .raw{font-size:10.5px;color:#B3AC9E;margin-top:2px}
+  .card.hl{background:#15803D;border-color:#15803D}
+  .card.hl .num,.card.hl .lab{color:#fff}
+  .card.hl .raw{color:rgba(255,255,255,.72)}
+  .rates{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .rate{background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:12px 14px;display:flex;align-items:baseline;gap:8px}
+  .rate b{font-size:20px;font-weight:800;color:#15803D;font-variant-numeric:tabular-nums}
+  .rate span{font-size:12px;color:#8A8378}
+  .brief{margin-top:14px;background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:16px}
+  .brief h2,.fb h2,.sum h2{font-size:15px;font-weight:700;margin-bottom:10px}
+  .brief p{font-size:14px;line-height:1.9;color:#374151}
+  .brief b{color:#15803D}
+  .fb{margin-top:14px;background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:16px}
+  .fb .cnt{font-size:12.5px;color:#8A8378;margin-bottom:10px}
+  .q{margin-bottom:12px}
+  .q:last-child{margin-bottom:0}
+  .q .qt{font-size:13px;font-weight:700;color:#374151;margin-bottom:6px}
+  .bar{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .bar .track{flex:1;height:8px;border-radius:4px;background:#F3F1EA;overflow:hidden}
+  .bar .fill{height:100%;border-radius:4px;background:#15803D}
+  .bar .fill.gray{background:#C9C3B6}
+  .bar .ol{font-size:11.5px;color:#4A463F;white-space:nowrap;min-width:72px;text-align:right;font-variant-numeric:tabular-nums}
+  .sum{margin-top:14px;background:#15803D;border-radius:16px;padding:18px 16px}
+  .sum h2{color:#fff}
+  .sum p{font-size:14px;line-height:1.9;color:rgba(255,255,255,.92)}
+  .sum b{color:#FDE68A}
+  .tip{margin-top:14px;text-align:center;font-size:11.5px;color:#B3AC9E;line-height:1.8}
+  .err{display:none;margin-top:14px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:12px;font-size:13px;color:#9A3412}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="dot"></span>亿成公考 · 数据看板</h1>
+  <div class="sub" id="updated">数据加载中…</div>
+
+  <div class="grid" id="cards"></div>
+  <div class="rates" id="rates"></div>
+
+  <div class="brief">
+    <h2>今日简报</h2>
+    <p id="briefText">—</p>
+  </div>
+
+  <div class="fb">
+    <h2>问卷反馈</h2>
+    <div class="cnt" id="fbCnt"></div>
+    <div id="fbGrid"></div>
+  </div>
+
+  <div class="sum">
+    <h2>一句话总结</h2>
+    <p id="sumText">—</p>
+  </div>
+
+  <div class="tip">想像 App 一样打开？<br>iPhone：Safari 打开本页 → 分享 → 添加到主屏幕<br>安卓：浏览器菜单 → 添加到桌面</div>
+  <div class="err" id="err">数据暂时没取到，稍后再打开试试；也可以直接问小林。</div>
+</div>
+
+<script>
+(function(){
+  var METRICS_URL = 'https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json';
+  var FB_KEY = 'ycgk-fb-v1';
+  var FB_GET = ['https://textdb.online/' + FB_KEY, 'https://textdb.dev/api/data/' + FB_KEY];
+  var OPTS = [
+    {k:'a1', q:'总体感受',      o:['非常好','还不错','一般','不太好']},
+    {k:'a2', q:'刷题量节奏',    o:['偏多','刚好','偏少']},
+    {k:'a3', q:'网络速度',      o:['很快','一般','较慢','经常加载失败']},
+    {k:'a4', q:'资料提取速度',  o:['很快','一般','较慢','还没用过']},
+    {k:'a5', q:'题目质量',      o:['没发现问题','发现少量','发现较多']},
+    {k:'a6', q:'遇到 bug',      o:['没有','偶尔有','经常有']}
+  ];
+  function el(id){return document.getElementById(id)}
+  function pct(a,b){ if(!b) return '—'; return (a/b*100).toFixed(1).replace(/\.0$/,'')+'%'; }
+
+  fetch(METRICS_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(m){
+    renderMetrics(m); loadFb();
+  }).catch(function(){ el('err').style.display='block'; el('updated').textContent='数据没取到'; });
+
+  function renderMetrics(m){
+    var t=(m.corrected&&m.corrected.totals)||{}, raw=m.totals||{};
+    var open=t.open||0, start=t.start||0, mat=t.materials||0, guide=t.guide||0;
+    el('updated').textContent='更新于 '+(m.updated_at||'').replace('T',' ').slice(5,16)+' · 今天 '+ (m.today_uv||0) +' 台设备打开';
+    var cards=[
+      {n:open, l:'累计打开（校正）', raw:'原始 '+raw.open, hl:true},
+      {n:m.today_uv||0, l:'今日独立设备'},
+      {n:start, l:'开始刷题（校正）', raw:'原始 '+raw.start},
+      {n:mat, l:'领资料点击（校正）', raw:'原始 '+raw.materials}
+    ];
+    el('cards').innerHTML=cards.map(function(c){
+      return '<div class="card'+(c.hl?' hl':'')+'"><div class="num">'+c.n+'</div><div class="lab">'+c.l+'</div>'+(c.raw!=null?'<div class="raw">'+c.raw+'</div>':'')+'</div>';
+    }).join('');
+    el('rates').innerHTML=
+      '<div class="rate"><b>'+pct(start,open)+'</b><span>刷题转化率</span></div>'+
+      '<div class="rate"><b>'+pct(mat,open)+'</b><span>领资料转化率</span></div>';
+    var days=m.days||[], today=days[days.length-1]||{};
+    var mainAct = mat>start ? '领资料' : '开始刷题';
+    el('briefText').innerHTML='今天已有 <b>'+(m.today_uv||0)+'</b> 台设备打开，累计打开 <b>'+open+'</b> 次，其中 <b>'+start+'</b> 次开始刷题、<b>'+mat+'</b> 次领资料。大家进来后最主要在做的动作是「<b>'+mainAct+'</b>」。';
+    el('sumText').innerHTML='流量在涨、领资料最热，<b>刷题转化是下一步的关键</b>：把针对性刷题、按考试分类和难度选择用起来，让领资料的同学留下来刷题。';
+  }
+
+  function loadFb(){
+    var done=false;
+    FB_GET.forEach(function(u){
+      fetch(u,{cache:'no-store'}).then(function(r){return r.text()}).then(function(txt){
+        if(done) return;
+        var d=JSON.parse(txt);
+        if(d&&d.list){done=true; renderFb(d.list);}
+      }).catch(function(){});
+    });
+    setTimeout(function(){ if(!done){ el('fbCnt').textContent='问卷数据暂时没取到，稍后刷新再试。'; } },8000);
+  }
+
+  function renderFb(list){
+    var rows=list.filter(function(x){return x&&x.values&&x.values.a1&&x.values.a1.indexOf('测试')<0;});
+    var n=rows.length;
+    el('fbCnt').textContent='有效问卷 '+n+' 份 · 内测链路测试记录已剔除';
+    if(!n){ el('fbGrid').innerHTML='<div class="cnt">还没有有效问卷反馈。</div>'; return; }
+    el('fbGrid').innerHTML=OPTS.map(function(qd){
+      var counts=qd.o.map(function(){return 0});
+      rows.forEach(function(r){ var v=r.values[qd.k]; var i=qd.o.indexOf(v); if(i>=0) counts[i]++; });
+      var max=Math.max.apply(null,counts)||1;
+      return '<div class="q"><div class="qt">'+qd.q+'</div>'+qd.o.map(function(o,i){
+        var w=Math.round(counts[i]/max*100);
+        return '<div class="bar"><div class="track"><div class="fill'+(counts[i]?'':' gray')+'" style="width:'+w+'%"></div></div><div class="ol">'+o+' '+counts[i]+'</div></div>';
+      }).join('')+'</div>';
+    }).join('');
+  }
+})();
+</script>
+</body>
+</html>
