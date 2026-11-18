@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亿成公考实时数据大屏</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,'Noto Sans CJK SC',sans-serif;background:#0B1220;color:#E2E8F0;font-size:16px;line-height:1.6}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:6px 4px 14px;border-bottom:1px solid rgba(148,163,184,.18)}
+.brand{display:flex;align-items:baseline;gap:14px}
+h1{font-size:22px;font-weight:800;letter-spacing:.02em;color:#F8FAFC}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4ADE80}
+.live i{width:8px;height:8px;border-radius:50%;background:#4ADE80;display:inline-block;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.clock{font-size:26px;font-weight:800;color:#7DD3FC;font-variant-numeric:tabular-nums}
+.cd{display:flex;align-items:baseline;gap:10px}
+.cd .num{font-size:34px;font-weight:900;color:#FBBF24;font-variant-numeric:tabular-nums}
+.cd .lab{font-size:12px;color:rgba(226,232,240,.6)}
+.meta{font-size:12px;color:rgba(226,232,240,.55)}
+.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin:16px 0}
+.kpi{background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.16);border-radius:14px;padding:14px 16px}
+.kpi .n{font-size:34px;font-weight:900;color:#F8FAFC;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .t{font-size:12.5px;color:rgba(226,232,240,.65);margin-top:2px}
+.kpi.hl .n{color:#4ADE80}
+.kpi.cy .n{color:#7DD3FC}
+.kpi.am .n{color:#FBBF24}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.15);border-radius:16px;padding:16px 18px;min-width:0}
+.card.w2{grid-column:span 2}
+h2{font-size:15px;font-weight:800;color:#F1F5F9;letter-spacing:.02em}
+.sub{font-size:12px;color:rgba(226,232,240,.55);margin:2px 0 12px}
+.brow{margin:8px 0}
+.bl{font-size:13px;font-weight:600;color:#CBD5E1}
+.bt{display:flex;align-items:center;gap:10px;margin-top:3px}
+.btrack{flex:1;height:12px;background:rgba(148,163,184,.15);border-radius:99px;overflow:hidden}
+.bfill{height:100%;background:#38BDF8;border-radius:99px}
+.bfill.lt{background:#818CF8}
+.bv{font-weight:800;font-size:13px;min-width:30px;text-align:right;color:#F8FAFC;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:rgba(226,232,240,.6)}
+.lg{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.hgrid{display:flex;align-items:flex-end;gap:4px;height:120px}
+.hcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.hbar-wrap{flex:1;display:flex;align-items:flex-end}
+.hbar{width:100%;background:linear-gradient(180deg,#38BDF8,#1D4ED8);border-radius:3px 3px 0 0}
+.hlab{font-size:9px;color:rgba(226,232,240,.5);text-align:center;margin-top:4px}
+.bignum{font-size:40px;font-weight:900;color:#FBBF24;font-variant-numeric:tabular-nums}
+.bankrow{display:flex;gap:20px;flex-wrap:wrap}
+.bankcol{flex:1;min-width:200px}
+.tag{display:inline-block;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#7DD3FC;font-size:12.5px;padding:2px 10px;border-radius:99px;margin:3px 6px 3px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-weight:600;color:rgba(226,232,240,.65);text-align:left;padding:6px;border-bottom:1px solid rgba(148,163,184,.2)}
+td{padding:6px;border-bottom:1px solid rgba(148,163,184,.1);font-variant-numeric:tabular-nums}
+li{margin:6px 0;padding-left:4px;list-style:none;font-size:13.5px;color:#CBD5E1}
+.muted{color:rgba(226,232,240,.5)}
+.fbgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.fbmini{background:rgba(148,163,184,.08);border-radius:10px;padding:10px 12px;text-align:center}
+.fbmini .n{font-size:24px;font-weight:900;color:#F8FAFC}
+.fbmini .t{font-size:11.5px;color:rgba(226,232,240,.6)}
+.foot{margin-top:14px;font-size:11.5px;color:rgba(226,232,240,.45);line-height:1.7}
+.badgeimg{height:20px;vertical-align:middle;border-radius:3px;min-width:60px;background:rgba(148,163,184,.12)}
+.judge{font-size:14.5px;color:#FDE68A;margin:10px 4px 2px}
+.onlinebadge{margin-top:6px;font-size:11px;color:rgba(226,232,240,.5)}
+.rrow{display:flex;align-items:center;gap:8px;margin:5px 0}
+.rmedal{width:26px;text-align:center;font-size:15px;flex:none}
+.rnum{font-size:12px;font-weight:800;color:rgba(226,232,240,.7)}
+.rname{font-size:13px;font-weight:700;color:#F1F5F9;flex:none}
+.rtrack{flex:1;height:10px;background:rgba(148,163,184,.15);border-radius:99px;overflow:hidden}
+.rfill{height:100%;background:linear-gradient(90deg,#FBBF24,#F59E0B);border-radius:99px}
+.rval{font-size:11.5px;color:#CBD5E1;flex:none;font-variant-numeric:tabular-nums}
+.rempty{font-size:13px;color:rgba(226,232,240,.5);padding:14px 0;text-align:center}
+@media (prefers-reduced-motion: reduce){.live i{animation:none}}
+
+html,body{width:100%;height:100%;overflow:hidden}
+#stage{position:fixed;left:0;top:0;width:100%;height:100%;padding:14px 24px 16px;display:flex;flex-direction:column;overflow:hidden}
+#stage .top{padding:2px 4px 10px;flex:none}
+#stage h1{font-size:24px}
+#stage .clock{font-size:24px}
+#stage .cd .num{font-size:28px}
+#stage .kpis{gap:10px;margin:10px 0;flex:none}
+#stage .kpi{padding:8px 14px;border-radius:12px}
+#stage .kpi .n{font-size:27px}
+#stage .kpi .t{font-size:12px}
+#stage .judge{font-size:13px;margin:2px 2px 8px;flex:none}
+#stage .grid{flex:1;min-height:0;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(0,1fr);gap:10px}
+#stage .card{padding:10px 14px;overflow:hidden;border-radius:14px}
+#stage h2{font-size:14.5px}
+#stage .sub{font-size:11px;margin:2px 0 6px}
+#stage .brow{margin:4px 0}
+#stage .bl{font-size:12px}
+#stage .btrack{height:10px}
+#stage .bv{font-size:12px;min-width:26px}
+#stage .hgrid{height:96px}
+#stage #trend svg{height:140px;width:100%}
+#stage .bignum{font-size:30px}
+#stage table{font-size:11.5px}
+#stage th{padding:3px 6px}
+#stage td{padding:3px 6px}
+#stage li{font-size:12px;margin:4px 0}
+#stage .fbmini{padding:6px 10px}
+#stage .fbmini .n{font-size:20px}
+#stage .fbmini .t{font-size:10.5px}
+#stage .foot{margin-top:8px;font-size:10.5px}
+#stage .rrow{margin:4px 0}
+#stage .rname{font-size:12.5px}
+#stage .rval{font-size:11px}
+#stage .rempty{padding:8px 0}
+@media (max-width:1100px){
+  #stage{padding:12px 16px 14px}
+  #stage .kpis{grid-template-columns:repeat(4,1fr)}
+  #stage .grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:640px){
+  #stage .kpis{grid-template-columns:repeat(2,1fr)}
+  #stage .grid{grid-template-columns:1fr}
+  #stage .card.w2{grid-column:auto}
+}
+</style>
+</head>
+<body data-visualization-style="finance-business">
+<div id="stage">
+
+  <div class="top">
+    <div class="brand">
+      <h1>亿成公考 · 实时数据大屏</h1>
+      <span class="live"><i></i>实时刷新中</span>
+      <span class="clock" id="clock">--:--:--</span>
+    </div>
+    <div class="cd">
+      <span class="lab">距 27 国考笔试</span>
+      <span class="num"><span id="cdDays">--</span><small style="font-size:16px">天</small> <span id="cdTime">--:--:--</span></span>
+    </div>
+    <div class="meta">数据更新于 <span id="updatedAt">…</span> · 每 30 秒自动拉取 · 页面打开期间持续刷新</div>
+  </div>
+
+  <p class="judge" id="judge"></p>
+
+  <div class="kpis">
+    <div class="kpi hl"><div class="n" id="kOnline">…</div><div class="t">当前在线（人）</div><div class="onlinebadge"><img id="onlineBadge" class="badgeimg" alt="实时在线读数" src=""><div>实时读数 · 含本看板</div></div></div>
+    <div class="kpi cy"><div class="n" id="kOpen">…</div><div class="t">累计打开（校正）</div></div>
+    <div class="kpi"><div class="n" id="kUv">…</div><div class="t">独立设备（累计）</div></div>
+    <div class="kpi am"><div class="n" id="kStart">…</div><div class="t">开始刷题（次）</div></div>
+    <div class="kpi"><div class="n" id="kMat">…</div><div class="t">领资料点击</div></div>
+    <div class="kpi"><div class="n" id="kShare">…</div><div class="t">分享 / 复制链接</div></div>
+    <div class="kpi"><div class="n" id="kRefin">…</div><div class="t">经邀请进入（人）</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card w2">
+      <h2>每日趋势</h2>
+      <div class="sub">最近 10 天 · 柱=打开次数，线=独立设备</div>
+      <div id="trend"></div>
+    </div>
+    <div class="card">
+      <h2>24 小时活跃分布</h2>
+      <div class="sub">哪个时段有人在用</div>
+      <div id="hours"></div>
+    </div>
+
+    <div class="card">
+      <h2>设备分布</h2>
+      <div class="sub">手机 / 平板 / 电脑（一次性识别）</div>
+      <div id="devices"></div>
+      <div class="sub" style="margin-top:8px">安装动作</div>
+      <div id="install"></div>
+    </div>
+    <div class="card">
+      <h2>题库家底</h2>
+      <div class="sub">截至 2026-11-19</div>
+      <div class="bankrow">
+        <div class="bankcol">
+          <div class="bignum" id="bankTotal">…</div>
+          <div class="sub">总题数 · 人均可刷 <span id="bankPer">…</span> 题</div>
+          <div id="bankModules"></div>
+        </div>
+        <div class="bankcol">
+          <div class="sub">难度分布</div>
+          <div id="bankDiffs"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>刷题排行榜</h2>
+      <div class="sub">匿名名次 · 每满 100 题升一档</div>
+      <div id="rank"></div>
+      <div class="sub" style="margin-top:8px">目前刷得最多的同学</div>
+      <div class="bignum" style="font-size:26px" id="rankTop">…</div>
+    </div>
+
+    <div class="card w2">
+      <h2>分享与邀请</h2>
+      <div class="sub">2026-11-18 晚上线 · 校正后累计</div>
+      <div id="share"></div>
+    </div>
+    <div class="card">
+      <h2>每日明细</h2>
+      <div class="sub">设备为当日去重 · 其余为当日增量</div>
+      <table id="daily"></table>
+    </div>
+
+    <div class="card w2">
+      <h2>内测用户意见（总结）</h2>
+      <div class="sub">实时读取问卷云端 · 已按主次归纳</div>
+      <div class="fbgrid">
+        <div class="fbmini"><div class="n" id="fbTotal">…</div><div class="t">有效问卷</div></div>
+        <div class="fbmini"><div class="n" id="fbPraise">…</div><div class="t">好评（非常好/还不错）</div></div>
+        <div class="fbmini"><div class="n" id="fbIssue">…</div><div class="t">提到问题 / bug</div></div>
+        <div class="fbmini"><div class="n" id="fbRec">…</div><div class="t">「肯定会推荐」</div></div>
+      </div>
+      <div class="sub">最想优先补充的题</div>
+      <div id="fbWant"></div>
+      <div class="sub" style="margin-top:6px">备考类型</div>
+      <div id="fbExam"></div>
+      <div class="sub" style="margin-top:6px">意见原文（最新 3 条）</div>
+      <ul id="fbQuotes"></ul>
+    </div>
+    <div class="card">
+      <h2>数据口径</h2>
+      <ul>
+        <li>「校正」= 原始计数减去自查读数膨胀。</li>
+        <li>在线人数按分钟心跳统计，含打开本看板的设备。</li>
+        <li>在线、24小时活跃、平板、刷题段位 2026-11-19 起计数，学生端更新后逐步累积。</li>
+        <li>刷题排行榜为匿名段位名次（每满 100 题升一档），不收集任何个人信息，显示为同学A/B/C…。</li>
+        <li>学生端逐题作答明细存在各自手机本地，无法远程读取。</li>
+        <li>计数服务为免费第三方，失效时显示最近快照。</li>
+      </ul>
+      <div class="foot">数据来源：metrics 每小时自动采集 + 问卷云端 · 亿成公考</div>
+    </div>
+  </div>
+
+</div>
+<script>
+
+var STATS = {"updated_at": "2026-11-19T02:30:25+08:00", "totals": {"open": 446, "start": 19, "guide": 19, "materials": 158, "share": 8, "sharecopy": 6, "refin": 13, "refstudy": 6, "refreturn": 9, "dev_ios": 11, "dev_android": 9, "dev_pc": 9, "installed": 7, "wlshow": 28, "wlok": 13, "genter": 6, "gvisit": 11, "gcopy": 5, "gdev_ios": 7, "gdev_android": 4, "gdev_pc": 5, "gdevdone": 4, "feedback": 7, "welcomeSeen": 4, "devdone": 4, "refsess": 4, "refClaimed": 4, "refDone": 4, "refinDone": 4, "shareCode": 4, "dev_tablet": 2, "ans_t10": 3, "ans_t50": 3, "ans_t100": 2, "ans_t500": 2, "ans_t1000": 2, "ans_t5000": 2, "hr_00": 2, "hr_01": 2, "hr_02": 3, "hr_03": 2, "hr_04": 2, "hr_05": 2, "hr_06": 2, "hr_07": 2, "hr_08": 2, "hr_09": 2, "hr_10": 2, "hr_11": 2, "hr_12": 2, "hr_13": 2, "hr_14": 2, "hr_15": 2, "hr_16": 2, "hr_17": 2, "hr_18": 2, "hr_19": 2, "hr_20": 2, "hr_21": 2, "hr_22": 2, "hr_23": 2, "lvl_1": 1, "lvl_2": 1, "lvl_3": 1, "lvl_4": 1, "lvl_5": 1, "lvl_6": 1, "lvl_7": 1, "lvl_8": 1, "lvl_9": 1, "lvl_10": 1, "lvl_11": 1, "lvl_12": 1, "lvl_13": 1, "lvl_14": 1, "lvl_15": 1, "lvl_16": 1, "lvl_17": 1, "lvl_18": 1, "lvl_19": 1, "lvl_20": 1, "lvl_21": 1, "lvl_22": 1, "lvl_23": 1, "lvl_24": 1, "lvl_25": 1, "lvl_26": 1, "lvl_27": 1, "lvl_28": 1, "lvl_29": 1, "lvl_30": 1, "lvl_31": 1, "lvl_32": 1, "lvl_33": 1, "lvl_34": 1, "lvl_35": 1, "lvl_36": 1, "lvl_37": 1, "lvl_38": 1, "lvl_39": 1, "lvl_40": 1, "lvl_41": 1, "lvl_42": 1, "lvl_43": 1, "lvl_44": 1, "lvl_45": 1, "lvl_46": 1, "lvl_47": 1, "lvl_48": 1, "lvl_49": 1}, "corrected": {"totals": {"open": 430, "start": 3, "guide": 3, "materials": 144, "share": 3, "sharecopy": 1, "refin": 8, "refstudy": 1, "refreturn": 4, "dev_ios": 6, "dev_android": 4, "dev_pc": 4, "installed": 2, "wlshow": 23, "wlok": 8, "genter": 2, "gvisit": 7, "gcopy": 1, "gdev_ios": 3, "gdev_android": 0, "gdev_pc": 1, "gdevdone": 0, "feedback": 3, "welcomeSeen": 0, "devdone": 0, "refsess": 0, "refClaimed": 0, "refDone": 0, "refinDone": 0, "shareCode": 0, "dev_tablet": 0, "ans_t10": 1, "ans_t50": 1, "ans_t100": 0, "ans_t500": 0, "ans_t1000": 0, "ans_t5000": 0, "hr_00": 0, "hr_01": 0, "hr_02": 1, "hr_03": 0, "hr_04": 0, "hr_05": 0, "hr_06": 0, "hr_07": 0, "hr_08": 0, "hr_09": 0, "hr_10": 0, "hr_11": 0, "hr_12": 0, "hr_13": 0, "hr_14": 0, "hr_15": 0, "hr_16": 0, "hr_17": 0, "hr_18": 0, "hr_19": 0, "hr_20": 0, "hr_21": 0, "hr_22": 0, "hr_23": 0, "lvl_1": 0, "lvl_2": 0, "lvl_3": 0, "lvl_4": 0, "lvl_5": 0, "lvl_6": 0, "lvl_7": 0, "lvl_8": 0, "lvl_9": 0, "lvl_10": 0, "lvl_11": 0, "lvl_12": 0, "lvl_13": 0, "lvl_14": 0, "lvl_15": 0, "lvl_16": 0, "lvl_17": 0, "lvl_18": 0, "lvl_19": 0, "lvl_20": 0, "lvl_21": 0, "lvl_22": 0, "lvl_23": 0, "lvl_24": 0, "lvl_25": 0, "lvl_26": 0, "lvl_27": 0, "lvl_28": 0, "lvl_29": 0, "lvl_30": 0, "lvl_31": 0, "lvl_32": 0, "lvl_33": 0, "lvl_34": 0, "lvl_35": 0, "lvl_36": 0, "lvl_37": 0, "lvl_38": 0, "lvl_39": 0, "lvl_40": 0, "lvl_41": 0, "lvl_42": 0, "lvl_43": 0, "lvl_44": 0, "lvl_45": 0, "lvl_46": 0, "lvl_47": 0, "lvl_48": 0, "lvl_49": 0}, "uv": {"20261119": 4, "20261118": 80}}, "today_uv": 8, "online_now": 2, "online_at": "202611190229", "days": [{"date": "2026-11-17", "uv": 28, "open": 50, "start": 5, "guide": 5, "materials": 34, "share": null, "sharecopy": null, "refin": null, "refstudy": null, "refreturn": null, "dev_ios": null, "dev_android": null, "dev_pc": null, "installed": null, "wlshow": null, "wlok": null, "genter": null, "gvisit": null, "gcopy": null, "gdev_ios": null, "gdev_android": null, "gdev_pc": null, "gdevdone": null, "feedback": null, "welcomeSeen": null, "devdone": null, "refsess": null, "refClaimed": null, "refDone": null, "refinDone": null, "shareCode": null, "dev_tablet": null, "ans_t10": null, "ans_t50": null, "ans_t100": null, "ans_t500": null, "ans_t1000": null, "ans_t5000": null, "hr_00": null, "hr_01": null, "hr_02": null, "hr_03": null, "hr_04": null, "hr_05": null, "hr_06": null, "hr_07": null, "hr_08": null, "hr_09": null, "hr_10": null, "hr_11": null, "hr_12": null, "hr_13": null, "hr_14": null, "hr_15": null, "hr_16": null, "hr_17": null, "hr_18": null, "hr_19": null, "hr_20": null, "hr_21": null, "hr_22": null, "hr_23": null, "lvl_1": null, "lvl_2": null, "lvl_3": null, "lvl_4": null, "lvl_5": null, "lvl_6": null, "lvl_7": null, "lvl_8": null, "lvl_9": null, "lvl_10": null, "lvl_11": null, "lvl_12": null, "lvl_13": null, "lvl_14": null, "lvl_15": null, "lvl_16": null, "lvl_17": null, "lvl_18": null, "lvl_19": null, "lvl_20": null, "lvl_21": null, "lvl_22": null, "lvl_23": null, "lvl_24": null, "lvl_25": null, "lvl_26": null, "lvl_27": null, "lvl_28": null, "lvl_29": null, "lvl_30": null, "lvl_31": null, "lvl_32": null, "lvl_33": null, "lvl_34": null, "lvl_35": null, "lvl_36": null, "lvl_37": null, "lvl_38": null, "lvl_39": null, "lvl_40": null, "lvl_41": null, "lvl_42": null, "lvl_43": null, "lvl_44": null, "lvl_45": null, "lvl_46": null, "lvl_47": null, "lvl_48": null, "lvl_49": null}, {"date": "2026-11-18", "uv": 94, "open": 390, "start": 11, "guide": 11, "materials": 121, "share": 5, "sharecopy": 3, "refin": 10, "refstudy": 3, "refreturn": 6, "dev_ios": 7, "dev_android": 6, "dev_pc": 6, "installed": 3, "wlshow": 23, "wlok": 8, "genter": null, "gvisit": null, "gcopy": null, "gdev_ios": null, "gdev_android": null, "gdev_pc": null, "gdevdone": null, "feedback": null, "welcomeSeen": null, "devdone": null, "refsess": null, "refClaimed": null, "refDone": null, "refinDone": null, "shareCode": null, "dev_tablet": null, "ans_t10": null, "ans_t50": null, "ans_t100": null, "ans_t500": null, "ans_t1000": null, "ans_t5000": null, "hr_00": null, "hr_01": null, "hr_02": null, "hr_03": null, "hr_04": null, "hr_05": null, "hr_06": null, "hr_07": null, "hr_08": null, "hr_09": null, "hr_10": null, "hr_11": null, "hr_12": null, "hr_13": null, "hr_14": null, "hr_15": null, "hr_16": null, "hr_17": null, "hr_18": null, "hr_19": null, "hr_20": null, "hr_21": null, "hr_22": null, "hr_23": null, "lvl_1": null, "lvl_2": null, "lvl_3": null, "lvl_4": null, "lvl_5": null, "lvl_6": null, "lvl_7": null, "lvl_8": null, "lvl_9": null, "lvl_10": null, "lvl_11": null, "lvl_12": null, "lvl_13": null, "lvl_14": null, "lvl_15": null, "lvl_16": null, "lvl_17": null, "lvl_18": null, "lvl_19": null, "lvl_20": null, "lvl_21": null, "lvl_22": null, "lvl_23": null, "lvl_24": null, "lvl_25": null, "lvl_26": null, "lvl_27": null, "lvl_28": null, "lvl_29": null, "lvl_30": null, "lvl_31": null, "lvl_32": null, "lvl_33": null, "lvl_34": null, "lvl_35": null, "lvl_36": null, "lvl_37": null, "lvl_38": null, "lvl_39": null, "lvl_40": null, "lvl_41": null, "lvl_42": null, "lvl_43": null, "lvl_44": null, "lvl_45": null, "lvl_46": null, "lvl_47": null, "lvl_48": null, "lvl_49": null}, {"date": "2026-11-19", "uv": 8, "open": 6, "start": 3, "guide": 3, "materials": 3, "share": 3, "sharecopy": 3, "refin": 3, "refstudy": 3, "refreturn": 3, "dev_ios": 4, "dev_android": 3, "dev_pc": 3, "installed": 4, "wlshow": 5, "wlok": 5, "genter": 3, "gvisit": 3, "gcopy": 3, "gdev_ios": 3, "gdev_android": 3, "gdev_pc": 3, "gdevdone": 3, "feedback": 3, "welcomeSeen": 3, "devdone": 3, "refsess": 3, "refClaimed": 3, "refDone": 3, "refinDone": 3, "shareCode": 3, "dev_tablet": 2, "ans_t10": 3, "ans_t50": 3, "ans_t100": 2, "ans_t500": 2, "ans_t1000": 2, "ans_t5000": 2, "hr_00": 2, "hr_01": 2, "hr_02": 3, "hr_03": 2, "hr_04": 2, "hr_05": 2, "hr_06": 2, "hr_07": 2, "hr_08": 2, "hr_09": 2, "hr_10": 2, "hr_11": 2, "hr_12": 2, "hr_13": 2, "hr_14": 2, "hr_15": 2, "hr_16": 2, "hr_17": 2, "hr_18": 2, "hr_19": 2, "hr_20": 2, "hr_21": 2, "hr_22": 2, "hr_23": 2, "lvl_1": 1, "lvl_2": 1, "lvl_3": 1, "lvl_4": 1, "lvl_5": 1, "lvl_6": 1, "lvl_7": 1, "lvl_8": 1, "lvl_9": 1, "lvl_10": 1, "lvl_11": 1, "lvl_12": 1, "lvl_13": 1, "lvl_14": 1, "lvl_15": 1, "lvl_16": 1, "lvl_17": 1, "lvl_18": 1, "lvl_19": 1, "lvl_20": 1, "lvl_21": 1, "lvl_22": 1, "lvl_23": 1, "lvl_24": 1, "lvl_25": 1, "lvl_26": 1, "lvl_27": 1, "lvl_28": 1, "lvl_29": 1, "lvl_30": 1, "lvl_31": 1, "lvl_32": 1, "lvl_33": 1, "lvl_34": 1, "lvl_35": 1, "lvl_36": 1, "lvl_37": 1, "lvl_38": 1, "lvl_39": 1, "lvl_40": 1, "lvl_41": 1, "lvl_42": 1, "lvl_43": 1, "lvl_44": 1, "lvl_45": 1, "lvl_46": 1, "lvl_47": 1, "lvl_48": 1, "lvl_49": 1}]};
+var FB = {"questions": [{"key": "a1", "title": "总体使用感受", "opts": ["非常好", "还不错", "一般", "不太好"]}, {"key": "a2", "title": "每天刷题的量（节奏）", "opts": ["偏多", "刚好", "偏少"]}, {"key": "a3", "title": "打开和刷题的网络速度", "opts": ["很快", "一般", "较慢", "经常加载失败"]}, {"key": "a4", "title": "资料 / 文件提取速度", "opts": ["很快", "一般", "较慢", "还没用过"]}, {"key": "a5", "title": "题目质量（错题、答案问题）", "opts": ["没发现问题", "发现少量", "发现较多"]}, {"key": "a6", "title": "使用中有没有 bug", "opts": ["没有", "偶尔有", "经常有"]}, {"key": "a7", "title": "在备考哪类考试", "opts": ["国考", "省考", "事业编", "军队文职", "教师编", "医疗编", "三支一扶"]}, {"key": "a8", "title": "最常用的功能", "opts": ["专项刷题", "整套卷子", "错题本", "速算特训", "领资料"]}, {"key": "a9", "title": "最希望优先补充的题", "opts": ["图形推理", "资料分析", "言语理解", "判断推理", "数量关系", "常识"]}, {"key": "a10", "title": "会推荐给同学吗", "opts": ["肯定会", "可能会", "不好说"]}], "list": [{"ts": 1794962965442, "a1": "非常好", "a2": "偏多", "a3": "很快", "a4": "很快", "a5": "没发现问题", "a6": "没有", "other": "内测链路测试，可忽略"}, {"ts": 1794963875114, "a1": "一般", "a2": "偏少", "a3": "较慢", "a4": "较慢", "a5": "发现少量", "a6": "偶尔有", "other": ""}, {"ts": 1795008606625, "a1": "还不错", "a2": "刚好", "a3": "较慢", "a4": "较慢", "a5": "发现少量", "a6": "偶尔有", "a7": "国考", "a8": "速算特训", "a9": "资料分析", "a10": "肯定会", "other": "有些题题目或者答案缺失"}, {"ts": 1795012971331, "a1": "非常好", "a2": "刚好", "a3": "很快", "a4": "一般", "a5": "没发现问题", "a6": "偶尔有", "a7": "国考", "a8": "专项刷题", "a9": "言语理解", "a10": "肯定会", "other": ""}]};
+var BANK = {"total": 21197, "asof": "2026-11-19", "modules": [["常识", 9025], ["言语理解", 4160], ["数量关系", 3760], ["判断推理", 1000], ["图形推理", 1235], ["资料分析", 2017]], "diffs": [["简单", 3674], ["中等", 5990], ["困难", 2570], ["暂未标注", 8963]]};
+var METRICS_URL = 'https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json';
+var FB_URL = 'https://textdb.online/ycgk-fb-v1/';
+var EXAM_AT = new Date('2026-11-29T09:00:00+08:00');
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function el(id){return document.getElementById(id);}
+function txt(id,v){var n=el(id); if(n) n.textContent=v;}
+function pct(a,b){return b>0?(a/b*100).toFixed(1)+'%':'—';}
+function barRow(label,value,max,cls,unit){
+  var w=max>0?Math.max(1.5,Math.round(value/max*100)):1.5;
+  return '<div class="brow"><div class="bl"><span>'+esc(label)+'</span></div>'+
+    '<div class="bt"><div class="btrack"><div class="bfill '+(cls||'')+'" style="width:'+w+'%"></div></div>'+
+    '<span class="bv">'+value+(unit||'')+'</span></div></div>';
+}
+function c(d){return (d.corrected&&d.corrected.totals)||{};}
+function cuv(d){return (d.corrected&&d.corrected.uv)||{};}
+function uvTotal(d){var u=cuv(d),t=0;Object.keys(u).forEach(function(k){t+=u[k];});return t;}
+
+/* 倒计时 + 时钟 */
+function tickClock(){
+  var n=new Date();
+  var hh=('0'+n.getHours()).slice(-2),mm=('0'+n.getMinutes()).slice(-2),ss=('0'+n.getSeconds()).slice(-2);
+  txt('clock',hh+':'+mm+':'+ss);
+  var diff=EXAM_AT-n;
+  if(diff<0)diff=0;
+  var days=Math.floor(diff/86400000);
+  var h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);
+  txt('cdDays',days);
+  txt('cdTime',('0'+h).slice(-2)+':'+('0'+m).slice(-2)+':'+('0'+s).slice(-2));
+}
+
+/* KPI */
+function renderKpis(d){
+  var k=c(d);
+  txt('kOnline',(d.online_now==null?'—':d.online_now));
+  txt('kOpen',k.open||0);
+  txt('kUv',uvTotal(d));
+  txt('kStart',k.start||0);
+  txt('kMat',k.materials||0);
+  txt('kShare',(k.shareCode||0)+(k.sharecopy||0));
+  txt('kRefin',k.refin||0);
+  var t=el('onlineBadge');
+  if(t){t.onerror=function(){this.style.visibility='hidden';};t.onload=function(){this.style.visibility='visible';};
+    var d0=new Date();var p=''+d0.getFullYear()+('0'+(d0.getMonth()+1)).slice(-2)+('0'+d0.getDate()).slice(-2)+('0'+d0.getHours()).slice(-2)+('0'+d0.getMinutes()).slice(-2);
+    t.src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.hb.'+p+'&r='+Date.now();}
+  txt('updatedAt',(d.updated_at||'').replace('T',' ').slice(0,16));
+}
+
+/* 每日趋势（SVG 柱 + 设备折线） */
+function renderTrend(d){
+  var days=(d.days||[]).slice(-10);
+  var W=600,H=160,pad=24;
+  if(!days.length){el('trend').textContent='暂无数据';return;}
+  var maxO=Math.max.apply(null,days.map(function(x){return x.open||0;}).concat([1]));
+  var maxU=Math.max.apply(null,days.map(function(x){return x.uv||0;}).concat([1]));
+  var bw=(W-pad*2)/days.length;
+  var s='';
+  days.forEach(function(x,i){
+    var h=(x.open||0)/maxO*(H-40);
+    s+='<rect x="'+(pad+i*bw+bw*0.18).toFixed(1)+'" y="'+(H-20-h).toFixed(1)+'" width="'+(bw*0.64).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="3" fill="url(#gO)"/>';
+    s+='<text x="'+(pad+i*bw+bw/2).toFixed(1)+'" y="'+(H-6)+'" fill="rgba(226,232,240,.55)" font-size="9" text-anchor="middle">'+x.date.slice(5)+'</text>';
+    s+='<text x="'+(pad+i*bw+bw/2).toFixed(1)+'" y="'+(H-26-h).toFixed(1)+'" fill="#7DD3FC" font-size="10" font-weight="700" text-anchor="middle">'+(x.open||0)+'</text>';
+  });
+  var pts=days.map(function(x,i){
+    var px=pad+i*bw+bw/2, py=H-20-((x.uv||0)/maxU*(H-40));
+    return px.toFixed(1)+','+py.toFixed(1);
+  });
+  s+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linejoin="round"/>';
+  days.forEach(function(x,i){
+    var px=pad+i*bw+bw/2, py=H-20-((x.uv||0)/maxU*(H-40));
+    s+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3" fill="#FBBF24"/>';
+  });
+  el('trend').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="auto" role="img" aria-label="每日打开与设备趋势"><defs><linearGradient id="gO" x2="0" y2="1"><stop offset="0" stop-color="#38BDF8"/><stop offset="1" stop-color="#1D4ED8"/></linearGradient></defs>'+s+'</svg>'+
+    '<div class="legend"><span class="lg"><i class="dot" style="background:#38BDF8"></i>打开次数</span><span class="lg"><i class="dot" style="background:#FBBF24"></i>独立设备</span></div>';
+}
+
+/* 24小时活跃分布 */
+function renderHours(d){
+  var k=c(d),max=1,vals=[];
+  for(var h=0;h<24;h++){var v=k['hr_'+('0'+h).slice(-2)]||0;vals.push(v);if(v>max)max=v;}
+  var s='';
+  vals.forEach(function(v,h){
+    var pctH=v/max*100;
+    s+='<div class="hcol"><div class="hbar-wrap"><div class="hbar" style="height:'+Math.max(2,pctH).toFixed(1)+'%"></div></div><div class="hlab">'+('0'+h).slice(-2)+'</div></div>';
+  });
+  el('hours').innerHTML='<div class="hgrid">'+s+'</div><div class="legend"><span class="lg">各时段打开次数（累计）· 目前仅 11-19 起计数</span></div>';
+}
+
+/* 设备分布 */
+function renderDevices(d){
+  var k=c(d);
+  var arr=[['iPhone',k.dev_ios||0],['安卓手机',k.dev_android||0],['平板',k.dev_tablet||0],['电脑',k.dev_pc||0]];
+  var max=Math.max.apply(null,arr.map(function(x){return x[1];}).concat([1]));
+  el('devices').innerHTML=arr.map(function(x){return barRow(x[0],x[1],max,'');}).join('');
+  var inst=[['以图标/独立窗口打开',k.installed||0],['应用内确认安装',k.devdone||0],['看到欢迎页',k.welcomeSeen||0]];
+  var imax=Math.max.apply(null,inst.map(function(x){return x[1];}).concat([1]));
+  el('install').innerHTML=inst.map(function(x){return barRow(x[0],x[1],imax,'lt');}).join('');
+}
+
+/* 题库家底 */
+function renderBank(){
+  txt('bankTotal',BANK.total);
+  el('bankModules').innerHTML=BANK.modules.map(function(x){return barRow(x[0],x[1],BANK.modules[0][1],'');}).join('');
+  el('bankDiffs').innerHTML=BANK.diffs.map(function(x,i){return barRow(x[0],x[1],Math.max.apply(null,BANK.diffs.map(function(y){return y[1];})),'lt');}).join('');
+  var uv=uvTotal(STATS);
+  txt('bankPer',uv>0?Math.floor(BANK.total/uv):'—');
+}
+
+/* 刷题排行榜（匿名段位名次：同学A/B/C…） */
+function renderRank(d){
+  var k=c(d);
+  var medals=['🥇','🥈','🥉'];
+  var names=['同学A','同学B','同学C','同学D','同学E','同学F','同学G','同学H'];
+  var rows=[];
+  for(var n=49;n>=1&&rows.length<8;n--){
+    var cnt=(k['lvl_'+n]||0)-((k['lvl_'+(n+1)])||0);
+    if(cnt>0)rows.push({n:n,cnt:cnt});
+  }
+  if(!rows.length){
+    el('rank').innerHTML='<div class="rempty">暂无上榜 · 学生端更新后开始计数</div>';
+    txt('rankTop','—');
+    return;
+  }
+  el('rank').innerHTML=rows.map(function(r,i){
+    var medal=i<3?medals[i]:('<span class="rnum">'+(i+1)+'</span>');
+    var w=Math.max(6,Math.round(r.n/49*100));
+    return '<div class="rrow"><div class="rmedal">'+medal+'</div><div class="rname">'+names[i]+'</div>'+
+      '<div class="rtrack"><div class="rfill" style="width:'+w+'%"></div></div>'+
+      '<div class="rval">≥'+(r.n*100)+'题 · '+r.cnt+'台</div></div>';
+  }).join('');
+  txt('rankTop','至少 '+(rows[0].n*100)+' 题');
+}
+
+/* 分享与邀请 */
+function renderShare(d){
+  var k=c(d);
+  var rows=[['打开分享弹层',k.share||0],['复制邀请链接',k.sharecopy||0],['生成分享码',k.shareCode||0],['经邀请链接进入',k.refin||0],['受邀开始刷题',k.refstudy||0],['受邀回访',k.refreturn||0],['受邀奖励领取',k.refClaimed||0],['受邀流程完成',k.refDone||0]];
+  var max=Math.max.apply(null,rows.map(function(x){return x[1];}).concat([1]));
+  el('share').innerHTML=rows.map(function(x,i){return barRow(x[0],x[1],max,i%2?'lt':'');}).join('');
+}
+
+/* 每日明细表 */
+function renderDaily(d){
+  var days=(d.days||[]).slice().reverse();
+  var head='<tr><th>日期</th><th>设备</th><th>打开</th><th>领资料</th><th>开始刷题</th><th>指南</th></tr>';
+  var rows=days.map(function(x){
+    return '<tr><td>'+x.date+'</td><td>'+(x.uv==null?'—':x.uv)+'</td><td>'+(x.open==null?'—':x.open)+'</td><td>'+
+      (x.materials==null?'—':x.materials)+'</td><td>'+(x.start==null?'—':x.start)+'</td><td>'+(x.guide==null?'—':x.guide)+'</td></tr>';
+  }).join('');
+  el('daily').innerHTML=head+rows;
+}
+
+/* 用户意见（总结版） */
+function renderFb(fb){
+  var list=(fb&&fb.list)||[];
+  var qs=fb.questions||[];
+  var real=list.filter(function(x){return !/内测/.test(x.other||'');});
+  var praise=real.filter(function(x){return x.a1==='非常好'||x.a1==='还不错';}).length;
+  var issues=real.filter(function(x){return (x.other||'').indexOf('缺失')>-1||(x.other||'').indexOf('bug')>-1||x.a5==='发现少量'||x.a5==='发现较多'||x.a6==='偶尔有'||x.a6==='经常有';}).length;
+  var recommend=real.filter(function(x){return x.a10==='肯定会';}).length;
+  txt('fbTotal',real.length);
+  txt('fbPraise',praise);
+  txt('fbIssue',issues);
+  txt('fbRec',recommend);
+  var quotes=real.filter(function(x){return (x.other||'').trim()&&!/内测/.test(x.other||'');})
+    .map(function(x){return x.other;});
+  el('fbQuotes').innerHTML=quotes.length?quotes.slice(0,3).map(function(q){return '<li>'+esc(q)+'</li>';}).join(''):'<li class="muted">暂无文字意见</li>';
+  var want={};
+  real.forEach(function(x){if(x.a9)want[x.a9]=(want[x.a9]||0)+1;});
+  var wk=Object.keys(want).sort(function(a,b){return want[b]-want[a];});
+  el('fbWant').innerHTML=wk.length?wk.slice(0,3).map(function(k){return '<span class="tag">'+esc(k)+' ×'+want[k]+'</span>';}).join(''):'<span class="muted">暂无</span>';
+  var exam={};
+  real.forEach(function(x){if(x.a7)exam[x.a7]=(exam[x.a7]||0)+1;});
+  var ek=Object.keys(exam).sort(function(a,b){return exam[b]-exam[a];});
+  el('fbExam').innerHTML=ek.length?ek.slice(0,3).map(function(k){return '<span class="tag">'+esc(k)+' ×'+exam[k]+'</span>';}).join(''):'<span class="muted">暂无</span>';
+}
+
+/* 一句话总结 */
+function renderJudge(d){
+  var k=c(d),u=cuv(d);
+  var uvMax=0;Object.keys(u).forEach(function(x){if(u[x]>uvMax)uvMax=u[x];});
+  txt('judge','流量在涨（单日最多 '+uvMax+' 台设备），但「领资料」多、「开始刷题」少——刷题转化是当前最大的洞，其次是安装引导完成率。');
+}
+
+function renderAll(d,fb){renderKpis(d);renderTrend(d);renderHours(d);renderDevices(d);renderBank();renderRank(d);renderShare(d);renderDaily(d);renderFb(fb);renderJudge(d);}
+
+renderAll(STATS,FB);
+tickClock();setInterval(tickClock,1000);
+
+function refreshMetrics(){
+  fetch(METRICS_URL).then(function(r){return r.json();}).then(function(d){STATS=d;renderKpis(d);renderTrend(d);renderHours(d);renderDevices(d);renderBank();renderRank(d);renderShare(d);renderDaily(d);renderJudge(d);}).catch(function(){});
+}
+function refreshFb(){
+  fetch(FB_URL).then(function(r){return r.json();}).then(function(d){if(d&&d.list){FB=d;renderFb({questions:FB.questions||[],list:d.list});}}).catch(function(){});
+}
+setInterval(refreshMetrics,30000);
+setInterval(refreshFb,300000);
+setInterval(function(){var t=el('onlineBadge');if(t){var d0=new Date();var p=''+d0.getFullYear()+('0'+(d0.getMonth()+1)).slice(-2)+('0'+d0.getDate()).slice(-2)+('0'+d0.getHours()).slice(-2)+('0'+d0.getMinutes()).slice(-2);t.src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.hb.'+p+'&r='+Date.now();}},60000);
+
+</script>
+</body>
+</html>
