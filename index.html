@@ -682,6 +682,9 @@ document.addEventListener('click', function(e){
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
+  /* 供邀请好友积分模块调用 */
+  window.getPoints = getPoints;
+  window.addPoints = addPoints;
 })();
 </script>
 <script>
@@ -1101,6 +1104,178 @@ document.addEventListener('click', function(e){
   var css=document.createElement("style");
   css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
   document.head.appendChild(css);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
+</script>
+<script>
+/* share & referral v1: 邀请好友得积分 */
+(function(){
+  var GET_URLS=["https://textdb.online/","https://textdb.dev/api/data/"];
+  function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function lsj(k){try{var v=ls(k);return v?JSON.parse(v):null}catch(e){return null}}
+  function lss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function myCode(){
+    var s=lsj("yicheng-gk-sync-v1");
+    if(s&&s.code)return s.code;
+    var c=ls("ycgk.shareCode");
+    if(!c){c="";for(var i=0;i<6;i++)c+=Math.floor(Math.random()*10);lss("ycgk.shareCode",c)}
+    return c;
+  }
+  function refKey(code){return "ycgkS1-ref-"+code}
+  function cloudGet(key,cb){
+    var done=0,got=false,err=null;
+    GET_URLS.forEach(function(u){
+      fetch(u+key,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+        if(t&&!got){got=true;cb(null,t)}
+        done++;if(done===GET_URLS.length&&!got)cb(err||new Error("网络不通"),null);
+      }).catch(function(e){err=e;done++;if(done===GET_URLS.length&&!got)cb(err,null)});
+    });
+  }
+  function cloudPut(key,val,cb){
+    var done=0,ok=false;
+    function fin(){done++;if(done===2)cb(ok?null:new Error("写入失败"))}
+    fetch("https://textdb.online/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val)).then(function(){fin()},function(){fin()});
+    fetch("https://textdb.dev/api/data/"+key,{method:"POST",headers:{"Content-Type":"text/plain"},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+  }
+  function parseN(t){var n=parseInt(String(t||"").trim(),10);return isNaN(n)?0:n}
+  function bumpRef(code,cb){
+    cloudGet(refKey(code),function(e,t){
+      var n=parseN(t)+1;
+      cloudPut(refKey(code),String(n),function(e2){cb&&cb(e2,n)});
+    });
+  }
+  function getRefCount(code,cb){
+    cloudGet(refKey(code),function(e,t){cb(null,parseN(t))});
+  }
+  /* 新访客带邀请链接进来：同一设备只记一次 */
+  function handleRef(){
+    try{
+      var q=new URLSearchParams(location.search);
+      var ref=q.get("ref");
+      if(!ref)return;
+      ref=ref.replace(/[^0-9]/g,"").slice(0,12);
+      if(!ref||ref===myCode())return;
+      if(ls("ycgk.refDone"))return;
+      lss("ycgk.refDone","1");
+      bumpRef(ref,function(){});
+      try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refin&r="+Date.now()}catch(e){}
+      setTimeout(function(){
+        try{
+          var b=document.createElement("div");b.className="yc-sync-hint";
+          b.innerHTML='<span>欢迎来到亿成公考！同学邀请你来的，TA 会收到积分奖励</span><i>好的</i>';
+          b.querySelector("i").addEventListener("click",function(){b.remove()});
+          document.body.appendChild(b);
+          setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},15000);
+        }catch(e){}
+      },3000);
+    }catch(e){}
+  }
+  /* 邀请者自动到账：云端邀请数 - 已领取数 */
+  function creditReferrals(){
+    try{
+      getRefCount(myCode(),function(e,n){
+        if(e||!n)return;
+        var claimed=parseInt(ls("ycgk.refClaimed")||"0",10)||0;
+        var un=n-claimed;
+        if(un>0){
+          lss("ycgk.refClaimed",String(n));
+          if(window.addPoints)addPoints(un*10,"邀请好友","新同学通过你的链接加入 x"+un);
+        }
+      });
+    }catch(e){}
+  }
+  /* 首页邀请卡片 */
+  function addShareCard(){
+    if(document.getElementById("yc-share-card"))return;
+    var entry=document.getElementById("yc-materials-card");
+    if(!entry)return;
+    var card=document.createElement("div");
+    card.id="yc-share-card";
+    card.innerHTML='<span class="material-icons yc-share-ic">group_add</span>'+
+      '<div class="yc-mat-tx"><div class="yc-share-t">邀请好友 · 双方得积分</div>'+
+      '<div class="yc-share-s">每带 1 位新同学 +10 分 · 可换一对一申论批改、1对1问诊</div></div>'+
+      '<span class="yc-share-go">去邀请 ›</span>';
+    card.addEventListener("click",openShare);
+    entry.parentNode.insertBefore(card,entry);
+  }
+  /* 分享弹层 */
+  var ov=null;
+  function ensureOv(){
+    if(ov)return;
+    ov=document.createElement("div");ov.className="yc-sync-ov";
+    var card=document.createElement("div");card.className="yc-sync-card";
+    ov.appendChild(card);document.body.appendChild(ov);
+    ov.addEventListener("click",function(e){if(e.target===ov)ov.classList.remove("on")});
+  }
+  function shareLink(){return "https://ycteacher.github.io/yichenggongkao/?ref="+myCode()}
+  function copyText(txt,ok,fail){
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fail)}
+      else{var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();var c=document.execCommand("copy");ta.remove();c?ok():fail()}
+    }catch(e){fail()}
+  }
+  function openShare(){
+    ensureOv();
+    var card=ov.firstChild;
+    card.innerHTML='<h3>邀请好友 · 得积分</h3>'+
+      '<div class="yc-sync-tip">把你的专属链接发给同学，TA 打开应用你就得 <b>10 分</b>，同一人只算一次。</div>'+
+      '<div class="yc-share-link" id="ycShareLink">'+shareLink()+'</div>'+
+      '<button class="yc-sync-btn main" id="ycShareCopy">复制邀请链接</button>'+
+      '<button class="yc-sync-btn" id="ycShareNative">分享给同学（微信 / QQ）</button>'+
+      '<div class="yc-share-stats" id="ycShareStats">邀请统计加载中…</div>'+
+      '<div class="yc-share-rules">'+
+        '<div class="yc-share-rt">积分可兑换 · 亿成老师亲自交付</div>'+
+        '<div class="yc-share-rule"><b>一对一申论批改</b><span>100 分</span></div>'+
+        '<div class="yc-share-rule"><b>一对一综应批改</b><span>100 分</span></div>'+
+        '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>60 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
+      '</div>'+
+      '<button class="yc-sync-btn" id="ycShareRedeem">兑换详情 · 认识亿成老师 ›</button>'+
+      '<button class="yc-sync-btn" id="ycShareClose">关闭</button>';
+    card.querySelector("#ycShareCopy").addEventListener("click",function(){
+      var btn=this;
+      copyText(shareLink(),function(){btn.textContent="已复制！去微信 / QQ 粘贴发给同学";setTimeout(function(){btn.textContent="复制邀请链接"},3500)},function(){window.prompt("全选复制下面的链接：",shareLink())});
+    });
+    card.querySelector("#ycShareNative").addEventListener("click",function(){
+      var txt="我在用亿成老师的公考刷题应用，题库全免费，邀请你一起刷：";
+      if(navigator.share){navigator.share({title:"亿成公考",text:txt,url:shareLink()}).catch(function(){})}
+      else{copyText(txt+shareLink(),function(){alert("链接已复制，去微信 / QQ 粘贴发给同学吧")},function(){window.prompt("全选复制下面的链接：",shareLink())})}
+    });
+    card.querySelector("#ycShareRedeem").addEventListener("click",function(){window.location.href="teacher.html"});
+    card.querySelector("#ycShareClose").addEventListener("click",function(){ov.classList.remove("on")});
+    getRefCount(myCode(),function(e,n){
+      var el=document.getElementById("ycShareStats");
+      if(!el)return;
+      var bal=(window.getPoints&&getPoints().balance)||0;
+      el.textContent=n>0?("已邀请 "+n+" 人 · 邀请积分 +"+(n*10)+" 分 · 当前积分 "+bal):"还没有同学通过你的链接来，快去分享吧";
+    });
+    creditReferrals();
+    ov.classList.add("on");
+  }
+  /* 积分中心补一条邀请规则 */
+  function patchPointsModal(){
+    if(window.__ycShareRulePatched)return;
+    var rules=document.querySelectorAll(".yc-rule");
+    for(var i=0;i<rules.length;i++){
+      if(rules[i].textContent.indexOf("邀请好友")>-1){window.__ycShareRulePatched=true;return}
+      if(rules[i].textContent.indexOf("兑换商城筹备中")>-1){
+        var d=document.createElement("div");
+        d.className="yc-rule";
+        d.innerHTML='<b>邀请好友 +10 / 人</b><span>点首页「邀请好友」卡片，拿专属链接</span>';
+        rules[i].parentNode.insertBefore(d,rules[i]);
+        window.__ycShareRulePatched=true;return;
+      }
+    }
+  }
+  var css=document.createElement("style");
+  css.textContent="#yc-share-card{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#4F46E5,#4338CA);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.28)}#yc-share-card:active{transform:scale(.985)}#yc-share-card .yc-share-ic{font-size:26px !important;flex:none}.yc-share-t{font-size:15px;font-weight:800;letter-spacing:.5px}.yc-share-s{font-size:11px;opacity:.92;margin-top:2px}.yc-share-go{font-size:12px;font-weight:700;flex:none;background:rgba(255,255,255,.18);border-radius:999px;padding:5px 10px}.yc-share-link{background:#f1f5f9;border:1.5px dashed #c7d2fe;border-radius:10px;padding:10px 12px;font-size:12px;word-break:break-all;color:#4338ca;margin-bottom:4px}.yc-share-stats{font-size:13px;color:#475569;margin-top:10px;text-align:center}.yc-share-rules{margin-top:12px;border-top:1px solid #eef2f7;padding-top:10px}.yc-share-rt{font-size:12px;color:#94a3b8;margin-bottom:8px}.yc-share-rule{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#0f172a;padding:4px 0}.yc-share-rule b{font-weight:700}.yc-share-rule span{color:#4f46e5;font-weight:700;font-size:12.5px;text-align:right}";
+  document.head.appendChild(css);
+  function boot(){
+    handleRef();
+    creditReferrals();
+    var mo=new MutationObserver(function(){addShareCard();patchPointsModal()});
+    mo.observe(document.body,{childList:true,subtree:true});
+    addShareCard();patchPointsModal();
+  }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
 </script>
