@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix8";
+      var V="ttfix9";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
@@ -70,9 +70,9 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix8"></script>
+</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix9"></script>
     <link rel="modulepreload" href="./assets/index-b21.js">
-    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix8">
+    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix9">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
     <meta name="asap-vite-contract" content="a4167c51ba36d6fb9d742332">
   <script>
@@ -83,7 +83,7 @@
 <meta http-equiv="Content-Security-Policy" content="
   script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
   frame-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
-  connect-src 'self' data: blob: https://textdb.online *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com;
+  connect-src 'self' data: blob: https://textdb.online https://textdb.dev *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com;
   child-src 'self' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
   object-src 'self' data: blob: *.alipay.com *.alipayobjects.com  *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
   base-uri 'self' *.alipay.com *.alipayobjects.com *.amap.com *.lingguang.com *.lingguangcontent.com *.lingguangobjects.com;
@@ -683,12 +683,36 @@ document.addEventListener('click', function(e){
     return b;
   }
   /* ---- cloud io ---- */
+  var EP_KEY="yicheng-gk-sync-ep-v1";
+  var ENDPOINTS=[
+    {name:"主线路",get:function(key,cb){fetch("https://textdb.online/"+key,{method:"GET"}).then(function(r){return r.text()}).then(function(t){cb(null,t)}).catch(function(e){cb(e)})},
+     put:function(key,val,cb){fetch("https://textdb.online/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val)).then(function(r){return r.json()}).then(function(j){cb(null,j)}).catch(function(e){cb(e)})}},
+    {name:"备用线路",get:function(key,cb){fetch("https://textdb.dev/api/data/"+key,{method:"GET"}).then(function(r){return r.text()}).then(function(t){cb(null,t)}).catch(function(e){cb(e)})},
+     put:function(key,val,cb){fetch("https://textdb.dev/api/data/"+key,{method:"POST",headers:{"Content-Type":"text/plain"},body:val}).then(function(r){if(r.ok){cb(null)}else{cb(new Error("HTTP "+r.status))}}).catch(function(e){cb(e)})}}
+  ];
+  function epPref(){var v=parseInt(localStorage.getItem(EP_KEY),10);return (isNaN(v)||v<0||v>=ENDPOINTS.length)?0:v}
+  function epPrefer(i){try{localStorage.setItem(EP_KEY,String(i))}catch(e){}}
+  function epOrder(){var p=epPref(),o=[];for(var i=0;i<ENDPOINTS.length;i++)o.push(ENDPOINTS[(p+i)%ENDPOINTS.length]);return o}
   function cloudGet(key,cb){
-    fetch(BASE+"/"+key,{method:"GET"}).then(function(r){return r.text()}).then(function(t){cb(null,t)}).catch(function(e){cb(e)});
+    var order=epOrder(),done=0,anyOK=false,err=null,got=false;
+    order.forEach(function(ep){
+      ep.get(key,function(e,t){
+        if(e){err=e}
+        else{anyOK=true;if(t&&!got){got=true;epPrefer(ENDPOINTS.indexOf(ep));cb(null,t)}}
+        done++;
+        if(done===order.length&&!got){cb(anyOK?null:(err||new Error("所有线路均连接失败")),null)}
+      });
+    });
   }
   function cloudPut(key,val,cb){
-    fetch(BASE+"/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val))
-      .then(function(r){return r.json()}).then(function(j){cb(null,j)}).catch(function(e){cb(e)});
+    var order=epOrder(),done=0,okAny=false,err=null;
+    order.forEach(function(ep){
+      ep.put(key,val,function(e){
+        if(e){err=e}else{okAny=true;epPrefer(ENDPOINTS.indexOf(ep))}
+        done++;
+        if(done===order.length){cb(okAny?null:(err||new Error("所有线路写入失败")))}
+      });
+    });
   }
   function toB64(s){try{return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_")}catch(e){return s}}
   function fromB64(s){try{var b=s.replace(/-/g,"+").replace(/_/g,"/");return decodeURIComponent(escape(atob(b)))}catch(e){return null}}
@@ -817,9 +841,17 @@ document.addEventListener('click', function(e){
         var btn=this;btn.disabled=true;btn.textContent="检测中…";
         var err=card.querySelector("#ycSyncErr");
         err.textContent="检测中，最多等 10 秒…";
-        var done=false;
-        var timer=setTimeout(function(){if(!done){done=true;err.textContent="✗ 10 秒没连上云端：手机网络或浏览器拦住了它。换个浏览器（如 Safari）或换 WiFi/流量试试";btn.disabled=false;btn.textContent="重新检测"}},10000);
-        fetch("https://textdb.online/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){if(!done){done=true;clearTimeout(timer);err.textContent="✓ 云端连接正常（HTTP "+r.status+"）。网络没问题，请重新输入学习码登录";btn.disabled=false;btn.textContent="重新检测"}})}).catch(function(e){if(!done){done=true;clearTimeout(timer);err.textContent="✗ 连不上云端："+(e&&e.message||e)+"。换个浏览器（如 Safari）或换 WiFi/流量试试";btn.disabled=false;btn.textContent="重新检测"}});
+        var res={};
+        var left=2;
+        var timer=setTimeout(function(){if(left>0){left=0;err.textContent="✗ 两条线路都没连上（10 秒超时）。请换个浏览器（如 Safari）或换 WiFi/流量再试";btn.disabled=false;btn.textContent="重新检测"}},10000);
+        function fin(){left--;if(left===0){clearTimeout(timer);var a=res[0],b=res[1];
+          if(a&&b){err.textContent="✓ 两条线路都正常，网络没问题，请重新输入学习码登录"}
+          else if(a){err.textContent="✓ 主线路正常（备用不通）。可以正常登录同步"}
+          else if(b){err.textContent="✓ 备用线路正常（主线路不通）。已可自动切换，请重新输入学习码登录"}
+          else{err.textContent="✗ 两条线路都连不上。请换个浏览器（如 Safari）或换 WiFi/流量再试"}
+          btn.disabled=false;btn.textContent="重新检测"}}
+        fetch("https://textdb.online/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[0]=true;fin()})}).catch(function(e){res[0]=false;fin()});
+        fetch("https://textdb.dev/api/data/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[1]=true;fin()})}).catch(function(e){res[1]=false;fin()});
       });
       card.querySelector("#ycSyncPaste").addEventListener("click",function(){
         card.innerHTML='<h3>粘贴同步数据</h3>'+
