@@ -90,7 +90,31 @@
       </div>
     </div>
     <div class="card">
-      <div class="q-t">7. 其他意见或建议（选填，写在「其他」里）</div>
+      <div class="q-t">7. 你在备考哪类考试 <span class="req">*</span></div>
+      <div class="opts" data-q="a7">
+        <span class="opt">国考</span><span class="opt">省考</span><span class="opt">事业编</span><span class="opt">军队文职</span><span class="opt">教师编</span><span class="opt">医疗编</span><span class="opt">三支一扶</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">8. 最常用的功能是哪个 <span class="req">*</span></div>
+      <div class="opts" data-q="a8">
+        <span class="opt">专项刷题</span><span class="opt">整套卷子</span><span class="opt">错题本</span><span class="opt">速算特训</span><span class="opt">领资料</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">9. 最希望优先补充哪类题 <span class="req">*</span></div>
+      <div class="opts" data-q="a9">
+        <span class="opt">图形推理</span><span class="opt">资料分析</span><span class="opt">言语理解</span><span class="opt">判断推理</span><span class="opt">数量关系</span><span class="opt">常识</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">10. 会推荐给一起备考的同学吗 <span class="req">*</span></div>
+      <div class="opts" data-q="a10">
+        <span class="opt">肯定会</span><span class="opt">可能会</span><span class="opt">不好说</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">11. 其他意见或建议（选填，写在「其他」里）</div>
       <textarea id="otherTx" placeholder="想加什么功能、哪里不顺手、还想刷什么题，都可以写"></textarea>
     </div>
     <button class="submit" id="submitBtn">提交问卷 · 领 200 积分</button>
@@ -175,11 +199,11 @@
 
   document.getElementById("submitBtn").addEventListener("click", function(){
     var btn=this;
-    for (var i=1;i<=6;i++){
+    for (var i=1;i<=10;i++){
       if(!answers["a"+i]){ alert("还有第 "+i+" 题没选，选完就能提交啦"); return; }
     }
     btn.disabled=true; btn.textContent="提交中…";
-    var payload={ ts:Date.now(), a1:answers.a1, a2:answers.a2, a3:answers.a3, a4:answers.a4, a5:answers.a5, a6:answers.a6, other:(document.getElementById("otherTx").value||"").slice(0,500) };
+    var payload={ ts:Date.now(), a1:answers.a1, a2:answers.a2, a3:answers.a3, a4:answers.a4, a5:answers.a5, a6:answers.a6, a7:answers.a7, a8:answers.a8, a9:answers.a9, a10:answers.a10, other:(document.getElementById("otherTx").value||"").slice(0,500) };
     loadCloud().then(function(cloud){
       cloud.list=cloud.list||[];
       cloud.list.push(payload);
