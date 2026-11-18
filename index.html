@@ -780,6 +780,19 @@ document.addEventListener('click', function(e){
           }
         }catch(e){}
       },8000);
+      /* 刷题段位：每跨过 100 题记一次 ycgk.lvl.<n>（匿名，供排行榜） */
+      var lastLvl=-1;
+      setInterval(function(){
+        try{
+          var a=ansTotal(), n=Math.min(49,Math.floor(a/100));
+          if(n>lastLvl){
+            for(var i=(lastLvl<0?0:lastLvl+1);i<=n;i++){
+              if(!localStorage.getItem('ycgk.lvl.'+i)){ localStorage.setItem('ycgk.lvl.'+i,'1'); hit('ycgk.lvl.'+i); }
+            }
+            lastLvl=n;
+          }
+        }catch(e){}
+      },8000);
     }catch(e){}
   }catch(e){}
 })();
