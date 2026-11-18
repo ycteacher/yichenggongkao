@@ -1102,7 +1102,7 @@ document.addEventListener('click', function(e){
     setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},30000);
   }
   var css=document.createElement("style");
-  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
+  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
   document.head.appendChild(css);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
@@ -1198,14 +1198,14 @@ document.addEventListener('click', function(e){
     card.addEventListener("click",openShare);
     entry.parentNode.insertBefore(card,entry);
   }
-  /* 分享弹层 */
-  var ov=null;
+  /* 分享弹层（独立元素，不与同步弹层共用） */
+  var shOv=null;
   function ensureOv(){
-    if(ov)return;
-    ov=document.createElement("div");ov.className="yc-sync-ov";
+    if(shOv)return;
+    shOv=document.createElement("div");shOv.className="yc-sync-ov";
     var card=document.createElement("div");card.className="yc-sync-card";
-    ov.appendChild(card);document.body.appendChild(ov);
-    ov.addEventListener("click",function(e){if(e.target===ov)ov.classList.remove("on")});
+    shOv.appendChild(card);document.body.appendChild(shOv);
+    shOv.addEventListener("click",function(e){if(e.target===shOv)shOv.classList.remove("on")});
   }
   function shareLink(){return "https://ycteacher.github.io/yichenggongkao/?ref="+myCode()}
   function copyText(txt,ok,fail){
@@ -1216,7 +1216,7 @@ document.addEventListener('click', function(e){
   }
   function openShare(){
     ensureOv();
-    var card=ov.firstChild;
+    var card=shOv.firstChild;
     card.innerHTML='<h3>邀请好友 · 得积分</h3>'+
       '<div class="yc-sync-tip">把你的专属链接发给同学，TA 打开应用你就得 <b>10 分</b>，同一人只算一次。</div>'+
       '<div class="yc-share-link" id="ycShareLink">'+shareLink()+'</div>'+
@@ -1227,7 +1227,7 @@ document.addEventListener('click', function(e){
         '<div class="yc-share-rt">积分可兑换 · 加微信 mshong 找亿成老师兑换</div>'+
         '<div class="yc-share-rule"><b>一对一申论批改</b><span>100 分</span></div>'+
         '<div class="yc-share-rule"><b>一对一综应批改</b><span>100 分</span></div>'+
-        '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>60 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
+        '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>600 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
       '</div>'+
       '<button class="yc-sync-btn" id="ycShareRedeem">兑换详情 · 认识亿成老师 ›</button>'+
       '<button class="yc-sync-btn" id="ycShareClose">关闭</button>';
@@ -1249,7 +1249,7 @@ document.addEventListener('click', function(e){
       el.textContent=n>0?("已邀请 "+n+" 人 · 邀请积分 +"+(n*10)+" 分 · 当前积分 "+bal):"还没有同学通过你的链接来，快去分享吧";
     });
     creditReferrals();
-    ov.classList.add("on");
+    shOv.classList.add("on");
   }
   /* 积分中心补一条邀请规则 */
   function patchPointsModal(){
@@ -1267,11 +1267,48 @@ document.addEventListener('click', function(e){
     }
   }
   var css=document.createElement("style");
-  css.textContent="#yc-share-card{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#4F46E5,#4338CA);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.28)}#yc-share-card:active{transform:scale(.985)}#yc-share-card .yc-share-ic{font-size:26px !important;flex:none}.yc-share-t{font-size:15px;font-weight:800;letter-spacing:.5px}.yc-share-s{font-size:11px;opacity:.92;margin-top:2px}.yc-share-go{font-size:12px;font-weight:700;flex:none;background:rgba(255,255,255,.18);border-radius:999px;padding:5px 10px}.yc-share-link{background:#f1f5f9;border:1.5px dashed #c7d2fe;border-radius:10px;padding:10px 12px;font-size:12px;word-break:break-all;color:#4338ca;margin-bottom:4px}.yc-share-stats{font-size:13px;color:#475569;margin-top:10px;text-align:center}.yc-share-rules{margin-top:12px;border-top:1px solid #eef2f7;padding-top:10px}.yc-share-rt{font-size:12px;color:#94a3b8;margin-bottom:8px}.yc-share-rule{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#0f172a;padding:4px 0}.yc-share-rule b{font-weight:700}.yc-share-rule span{color:#4f46e5;font-weight:700;font-size:12.5px;text-align:right}";
+  css.textContent="#yc-share-card{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#4F46E5,#4338CA);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.28)}#yc-share-card:active{transform:scale(.985)}#yc-share-card .yc-share-ic{font-size:26px !important;flex:none}.yc-share-t{font-size:15px;font-weight:800;letter-spacing:.5px}.yc-share-s{font-size:11px;opacity:.92;margin-top:2px}.yc-share-go{font-size:12px;font-weight:700;flex:none;background:rgba(255,255,255,.18);border-radius:999px;padding:5px 10px}.yc-share-link{background:#f1f5f9;border:1.5px dashed #c7d2fe;border-radius:10px;padding:10px 12px;font-size:12px;word-break:break-all;color:#4338ca;margin-bottom:4px}.yc-share-stats{font-size:13px;color:#475569;margin-top:10px;text-align:center}.yc-share-rules{margin-top:12px;border-top:1px solid #eef2f7;padding-top:10px}.yc-share-rt{font-size:12px;color:#94a3b8;margin-bottom:8px}.yc-share-rule{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#0f172a;padding:4px 0}.yc-share-rule b{font-weight:700}.yc-share-rule span{color:#4f46e5;font-weight:700;font-size:12.5px;text-align:right}.yc-wl-st{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:13.5px;line-height:1.6;color:#0f172a;text-align:left}.yc-wl-st b{flex:none;width:20px;height:20px;border-radius:50%;background:#4f46e5;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}.yc-wl-st span{flex:1}.yc-wl-wx{background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:#9a3412;margin-bottom:6px}";
   document.head.appendChild(css);
+  /* 新同学首次打开：安装到桌面引导 */
+  function welcomeGuide(){
+    var seen=false;
+    try{seen=!!localStorage.getItem("ycgk.welcomeSeen")}catch(e){}
+    if(seen)return;
+    var ua=navigator.userAgent||"";
+    var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+    var isAndroid=/Android/i.test(ua);
+    var inWx=/MicroMessenger/i.test(ua);
+    var steps="";
+    if(isIOS){
+      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器底部中间的「分享」按钮（方框加向上箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>在弹出的菜单里选「添加到主屏幕」</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>点右上「添加」，桌面就有亿成公考图标了</span></div>';
+    }else if(isAndroid){
+      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器右上角的「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>选「添加到主屏幕」或「安装应用」</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>点「安装」，桌面就有图标了</span></div>';
+    }else{
+      steps='<div class="yc-wl-st"><b>1</b><span>按 <b>Ctrl+D</b>（Mac 按 ⌘+D）收藏本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>也可以把地址栏左边的图标直接拖到桌面</span></div>';
+    }
+    var ov=document.createElement("div");ov.className="yc-sync-ov";
+    ov.innerHTML='<div class="yc-sync-card">'+
+      '<h3>欢迎来到亿成公考</h3>'+
+      '<div class="yc-sync-tip">题库全免费，内测期间不收一分钱。<b>建议先把应用添加到桌面</b>，以后从桌面图标进，不用再找链接：</div>'+
+      (inWx?'<div class="yc-wl-wx">你现在在微信里打开，请先点右上角「···」选「在浏览器打开」，再按下面步骤操作</div>':'')+
+      steps+
+      '<button class="yc-sync-btn main" id="ycWlOk">好的，开始刷题</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    function done(){try{localStorage.setItem("ycgk.welcomeSeen","1")}catch(e){}ov.classList.remove("on")}
+    ov.addEventListener("click",function(e){if(e.target===ov)done()});
+    ov.querySelector("#ycWlOk").addEventListener("click",done);
+    setTimeout(function(){ov.classList.add("on")},600);
+  }
   function boot(){
     handleRef();
     creditReferrals();
+    welcomeGuide();
     var mo=new MutationObserver(function(){addShareCard();patchPointsModal()});
     mo.observe(document.body,{childList:true,subtree:true});
     addShareCard();patchPointsModal();
