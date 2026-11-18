@@ -267,21 +267,23 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-dir-banner .yc-db-s { font-size: 11px; color: var(--yc-mut); margin-top: 2px; }
 .yc-dir-banner .yc-db-r { font-size: 12px; font-weight: 600; color: var(--yc-green); flex: none; }
 
-/* 内测版横幅（页面最上方，紧凑单条横条） */
+/* 内测版横幅（页面最上方，加宽加大横条） */
 .yc-beta-banner {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
   width: 100%; box-sizing: border-box;
-  margin: 12px 0 0; padding: 10px 14px; border-radius: 12px;
-  background: linear-gradient(135deg, rgba(220,38,38,.10), rgba(220,38,38,.04));
-  border: 1px solid rgba(220,38,38,.25);
+  margin: 12px 0 0; padding: 15px 18px; border-radius: 14px;
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  box-shadow: 0 4px 16px rgba(220,38,38,.28);
 }
 .yc-beta-banner .yc-bb-tag {
-  flex: none; font-size: 12px; font-weight: 800; color: #fff;
-  background: #DC2626; border-radius: 6px; padding: 3px 8px; letter-spacing: 1px;
+  flex: none; font-size: 14px; font-weight: 900; color: #DC2626;
+  background: #fff; border-radius: 8px; padding: 5px 11px; letter-spacing: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
 }
 .yc-beta-banner .yc-bb-tx {
-  flex: 1; min-width: 0; font-size: 15px; font-weight: 700;
-  color: #B91C1C; line-height: 1.4;
+  flex: 1; min-width: 0; font-size: 17px; font-weight: 800;
+  color: #fff; line-height: 1.45; letter-spacing: .3px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.12);
 }
 
 /* 听取意见横幅（页面最底部，底栏之上） */
@@ -295,6 +297,10 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-fb-banner .yc-fb-l { font-size: 14px; font-weight: 800; color: #fff; }
 .yc-fb-banner .yc-fb-s { font-size: 11px; color: rgba(255,255,255,.85); margin-top: 3px; line-height: 1.5; }
 .yc-fb-banner .yc-fb-r { flex: none; font-size: 12px; font-weight: 700; color: #FFF7ED; background: rgba(255,255,255,.18); border-radius: 999px; padding: 6px 12px; }
+.yc-fb-banner .yc-gifts { display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap; }
+.yc-fb-banner .yc-gift { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); border-radius: 999px; padding: 4px 10px 4px 7px; }
+.yc-fb-banner .yc-gift svg { width: 19px; height: 19px; display: block; }
+.yc-fb-banner .yc-gift b { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
 
 /* 新图标 */
 .yc-svg { width: 20px; height: 20px; display: block; }
@@ -665,7 +671,19 @@ document.addEventListener('click', function(e){
     var b = document.createElement("div");
     b.id = "yc-fb-banner";
     b.className = "yc-fb-banner";
-    b.innerHTML = '<div><div class="yc-fb-l">听取意见 · 填问卷拿礼品</div><div class="yc-fb-s">1 分钟匿名问卷 · 积分可换真题卷、考公书籍、小家电、平板、手机</div></div><span class="yc-fb-r">去填写 ›</span>';
+    var GIFT_SVGS = {
+      humid: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="7" width="8" height="13" rx="2"/><path d="M10 4h4"/><path d="M12 11.5c-1.1 1.4-1.7 2.3-1.7 3.1a1.7 1.7 0 1 0 3.4 0c0-.8-.6-1.7-1.7-3.1z"/></svg>',
+      pad: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3" width="15" height="18" rx="2.5"/><path d="M10 17.5h4"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7.5" y="2.5" width="9" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>',
+      book: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5C10.5 4.2 8.6 3.5 6 3.5v14c2.6 0 4.5.7 6 2 1.5-1.3 3.4-2 6-2v-14c-2.6 0-4.5.7-6 2z"/><path d="M12 5.5v14"/></svg>'
+    };
+    b.innerHTML = '<div style="min-width:0"><div class="yc-fb-l">听取意见 · 填问卷拿礼品</div><div class="yc-fb-s">1 分钟匿名问卷 · 积分可换真题卷、考公书籍、小家电、平板、手机</div>' +
+      '<div class="yc-gifts">' +
+      '<span class="yc-gift">' + GIFT_SVGS.humid + '<b>加湿器</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.pad + '<b>平板</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.phone + '<b>手机</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.book + '<b>考公书籍</b></span>' +
+      '</div></div><span class="yc-fb-r">去填写 ›</span>';
     b.addEventListener("click", function(){
       try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.feedback&r=" + Date.now(); }catch(e){}
       window.location.href = "feedback.html";
@@ -1047,9 +1065,32 @@ document.addEventListener('click', function(e){
     var t=setInterval(function(){if(addChip()||++tries>20)clearInterval(t)},300);
     hint();bootPull();
     setInterval(loop,6000);
+    setInterval(function(){if(!document.hidden)pullNow()},90000);
     document.addEventListener("visibilitychange",function(){
       if(document.hidden&&myCode()&&snapStr()!==lastPushed){setChip("busy");push(function(e){if(!e)lastPushed=snapStr();setChip("")})}
+      if(!document.hidden)pullNow();
     });
+  }
+  /* 其他设备有新进度时，温和提示刷新，不打断做题 */
+  function pullNow(){
+    if(!myCode()||pushing||pullBusy)return;
+    pull(function(e,cloud){
+      if(e||!cloud)return;
+      var s=getSync();
+      if((cloud.ts||0)>(s.appliedTs||0)){
+        var changed=applyCloud(cloud);
+        if(changed)showUpdateBar();
+      }
+    });
+  }
+  function showUpdateBar(){
+    if(document.getElementById("yc-sync-upd"))return;
+    var b=document.createElement("div");
+    b.className="yc-sync-hint";b.id="yc-sync-upd";
+    b.innerHTML='<span>其他设备有新的刷题进度</span><i>刷新查看</i>';
+    b.querySelector("i").addEventListener("click",function(){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()});
+    document.body.appendChild(b);
+    setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},30000);
   }
   var css=document.createElement("style");
   css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
