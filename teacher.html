@@ -38,6 +38,13 @@
   .exch .t{font-size:14.5px;font-weight:800;color:#0f172a;}
   .exch .s{font-size:12px;color:#64748b;margin-top:2px;line-height:1.5;}
   .exch .pt{font-size:14px;font-weight:900;color:#4f46e5;flex:none;}
+  .wxcard{display:flex;align-items:center;gap:10px;background:#eef8ef;border:1.5px solid #b9dfc2;
+    border-radius:12px;padding:12px 14px;margin-top:12px;}
+  .wxcard .wl{font-size:12px;color:#4a7c59;flex:none;}
+  .wxcard .wid{font-size:17px;font-weight:900;color:#1c7c3c;letter-spacing:1.5px;flex:1;min-width:0;
+    word-break:break-all;}
+  .wxcard button{flex:none;border:none;border-radius:9px;background:#1c7c3c;color:#fff;
+    font-size:13px;font-weight:700;padding:8px 16px;cursor:pointer;}
   .steps{margin-top:12px;}
   .steps .st{display:flex;gap:10px;margin-bottom:10px;}
   .steps .no{flex:none;width:20px;height:20px;border-radius:50%;background:#16469b;color:#fff;
@@ -88,14 +95,30 @@
     <div class="exch"><span class="ic">💬</span><div class="tx"><div class="t">30分钟一对一咨询</div><div class="s">政策 / 选岗 / 报名方向问诊</div></div><span class="pt">60分</span></div>
     <div class="steps">
       <div class="st"><span class="no">1</span><span class="tx">在刷题应用首页点右上角「登录同步」，<b>记下你的学习码</b>（积分明细里也能看到邀请积分）。</span></div>
-      <div class="st"><span class="no">2</span><span class="tx">积分够了以后，通过<b>抖音或小红书私信亿成老师</b>，发送你的学习码和想兑换的项目。</span></div>
+      <div class="st"><span class="no">2</span><span class="tx">积分够了以后，<b>加亿成老师微信</b>，加的时候说明情况：发你的学习码＋想兑换的项目。</span></div>
       <div class="st"><span class="no">3</span><span class="tx">老师核对积分后，会和你<b>约定时间，亲自交付</b>。</span></div>
     </div>
+    <div class="wxcard"><span class="wl">亿成老师微信</span><span class="wid" id="wxId">mshong</span><button id="wxCopy" type="button">复制</button></div>
     <a class="btn main" href="index.html">回到刷题应用</a>
     <a class="btn ghost" href="materials.html">先去领免费资料</a>
   </div>
 
   <div class="foot">亿成老师团队 · 多助公考<br>积分规则如有调整，以应用内最新说明为准</div>
 </div>
+<script>
+(function(){
+  var btn=document.getElementById("wxCopy");
+  if(!btn)return;
+  btn.addEventListener("click",function(){
+    var id=document.getElementById("wxId").textContent.trim();
+    function ok(){btn.textContent="已复制";setTimeout(function(){btn.textContent="复制"},3000)}
+    function fail(){window.prompt("全选复制微信号：",id)}
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(id).then(ok,fail)}
+      else{var ta=document.createElement("textarea");ta.value=id;document.body.appendChild(ta);ta.select();var c=document.execCommand("copy");ta.remove();c?ok():fail()}
+    }catch(e){fail()}
+  });
+})();
+</script>
 </body>
 </html>
