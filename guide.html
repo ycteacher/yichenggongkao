@@ -33,10 +33,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
 .tip{margin-top:12px;font-size:12px;color:#9ca3af;line-height:1.6;background:#f9fafb;border-radius:10px;padding:10px 12px}
 .other{margin-top:12px;text-align:center}
 .other a{font-size:12.5px;color:#6b7280;text-decoration:underline;cursor:pointer}
-.otherbox{display:none;margin-top:10px;text-align:left}
-.otherbox.on{display:block}
-.otherbox h3{font-size:13px;font-weight:800;color:#374151;margin-top:10px}
-.otherbox p{font-size:12.5px;color:#6b7280;line-height:1.7;margin-top:3px}
+.oc{margin-top:12px}
+.oc h3{font-size:14px;font-weight:800;color:#374151;padding-bottom:8px;border-bottom:1px solid #f3f4f6}
+.oc .sep{height:1px;background:#f3f4f6;margin:16px 0}
+.oc .st{margin-top:12px}
 .cta{margin-top:18px;width:100%;border:none;border-radius:14px;background:#d6362b;color:#fff;font-size:17px;font-weight:800;padding:15px;cursor:pointer;box-shadow:0 6px 18px rgba(214,54,43,.3)}
 .cta:active{transform:scale(.98)}
 .cta-sub{margin-top:8px;text-align:center;font-size:12px;color:#9ca3af}
@@ -78,14 +78,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
     <h2><span id="devName">安装步骤</span><span class="tag" id="devTag">已自动识别你的设备</span></h2>
     <div id="stepBox"></div>
     <div class="tip" id="devTip"></div>
-    <div class="other"><a id="otherToggle">不是这个设备？看其他设备的装法</a>
-      <div class="otherbox" id="otherBox">
-        <h3>苹果手机 / iPad</h3><p>用 Safari 打开本页 → 点底部中间「分享」按钮（方框加向上箭头）→ 选「添加到主屏幕」→ 点「添加」。</p>
-        <h3>华为 / 鸿蒙 / 安卓手机</h3><p>点浏览器右上角「⋮」（华为浏览器也可能在底部「⌘」）→ 选「添加到桌面」或「安装应用」→ 点「安装」。</p>
-        <h3>电脑</h3><p>按 <b>Ctrl+D</b>（Mac 按 <b>⌘+D</b>）收藏本页，或把地址栏左边的图标拖到桌面。</p>
-      </div>
-    </div>
   </div>
+
+  <div class="steps oc" id="otherAll"></div>
 
   <button class="cta" id="goBtn">装好了，进入刷题 →</button>
   <div class="cta-sub">题库全免费，内测期间不收一分钱</div>
@@ -107,7 +102,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
     if(q.get("ref")&&!localStorage.getItem("ycgk.refinDone")){localStorage.setItem("ycgk.refinDone","1");hit("ycgk.refin")}
   }catch(e){}
 
-  var name,steps,tip;
   /* 已装到桌面：iOS 桌面图标打开 navigator.standalone===true；安卓/PWA 用 display-mode 判断 */
   var isStandalone=false;
   try{isStandalone=(navigator.standalone===true)||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)}catch(e){}
@@ -120,32 +114,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
     document.getElementById("heroBox").style.display="none";
     document.getElementById("wxBox").style.display="none";
     document.getElementById("stepsBox").style.display="none";
+    document.getElementById("otherAll").style.display="none";
     document.getElementById("goBtn").textContent="开始刷题 →";
     return;
   }
-  if(isIOS){
-    name="苹果手机 / iPad 装法";
-    steps='<div class="st"><div class="n">1</div><div class="tx">先确认最上面地址栏是 <span class="kb">ycteacher.github.io</span>，说明你已经在 Safari 里了</div></div>'+
-          '<div class="st"><div class="n">2</div><div class="tx">点浏览器<b>底部中间的「分享」按钮</b>（方框加向上箭头；iPad 在地址栏右侧）</div></div>'+
-          '<div class="st"><div class="n">3</div><div class="tx">在弹出的菜单里<b>往下滑一点</b>，找到<b>「添加到主屏幕」</b>（橙色方块加号图标）</div></div>'+
-          '<div class="st"><div class="n">4</div><div class="tx">点右上「<b>添加</b>」，想改名字的可以顺手改</div></div>'+
-          '<div class="st"><div class="n">5</div><div class="tx">回到桌面，看到「亿成公考」图标，点它直接进，以后都不用再找链接</div></div>';
-    tip="找不到「添加到主屏幕」？在分享菜单里往下滚动就有；如果连分享按钮都没有，说明你还在微信里，先按上面的方法去 Safari 打开。";
-  }else if(isMobi){
-    name=(isHarmony?"华为 / 鸿蒙手机":"安卓手机")+"装法";
-    steps='<div class="st"><div class="n">1</div><div class="tx">点浏览器<b>右上角的「⋮」菜单</b>（华为浏览器也可能在底部「⌘」）</div></div>'+
-          '<div class="st"><div class="n">2</div><div class="tx">选<b>「添加到桌面」</b>或「安装应用」</div></div>'+
-          '<div class="st"><div class="n">3</div><div class="tx">点「安装」，桌面就有亿成公考图标了</div></div>';
-    tip="找不到菜单的话，试试浏览器底部中间的按钮，一般就在那里。";
-  }else{
-    name="电脑装法";
-    steps='<div class="st"><div class="n">1</div><div class="tx">按 <span class="kb">Ctrl+D</span>（Mac 按 <span class="kb">⌘+D</span>）收藏本页</div></div>'+
-          '<div class="st"><div class="n">2</div><div class="tx">也可以把地址栏左边的图标直接拖到桌面</div></div>';
-    tip="收藏后可以在收藏栏右键 →「发送到桌面快捷方式」。";
-  }
-  document.getElementById("devName").textContent=name;
-  document.getElementById("stepBox").innerHTML=steps;
-  document.getElementById("devTip").textContent=tip;
+  /* 三套装法：识别到的放最上面，其余两套平铺在下面 */
+  var DEV={
+    ios:{t:"苹果手机 / iPad 装法",
+      s:'<div class="st"><div class="n">1</div><div class="tx">先确认最上面地址栏是 <span class="kb">ycteacher.github.io</span>，说明你已经在 Safari 里了</div></div>'+
+        '<div class="st"><div class="n">2</div><div class="tx">点浏览器<b>底部中间的「分享」按钮</b>（方框加向上箭头；iPad 在地址栏右侧）</div></div>'+
+        '<div class="st"><div class="n">3</div><div class="tx">在弹出的菜单里<b>往下滑一点</b>，找到<b>「添加到主屏幕」</b>（橙色方块加号图标）</div></div>'+
+        '<div class="st"><div class="n">4</div><div class="tx">点右上「<b>添加</b>」，想改名字的可以顺手改</div></div>'+
+        '<div class="st"><div class="n">5</div><div class="tx">回到桌面，看到「亿成公考」图标，点它直接进，以后都不用再找链接</div></div>',
+      tip:"找不到「添加到主屏幕」？在分享菜单里往下滚动就有；如果连分享按钮都没有，说明你还在微信里，先按上面的方法去 Safari 打开。"},
+    mobi:{t:(isHarmony?"华为 / 鸿蒙手机":"安卓手机")+"装法",
+      s:'<div class="st"><div class="n">1</div><div class="tx">点浏览器<b>右上角的「⋮」菜单</b>（华为浏览器也可能在底部「⌘」）</div></div>'+
+        '<div class="st"><div class="n">2</div><div class="tx">选<b>「添加到桌面」</b>或「安装应用」</div></div>'+
+        '<div class="st"><div class="n">3</div><div class="tx">点「安装」，桌面就有亿成公考图标了</div></div>',
+      tip:"找不到菜单的话，试试浏览器底部中间的按钮，一般就在那里。"},
+    pc:{t:"电脑装法",
+      s:'<div class="st"><div class="n">1</div><div class="tx">按 <span class="kb">Ctrl+D</span>（Mac 按 <span class="kb">⌘+D</span>）收藏本页</div></div>'+
+        '<div class="st"><div class="n">2</div><div class="tx">也可以把地址栏左边的图标直接拖到桌面</div></div>',
+      tip:"收藏后可以在收藏栏右键 →「发送到桌面快捷方式」。"}
+  };
+  var mainKey=isIOS?"ios":(isMobi?"mobi":"pc");
+  var others=["ios","mobi","pc"].filter(function(k){return k!==mainKey});
+  document.getElementById("devName").textContent=DEV[mainKey].t;
+  document.getElementById("stepBox").innerHTML=DEV[mainKey].s;
+  document.getElementById("devTip").textContent=DEV[mainKey].tip;
+  document.getElementById("otherAll").innerHTML=
+    '<h3>'+DEV[others[0]].t+'</h3>'+DEV[others[0]].s+
+    '<div class="sep"></div><h3>'+DEV[others[1]].t+'</h3>'+DEV[others[1]].s;
 
   if(inWx){
     document.getElementById("wxBox").style.display="block";
@@ -167,11 +166,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
       document.body.removeChild(ta);
     }
   });
-
-  document.getElementById("otherToggle").addEventListener("click",function(){
-    document.getElementById("otherBox").classList.toggle("on");
-  });
-})();
-</script>
+})();</script>
 </body>
 </html>
