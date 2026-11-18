@@ -70,7 +70,7 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b31.js?v=ttfix16"></script>
+</style><script type="module" crossorigin="" src="./assets/index-b32.js?v=ttfix17"></script>
     <link rel="modulepreload" href="./assets/index-b21.js">
     <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix10">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
@@ -805,12 +805,24 @@ document.addEventListener('click', function(e){
     pushing=true;
     var payload;try{payload=toB64(JSON.stringify({v:1,ts:Date.now(),d:snapshot()}))}catch(e){pushing=false;cb&&cb(e);return}
     var parts=chunkStr(payload,CHUNK_ENC),meta={v:1,ts:Date.now(),n:parts.length};
-    var done=0,failed=null;
+    var i=0,failed=null;
     function fin(){pushing=false;if(failed){cb&&cb(failed)}else{var s=getSync();s.lastPush=Date.now();setSync(s);setChip("ok");cb&&cb(null)}}
-    for(var i=0;i<parts.length;i++){
-      cloudPut(PRE+c+"-c"+i,parts[i],function(e){if(e)failed=e;done++;if(done===parts.length)cloudPut(PRE+c,JSON.stringify(meta),function(e2){if(e2)failed=e2;fin()})});
+    function putMeta(){cloudPut(PRE+c,JSON.stringify(meta),function(e2){if(e2)failed=e2;fin()})}
+    function next(){
+      if(failed){pushing=false;cb&&cb(failed);return}
+      if(i>=parts.length){putMeta();return}
+      var idx=i++,tries=0;
+      function attempt(){
+        cloudPut(PRE+c+"-c"+idx,parts[idx],function(e){
+          if(e&&tries<2){tries++;attempt();return}
+          if(e)failed=e;
+          next();
+        });
+      }
+      attempt();
     }
-    if(parts.length===0)fin();
+    if(parts.length===0){fin();return}
+    next();
   }
   function pull(cb){
     var c=myCode();if(!c){cb&&cb("nocode",null);return}
@@ -976,7 +988,19 @@ document.addEventListener('click', function(e){
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
       card.querySelector("#ycSyncNow").addEventListener("click",function(){
         this.textContent="同步中…";this.disabled=true;
-        push(function(e){openModal()});
+        push(function(e){
+          if(e){openModal();return}
+          pull(function(e2,cloud){
+            if(!e2&&cloud){
+              var s=getSync();
+              if((cloud.ts||0)>(s.appliedTs||0)){
+                var changed=applyCloud(cloud);
+                if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload();return}
+              }
+            }
+            openModal();
+          });
+        });
       });
       card.querySelector("#ycSyncCopy").addEventListener("click",function(){
         var btn=this;
@@ -1049,16 +1073,21 @@ document.addEventListener('click', function(e){
   }
   function bootPull(){
     if(!myCode())return;
-    setTimeout(function(){
-      pull(function(e,cloud){
-        if(e||!cloud)return;
-        var s=getSync();
-        if((cloud.ts||0)>(s.appliedTs||0)){
-          var changed=applyCloud(cloud);
-          if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
-        }
-      });
-    },2500);
+    var tries=0;
+    function attempt(){
+      setTimeout(function(){
+        pull(function(e,cloud){
+          if(e&&tries<3){tries++;attempt();return}
+          if(e||!cloud)return;
+          var s=getSync();
+          if((cloud.ts||0)>(s.appliedTs||0)){
+            var changed=applyCloud(cloud);
+            if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+          }
+        });
+      },tries?3000:2500);
+    }
+    attempt();
   }
   function boot(){
     var tries=0;
