@@ -49,18 +49,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
     <div><h1>亿成公考 · 备考神器</h1><p>亿成老师团队倾心打造 · 题库持续更新</p></div>
   </div>
 
-  <div class="hero">
+  <div class="hero" id="heroBox">
     <b>先把应用装到桌面，再开始刷题</b>
     <span>装到桌面后，以后点桌面图标直接进，不用再翻聊天记录找链接，也不会弄丢刷题记录。</span>
   </div>
 
-  <div class="wx" id="wxBox" style="display:none">
-    <div class="t">你现在在微信里打开</div>
-    <div class="d">微信里装不了。先点右上角「<b>···</b>」→ 选「<b>在浏览器打开</b>」，再照下面步骤装。<br>或者复制下面的链接，去手机浏览器里粘贴打开：</div>
-    <button class="copybtn" id="copyBtn">一键复制链接</button>
+  <div id="okBox" style="display:none;margin-top:14px;background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:14px;padding:14px">
+    <div style="font-size:14px;font-weight:800;color:#047857">已经装好啦，桌面图标就是亿成公考</div>
+    <div style="font-size:13px;color:#047857;line-height:1.7;margin-top:6px">你现在就是从桌面图标进来的，以后每次都这样打开就行。点下面按钮直接开始刷题。</div>
   </div>
 
-  <div class="steps">
+  <div class="wx" id="wxBox" style="display:none">
+    <div class="t" id="wxTitle">你现在在微信里打开</div>
+    <div class="d" id="wxDesc">微信里装不了。先点右上角「<b>···</b>」→ 选「<b>在浏览器打开</b>」，再照下面步骤装。<br>或者复制下面的链接，去手机浏览器里粘贴打开：</div>
+    <button class="copybtn" id="copyBtn">复制链接，去 Safari 粘贴打开</button>
+    <div id="wxSteps" style="display:none;margin-top:12px;border-top:1px dashed #fdba74;padding-top:10px">
+      <div style="font-size:13px;font-weight:800;color:#9a3412">复制完之后，照这个走：</div>
+      <div style="font-size:13px;color:#9a3412;line-height:1.9;margin-top:4px">
+        1. 回到手机桌面，打开 <b>Safari</b>（蓝色指南针图标）<br>
+        2. 点 Safari 底部的地址栏 → <b>长按 → 粘贴</b> → 点「前往」<br>
+        3. 页面打开后，照下面的步骤装到桌面
+      </div>
+      <div style="font-size:11.5px;color:#b45309;margin-top:8px;line-height:1.6">小提示：微信不允许网页直接跳到 Safari，所以只能用复制链接的方式，一次就好。</div>
+    </div>
+  </div>
+
+  <div class="steps" id="stepsBox">
     <h2><span id="devName">安装步骤</span><span class="tag" id="devTag">已自动识别你的设备</span></h2>
     <div id="stepBox"></div>
     <div class="tip" id="devTip"></div>
@@ -94,12 +108,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
   }catch(e){}
 
   var name,steps,tip;
+  /* 已装到桌面：iOS 桌面图标打开 navigator.standalone===true；安卓/PWA 用 display-mode 判断 */
+  var isStandalone=false;
+  try{isStandalone=(navigator.standalone===true)||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)}catch(e){}
+  document.getElementById("goBtn").addEventListener("click",function(){
+    hit("ycgk.genter");
+    setTimeout(function(){location.href="./"+location.search},120);
+  });
+  if(isStandalone){
+    document.getElementById("okBox").style.display="block";
+    document.getElementById("heroBox").style.display="none";
+    document.getElementById("wxBox").style.display="none";
+    document.getElementById("stepsBox").style.display="none";
+    document.getElementById("goBtn").textContent="开始刷题 →";
+    return;
+  }
   if(isIOS){
     name="苹果手机 / iPad 装法";
-    steps='<div class="st"><div class="n">1</div><div class="tx">点浏览器<b>底部中间的「分享」按钮</b>（方框加向上箭头）</div></div>'+
-          '<div class="st"><div class="n">2</div><div class="tx">在弹出的菜单里选<b>「添加到主屏幕」</b></div></div>'+
-          '<div class="st"><div class="n">3</div><div class="tx">点右上「添加」，桌面就有亿成公考图标了</div></div>';
-    tip="如果底部没有分享按钮，说明你还在微信里，先按上面的方法去浏览器打开。";
+    steps='<div class="st"><div class="n">1</div><div class="tx">先确认最上面地址栏是 <span class="kb">ycteacher.github.io</span>，说明你已经在 Safari 里了</div></div>'+
+          '<div class="st"><div class="n">2</div><div class="tx">点浏览器<b>底部中间的「分享」按钮</b>（方框加向上箭头；iPad 在地址栏右侧）</div></div>'+
+          '<div class="st"><div class="n">3</div><div class="tx">在弹出的菜单里<b>往下滑一点</b>，找到<b>「添加到主屏幕」</b>（橙色方块加号图标）</div></div>'+
+          '<div class="st"><div class="n">4</div><div class="tx">点右上「<b>添加</b>」，想改名字的可以顺手改</div></div>'+
+          '<div class="st"><div class="n">5</div><div class="tx">回到桌面，看到「亿成公考」图标，点它直接进，以后都不用再找链接</div></div>';
+    tip="找不到「添加到主屏幕」？在分享菜单里往下滚动就有；如果连分享按钮都没有，说明你还在微信里，先按上面的方法去 Safari 打开。";
   }else if(isMobi){
     name=(isHarmony?"华为 / 鸿蒙手机":"安卓手机")+"装法";
     steps='<div class="st"><div class="n">1</div><div class="tx">点浏览器<b>右上角的「⋮」菜单</b>（华为浏览器也可能在底部「⌘」）</div></div>'+
@@ -118,7 +149,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
 
   if(inWx){
     document.getElementById("wxBox").style.display="block";
-    document.getElementById("devTag").textContent="先去浏览器，再照步骤装";
+    document.getElementById("wxSteps").style.display="block";
+    document.getElementById("devTag").textContent="先复制去 Safari，再照步骤装";
+    document.getElementById("devName").textContent=isIOS?"到 Safari 后这样装（苹果手机 / iPad）":name;
   }
 
   var copyBtn=document.getElementById("copyBtn");
@@ -137,11 +170,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans 
 
   document.getElementById("otherToggle").addEventListener("click",function(){
     document.getElementById("otherBox").classList.toggle("on");
-  });
-
-  document.getElementById("goBtn").addEventListener("click",function(){
-    hit("ycgk.genter");
-    setTimeout(function(){location.href="./"+location.search},120);
   });
 })();
 </script>
