@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix7";
+      var V="ttfix8";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
@@ -70,9 +70,9 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix7"></script>
+</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix8"></script>
     <link rel="modulepreload" href="./assets/index-b21.js">
-    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix7">
+    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix8">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
     <meta name="asap-vite-contract" content="a4167c51ba36d6fb9d742332">
   <script>
@@ -795,6 +795,8 @@ document.addEventListener('click', function(e){
         '<button class="yc-sync-btn main" id="ycSyncLogin">用学习码登录</button>'+
         '<div class="yc-sync-div"><span>或</span></div>'+
         '<button class="yc-sync-btn" id="ycSyncGen">生成我的学习码</button>'+
+        '<button class="yc-sync-btn" id="ycSyncPaste">用同步数据导入（不用网络）</button>'+
+        '<button class="yc-sync-btn" id="ycSyncTest">检测云端连接</button>'+
         '<div class="yc-sync-err" id="ycSyncErr"></div>';
       card.querySelector("#ycSyncGen").addEventListener("click",function(){
         var btn=this;btn.disabled=true;btn.textContent="生成中…";
@@ -806,8 +808,39 @@ document.addEventListener('click', function(e){
             '<button class="yc-sync-btn main" id="ycSyncSave">我已保存，开启同步</button>';
           card.querySelector("#ycSyncSave").addEventListener("click",function(){
             setSync({code:code,appliedTs:0,lastLocalTs:Date.now()});
-            ov.classList.remove("on");setChip("ok");push();
+            ov.classList.remove("on");setChip("busy");
+            push(function(e){setChip(e?"err":"ok")});
           });
+        });
+      });
+      card.querySelector("#ycSyncTest").addEventListener("click",function(){
+        var btn=this;btn.disabled=true;btn.textContent="检测中…";
+        var err=card.querySelector("#ycSyncErr");
+        err.textContent="检测中，最多等 10 秒…";
+        var done=false;
+        var timer=setTimeout(function(){if(!done){done=true;err.textContent="✗ 10 秒没连上云端：手机网络或浏览器拦住了它。换个浏览器（如 Safari）或换 WiFi/流量试试";btn.disabled=false;btn.textContent="重新检测"}},10000);
+        fetch("https://textdb.online/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){if(!done){done=true;clearTimeout(timer);err.textContent="✓ 云端连接正常（HTTP "+r.status+"）。网络没问题，请重新输入学习码登录";btn.disabled=false;btn.textContent="重新检测"}})}).catch(function(e){if(!done){done=true;clearTimeout(timer);err.textContent="✗ 连不上云端："+(e&&e.message||e)+"。换个浏览器（如 Safari）或换 WiFi/流量试试";btn.disabled=false;btn.textContent="重新检测"}});
+      });
+      card.querySelector("#ycSyncPaste").addEventListener("click",function(){
+        card.innerHTML='<h3>粘贴同步数据</h3>'+
+          '<div class="yc-sync-tip">在存有刷题记录的设备上：点右上角「登录同步」→「复制同步数据」，把发过来的整段内容粘贴到下面。</div>'+
+          '<textarea class="yc-sync-in" id="ycSyncPayload" style="height:90px;font-size:12px;letter-spacing:0;text-transform:none" placeholder="粘贴 YCSYNC1 开头的内容"></textarea>'+
+          '<button class="yc-sync-btn main" id="ycSyncImport">导入并合并到本机</button>'+
+          '<button class="yc-sync-btn" id="ycSyncBack">返回</button>'+
+          '<div class="yc-sync-err" id="ycSyncErr"></div>';
+        card.querySelector("#ycSyncBack").addEventListener("click",function(){ov.classList.remove("on");openModal()});
+        card.querySelector("#ycSyncImport").addEventListener("click",function(){
+          var err=card.querySelector("#ycSyncErr");
+          var raw=(card.querySelector("#ycSyncPayload").value||"").trim();
+          if(raw.indexOf("YCSYNC1:")!==0){err.textContent="内容不对：请粘贴 YCSYNC1 开头的完整同步数据";return}
+          var json=fromB64(raw.slice(8));
+          if(!json){err.textContent="数据损坏：请重新复制一次";return}
+          var d=null;try{d=JSON.parse(json)}catch(e){}
+          if(!d||typeof d!=="object"){err.textContent="数据损坏：请重新复制一次";return}
+          var changed=applyCloud({ts:Date.now(),d:d});
+          ov.classList.remove("on");setChip("ok");
+          if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+          else{err.textContent="本机已是最新，无需导入"}
         });
       });
       card.querySelector("#ycSyncLogin").addEventListener("click",function(){
@@ -817,7 +850,7 @@ document.addEventListener('click', function(e){
         err.textContent="登录中…";
         setSync({code:v,appliedTs:0,lastLocalTs:Date.now()});
         pull(function(e,cloud){
-          if(e){err.textContent="网络没连上，稍后再试";setSync({});return}
+          if(e){err.textContent="云端连接失败（v8）："+(e&&e.message||e)+"。可点「检测云端连接」查原因";setSync({});return}
           var changed=cloud?applyCloud(cloud):false;
           ov.classList.remove("on");setChip("ok");
           if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
@@ -830,10 +863,22 @@ document.addEventListener('click', function(e){
         '<div class="yc-sync-code">'+esc(c)+'</div>'+
         '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。</div>'+
         '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
+        '<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>'+
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
       card.querySelector("#ycSyncNow").addEventListener("click",function(){
         this.textContent="同步中…";this.disabled=true;
         push(function(e){openModal()});
+      });
+      card.querySelector("#ycSyncCopy").addEventListener("click",function(){
+        var btn=this;
+        var data={};KEYS.forEach(function(k){data[k]=rd(k)});
+        var payload="YCSYNC1:"+toB64(JSON.stringify(data));
+        function ok(){btn.textContent="已复制！用微信/QQ发给另一台设备，在那边选「用同步数据导入」";setTimeout(function(){btn.textContent="复制同步数据（发到另一台设备）"},4000)}
+        function fail(){btn.textContent="复制失败，请截图这段数据";if(window.prompt)window.prompt("全选复制下面内容：",payload)}
+        try{
+          if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(payload).then(ok,function(){fail()})}
+          else{var ta=document.createElement("textarea");ta.value=payload;document.body.appendChild(ta);ta.select();var c=document.execCommand("copy");ta.remove();c?ok():fail()}
+        }catch(e){fail()}
       });
       card.querySelector("#ycSyncOut").addEventListener("click",function(){
         if(confirm("退出后本机数据保留，但不再同步到云端。确定退出？")){setSync({});ov.classList.remove("on");setChip("")}
