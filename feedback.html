@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="application-name" content="亿成公考">
+<title>内测意见问卷 · 亿成公考</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:#F7F4EF; color:#202020; padding-bottom:calc(28px + env(safe-area-inset-bottom)); }
+  .wrap { max-width:640px; margin:0 auto; padding:0 16px; }
+  .hero { background:linear-gradient(135deg,#DC2626,#B91C1C); margin:0 -16px; padding:26px 20px 22px; color:#fff; }
+  .hero .back { display:inline-flex; align-items:center; gap:6px; font-size:16px; font-weight:800; color:#7F1D1D; background:#FEE2E2; border:2px solid #7F1D1D; border-radius:999px; padding:9px 20px; text-decoration:none; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+  .hero .back:active { transform:scale(.97); }
+  .hero h1 { font-size:22px; font-weight:800; letter-spacing:.5px; }
+  .hero p { font-size:12px; opacity:.92; margin-top:6px; line-height:1.6; }
+  .card { background:#fff; border-radius:16px; padding:18px 16px; margin-top:14px; box-shadow:0 2px 12px rgba(32,32,32,.06); }
+  .q-t { font-size:14px; font-weight:700; color:#202020; }
+  .q-t .req { color:#DC2626; }
+  .opts { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .opt { font-size:13px; padding:8px 14px; border-radius:999px; border:1.5px solid #E5E1D8; background:#FBF9F4; color:#4A463F; cursor:pointer; transition:all .15s; }
+  .opt.on { border-color:#DC2626; background:#FDEBEB; color:#B91C1C; font-weight:700; }
+  textarea { width:100%; min-height:88px; margin-top:10px; border:1.5px solid #E5E1D8; border-radius:12px; background:#FBF9F4; padding:10px 12px; font-size:13px; font-family:inherit; color:#202020; resize:vertical; }
+  textarea:focus { outline:none; border-color:#DC2626; }
+  .submit { display:block; width:100%; margin-top:18px; border:none; border-radius:14px; background:linear-gradient(135deg,#DC2626,#B91C1C); color:#fff; font-size:16px; font-weight:800; padding:15px; cursor:pointer; box-shadow:0 4px 16px rgba(220,38,38,.3); }
+  .submit:disabled { opacity:.55; }
+  .submit:active { transform:scale(.99); }
+  .pts-hero { display:flex; align-items:baseline; gap:6px; margin-top:8px; }
+  .pts-hero .num { font-size:30px; font-weight:900; color:#B45309; }
+  .pts-hero .unit { font-size:12px; color:#8A8378; }
+  .gift { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px dashed #EDEAE3; }
+  .gift:last-child { border-bottom:none; }
+  .gift .ic { flex:none; width:42px; height:42px; border-radius:12px; background:#FFF7ED; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .gift .nm { font-size:14px; font-weight:700; color:#202020; }
+  .gift .ds { font-size:11px; color:#8A8378; margin-top:2px; }
+  .gift .pv { margin-left:auto; flex:none; font-size:13px; font-weight:800; color:#B45309; background:#FFF7ED; border-radius:999px; padding:5px 11px; }
+  .tip { font-size:11px; color:#8A8378; line-height:1.7; margin-top:10px; }
+  .done { text-align:center; padding:26px 16px; }
+  .done .big { font-size:40px; }
+  .done h2 { font-size:18px; font-weight:800; margin-top:10px; color:#15803D; }
+  .done p { font-size:13px; color:#4A463F; margin-top:8px; line-height:1.7; }
+  .hidden { display:none; }
+  .sec-t { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:#8A8378; letter-spacing:1px; margin:24px 0 10px; }
+  .sec-t::before { content:""; width:4px; height:14px; border-radius:2px; background:#DC2626; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <a class="back" href="index.html">‹ 返回刷题</a>
+    <h1>内测意见问卷</h1>
+    <p>你是第一批用这个神器的人，你的意见直接决定它下一步怎么改。<br>填写问卷得 <b>200 积分</b>，积分可兑换真题卷、考公书籍、小家电、平板、手机（见页面下方）。</p>
+  </div>
+
+  <div id="formBox">
+    <div class="card">
+      <div class="q-t">1. 总体使用感受 <span class="req">*</span></div>
+      <div class="opts" data-q="a1">
+        <span class="opt">非常好</span><span class="opt">还不错</span><span class="opt">一般</span><span class="opt">不太好</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">2. 每天刷题的量（节奏）感觉如何 <span class="req">*</span></div>
+      <div class="opts" data-q="a2">
+        <span class="opt">偏多</span><span class="opt">刚好</span><span class="opt">偏少</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">3. 打开应用和刷题的网络速度 <span class="req">*</span></div>
+      <div class="opts" data-q="a3">
+        <span class="opt">很快</span><span class="opt">一般</span><span class="opt">较慢</span><span class="opt">经常加载失败</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">4. 资料 / 文件提取的速度 <span class="req">*</span></div>
+      <div class="opts" data-q="a4">
+        <span class="opt">很快</span><span class="opt">一般</span><span class="opt">较慢</span><span class="opt">还没用过</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">5. 题目质量（有没有发现错题、答案问题）<span class="req">*</span></div>
+      <div class="opts" data-q="a5">
+        <span class="opt">没发现问题</span><span class="opt">发现少量</span><span class="opt">发现较多</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">6. 使用中有没有 bug（卡顿、按钮失灵等）<span class="req">*</span></div>
+      <div class="opts" data-q="a6">
+        <span class="opt">没有</span><span class="opt">偶尔有</span><span class="opt">经常有</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t">7. 其他意见或建议（选填，写在「其他」里）</div>
+      <textarea id="otherTx" placeholder="想加什么功能、哪里不顺手、还想刷什么题，都可以写"></textarea>
+    </div>
+    <button class="submit" id="submitBtn">提交问卷 · 领 200 积分</button>
+    <p class="tip">问卷匿名提交，不收集任何个人信息；每人积分奖励仅一次，问卷可以多次提交（以最新一次为准）。</p>
+  </div>
+
+  <div id="doneBox" class="card done hidden">
+    <div class="big">🎉</div>
+    <h2>提交成功！200 积分已到账</h2>
+    <p>你的意见我们会认真看，内测期的好建议会直接变成下一次更新。<br>积分攒够就能兑换下方礼品，继续加油！</p>
+    <button class="submit" style="margin-top:16px" onclick="location.href='index.html'">回去继续刷题</button>
+  </div>
+
+  <div class="sec-t">我的积分</div>
+  <div class="card">
+    <div class="pts-hero"><span class="num" id="ptsNum">0</span><span class="unit">分 · 打开刷题应用首页右上角「积分」可看明细</span></div>
+  </div>
+
+  <div class="sec-t">积分能换什么（内测用户专属）</div>
+  <div class="card">
+    <div class="gift"><span class="ic">📄</span><div><div class="nm">纸质真题卷</div><div class="ds">近三年国考/省考真题，包邮到家</div></div><span class="pv">500 积分</span></div>
+    <div class="gift"><span class="ic">📚</span><div><div class="nm">考公书籍</div><div class="ds">行测/申论教材、题库任选一本</div></div><span class="pv">2000 积分</span></div>
+    <div class="gift"><span class="ic">💧</span><div><div class="nm">加湿器</div><div class="ds">桌面静音款，备考宿舍必备</div></div><span class="pv">5000 积分</span></div>
+    <div class="gift"><span class="ic">🍚</span><div><div class="nm">智能电饭煲</div><div class="ds">家用迷你款</div></div><span class="pv">10000 积分</span></div>
+    <div class="gift"><span class="ic">📱</span><div><div class="nm">小米平板</div><div class="ds">刷题看课两不误</div></div><span class="pv">30000 积分</span></div>
+    <div class="gift"><span class="ic">🎁</span><div><div class="nm">千元手机</div><div class="ds">红米/荣耀新款，上岸换机</div></div><span class="pv">60000 积分</span></div>
+    <p class="tip">内测结束后统一登记发放，届时会通知达标的同学填写收货方式；积分只涨不清零，放心攒。</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PTS_KEY="yicheng-gk-points-v1", DONE_KEY="yicheng-gk-fb-done-v1";
+  var FB_KEY="ycgk-fb-v1";
+  var EP_GET=["https://textdb.online/"+FB_KEY, "https://textdb.dev/api/data/"+FB_KEY];
+  var EP_PUT=[
+    function(v){ return fetch("https://textdb.online/update/?key="+encodeURIComponent(FB_KEY)+"&value="+encodeURIComponent(v)); },
+    function(v){ return fetch("https://textdb.dev/api/data/"+FB_KEY, {method:"POST", headers:{"Content-Type":"text/plain"}, body:v}); }
+  ];
+
+  function getPoints(){ try{ return JSON.parse(localStorage.getItem(PTS_KEY))||{balance:0,ledger:[]}; }catch(e){ return {balance:0,ledger:[]}; } }
+  function addPoints(amount, reason, detail){
+    var p=getPoints();
+    p.balance=(p.balance||0)+amount;
+    p.todayEarned=(p.todayEarned||0)+amount;
+    p.todayDate=new Date().toISOString().slice(0,10);
+    p.ledger=p.ledger||[];
+    p.ledger.unshift({id:"yc-"+Date.now(), time:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16), amount:amount, reason:reason, detail:detail});
+    p.ledger=p.ledger.slice(0,30);
+    try{ localStorage.setItem(PTS_KEY, JSON.stringify(p)); }catch(e){}
+    document.getElementById("ptsNum").textContent=p.balance||0;
+  }
+
+  // 选项点选
+  var answers={};
+  document.querySelectorAll(".opts").forEach(function(box){
+    box.addEventListener("click", function(e){
+      var el=e.target;
+      if(!el.classList.contains("opt")) return;
+      box.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("on"); });
+      el.classList.add("on");
+      answers[box.dataset.q]=el.textContent;
+    });
+  });
+
+  function loadCloud(){
+    return Promise.allSettled(EP_GET.map(function(u){
+      return fetch(u, {cache:"no-store"}).then(function(r){ return r.text(); });
+    })).then(function(rs){
+      for (var i=0;i<rs.length;i++){
+        if (rs[i].status==="fulfilled" && rs[i].value && rs[i].value.trim()){
+          try{ var d=JSON.parse(rs[i].value); if (d && d.list) return d; }catch(e){}
+        }
+      }
+      return {list:[]};
+    });
+  }
+  function saveCloud(obj){
+    var str=JSON.stringify(obj);
+    return Promise.allSettled(EP_PUT.map(function(f){ return f(str); }));
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", function(){
+    var btn=this;
+    for (var i=1;i<=6;i++){
+      if(!answers["a"+i]){ alert("还有第 "+i+" 题没选，选完就能提交啦"); return; }
+    }
+    btn.disabled=true; btn.textContent="提交中…";
+    var payload={ ts:Date.now(), a1:answers.a1, a2:answers.a2, a3:answers.a3, a4:answers.a4, a5:answers.a5, a6:answers.a6, other:(document.getElementById("otherTx").value||"").slice(0,500) };
+    loadCloud().then(function(cloud){
+      cloud.list=cloud.list||[];
+      cloud.list.push(payload);
+      if (cloud.list.length>500) cloud.list=cloud.list.slice(-500);
+      return saveCloud(cloud);
+    }).then(function(){
+      if(!localStorage.getItem(DONE_KEY)){
+        localStorage.setItem(DONE_KEY, "1");
+        addPoints(200, "内测问卷", "填写内测意见问卷 +200");
+      }
+      document.getElementById("formBox").classList.add("hidden");
+      document.getElementById("doneBox").classList.remove("hidden");
+      window.scrollTo(0,0);
+    }).catch(function(){
+      btn.disabled=false; btn.textContent="提交失败，请检查网络后重试";
+    });
+  });
+
+  // 初始化积分显示
+  document.getElementById("ptsNum").textContent=getPoints().balance||0;
+})();
+</script>
+</body>
+</html>
