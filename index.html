@@ -631,7 +631,7 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
-/* usage stats beacon v1 */
+/* usage stats beacon v2: start 埋点改为沿祖先逐层匹配文本（首页刷题卡是 div 不是 button，v1 漏计） */
 (function(){
   try{
     var B='https://visitor-badge.laobi.icu/badge?page_id=';
@@ -641,11 +641,12 @@ document.addEventListener('click', function(e){
     try{ if(!localStorage.getItem('ycgk.d'+p)){ localStorage.setItem('ycgk.d'+p,'1'); hit('ycgk.uv.'+p); } }catch(e){}
     document.addEventListener('click',function(e){
       try{
-        var el=e.target;
-        while(el&&el!==document.body&&el.tagName!=='BUTTON'){el=el.parentElement;}
-        if(!el||el===document.body)return;
-        var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
-        if(/(顺序刷|随机刷|第\d+套$)/.test(t)) hit('ycgk.start');
+        var el=e.target,n=0;
+        while(el&&el!==document.body&&n<6){
+          var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+          if(/(顺序刷|随机刷|第\d+套)/.test(t)){ hit('ycgk.start'); return; }
+          el=el.parentElement;n++;
+        }
       }catch(e){}
     },true);
   }catch(e){}
