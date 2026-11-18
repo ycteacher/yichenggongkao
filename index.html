@@ -267,18 +267,22 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-dir-banner .yc-db-s { font-size: 11px; color: var(--yc-mut); margin-top: 2px; }
 .yc-dir-banner .yc-db-r { font-size: 12px; font-weight: 600; color: var(--yc-green); flex: none; }
 
-/* 内测版横幅（页面最上方） */
+/* 内测版横幅（页面最上方，紧凑单条横条） */
 .yc-beta-banner {
-  display: flex; align-items: center; gap: 8px;
-  margin: 12px 0 0; padding: 9px 13px; border-radius: 12px;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; box-sizing: border-box;
+  margin: 12px 0 0; padding: 10px 14px; border-radius: 12px;
   background: linear-gradient(135deg, rgba(220,38,38,.10), rgba(220,38,38,.04));
   border: 1px solid rgba(220,38,38,.25);
 }
 .yc-beta-banner .yc-bb-tag {
-  flex: none; font-size: 10px; font-weight: 800; color: #fff;
-  background: #DC2626; border-radius: 6px; padding: 2px 7px; letter-spacing: 1px;
+  flex: none; font-size: 12px; font-weight: 800; color: #fff;
+  background: #DC2626; border-radius: 6px; padding: 3px 8px; letter-spacing: 1px;
 }
-.yc-beta-banner .yc-bb-tx { font-size: 12px; font-weight: 600; color: #B91C1C; line-height: 1.5; }
+.yc-beta-banner .yc-bb-tx {
+  flex: 1; min-width: 0; font-size: 15px; font-weight: 700;
+  color: #B91C1C; line-height: 1.4;
+}
 
 /* 听取意见横幅（页面最底部，底栏之上） */
 .yc-fb-banner {
@@ -300,6 +304,8 @@ body.yc-ui { padding-top: 60px !important; }
 .from-\[\#7C3AED\]{--tw-gradient-from: #7C3AED var(--tw-gradient-from-position);--tw-gradient-to: rgb(124 58 237 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
 .to-\[\#5B21B6\]{--tw-gradient-to: #5B21B6 var(--tw-gradient-to-position)}
 .from-\[\#16A34A\]{--tw-gradient-from: #16A34A var(--tw-gradient-from-position);--tw-gradient-to: rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.from-\[\#0E7490\]{--tw-gradient-from: #0E7490 var(--tw-gradient-from-position);--tw-gradient-to: rgb(14 116 144 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.to-\[\#155E75\]{--tw-gradient-to: #155E75 var(--tw-gradient-to-position)}
 
 /* ===== 资料领取专区卡片 ===== */
 #yc-materials-card{
@@ -647,7 +653,7 @@ document.addEventListener('click', function(e){
     var b = document.createElement("div");
     b.id = "yc-beta-banner";
     b.className = "yc-beta-banner";
-    b.innerHTML = '<span class="yc-bb-tag">内测版</span><span class="yc-bb-tx">亿成公考 · 备考神器内测版，免费使用，欢迎大家提出意见</span>';
+    b.innerHTML = '<span class="yc-bb-tag">内测版</span><span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>';
     shell.insertBefore(b, shell.firstChild);
   }
 
