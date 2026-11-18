@@ -113,14 +113,14 @@ t==="gk"?s.jsx("div",{className:"mt-4 space-y-3",children:list.length?list.map((
 groups.length?s.jsx("div",{className:"mt-4 space-y-3",children:groups.map(g=>{
 const isOpen=open===g.name;
 return s.jsxs("div",{className:"rounded-3xl border border-[#E5E1D8] bg-white shadow-[0_2px_12px_rgba(32,32,32,0.04)] overflow-hidden",children:[
-s.jsxs("button",{type:"button",onClick:()=>O(isOpen?null:g.name),className:"flex w-full items-center justify-between gap-3 px-4 py-4 text-left",children:[
+s.jsxs("button",{type:"button",onClick:()=>{if(g.papers&&!g.items){c({name:"papers"});return}O(isOpen?null:g.name)},className:"flex w-full items-center justify-between gap-3 px-4 py-4 text-left",children:[
 s.jsxs("div",{className:"min-w-0",children:[
 s.jsx("p",{className:"text-sm font-bold text-[#202020]",children:g.name}),
 s.jsx("p",{className:"mt-0.5 text-xs leading-relaxed text-[#8A8378]",children:g.desc})
 ]}),
 s.jsx("span",{className:"material-icons text-[18px] text-[#B3AC9E]",children:isOpen?"expand_less":"expand_more"})
 ]}),
-isOpen?s.jsx("div",{className:"border-t border-[#E5E1D8] p-3 space-y-3",children:g.items.map((it,ii)=>it&&it.papers?itemRow(it,ii):it&&it.module?itemRow(it,ii):fileCard(it,ii))}):null
+isOpen?s.jsx("div",{className:"border-t border-[#E5E1D8] p-3 space-y-3",children:(g.items||[]).map((it,ii)=>it&&it.papers?itemRow(it,ii):it&&it.module?itemRow(it,ii):fileCard(it,ii))}):null
 ]},g.name)})}):empty,
 s.jsx("p",{className:"mt-4 text-center text-xs text-[#B3AC9E]",children:"点绿色按钮直接保存到手机文件；点「打开」先预览再存。资料持续更新。"})
 ]})}
