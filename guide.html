@@ -3,218 +3,321 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>亿成公考刷题 · 使用指南</title>
+<title>亿成公考刷题·从安装到刷题一篇搞清楚</title>
 <style>
-  :root{
-    --ink:#202020; --sub:#8A8378; --line:#E5E1D8; --paper:#FAF8F3;
-    --red:#C7331F; --red-deep:#A02818; --green:#15803D; --gold:#B8860B;
+  :root {
+    --red: #B91C1C;
+    --red-deep: #7F1D1D;
+    --ink: #262626;
+    --gray: #6B7280;
+    --bg: #F5F1EA;
+    --card: #FFFFFF;
+    --line: #EADFD0;
+    --green: #15803D;
+    --blue: #1E40AF;
+    --amber: #B45309;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-    background:#F3F0E9; color:var(--ink); font-size:16px; line-height:1.7;
-    -webkit-text-size-adjust:100%;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+    line-height: 1.7;
+    font-size: 16px;
   }
-  .wrap{max-width:680px;margin:0 auto;padding:0 16px 56px;}
-  header{
-    background:linear-gradient(160deg,#C7331F 0%,#A02818 100%);
-    color:#fff; border-radius:0 0 28px 28px; padding:36px 22px 30px; text-align:center;
+  .page { max-width: 640px; margin: 0 auto; padding-bottom: 56px; }
+
+  /* 头部 */
+  .hero {
+    background: linear-gradient(160deg, #C22626 0%, #8F1414 100%);
+    color: #FFF;
+    text-align: center;
+    padding: 44px 24px 34px;
   }
-  header h1{font-size:26px;letter-spacing:2px;font-weight:800;}
-  header .tagline{margin-top:8px;font-size:14px;opacity:.92;}
-  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
-  .badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
-    border-radius:999px;padding:4px 14px;font-size:13px;}
-  section{margin-top:26px;}
-  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-  .step-num{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--red);
-    color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;}
-  .step-head h2{font-size:19px;font-weight:800;}
-  .card{background:#fff;border-radius:20px;padding:20px 18px;
-    box-shadow:0 2px 12px rgba(32,32,32,.06);}
-  .card + .card{margin-top:12px;}
-  .card h3{font-size:16px;font-weight:700;margin-bottom:8px;}
-  .card p{color:#3a3a3a;}
-  .muted{color:var(--sub);font-size:14px;}
-  ol.steps{padding-left:0;list-style:none;counter-reset:s;}
-  ol.steps li{position:relative;padding-left:34px;margin-top:10px;counter-increment:s;}
-  ol.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:22px;height:22px;
-    border-radius:50%;background:var(--paper);border:1px solid var(--line);
-    color:var(--red);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;}
-  .qr-box{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
-  .qr-box img{width:150px;height:150px;border-radius:14px;border:1px solid var(--line);background:#fff;padding:6px;}
-  .qr-box .link-box{flex:1;min-width:220px;}
-  .url{display:block;background:var(--paper);border:1px dashed var(--line);border-radius:12px;
-    padding:10px 12px;font-size:15px;word-break:break-all;color:var(--red-deep);text-decoration:none;font-weight:600;}
-  .tip{background:#FFF7ED;border:1px solid #FDE4C8;border-radius:12px;padding:10px 14px;
-    font-size:14px;color:#8a5a1e;margin-top:12px;}
-  .device-tabs{display:grid;grid-template-columns:1fr;gap:12px;}
-  @media(min-width:560px){.device-tabs{grid-template-columns:1fr 1fr;}}
-  .dev{background:#fff;border-radius:18px;padding:18px 16px;box-shadow:0 2px 12px rgba(32,32,32,.06);}
-  .dev .icon{font-size:24px;}
-  .dev h3{font-size:16px;font-weight:800;margin:6px 0 6px;}
-  .dev p{font-size:14.5px;color:#3a3a3a;}
-  .path-flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;}
-  .flow-node{background:var(--paper);border:1px solid var(--line);border-radius:10px;
-    padding:6px 12px;font-size:14px;font-weight:600;}
-  .flow-arrow{color:var(--red);font-weight:700;}
-  .hl{background:linear-gradient(180deg,transparent 62%,#FBE3A0 62%);font-weight:700;}
-  .suan{background:linear-gradient(135deg,#FFF7E8,#FFEFD2);border:1px solid #F2DCA8;}
-  .suan h3{color:var(--red-deep);}
-  .points{display:grid;grid-template-columns:1fr;gap:12px;}
-  @media(min-width:560px){.points{grid-template-columns:1fr 1fr 1fr;}}
-  .pt{background:#fff;border-radius:18px;padding:18px 16px;text-align:center;
-    box-shadow:0 2px 12px rgba(32,32,32,.06);}
-  .pt .big{font-size:26px;}
-  .pt h3{font-size:15.5px;font-weight:800;margin:6px 0 4px;}
-  .pt p{font-size:13.5px;color:var(--sub);}
-  .role-cards{display:grid;grid-template-columns:1fr;gap:12px;}
-  .role{border-radius:18px;padding:18px 16px;color:#fff;}
-  .role h3{font-size:16px;font-weight:800;}
-  .role p{font-size:14px;opacity:.94;margin-top:4px;}
-  .role.gk{background:linear-gradient(135deg,#C7331F,#A02818);}
-  .role.sk{background:linear-gradient(135deg,#1D6FB8,#14507F);}
-  .role.sy{background:linear-gradient(135deg,#15803D,#0E5C2C);}
-  footer{margin-top:34px;text-align:center;color:var(--sub);font-size:13.5px;}
-  footer .brand{font-weight:800;color:var(--ink);letter-spacing:1px;}
-  .free-flag{display:inline-block;background:var(--green);color:#fff;border-radius:999px;
-    padding:3px 14px;font-size:13px;font-weight:700;margin-bottom:10px;}
+  .hero h1 { font-family: "Noto Serif SC", "Songti SC", serif; font-size: 34px; letter-spacing: 0.06em; }
+  .hero .sub { font-size: 14px; opacity: 0.92; margin-top: 8px; }
+  .tags { margin-top: 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .tag {
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 13px;
+  }
+
+  /* 主体 */
+  .body { padding: 26px 18px 0; }
+  .step-head { display: flex; align-items: center; gap: 10px; margin: 34px 0 14px; }
+  .step-no {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--red); color: #FFF;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; flex: none;
+  }
+  .step-head h2 { font-size: 20px; }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px 18px;
+    box-shadow: 0 3px 14px rgba(90, 50, 20, 0.07);
+    margin-bottom: 6px;
+  }
+  .card p + p { margin-top: 10px; }
+  .muted { color: var(--gray); font-size: 14px; }
+  .num-list { padding-left: 20px; }
+  .num-list li { margin-bottom: 8px; }
+  .url-box {
+    background: #FDF3E7;
+    border: 1px dashed #D9A05B;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 15px;
+    word-break: break-all;
+    margin-top: 12px;
+  }
+  .warn {
+    background: #FDF6E7;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--amber);
+    margin-top: 12px;
+  }
+  .qr-row { display: flex; gap: 18px; align-items: center; }
+  .qr-row img { width: 128px; height: 128px; border-radius: 10px; flex: none; }
+
+  /* 四栏设备 */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .device {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 3px 14px rgba(90, 50, 20, 0.07);
+  }
+  .device h3 { font-size: 16px; margin-bottom: 8px; }
+  .device ol { padding-left: 18px; font-size: 14px; }
+  .device ol li { margin-bottom: 6px; }
+  .device .note { font-size: 13px; color: var(--gray); margin-top: 8px; }
+  @media (max-width: 420px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* 内测码高亮 */
+  .beta-card {
+    background: linear-gradient(150deg, #FFF7ED, #FDEBDD);
+    border: 1.5px solid #EAB308;
+    border-radius: 16px;
+    padding: 20px 18px;
+  }
+  .beta-card h3 { font-size: 18px; color: var(--red); margin-bottom: 8px; }
+  .code-chip {
+    display: inline-block;
+    background: var(--ink); color: #FFF;
+    border-radius: 8px; padding: 4px 12px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 14px;
+  }
+
+  /* 考试横条 */
+  .bar { border-radius: 14px; padding: 16px 18px; color: #FFF; margin-bottom: 12px; }
+  .bar h3 { font-size: 17px; margin-bottom: 4px; }
+  .bar p { font-size: 14px; opacity: 0.94; }
+  .bar.red { background: linear-gradient(135deg, #C22626, #8F1414); }
+  .bar.blue { background: linear-gradient(135deg, #1D4ED8, #1E3A8A); }
+  .bar.green { background: linear-gradient(135deg, #16A34A, #14532D); }
+
+  /* 三件事 */
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .value {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    box-shadow: 0 3px 14px rgba(90, 50, 20, 0.07);
+  }
+  .value .icon { font-size: 26px; }
+  .value h3 { font-size: 15px; color: var(--red); margin: 6px 0 6px; }
+  .value p { font-size: 13px; color: var(--gray); }
+  @media (max-width: 420px) { .grid3 { grid-template-columns: 1fr; } }
+
+  /* 内测说明 */
+  .free-banner {
+    background: linear-gradient(135deg, #C22626, #8F1414);
+    color: #FFF;
+    border-radius: 16px;
+    padding: 22px 20px;
+    text-align: center;
+  }
+  .free-banner .pill {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 999px;
+    padding: 4px 16px;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .free-banner h3 { font-size: 20px; margin-bottom: 8px; }
+  .free-banner p { font-size: 14px; opacity: 0.95; }
+  .gift-list {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 18px;
+    margin-top: 12px;
+    box-shadow: 0 3px 14px rgba(90, 50, 20, 0.07);
+  }
+  .gift-list h3 { font-size: 17px; margin-bottom: 8px; }
+  .gift-list .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .gift-list .chip {
+    background: #FDF3E7;
+    border: 1px solid #EAB308;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 14px;
+  }
+
+  footer { text-align: center; margin-top: 44px; padding: 0 24px; }
+  footer .brand { font-family: "Noto Serif SC", "Songti SC", serif; font-size: 18px; }
+  footer .slogan { font-size: 14px; color: var(--gray); margin-top: 6px; }
 </style>
 </head>
 <body data-visualization-style="knowledge-technology">
-<div class="wrap">
+<div class="page">
 
-  <header>
+  <header class="hero">
     <h1>亿成公考刷题</h1>
-    <p class="tagline">从安装到开刷，一篇说清楚 · 苹果 / 安卓 / 平板 / 电脑通用</p>
-    <div class="badges">
-      <span class="badge">📱 无需下载 App</span>
-      <span class="badge">🆓 测试期完全免费</span>
-      <span class="badge">✅ 题源全部真题</span>
+    <p class="sub">从安装到刷题，一篇搞清楚 ｜ 苹果 / 安卓 / 平板 / 电脑通用</p>
+    <div class="tags">
+      <span class="tag">📱 无需下载 App</span>
+      <span class="tag">🧪 测试期完全免费</span>
+      <span class="tag">✅ 题源全部真题</span>
     </div>
   </header>
 
-  <section>
-    <div class="step-head"><span class="step-num">1</span><h2>先拿到入口</h2></div>
-    <div class="card qr-box">
-      <img src="https://mdn.alipayobjects.com/asap_serivce/uri/file/as/upload_image_3466e491baf647b8b5a8ba283fb5c413.png" alt="亿成公考刷题二维码">
-      <div class="link-box">
-        <h3>两种方式任选</h3>
-        <p style="margin-top:6px;">① 用手机<b>相机或浏览器扫码</b>上方二维码；</p>
-        <p style="margin-top:6px;">② 或点开下面这条链接（建议先复制到浏览器打开）：</p>
-        <a class="url" href="https://ycteacher.github.io/yichenggongkao/">ycteacher.github.io/yichenggongkao</a>
-        <div class="tip">⚠️ 如果是在微信里点开，页面也能直接刷题；但想「添加到桌面」的话，先点右上角「···」→ 选「在浏览器打开」，再用浏览器添加。</div>
-      </div>
-    </div>
-  </section>
+  <main class="body">
 
-  <section>
-    <div class="step-head"><span class="step-num">2</span><h2>添加到桌面（装好一次，以后像 App 一样点开）</h2></div>
-    <p class="muted" style="margin-bottom:12px;">苹果、安卓做法基本一样，都是「用浏览器打开 → 添加到主屏幕」，不需要去应用商店下载任何东西。</p>
-    <div class="device-tabs">
-      <div class="dev">
-        <span class="icon">🍎</span>
-        <h3>iPhone / iPad</h3>
-        <ol class="steps">
-          <li>用 <b>Safari</b> 打开上面的链接</li>
-          <li>点底部中间的「分享」按钮 <b>⬆︎</b></li>
-          <li>往下找到「<b>添加到主屏幕</b>」→ 点「添加」</li>
-        </ol>
-        <p class="muted" style="margin-top:8px;">桌面上就会出现一个图标，点开直接刷题。</p>
-      </div>
-      <div class="dev">
-        <span class="icon">🤖</span>
-        <h3>安卓手机 / 平板</h3>
-        <ol class="steps">
-          <li>用浏览器（Chrome、华为浏览器等）打开链接</li>
-          <li>点右上角「<b>⋮</b>」菜单</li>
-          <li>选「<b>添加到主屏幕 / 添加到桌面</b>」→ 确认</li>
-        </ol>
-        <p class="muted" style="margin-top:8px;">不同品牌叫法略有差别，认准「添加到主屏幕」字样即可。</p>
-      </div>
-      <div class="dev">
-        <span class="icon">💻</span>
-        <h3>电脑</h3>
-        <p>浏览器直接打开链接就能用，大屏刷题、看解析更舒服。想长期用，可以把网址<b>收藏到书签栏</b>，或拖到桌面生成快捷方式。</p>
-      </div>
-      <div class="dev">
-        <span class="icon">📲</span>
-        <h3>平板</h3>
-        <p>iPad 按 iPhone 的步骤（Safari → 分享 → 添加到主屏幕）；安卓平板按安卓的步骤。横屏竖屏都适配好了。</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="step-head"><span class="step-num">3</span><h2>打开之后怎么学（三步开刷）</h2></div>
+    <div class="step-head"><span class="step-no">1</span><h2>先拿到入口</h2></div>
     <div class="card">
-      <div class="path-flow">
-        <span class="flow-node">① 选身份</span><span class="flow-arrow">→</span>
-        <span class="flow-node">② 点模块 · 选题量</span><span class="flow-arrow">→</span>
-        <span class="flow-node">③ 开刷</span>
+      <div class="qr-row">
+        <img src="https://mdn.alipayobjects.com/asap_serivce/uri/file/as/upload_image_f01b1335121b4b678fc7a0b34c3162b1.png" alt="应用入口二维码">
+        <div>
+          <p><strong>两种方式任选</strong></p>
+          <p class="muted">① 用手机相机或浏览器扫上方二维码；<br>② 或点开下面这条链接（建议先复制到浏览器打开）：</p>
+        </div>
       </div>
-      <ol class="steps" style="margin-top:14px;">
-        <li><b>选身份</b>：你准备国考、省考还是事业编？页面会告诉你每类卷子的情况，照着自己的考试选就行。</li>
-        <li><b>点模块、选题量</b>：常识、言语、数量、判断、资料五大模块随便点。点进去先选「顺序刷」还是「随机刷」，再选 15 / 20 / 50 / 100 题或全部——不用一次刷完，选一组，做完随时能退。</li>
-        <li><b>整套卷子</b>：首页的「整套卷子」板块有 20 套完整卷子，每套 130 题，按考试类型分好类、标好难度，想练整卷的直接进。</li>
+      <div class="url-box">ycteacher.github.io/yichenggongkao</div>
+      <div class="warn">⚠ 如果你在微信里打开，可能被拦截；想「添加到桌面」，请先点右上角「···」，选「在浏览器打开」，再用浏览器添加。</div>
+    </div>
+
+    <div class="step-head"><span class="step-no">2</span><h2>添加到桌面（装好一次，以后像 App 一样点开）</h2></div>
+    <p class="muted" style="margin-bottom:12px">苹果、安卓做法基本一样，都是「用浏览器打开 → 添加到主屏幕」，不需要去应用商店下载任何东西。</p>
+    <div class="grid2">
+      <div class="device">
+        <h3>🍎 iPhone / iPad</h3>
+        <ol>
+          <li>用 Safari 打开上面的链接</li>
+          <li>点底部中间的「分享」按钮 ⬆</li>
+          <li>往下找到「添加到主屏幕」→ 点「添加」</li>
+        </ol>
+        <p class="note">桌面上就会出现一个图标，点开直接刷题。</p>
+      </div>
+      <div class="device">
+        <h3>🤖 安卓手机 / 平板</h3>
+        <ol>
+          <li>用浏览器（Chrome、华为浏览器等）打开链接</li>
+          <li>点右上角「⋮」菜单</li>
+          <li>选「添加到主屏幕 / 添加到桌面」→ 确认</li>
+        </ol>
+        <p class="note">不同品牌叫法略有差别，认准「添加到主屏幕」字样即可。</p>
+      </div>
+      <div class="device">
+        <h3>💻 电脑</h3>
+        <p class="note">浏览器直接打开链接就能用，大屏刷题、看解析更舒服。想长期用，可以把网址收藏到书签栏，或拖到桌面生成快捷方式。</p>
+      </div>
+      <div class="device">
+        <h3>📲 平板</h3>
+        <p class="note">iPad 按 iPhone 的步骤（Safari → 分享 → 添加到主屏幕）；安卓平板按安卓的步骤。横屏竖屏都适配好了。</p>
+      </div>
+    </div>
+
+    <div class="step-head"><span class="step-no">3</span><h2>内测码：打开就自动生成</h2></div>
+    <div class="beta-card">
+      <h3>你的内测码不用申请，打开就有</h3>
+      <p>第一次打开应用，系统会<strong>自动生成一个属于你的内测码</strong>（学习码）。</p>
+      <p style="margin-top:8px">📱 <strong>截图保存好</strong>，它长这样：<span class="code-chip">YC-XXXXXX</span></p>
+      <p style="margin-top:8px" class="muted">换手机、换平板、用电脑时，输入<strong>同一个内测码</strong>，刷题记录、错题本、积分全部自动同步，一个码走天下。</p>
+    </div>
+
+    <div class="step-head"><span class="step-no">4</span><h2>打开之后怎么学（三步开刷）</h2></div>
+    <div class="card">
+      <p><strong>① 选身份 → ② 点模块·选题量 → ③ 开刷</strong></p>
+      <ol class="num-list">
+        <li><strong>选身份</strong>：你准备国考、省考还是事业编？页面会告诉你每类卷子的情况，照着自己的考试选就行。</li>
+        <li><strong>点模块、选题量</strong>：常识、言语、数量、判断、资料五大板块随便点。进去先选「顺序刷」还是「随机刷」，再选 15 / 20 / 50 / 100 题一组——不用一次刷完，选一组，做完随时退。</li>
+        <li><strong>整卷卷子</strong>：首页的「整卷卷子」板块有 20 套完整卷子，每套 130 题，按考试类型分好类、标好难度，想整卷刷的直接进。</li>
       </ol>
-      <div class="tip">💡 每道题做完立刻出对错和解析，错在哪、为什么，当场看明白。</div>
+      <div class="warn">💡 每道题做完立刻出对错和解析，错在哪、为什么，当场看明白。</div>
     </div>
-  </section>
 
-  <section>
-    <div class="step-head"><span class="step-num">4</span><h2>不同考试的同学，怎么刷最划算</h2></div>
-    <div class="role-cards">
-      <div class="role gk">
-        <h3>准备国考的同学</h3>
-        <p>国考板块目前<b>更新题目最多</b>，把国考的题好好刷一刷、刷透，性价比最高。</p>
-      </div>
-      <div class="role sk">
-        <h3>准备省考的同学</h3>
-        <p>和所有考试<b>共用同一个题库</b>，只是难易程度不一样。省考卷贴近联考难度，可以放心刷。</p>
-      </div>
-      <div class="role sy">
-        <h3>准备事业编的同学</h3>
-        <p>同样出自这个题库，事业编卷<b>难度偏高</b>，适合拔高；刚上手的话建议先从国考、省考卷刷起。</p>
-      </div>
+    <div class="step-head"><span class="step-no">5</span><h2>不同考试的同学，怎么刷最划算</h2></div>
+    <div class="bar red">
+      <h3>准备国考的同学</h3>
+      <p>国考板块目前更新题量最多，把国考的题好好刷一轮，刷透，性价比最高。</p>
     </div>
-  </section>
+    <div class="bar blue">
+      <h3>准备省考的同学</h3>
+      <p>和所有考试共用同一个题库，只是难易程度不一样。省考卷贴近联考难度，可以放心刷。</p>
+    </div>
+    <div class="bar green">
+      <h3>准备事业编的同学</h3>
+      <p>同样用这同一个题库，事业编卷难度偏高，适合拔高；刚上手的话建议先从国考、省考卷刷起。</p>
+    </div>
 
-  <section>
-    <div class="step-head"><span class="step-num">5</span><h2>这个应用里最值钱的三件事</h2></div>
-    <div class="points">
-      <div class="pt suan">
-        <div class="big">⚡</div>
+    <div class="step-head"><span class="step-no">6</span><h2>这个应用里最值钱的三件事</h2></div>
+    <div class="grid3">
+      <div class="value">
+        <div class="icon">⚡</div>
         <h3>速算板块</h3>
-        <p>目前市场上<b>独一份</b>的功能，别的任何软件都做不到这种程度。资料分析提速，就靠它。</p>
+        <p>目前市面上独一份的功能，别的任何软件都不会这种程度。资料分析提速，就靠它。</p>
       </div>
-      <div class="pt">
-        <div class="big">✅</div>
+      <div class="value">
+        <div class="icon">✅</div>
         <h3>题源全部真题</h3>
-        <p>题库里的题<b>全部来自真题</b>，不掺模拟题，刷的每一道都算数。</p>
+        <p>题库里的题全部来自真题，不掺模拟题，刷的一道是一遍真题。</p>
       </div>
-      <div class="pt">
-        <div class="big">🎁</div>
+      <div class="value">
+        <div class="icon">🎁</div>
         <h3>刷题攒积分</h3>
-        <p>刷题就有积分，积分可以<b>兑换相应的礼品</b>——刷得越多，拿得越多。</p>
+        <p>刷题就有积分，积分可以兑换相应的礼品——刷得越多，拿得越多。</p>
       </div>
     </div>
-  </section>
 
-  <section>
-    <div class="card" style="text-align:center;">
-      <span class="free-flag">测试阶段 · 完全免费</span>
-      <p>现在处在测试阶段，<b>不收一分钱</b>，所有功能开放使用。题目还在通过服务器<b>持续加速填充</b>，暂时没刷到的板块别急，内容马上就来。觉得好用，欢迎告诉身边一起备考的同学。</p>
+    <div class="step-head"><span class="step-no">7</span><h2>内测阶段，这些要知道</h2></div>
+    <div class="free-banner">
+      <span class="pill">🧪 内测版 · 永久免费</span>
+      <h3>内测版的同学，这个刷题神器永久免费</h3>
+      <p>现在在测试阶段，会有一些 bug，但基本上没有什么大问题。题目还在通过服务器持续加量填充，暂时没刷到的板块内容会马上补上。</p>
     </div>
-  </section>
+    <div class="gift-list">
+      <h3>🎁 提意见、多分享，积分福利拿不停</h3>
+      <p class="muted">在应用「意见栏」里填一份问卷，就能获得相应积分；<strong>内测版多分享给身边备考的朋友，分享也有积分</strong>。</p>
+      <p style="margin-top:10px">我们会抽取一些幸运的局长们，送出福利：</p>
+      <div class="chips">
+        <span class="chip">亿成老师亲笔编写的书</span>
+        <span class="chip">保温杯</span>
+        <span class="chip">加湿器</span>
+        <span class="chip">平板</span>
+        <span class="chip">手机</span>
+        <span class="chip">……等等</span>
+      </div>
+      <p class="muted">积分累积越高，抽中送出的东西越多，福利我们会邮寄到家。</p>
+    </div>
 
-  <footer>
-    <p class="brand">亿成老师 · 倾力打造</p>
-    <p style="margin-top:4px;">把会做的分，稳稳拿到手。</p>
-  </footer>
+    <footer>
+      <p class="brand">亿成老师 · 倾力打造</p>
+      <p class="slogan">把会做的分，稳稳拿到。</p>
+    </footer>
 
+  </main>
 </div>
-<script>
-(function(){try{new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.guide&r='+Date.now();}catch(e){}})();
-</script></body>
+</body>
 </html>
