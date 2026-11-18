@@ -709,8 +709,8 @@ document.addEventListener('click', function(e){
         localStorage.setItem('ycgk.devdone','1');
         var ua=navigator.userAgent||'';
         var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-        var isAndroid=/Android/i.test(ua);
-        hit(isIOS?'ycgk.dev.ios':(isAndroid?'ycgk.dev.android':'ycgk.dev.pc'));
+        var isMobi=isIOS||/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)||/Android|Mobile|Mobi/i.test(ua);
+        hit(isIOS?'ycgk.dev.ios':(isMobi?'ycgk.dev.android':'ycgk.dev.pc'));
         var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
         if(standalone)hit('ycgk.installed');
       }
@@ -1186,7 +1186,8 @@ document.addEventListener('click', function(e){
       if(ls("ycgk.refDone"))return;
       lss("ycgk.refDone","1");
       bumpRef(ref,function(){});
-      try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refin&r="+Date.now()}catch(e){}
+      /* 受邀访客计数已挪到 guide.html 第一触点；直接带 ref 打开本页的旧链接在此兜底 */
+      try{if(!ls("ycgk.refinDone")){lss("ycgk.refinDone","1");new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refin&r="+Date.now()}}catch(e){}
       setTimeout(function(){
         try{
           var b=document.createElement("div");b.className="yc-sync-hint";
@@ -1235,7 +1236,7 @@ document.addEventListener('click', function(e){
     shOv.appendChild(card);document.body.appendChild(shOv);
     shOv.addEventListener("click",function(e){if(e.target===shOv)shOv.classList.remove("on")});
   }
-  function shareLink(){return "https://ycteacher.github.io/yichenggongkao/?ref="+myCode()}
+  function shareLink(){return "https://ycteacher.github.io/yichenggongkao/guide.html?ref="+myCode()}
   function copyText(txt,ok,fail){
     try{
       if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fail)}
@@ -1305,16 +1306,17 @@ document.addEventListener('click', function(e){
     if(seen)return;
     var ua=navigator.userAgent||"";
     var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-    var isAndroid=/Android/i.test(ua);
+    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua);
+    var isMobi=isIOS||isHarmony||/Android|Mobile|Mobi/i.test(ua);
     var inWx=/MicroMessenger/i.test(ua);
     var steps="";
     if(isIOS){
       steps='<div class="yc-wl-st"><b>1</b><span>点浏览器底部中间的「分享」按钮（方框加向上箭头）</span></div>'+
             '<div class="yc-wl-st"><b>2</b><span>在弹出的菜单里选「添加到主屏幕」</span></div>'+
             '<div class="yc-wl-st"><b>3</b><span>点右上「添加」，桌面就有亿成公考图标了</span></div>';
-    }else if(isAndroid){
-      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器右上角的「⋮」菜单</span></div>'+
-            '<div class="yc-wl-st"><b>2</b><span>选「添加到主屏幕」或「安装应用」</span></div>'+
+    }else if(isMobi){
+      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器右上角的「⋮」菜单（华为浏览器也可能在底部「⌘」）</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>选「添加到桌面」或「安装应用」</span></div>'+
             '<div class="yc-wl-st"><b>3</b><span>点「安装」，桌面就有图标了</span></div>';
     }else{
       steps='<div class="yc-wl-st"><b>1</b><span>按 <b class="kb">Ctrl+D</b>（Mac 按 <b class="kb">⌘+D</b>）收藏本页</span></div>'+
