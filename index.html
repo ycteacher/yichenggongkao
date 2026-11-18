@@ -33,6 +33,7 @@
     <base href="https://ycteacher.github.io/yichenggongkao/">
     <link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
     <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=2">
+    <link rel="preconnect" href="https://gw.alipayobjects.com" crossorigin>
     <link href="https://gw.alipayobjects.com/render/p/yuyan/180023180003946312/material-icons.css" rel="stylesheet" crossorigin="anonymous">
     <script defer="" src="base.js"></script>
     <script>window.YC_CS_BANK=window.YC_CS_BANK||[];</script>
@@ -582,6 +583,12 @@ document.addEventListener('click', function(e){
     setInterval(function(){
       var t = studyTotals();
       var da = t.a - last.a, dc = t.c - last.c;
+      try{
+        if(da>0&&localStorage.getItem('ycgk.refDone')&&!localStorage.getItem('ycgk.refstudyDone')){
+          localStorage.setItem('ycgk.refstudyDone','1');
+          new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refstudy&r="+Date.now();
+        }
+      }catch(e){}
       if (da > 0) addPoints(da, "完成刷题", "新答 " + da + " 题，每题 +1");
       if (dc > 0) addPoints(dc, "答对加分", "答对 " + dc + " 题，每题 +1");
       last = t;
@@ -696,6 +703,27 @@ document.addEventListener('click', function(e){
     hit('ycgk.open');
     var d=new Date(),p=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
     try{ if(!localStorage.getItem('ycgk.d'+p)){ localStorage.setItem('ycgk.d'+p,'1'); hit('ycgk.uv.'+p); } }catch(e){}
+    /* 设备类型与安装状态：每台设备只记一次 */
+    try{
+      if(!localStorage.getItem('ycgk.devdone')){
+        localStorage.setItem('ycgk.devdone','1');
+        var ua=navigator.userAgent||'';
+        var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+        var isAndroid=/Android/i.test(ua);
+        hit(isIOS?'ycgk.dev.ios':(isAndroid?'ycgk.dev.android':'ycgk.dev.pc'));
+        var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+        if(standalone)hit('ycgk.installed');
+      }
+    }catch(e){}
+    /* 受邀同学回访：带过邀请链接的设备再次打开 */
+    try{
+      if(localStorage.getItem('ycgk.refDone')&&!sessionStorage.getItem('ycgk.refsess')){
+        sessionStorage.setItem('ycgk.refsess','1');
+        hit('ycgk.refreturn');
+      }
+    }catch(e){}
+    /* 离线缓存：装到桌面后再次打开基本秒开 */
+    if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js?v=1').catch(function(){})})}
     document.addEventListener('click',function(e){
       try{
         var el=e.target;
@@ -1233,7 +1261,7 @@ document.addEventListener('click', function(e){
       '<button class="yc-sync-btn" id="ycShareClose">关闭</button>';
     card.querySelector("#ycShareCopy").addEventListener("click",function(){
       var btn=this;
-      copyText(shareLink(),function(){btn.textContent="已复制！去微信 / QQ 粘贴发给同学";setTimeout(function(){btn.textContent="复制邀请链接"},3500)},function(){window.prompt("全选复制下面的链接：",shareLink())});
+      copyText(shareLink(),function(){btn.textContent="已复制！去微信 / QQ 粘贴发给同学";try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.sharecopy&r="+Date.now()}catch(e){}setTimeout(function(){btn.textContent="复制邀请链接"},3500)},function(){window.prompt("全选复制下面的链接：",shareLink())});
     });
     card.querySelector("#ycShareNative").addEventListener("click",function(){
       var txt="我在用亿成老师的公考刷题应用，题库全免费，邀请你一起刷：";
@@ -1249,6 +1277,7 @@ document.addEventListener('click', function(e){
       el.textContent=n>0?("已邀请 "+n+" 人 · 邀请积分 +"+(n*10)+" 分 · 当前积分 "+bal):"还没有同学通过你的链接来，快去分享吧";
     });
     creditReferrals();
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.share&r="+Date.now()}catch(e){}
     shOv.classList.add("on");
   }
   /* 积分中心补一条邀请规则 */
@@ -1300,9 +1329,10 @@ document.addEventListener('click', function(e){
       '<button class="yc-sync-btn main" id="ycWlOk">好的，开始刷题</button>'+
       '</div>';
     document.body.appendChild(ov);
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlshow&r="+Date.now()}catch(e){}
     function done(){try{localStorage.setItem("ycgk.welcomeSeen","1")}catch(e){}ov.classList.remove("on")}
     ov.addEventListener("click",function(e){if(e.target===ov)done()});
-    ov.querySelector("#ycWlOk").addEventListener("click",done);
+    ov.querySelector("#ycWlOk").addEventListener("click",function(){try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlok&r="+Date.now()}catch(e){}done()});
     setTimeout(function(){ov.classList.add("on")},600);
   }
   function boot(){
