@@ -737,6 +737,54 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
+/* usage stats beacon v3: 在线心跳 / 24小时活跃 / 平板识别 / 刷题深度 */
+(function(){
+  try{
+    var B='https://visitor-badge.laobi.icu/badge?page_id=';
+    function hit(id){ try{ new Image().src=B+id+'&r='+Date.now(); }catch(e){} }
+    function pad(n){ return ('0'+n).slice(-2); }
+    /* 平板识别：每台设备只记一次（iPad 同时计入 iOS，平板为补充标签） */
+    try{
+      if(!localStorage.getItem('ycgk.devtab')){
+        localStorage.setItem('ycgk.devtab','1');
+        var ua=navigator.userAgent||'';
+        if(/iPad|Tablet|PlayBook|Silk|SM-T\d|SM-P\d|Tab\d|MatePad|Pad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)) hit('ycgk.dev.tablet');
+      }
+    }catch(e){}
+    /* 24小时活跃分布：每次打开记入所在小时 */
+    try{ hit('ycgk.hr.'+pad(new Date().getHours())); }catch(e){}
+    /* 在线心跳：打开时及每 60 秒各记一次所在分钟 */
+    try{
+      var lastHb='';
+      function hb(){ var d=new Date(),s=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours())+pad(d.getMinutes()); if(s!==lastHb){ lastHb=s; hit('ycgk.hb.'+s); } }
+      hb(); setInterval(hb,60000);
+    }catch(e){}
+    /* 刷题深度：累计作答跨过 10/50/100/500/1000/5000 题各记一次（匿名） */
+    try{
+      var TH=[10,50,100,500,1000,5000];
+      function ansTotal(){
+        var t=0;
+        try{
+          var s=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}');
+          var mp=s.moduleProgress||{};
+          Object.keys(mp).forEach(function(k){ t+=(mp[k].answered||0); });
+        }catch(e){}
+        return t;
+      }
+      setInterval(function(){
+        try{
+          var a=ansTotal();
+          for(var i=0;i<TH.length;i++){
+            var n=TH[i];
+            if(a>=n&&!localStorage.getItem('ycgk.ans.t'+n)){ localStorage.setItem('ycgk.ans.t'+n,'1'); hit('ycgk.ans.t'+n); }
+          }
+        }catch(e){}
+      },8000);
+    }catch(e){}
+  }catch(e){}
+})();
+</script>
+<script>
 /* cloud sync layer v1: 学习码多设备同步 */
 (function(){
   var SYNC_FLAG="yicheng-gk-sync-v1", HINT_FLAG="yicheng-gk-sync-hint-v1";
