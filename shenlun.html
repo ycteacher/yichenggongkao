@@ -140,16 +140,16 @@
     html += '<div style="display:flex;align-items:center;gap:12px;">';
     html += '<a href="./index.html" style="color:#6B6558;text-decoration:none;"><span class="material-icons">arrow_back</span></a>';
     html += '<div><h1 style="margin:0;font-size:22px;font-weight:800;">' + tabName() + '练习专区</h1>';
-    html += '<p style="margin:2px 0 0;font-size:12px;color:#8A8378;">真题材料 · 电脑/平板打字作答 · AI 智能批阅</p></div></div>';
+    html += '<p style="margin:2px 0 0;font-size:12px;color:#8A8378;">真题材料 · 电脑/平板打字作答 · 智能精批</p></div></div>';
     // 统计条
     html += '<div class="card" style="margin-top:16px;padding:16px 20px;display:flex;gap:0;text-align:center;">';
     html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">在练题目</p></div>';
     html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#15803D;">' + done + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">已练过</p></div>';
-    html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">AI 批阅支持</p></div>';
+    html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">支持智能精批</p></div>';
     html += '</div>';
     // 提示卡
     html += '<div class="card" style="margin-top:12px;padding:14px 18px;font-size:12px;line-height:1.8;color:#6B6558;">';
-    html += '💡 建议用<strong>平板或电脑</strong>打开本页，直接打字作答更顺手；写完点「交卷批阅」立刻看到逐条采分点判定，再点「AI 深度批阅」把答案交给灵光做精细点评。</div>';
+    html += '💡 建议用<strong>平板或电脑</strong>打开本页，直接打字作答更顺手；写完点「交卷批阅」立刻看到逐条采分点判定，写完点「深度批阅」，稍等几秒就能看到逐句精细点评。</div>';
     // 分类 chips
     html += '<div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;">';
     cats.forEach(function(c){
@@ -224,9 +224,9 @@
     html += '<textarea id="ans" class="ans" style="margin-top:10px;" placeholder="在这里直接打字作答…建议用电脑或平板，作答会自动保存草稿。"></textarea>';
     html += '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">';
     html += '<button id="submitBtn" class="btn-primary">交卷批阅</button>';
-    html += '<button id="aiBtn" class="btn-ghost">AI 深度批阅（复制给灵光）</button>';
+    html += '<button id="aiBtn" class="btn-ghost">深度批阅</button>';
     html += '</div>';
-    html += '<p id="aiTip" style="margin:10px 0 0;font-size:12px;color:#8A8378;">交卷后先看逐条采分点判定；「AI 深度批阅」会把题目、材料和你的答案打包成一段批阅指令，复制后发给灵光即可获得精细点评。</p>';
+    html += '<p id="aiTip" style="margin:10px 0 0;font-size:12px;color:#8A8378;">交卷后先看逐条采分点判定；点「深度批阅」直接获得逐句精细点评。</p>';
     html += '</div>';
 
     // 批阅结果
@@ -278,8 +278,8 @@
     };
     document.getElementById('aiBtn').onclick = function(){
       var answer = ta.value.trim();
-      if(countChars(answer) < 10){ alert('先写一段作答，再让 AI 深度批阅～'); return; }
-      showAiModal(buildAiPrompt(q, answer));
+      if(countChars(answer) < 10){ alert('先写一段作答，再点深度批阅～'); return; }
+      deepReview(q, answer, this);
     };
     if(state.review) renderReview(q, state.review, state.draft);
   }
@@ -294,13 +294,13 @@
     html += '<p style="margin:0;font-size:14px;font-weight:700;">批阅结果</p>';
     html += '<p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + g.total + '<span style="font-size:13px;color:#8A8378;"> / ' + g.full + ' 分</span></p></div>';
     html += '<p style="margin:8px 0 0;font-size:12px;color:#6B6558;">' + praise;
-    if(g.aiFull){ html += '（规则初判 ' + g.total + ' 分，另有 ' + g.aiFull + ' 分格式/综合项由「AI 深度批阅」判定）'; }
-    else { html += '（规则初判，点「AI 深度批阅」可获得更精细的逐句点评）'; }
+    if(g.aiFull){ html += '（规则初判 ' + g.total + ' 分，另有 ' + g.aiFull + ' 分格式/综合项由「深度批阅」判定）'; }
+    else { html += '（规则初判，点「深度批阅」可获得更精细的逐句点评）'; }
     html += '</p>';
     html += '<div style="margin-top:14px;">';
     g.results.forEach(function(r){
       if(r.aiOnly){
-        html += '<div class="pt-row" style="background:#F5F3EE;"><span style="margin-top:2px;"><span class="tag" style="background:#E7E5E4;color:#57534E;">AI 判定</span></span><span><strong>' + esc(r.point) + '</strong><span style="color:#8A8378;">（' + r.score + '分）</span><br><span style="font-size:11px;color:#8A8378;">此项由 AI 深度批阅综合判定，规则初判不计分</span></span></div>';
+        html += '<div class="pt-row" style="background:#F5F3EE;"><span style="margin-top:2px;"><span class="tag" style="background:#E7E5E4;color:#57534E;">综合判定</span></span><span><strong>' + esc(r.point) + '</strong><span style="color:#8A8378;">（' + r.score + '分）</span><br><span style="font-size:11px;color:#8A8378;">此项由深度批阅综合判定，规则初判不计分</span></span></div>';
         return;
       }
       var cls = r.status === 'hit' ? 'pt-hit' : (r.status === 'half' ? 'pt-half' : 'pt-miss');
@@ -318,27 +318,71 @@
     box.innerHTML = html;
   }
 
-  function showAiModal(prompt){
+  function deepReview(q, answer, btn){
+    var ai = (typeof window !== 'undefined') && window.lingguang && window.lingguang.ai;
+    if(!ai || typeof ai.chat !== 'function'){
+      showAiModal('深度批阅需要在「亿成公考」App 内打开本页使用，网页端暂不支持。');
+      return;
+    }
+    var oldText = btn.textContent;
+    btn.disabled = true; btn.textContent = '批阅中，请稍候…';
+    var prompt = buildAiPrompt(q, answer);
+    var done = false;
+    var finish = function(fn){
+      if(done) return; done = true;
+      btn.disabled = false; btn.textContent = oldText;
+      fn();
+    };
+    var timer = setTimeout(function(){ finish(function(){ showAiModal('批阅超时了，请再点一次「深度批阅」试试。'); }); }, 120000);
+    try {
+      ai.chat({ messages: [{ role: 'user', content: prompt }] }).then(function(res){
+        clearTimeout(timer);
+        finish(function(){
+          var d = res && res.data !== undefined ? res.data : res;
+          var text = (typeof d === 'string' ? d : (d && (d.content || d.text || (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content)))) || '';
+          if(!text){ showAiModal('这次批阅没有返回内容，请再试一次。'); return; }
+          showReviewResult(text);
+        });
+      }).catch(function(){
+        clearTimeout(timer);
+        finish(function(){ showAiModal('批阅没有成功，请再点一次「深度批阅」试试。'); });
+      });
+    } catch(e) {
+      clearTimeout(timer);
+      finish(function(){ showAiModal('批阅没有成功，请再点一次「深度批阅」试试。'); });
+    }
+  }
+  function showReviewResult(text){
     var mask = document.createElement('div');
     mask.className = 'modal-mask';
-    mask.innerHTML = '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;">'
-      + '<p style="margin:0;font-size:16px;font-weight:800;">AI 深度批阅 · 两步搞定</p>'
+    mask.innerHTML = '<div class="modal" style="max-height:80vh;overflow-y:auto;"><div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<p style="margin:0;font-size:16px;font-weight:800;">深度批阅 · 逐句点评</p>'
       + '<button id="mClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
-      + '<ol style="font-size:13px;line-height:2;color:#444;padding-left:20px;margin:12px 0;">'
-      + '<li>点下面「复制批阅指令」，批阅内容已打包好；</li>'
-      + '<li>打开灵光 App 对话框，<strong>粘贴并发送</strong>，AI 阅卷专家逐点给你点评。</li></ol>'
-      + '<pre class="prompt" id="mPrompt">' + esc(prompt) + '</pre>'
-      + '<div style="margin-top:14px;display:flex;gap:10px;">'
-      + '<button id="mCopy" class="btn-primary" style="flex:1;">复制批阅指令</button></div></div>';
+      + '<div id="mResult" style="font-size:13px;line-height:2;color:#444;margin:12px 0;white-space:pre-wrap;">' + esc(text) + '</div>'
+      + '<div style="margin-top:10px;display:flex;gap:10px;">'
+      + '<button id="mCopy2" class="btn-primary" style="flex:1;">复制点评内容</button></div></div>';
     document.body.appendChild(mask);
     mask.querySelector('#mClose').onclick = function(){ mask.remove(); };
     mask.onclick = function(e){ if(e.target === mask) mask.remove(); };
-    mask.querySelector('#mCopy').onclick = function(){
-      var done = function(){ this.textContent = '已复制 ✓ 去灵光粘贴吧'; }.bind(this);
+    mask.querySelector('#mCopy2').onclick = function(){
+      var done = function(){ this.textContent = '已复制 ✓'; }.bind(this);
       if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(prompt).then(done).catch(function(){ fallbackCopy(prompt); done(); });
-      } else { fallbackCopy(prompt); done(); }
+        navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text); done(); });
+      } else { fallbackCopy(text); done(); }
     };
+  }
+  function showAiModal(msg){
+    var mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.innerHTML = '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<p style="margin:0;font-size:16px;font-weight:800;">深度批阅</p>'
+      + '<button id="mClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
+      + '<p style="font-size:13px;line-height:2;color:#444;margin:12px 0;">' + esc(msg) + '</p>'
+      + '<div style="margin-top:10px;"><button id="mOk" class="btn-primary" style="width:100%;">知道了</button></div></div>';
+    document.body.appendChild(mask);
+    mask.querySelector('#mClose').onclick = function(){ mask.remove(); };
+    mask.querySelector('#mOk').onclick = function(){ mask.remove(); };
+    mask.onclick = function(e){ if(e.target === mask) mask.remove(); };
   }
   function fallbackCopy(text){
     var ta = document.createElement('textarea');
