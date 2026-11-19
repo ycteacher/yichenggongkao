@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix9";
+      var V="ttfix10";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
@@ -33,32 +33,11 @@
     <base href="https://ycteacher.github.io/yichenggongkao/">
     <link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
     <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=2">
+    <link rel="preconnect" href="https://gw.alipayobjects.com" crossorigin>
     <link href="https://gw.alipayobjects.com/render/p/yuyan/180023180003946312/material-icons.css" rel="stylesheet" crossorigin="anonymous">
     <script defer="" src="base.js"></script>
     <script>window.YC_CS_BANK=window.YC_CS_BANK||[];</script>
-    <script src="./assets/cs-bank-1.js"></script><script defer src="./assets/cs-bank-2.js"></script><script defer src="./assets/cs-bank-3.js"></script><script defer src="./assets/cs-bank-4.js"></script><script defer src="./assets/cs-bank-5.js"></script><script defer src="./assets/cs-bank-6.js"></script><script defer src="./assets/cs-bank-7.js"></script><script defer src="./assets/cs-bank-8.js"></script><script defer src="./assets/cs-bank-9.js"></script>
-    <script>
-    (function(){
-      function loadRest(){
-        fetch('./assets/cs-banks.json?t='+Date.now()).then(function(r){return r.json()}).then(function(m){
-          var files=(m&&m.banks)||[]; var i=0;
-          function next(){
-            if(i>=files.length) return;
-            var f=files[i++];
-            var s=document.createElement('script');
-            s.src='./assets/'+f+'.js';
-            s.onload=function(){ try{ window.__ycMergeCs && window.__ycMergeCs(window.YC_CS_BANK.splice(0)); }catch(e){} next(); };
-            s.onerror=function(){ next(); };
-            document.head.appendChild(s);
-          }
-          next();
-        }).catch(function(){});
-      }
-      if(document.readyState==='complete') setTimeout(loadRest,1200);
-      else window.addEventListener('load',function(){ setTimeout(loadRest,1200); });
-    })();
-    </script>
-    <style>.tt-fig{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.tt-fig svg{width:60px;height:60px}.tt-opt svg{width:52px;height:52px;display:block;margin:0 auto}
+        <style>.tt-fig{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.md-tbl{border-collapse:collapse;margin:10px 0;width:100%;font-size:14px}.md-tbl th,.md-tbl td{border:1px solid #E5E1D8;padding:6px 10px;text-align:left;white-space:nowrap}.md-tbl th{background:#F7F5EF;font-weight:600;color:#4A463F}.tt-fig svg{max-width:100%;height:auto}.tt-opt svg{width:64px;height:64px;display:block;margin:0 auto}
 /* ===== Tab bar v1 ===== */
 .page-shell-bottom { padding-bottom: 78px !important; }
 .yc-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: flex; background: rgba(255,255,255,.97); border-top: 1px solid #E8E4DB; padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
@@ -70,9 +49,8 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b25.js?v=ttfix9"></script>
-    <link rel="modulepreload" href="./assets/index-b21.js">
-    <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix9">
+</style><script type="module" crossorigin="" src="./assets/index-b33.js?v=ttfix57"></script>
+        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix10">
       <!-- asap-vite-contract:a4167c51ba36d6fb9d742332 -->
     <meta name="asap-vite-contract" content="a4167c51ba36d6fb9d742332">
   <script>
@@ -267,6 +245,41 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-dir-banner .yc-db-s { font-size: 11px; color: var(--yc-mut); margin-top: 2px; }
 .yc-dir-banner .yc-db-r { font-size: 12px; font-weight: 600; color: var(--yc-green); flex: none; }
 
+/* 内测版横幅（页面最上方，加宽加大横条） */
+.yc-beta-banner {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; box-sizing: border-box;
+  margin: 12px 0 0; padding: 15px 18px; border-radius: 14px;
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  box-shadow: 0 4px 16px rgba(220,38,38,.28);
+}
+.yc-beta-banner .yc-bb-tag {
+  flex: none; font-size: 14px; font-weight: 900; color: #DC2626;
+  background: #fff; border-radius: 8px; padding: 5px 11px; letter-spacing: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.yc-beta-banner .yc-bb-tx {
+  flex: 1; min-width: 0; font-size: 17px; font-weight: 800;
+  color: #fff; line-height: 1.45; letter-spacing: .3px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.12);
+}
+
+/* 听取意见横幅（页面最底部，底栏之上） */
+.yc-fb-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 18px 0 4px; padding: 14px 16px; border-radius: 16px; cursor: pointer;
+  background: linear-gradient(135deg, #B45309, #92400E);
+  box-shadow: 0 4px 16px rgba(180,83,9,.25);
+}
+.yc-fb-banner:active { transform: scale(.99); }
+.yc-fb-banner .yc-fb-l { font-size: 14px; font-weight: 800; color: #fff; }
+.yc-fb-banner .yc-fb-s { font-size: 11px; color: rgba(255,255,255,.85); margin-top: 3px; line-height: 1.5; }
+.yc-fb-banner .yc-fb-r { flex: none; font-size: 12px; font-weight: 700; color: #FFF7ED; background: rgba(255,255,255,.18); border-radius: 999px; padding: 6px 12px; }
+.yc-fb-banner .yc-gifts { display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap; }
+.yc-fb-banner .yc-gift { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); border-radius: 999px; padding: 4px 10px 4px 7px; }
+.yc-fb-banner .yc-gift svg { width: 19px; height: 19px; display: block; }
+.yc-fb-banner .yc-gift b { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
+
 /* 新图标 */
 .yc-svg { width: 20px; height: 20px; display: block; }
 .page-shell .mt-3.grid > button .yc-svg { width: 21px; height: 21px; }
@@ -275,6 +288,8 @@ body.yc-ui { padding-top: 60px !important; }
 .from-\[\#7C3AED\]{--tw-gradient-from: #7C3AED var(--tw-gradient-from-position);--tw-gradient-to: rgb(124 58 237 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
 .to-\[\#5B21B6\]{--tw-gradient-to: #5B21B6 var(--tw-gradient-to-position)}
 .from-\[\#16A34A\]{--tw-gradient-from: #16A34A var(--tw-gradient-from-position);--tw-gradient-to: rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.from-\[\#0E7490\]{--tw-gradient-from: #0E7490 var(--tw-gradient-from-position);--tw-gradient-to: rgb(14 116 144 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.to-\[\#155E75\]{--tw-gradient-to: #155E75 var(--tw-gradient-to-position)}
 
 /* ===== 资料领取专区卡片 ===== */
 #yc-materials-card{
@@ -568,6 +583,12 @@ document.addEventListener('click', function(e){
     setInterval(function(){
       var t = studyTotals();
       var da = t.a - last.a, dc = t.c - last.c;
+      try{
+        if(da>0&&localStorage.getItem('ycgk.refDone')&&!localStorage.getItem('ycgk.refstudyDone')){
+          localStorage.setItem('ycgk.refstudyDone','1');
+          new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refstudy&r="+Date.now();
+        }
+      }catch(e){}
       if (da > 0) addPoints(da, "完成刷题", "新答 " + da + " 题，每题 +1");
       if (dc > 0) addPoints(dc, "答对加分", "答对 " + dc + " 题，每题 +1");
       last = t;
@@ -614,6 +635,46 @@ document.addEventListener('click', function(e){
     entry.parentNode.insertBefore(card, entry);
   }
 
+  /* ---------- 内测版横幅（首页顶部） ---------- */
+  function addBetaBanner(){
+    var shell = document.querySelector(".page-shell");
+    if (!shell || document.getElementById("yc-beta-banner")) return;
+    if (shell.textContent.indexOf("专项刷题") === -1) return;
+    var b = document.createElement("div");
+    b.id = "yc-beta-banner";
+    b.className = "yc-beta-banner";
+    b.innerHTML = '<span class="yc-bb-tag">内测版</span><span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>';
+    shell.insertBefore(b, shell.firstChild);
+  }
+
+  /* ---------- 听取意见横幅（首页底部） ---------- */
+  function addFbBanner(){
+    var shell = document.querySelector(".page-shell");
+    if (!shell || document.getElementById("yc-fb-banner")) return;
+    if (shell.textContent.indexOf("专项刷题") === -1) return;
+    var b = document.createElement("div");
+    b.id = "yc-fb-banner";
+    b.className = "yc-fb-banner";
+    var GIFT_SVGS = {
+      humid: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="7" width="8" height="13" rx="2"/><path d="M10 4h4"/><path d="M12 11.5c-1.1 1.4-1.7 2.3-1.7 3.1a1.7 1.7 0 1 0 3.4 0c0-.8-.6-1.7-1.7-3.1z"/></svg>',
+      pad: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3" width="15" height="18" rx="2.5"/><path d="M10 17.5h4"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7.5" y="2.5" width="9" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>',
+      book: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5C10.5 4.2 8.6 3.5 6 3.5v14c2.6 0 4.5.7 6 2 1.5-1.3 3.4-2 6-2v-14c-2.6 0-4.5.7-6 2z"/><path d="M12 5.5v14"/></svg>'
+    };
+    b.innerHTML = '<div style="min-width:0"><div class="yc-fb-l">听取意见 · 填问卷拿礼品</div><div class="yc-fb-s">1 分钟匿名问卷 · 积分可换真题卷、考公书籍、小家电、平板、手机</div>' +
+      '<div class="yc-gifts">' +
+      '<span class="yc-gift">' + GIFT_SVGS.humid + '<b>加湿器</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.pad + '<b>平板</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.phone + '<b>手机</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.book + '<b>考公书籍</b></span>' +
+      '</div></div><span class="yc-fb-r">去填写 ›</span>';
+    b.addEventListener("click", function(){
+      try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.feedback&r=" + Date.now(); }catch(e){}
+      window.location.href = "feedback.html";
+    });
+    shell.appendChild(b);
+  }
+
   /* ---------- 启动 ---------- */
   function boot(){
     replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers();
@@ -622,16 +683,19 @@ document.addEventListener('click', function(e){
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
     });
   }
-  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); });
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); addBetaBanner(); addFbBanner(); });
     mo.observe(document.body, {childList: true, subtree: true});
-    addMaterialsCard();
+    addMaterialsCard(); addBetaBanner(); addFbBanner();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
+  /* 供邀请好友积分模块调用 */
+  window.getPoints = getPoints;
+  window.addPoints = addPoints;
 })();
 </script>
 <script>
-/* usage stats beacon v3: 首页已改版无「顺序刷/随机刷」卡，改为按学习入口标签清单判定（模块名稳定，改版不易失效） */
+/* usage stats beacon v1 */
 (function(){
   try{
     var B='https://visitor-badge.laobi.icu/badge?page_id=';
@@ -639,18 +703,97 @@ document.addEventListener('click', function(e){
     hit('ycgk.open');
     var d=new Date(),p=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
     try{ if(!localStorage.getItem('ycgk.d'+p)){ localStorage.setItem('ycgk.d'+p,'1'); hit('ycgk.uv.'+p); } }catch(e){}
-    var START=/^(开始今天的练习|定制冲刺计划|专项刷题|速算特训|常识判断|言语理解|数量关系|判断推理|图形推理|资料分析|军队文职|教师编|医疗编|错题本|事业编专项|央国企|整套卷子|考公随机组卷|考编随机组卷|国考专题页|执法卷专题页|母题拆解手册|专项刷题冲刺计划|顺序刷|随机刷)/;
-    var EX=/领取|邀请|问卷|登录|同步|关闭|知道了|复制|检测|兑换|分享|提交|保存|客服|激活|开刷$|^全部$/;
+    /* 设备类型与安装状态：每台设备只记一次 */
+    try{
+      if(!localStorage.getItem('ycgk.devdone')){
+        localStorage.setItem('ycgk.devdone','1');
+        var ua=navigator.userAgent||'';
+        var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+        var isMobi=isIOS||/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)||/Android|Mobile|Mobi/i.test(ua);
+        hit(isIOS?'ycgk.dev.ios':(isMobi?'ycgk.dev.android':'ycgk.dev.pc'));
+        var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+        if(standalone)hit('ycgk.installed');
+      }
+    }catch(e){}
+    /* 受邀同学回访：带过邀请链接的设备再次打开 */
+    try{
+      if(localStorage.getItem('ycgk.refDone')&&!sessionStorage.getItem('ycgk.refsess')){
+        sessionStorage.setItem('ycgk.refsess','1');
+        hit('ycgk.refreturn');
+      }
+    }catch(e){}
+    /* 离线缓存：装到桌面后再次打开基本秒开 */
+    if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js?v=1').catch(function(){})})}
     document.addEventListener('click',function(e){
       try{
-        var el=e.target,n=0;
-        while(el&&el!==document.body&&n<5){
-          var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
-          if(t&&(START.test(t)||/第\d+套/.test(t))&&!EX.test(t)){ hit('ycgk.start'); return; }
-          el=el.parentElement;n++;
-        }
+        var el=e.target;
+        while(el&&el!==document.body&&el.tagName!=='BUTTON'){el=el.parentElement;}
+        if(!el||el===document.body)return;
+        var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+        if(/(顺序刷|随机刷|第\d+套$)/.test(t)) hit('ycgk.start');
       }catch(e){}
     },true);
+  }catch(e){}
+})();
+</script>
+<script>
+/* usage stats beacon v3: 在线心跳 / 24小时活跃 / 平板识别 / 刷题深度 */
+(function(){
+  try{
+    var B='https://visitor-badge.laobi.icu/badge?page_id=';
+    function hit(id){ try{ new Image().src=B+id+'&r='+Date.now(); }catch(e){} }
+    function pad(n){ return ('0'+n).slice(-2); }
+    /* 平板识别：每台设备只记一次（iPad 同时计入 iOS，平板为补充标签） */
+    try{
+      if(!localStorage.getItem('ycgk.devtab')){
+        localStorage.setItem('ycgk.devtab','1');
+        var ua=navigator.userAgent||'';
+        if(/iPad|Tablet|PlayBook|Silk|SM-T\d|SM-P\d|Tab\d|MatePad|Pad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)) hit('ycgk.dev.tablet');
+      }
+    }catch(e){}
+    /* 24小时活跃分布：每次打开记入所在小时 */
+    try{ hit('ycgk.hr.'+pad(new Date().getHours())); }catch(e){}
+    /* 在线心跳：打开时及每 60 秒各记一次所在分钟 */
+    try{
+      var lastHb='';
+      function hb(){ var d=new Date(),s=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours())+pad(d.getMinutes()); if(s!==lastHb){ lastHb=s; hit('ycgk.hb.'+s); } }
+      hb(); setInterval(hb,60000);
+    }catch(e){}
+    /* 刷题深度：累计作答跨过 10/50/100/500/1000/5000 题各记一次（匿名） */
+    try{
+      var TH=[10,50,100,500,1000,5000];
+      function ansTotal(){
+        var t=0;
+        try{
+          var s=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}');
+          var mp=s.moduleProgress||{};
+          Object.keys(mp).forEach(function(k){ t+=(mp[k].answered||0); });
+        }catch(e){}
+        return t;
+      }
+      setInterval(function(){
+        try{
+          var a=ansTotal();
+          for(var i=0;i<TH.length;i++){
+            var n=TH[i];
+            if(a>=n&&!localStorage.getItem('ycgk.ans.t'+n)){ localStorage.setItem('ycgk.ans.t'+n,'1'); hit('ycgk.ans.t'+n); }
+          }
+        }catch(e){}
+      },8000);
+      /* 刷题段位：每跨过 100 题记一次 ycgk.lvl.<n>（匿名，供排行榜） */
+      var lastLvl=-1;
+      setInterval(function(){
+        try{
+          var a=ansTotal(), n=Math.min(49,Math.floor(a/100));
+          if(n>lastLvl){
+            for(var i=(lastLvl<0?0:lastLvl+1);i<=n;i++){
+              if(!localStorage.getItem('ycgk.lvl.'+i)){ localStorage.setItem('ycgk.lvl.'+i,'1'); hit('ycgk.lvl.'+i); }
+            }
+            lastLvl=n;
+          }
+        }catch(e){}
+      },8000);
+    }catch(e){}
   }catch(e){}
 })();
 </script>
@@ -731,12 +874,24 @@ document.addEventListener('click', function(e){
     pushing=true;
     var payload;try{payload=toB64(JSON.stringify({v:1,ts:Date.now(),d:snapshot()}))}catch(e){pushing=false;cb&&cb(e);return}
     var parts=chunkStr(payload,CHUNK_ENC),meta={v:1,ts:Date.now(),n:parts.length};
-    var done=0,failed=null;
+    var i=0,failed=null;
     function fin(){pushing=false;if(failed){cb&&cb(failed)}else{var s=getSync();s.lastPush=Date.now();setSync(s);setChip("ok");cb&&cb(null)}}
-    for(var i=0;i<parts.length;i++){
-      cloudPut(PRE+c+"-c"+i,parts[i],function(e){if(e)failed=e;done++;if(done===parts.length)cloudPut(PRE+c,JSON.stringify(meta),function(e2){if(e2)failed=e2;fin()})});
+    function putMeta(){cloudPut(PRE+c,JSON.stringify(meta),function(e2){if(e2)failed=e2;fin()})}
+    function next(){
+      if(failed){pushing=false;cb&&cb(failed);return}
+      if(i>=parts.length){putMeta();return}
+      var idx=i++,tries=0;
+      function attempt(){
+        cloudPut(PRE+c+"-c"+idx,parts[idx],function(e){
+          if(e&&tries<2){tries++;attempt();return}
+          if(e)failed=e;
+          next();
+        });
+      }
+      attempt();
     }
-    if(parts.length===0)fin();
+    if(parts.length===0){fin();return}
+    next();
   }
   function pull(cb){
     var c=myCode();if(!c){cb&&cb("nocode",null);return}
@@ -902,7 +1057,19 @@ document.addEventListener('click', function(e){
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
       card.querySelector("#ycSyncNow").addEventListener("click",function(){
         this.textContent="同步中…";this.disabled=true;
-        push(function(e){openModal()});
+        push(function(e){
+          if(e){openModal();return}
+          pull(function(e2,cloud){
+            if(!e2&&cloud){
+              var s=getSync();
+              if((cloud.ts||0)>(s.appliedTs||0)){
+                var changed=applyCloud(cloud);
+                if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload();return}
+              }
+            }
+            openModal();
+          });
+        });
       });
       card.querySelector("#ycSyncCopy").addEventListener("click",function(){
         var btn=this;
@@ -975,29 +1142,270 @@ document.addEventListener('click', function(e){
   }
   function bootPull(){
     if(!myCode())return;
-    setTimeout(function(){
-      pull(function(e,cloud){
-        if(e||!cloud)return;
-        var s=getSync();
-        if((cloud.ts||0)>(s.appliedTs||0)){
-          var changed=applyCloud(cloud);
-          if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
-        }
-      });
-    },2500);
+    var tries=0;
+    function attempt(){
+      setTimeout(function(){
+        pull(function(e,cloud){
+          if(e&&tries<3){tries++;attempt();return}
+          if(e||!cloud)return;
+          var s=getSync();
+          if((cloud.ts||0)>(s.appliedTs||0)){
+            var changed=applyCloud(cloud);
+            if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+          }
+        });
+      },tries?3000:2500);
+    }
+    attempt();
   }
   function boot(){
     var tries=0;
     var t=setInterval(function(){if(addChip()||++tries>20)clearInterval(t)},300);
     hint();bootPull();
     setInterval(loop,6000);
+    setInterval(function(){if(!document.hidden)pullNow()},90000);
     document.addEventListener("visibilitychange",function(){
       if(document.hidden&&myCode()&&snapStr()!==lastPushed){setChip("busy");push(function(e){if(!e)lastPushed=snapStr();setChip("")})}
+      if(!document.hidden)pullNow();
     });
   }
+  /* 其他设备有新进度时，温和提示刷新，不打断做题 */
+  function pullNow(){
+    if(!myCode()||pushing||pullBusy)return;
+    pull(function(e,cloud){
+      if(e||!cloud)return;
+      var s=getSync();
+      if((cloud.ts||0)>(s.appliedTs||0)){
+        var changed=applyCloud(cloud);
+        if(changed)showUpdateBar();
+      }
+    });
+  }
+  function showUpdateBar(){
+    if(document.getElementById("yc-sync-upd"))return;
+    var b=document.createElement("div");
+    b.className="yc-sync-hint";b.id="yc-sync-upd";
+    b.innerHTML='<span>其他设备有新的刷题进度</span><i>刷新查看</i>';
+    b.querySelector("i").addEventListener("click",function(){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()});
+    document.body.appendChild(b);
+    setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},30000);
+  }
   var css=document.createElement("style");
-  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
+  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
   document.head.appendChild(css);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
+</script>
+<script>
+/* share & referral v1: 邀请好友得积分 */
+(function(){
+  var GET_URLS=["https://textdb.online/","https://textdb.dev/api/data/"];
+  function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function lsj(k){try{var v=ls(k);return v?JSON.parse(v):null}catch(e){return null}}
+  function lss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function myCode(){
+    var s=lsj("yicheng-gk-sync-v1");
+    if(s&&s.code)return s.code;
+    var c=ls("ycgk.shareCode");
+    if(!c){c="";for(var i=0;i<6;i++)c+=Math.floor(Math.random()*10);lss("ycgk.shareCode",c)}
+    return c;
+  }
+  function refKey(code){return "ycgkS1-ref-"+code}
+  function cloudGet(key,cb){
+    var done=0,got=false,err=null;
+    GET_URLS.forEach(function(u){
+      fetch(u+key,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+        if(t&&!got){got=true;cb(null,t)}
+        done++;if(done===GET_URLS.length&&!got)cb(err||new Error("网络不通"),null);
+      }).catch(function(e){err=e;done++;if(done===GET_URLS.length&&!got)cb(err,null)});
+    });
+  }
+  function cloudPut(key,val,cb){
+    var done=0,ok=false;
+    function fin(){done++;if(done===2)cb(ok?null:new Error("写入失败"))}
+    fetch("https://textdb.online/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val)).then(function(){fin()},function(){fin()});
+    fetch("https://textdb.dev/api/data/"+key,{method:"POST",headers:{"Content-Type":"text/plain"},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+  }
+  function parseN(t){var n=parseInt(String(t||"").trim(),10);return isNaN(n)?0:n}
+  function bumpRef(code,cb){
+    cloudGet(refKey(code),function(e,t){
+      var n=parseN(t)+1;
+      cloudPut(refKey(code),String(n),function(e2){cb&&cb(e2,n)});
+    });
+  }
+  function getRefCount(code,cb){
+    cloudGet(refKey(code),function(e,t){cb(null,parseN(t))});
+  }
+  /* 新访客带邀请链接进来：同一设备只记一次 */
+  function handleRef(){
+    try{
+      var q=new URLSearchParams(location.search);
+      var ref=q.get("ref");
+      if(!ref)return;
+      ref=ref.replace(/[^0-9]/g,"").slice(0,12);
+      if(!ref||ref===myCode())return;
+      if(ls("ycgk.refDone"))return;
+      lss("ycgk.refDone","1");
+      bumpRef(ref,function(){});
+      /* 受邀访客计数已挪到 guide.html 第一触点；直接带 ref 打开本页的旧链接在此兜底 */
+      try{if(!ls("ycgk.refinDone")){lss("ycgk.refinDone","1");new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refin&r="+Date.now()}}catch(e){}
+      setTimeout(function(){
+        try{
+          var b=document.createElement("div");b.className="yc-sync-hint";
+          b.innerHTML='<span>欢迎来到亿成公考！同学邀请你来的，TA 会收到积分奖励</span><i>好的</i>';
+          b.querySelector("i").addEventListener("click",function(){b.remove()});
+          document.body.appendChild(b);
+          setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},15000);
+        }catch(e){}
+      },3000);
+    }catch(e){}
+  }
+  /* 邀请者自动到账：云端邀请数 - 已领取数 */
+  function creditReferrals(){
+    try{
+      getRefCount(myCode(),function(e,n){
+        if(e||!n)return;
+        var claimed=parseInt(ls("ycgk.refClaimed")||"0",10)||0;
+        var un=n-claimed;
+        if(un>0){
+          lss("ycgk.refClaimed",String(n));
+          if(window.addPoints)addPoints(un*10,"邀请好友","新同学通过你的链接加入 x"+un);
+        }
+      });
+    }catch(e){}
+  }
+  /* 首页邀请卡片 */
+  function addShareCard(){
+    if(document.getElementById("yc-share-card"))return;
+    var entry=document.getElementById("yc-materials-card");
+    if(!entry)return;
+    var card=document.createElement("div");
+    card.id="yc-share-card";
+    card.innerHTML='<span class="material-icons yc-share-ic">group_add</span>'+
+      '<div class="yc-mat-tx"><div class="yc-share-t">邀请好友 · 双方得积分</div>'+
+      '<div class="yc-share-s">每带 1 位新同学 +10 分 · 可换一对一申论批改、1对1问诊</div></div>'+
+      '<span class="yc-share-go">去邀请 ›</span>';
+    card.addEventListener("click",openShare);
+    entry.parentNode.insertBefore(card,entry);
+  }
+  /* 分享弹层（独立元素，不与同步弹层共用） */
+  var shOv=null;
+  function ensureOv(){
+    if(shOv)return;
+    shOv=document.createElement("div");shOv.className="yc-sync-ov";
+    var card=document.createElement("div");card.className="yc-sync-card";
+    shOv.appendChild(card);document.body.appendChild(shOv);
+    shOv.addEventListener("click",function(e){if(e.target===shOv)shOv.classList.remove("on")});
+  }
+  function shareLink(){return "https://ycteacher.github.io/yichenggongkao/guide.html?ref="+myCode()}
+  function copyText(txt,ok,fail){
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fail)}
+      else{var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();var c=document.execCommand("copy");ta.remove();c?ok():fail()}
+    }catch(e){fail()}
+  }
+  function openShare(){
+    ensureOv();
+    var card=shOv.firstChild;
+    card.innerHTML='<h3>邀请好友 · 得积分</h3>'+
+      '<div class="yc-sync-tip">把你的专属链接发给同学，TA 打开应用你就得 <b>10 分</b>，同一人只算一次。</div>'+
+      '<div class="yc-share-link" id="ycShareLink">'+shareLink()+'</div>'+
+      '<button class="yc-sync-btn main" id="ycShareCopy">复制邀请链接</button>'+
+      '<button class="yc-sync-btn" id="ycShareNative">分享给同学（微信 / QQ）</button>'+
+      '<div class="yc-share-stats" id="ycShareStats">邀请统计加载中…</div>'+
+      '<div class="yc-share-rules">'+
+        '<div class="yc-share-rt">积分可兑换 · 加微信 mshong 找亿成老师兑换</div>'+
+        '<div class="yc-share-rule"><b>一对一申论批改</b><span>100 分</span></div>'+
+        '<div class="yc-share-rule"><b>一对一综应批改</b><span>100 分</span></div>'+
+        '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>600 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
+      '</div>'+
+      '<button class="yc-sync-btn" id="ycShareRedeem">兑换详情 · 认识亿成老师 ›</button>'+
+      '<button class="yc-sync-btn" id="ycShareClose">关闭</button>';
+    card.querySelector("#ycShareCopy").addEventListener("click",function(){
+      var btn=this;
+      copyText(shareLink(),function(){btn.textContent="已复制！去微信 / QQ 粘贴发给同学";try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.sharecopy&r="+Date.now()}catch(e){}setTimeout(function(){btn.textContent="复制邀请链接"},3500)},function(){window.prompt("全选复制下面的链接：",shareLink())});
+    });
+    card.querySelector("#ycShareNative").addEventListener("click",function(){
+      var txt="我在用亿成老师的公考刷题应用，题库全免费，邀请你一起刷：";
+      if(navigator.share){navigator.share({title:"亿成公考",text:txt,url:shareLink()}).catch(function(){})}
+      else{copyText(txt+shareLink(),function(){alert("链接已复制，去微信 / QQ 粘贴发给同学吧")},function(){window.prompt("全选复制下面的链接：",shareLink())})}
+    });
+    card.querySelector("#ycShareRedeem").addEventListener("click",function(){window.location.href="teacher.html"});
+    card.querySelector("#ycShareClose").addEventListener("click",function(){shOv.classList.remove("on")});
+    getRefCount(myCode(),function(e,n){
+      var el=document.getElementById("ycShareStats");
+      if(!el)return;
+      var bal=(window.getPoints&&getPoints().balance)||0;
+      el.textContent=n>0?("已邀请 "+n+" 人 · 邀请积分 +"+(n*10)+" 分 · 当前积分 "+bal):"还没有同学通过你的链接来，快去分享吧";
+    });
+    creditReferrals();
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.share&r="+Date.now()}catch(e){}
+    shOv.classList.add("on");
+  }
+  /* 积分中心补一条邀请规则 */
+  function patchPointsModal(){
+    if(window.__ycShareRulePatched)return;
+    var rules=document.querySelectorAll(".yc-rule");
+    for(var i=0;i<rules.length;i++){
+      if(rules[i].textContent.indexOf("邀请好友")>-1){window.__ycShareRulePatched=true;return}
+      if(rules[i].textContent.indexOf("兑换商城筹备中")>-1){
+        var d=document.createElement("div");
+        d.className="yc-rule";
+        d.innerHTML='<b>邀请好友 +10 / 人</b><span>点首页「邀请好友」卡片，拿专属链接</span>';
+        rules[i].parentNode.insertBefore(d,rules[i]);
+        window.__ycShareRulePatched=true;return;
+      }
+    }
+  }
+  var css=document.createElement("style");
+  css.textContent="#yc-share-card{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#4F46E5,#4338CA);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.28)}#yc-share-card:active{transform:scale(.985)}#yc-share-card .yc-share-ic{font-size:26px !important;flex:none}.yc-share-t{font-size:15px;font-weight:800;letter-spacing:.5px}.yc-share-s{font-size:11px;opacity:.92;margin-top:2px}.yc-share-go{font-size:12px;font-weight:700;flex:none;background:rgba(255,255,255,.18);border-radius:999px;padding:5px 10px}.yc-share-link{background:#f1f5f9;border:1.5px dashed #c7d2fe;border-radius:10px;padding:10px 12px;font-size:12px;word-break:break-all;color:#4338ca;margin-bottom:4px}.yc-share-stats{font-size:13px;color:#475569;margin-top:10px;text-align:center}.yc-share-rules{margin-top:12px;border-top:1px solid #eef2f7;padding-top:10px}.yc-share-rt{font-size:12px;color:#94a3b8;margin-bottom:8px}.yc-share-rule{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#0f172a;padding:4px 0}.yc-share-rule b{font-weight:700}.yc-share-rule span{color:#4f46e5;font-weight:700;font-size:12.5px;text-align:right}.yc-wl-st{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:13.5px;line-height:1.6;color:#0f172a;text-align:left}.yc-wl-st>b{flex:none;width:20px;height:20px;border-radius:50%;background:#4f46e5;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}.yc-wl-st span{flex:1}.yc-wl-st .kb{background:#eef2ff;color:#4338ca;border-radius:6px;padding:1px 6px;font-weight:800;white-space:nowrap}.yc-wl-wx{background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:#9a3412;margin-bottom:6px}";
+  document.head.appendChild(css);
+  /* 新同学首次打开：安装到桌面引导 */
+  function welcomeGuide(){
+    var seen=false;
+    try{seen=!!localStorage.getItem("ycgk.welcomeSeen")}catch(e){}
+    if(seen)return;
+    var ua=navigator.userAgent||"";
+    var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua);
+    var isMobi=isIOS||isHarmony||/Android|Mobile|Mobi/i.test(ua);
+    var inWx=/MicroMessenger/i.test(ua);
+    var steps="";
+    if(isIOS){
+      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器底部中间的「分享」按钮（方框加向上箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>在弹出的菜单里选「添加到主屏幕」</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>点右上「添加」，桌面就有亿成公考图标了</span></div>';
+    }else if(isMobi){
+      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器右上角的「⋮」菜单（华为浏览器也可能在底部「⌘」）</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>选「添加到桌面」或「安装应用」</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>点「安装」，桌面就有图标了</span></div>';
+    }else{
+      steps='<div class="yc-wl-st"><b>1</b><span>按 <b class="kb">Ctrl+D</b>（Mac 按 <b class="kb">⌘+D</b>）收藏本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>也可以把地址栏左边的图标直接拖到桌面</span></div>';
+    }
+    var ov=document.createElement("div");ov.className="yc-sync-ov";
+    ov.innerHTML='<div class="yc-sync-card">'+
+      '<h3>欢迎来到亿成公考</h3>'+
+      '<div class="yc-sync-tip">题库全免费，内测期间不收一分钱。<b>建议先把应用添加到桌面</b>，以后从桌面图标进，不用再找链接：</div>'+
+      (inWx?'<div class="yc-wl-wx">你现在在微信里打开，请先点右上角「···」选「在浏览器打开」，再按下面步骤操作</div>':'')+
+      steps+
+      '<button class="yc-sync-btn main" id="ycWlOk">好的，开始刷题</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlshow&r="+Date.now()}catch(e){}
+    function done(){try{localStorage.setItem("ycgk.welcomeSeen","1")}catch(e){}ov.classList.remove("on")}
+    ov.addEventListener("click",function(e){if(e.target===ov)done()});
+    ov.querySelector("#ycWlOk").addEventListener("click",function(){try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlok&r="+Date.now()}catch(e){}done()});
+    setTimeout(function(){ov.classList.add("on")},600);
+  }
+  function boot(){
+    handleRef();
+    creditReferrals();
+    welcomeGuide();
+    var mo=new MutationObserver(function(){addShareCard();patchPointsModal()});
+    mo.observe(document.body,{childList:true,subtree:true});
+    addShareCard();patchPointsModal();
+  }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
 </script>
