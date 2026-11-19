@@ -251,10 +251,14 @@ function bm(){const[a,c]=G.useState(()=>{try{return location.hash==="#plan"?{nam
     eve: ["晚上是复盘的黄金时间，错题本翻一翻。", "白天没时间？晚上的坚持更可贵。", "今天流的汗，都是考场上的从容。", "别人在休息，你在坚持，差距就是这样拉开的。", "坚持到晚上，今天就没有白过。"],
     late: ["这么晚还在坚持，你已经赢过大多数人了。", "夜深了，做完这道题就早点休息，身体最重要。", "深夜的台灯，会照亮你走进考场的路。", "别熬太晚，明天还要继续战斗。", "深夜的努力不会白费，但也要照顾好自己。"]
   };
+  var CHEER_SLOTS = { dawn: CHEER.dawn, am: CHEER.am, noon: CHEER.noon, pm: CHEER.pm, eve: CHEER.eve, late: CHEER.late };
   function cheer() {
     var h = new Date().getHours();
-    var p = h >= 5 && h < 8 ? CHEER.dawn : h < 12 ? CHEER.am : h < 14 ? CHEER.noon : h < 18 ? CHEER.pm : h < 23 ? CHEER.eve : CHEER.late;
-    return p[Math.floor(Math.random() * p.length)];
+    var slot = h >= 5 && h < 8 ? "dawn" : h < 12 ? "am" : h < 14 ? "noon" : h < 18 ? "pm" : h < 23 ? "eve" : "late";
+    var ck = "yicheng-gk-cheer-v1";
+    var c = jget(ck, {});
+    if (!c[slot] || c.d !== todayStr()) { c = { d: todayStr() }; c[slot] = CHEER_SLOTS[slot][Math.floor(Math.random() * CHEER_SLOTS[slot].length)]; jset(ck, c); }
+    return c[slot];
   }
   function greet() {
     var h = new Date().getHours();
@@ -397,11 +401,12 @@ function bm(){const[a,c]=G.useState(()=>{try{return location.hash==="#plan"?{nam
               : "考试月已到，全力冲刺！")
           : "点这里设置备考方向，开启考试倒计时";
         var sub = dir ? dir.region + " · " + dir.cat + " · 预计 " + dir.ym.replace("-", " 年 ") + " 月（以公告为准）" : "地区 + 类别 + 月份，10 秒选完";
-        banner.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+        var bannerHtml = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
           '<div style="min-width:0"><p style="margin:0;font-size:13px;font-weight:700;color:#202020">' + main + '</p>' +
           '<p style="margin:3px 0 0;font-size:11px;color:#8A6A1F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + sub + '</p>' +
           '<p style="margin:3px 0 0;font-size:11px;color:#B45309">' + cheer() + '</p></div>' +
-          '<span style="color:#B45309;font-size:18px;flex:none">' + (dir ? "✎" : "›") + "</span></div>";
+          '<span style="color:#B45309;font-size:18px;flex:none">' + (dir ? "\u2718" : "\u203a") + "</span></div>";
+          if (banner.__ycHtml !== bannerHtml) { banner.innerHTML = bannerHtml; banner.__ycHtml = bannerHtml; }
         banner.onclick = function () { openDirModal(false); };
         var btn = document.getElementById("yc-dash-btn");
         if (!btn) {
