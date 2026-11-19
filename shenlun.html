@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>申论 · 综应练习专区 - 亿成公考</title>
+<link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
+<link href="https://gw.alipayobjects.com/render/p/yuyan/180023180003946312/material-icons.css" rel="stylesheet" crossorigin="anonymous">
+<link rel="stylesheet" crossorigin href="./assets/index-C2M5URtc.css?v=ttfix10">
+<style>
+  body{background:#F7F4EF;color:#202020;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;}
+  .card{background:#fff;border:1px solid #E5E1D8;border-radius:24px;box-shadow:0 2px 12px rgba(32,32,32,.06);}
+  .chip{border:1px solid #E5E1D8;background:#FAF8F3;border-radius:9999px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .15s;}
+  .chip.on{border-color:#B5483C;background:rgba(181,72,60,.08);color:#B5483C;font-weight:600;}
+  .btn-primary{background:linear-gradient(90deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(220,38,38,.22);}
+  .btn-ghost{background:#fff;border:1px solid #E5E1D8;color:#202020;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;}
+  .material-para{padding:10px 14px;background:#FAF8F3;border-radius:14px;font-size:14px;line-height:1.9;white-space:pre-wrap;margin-bottom:10px;}
+  textarea.ans{width:100%;min-height:220px;border:1px solid #E5E1D8;border-radius:18px;padding:14px;font-size:14px;line-height:1.8;resize:vertical;background:#fff;box-sizing:border-box;font-family:inherit;}
+  textarea.ans:focus{outline:none;border-color:#B5483C;}
+  .pt-row{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:14px;margin-bottom:8px;font-size:13px;line-height:1.7;}
+  .pt-hit{background:rgba(21,128,61,.08);}
+  .pt-half{background:rgba(217,119,6,.08);}
+  .pt-miss{background:rgba(220,38,38,.06);}
+  .tag{display:inline-block;border-radius:8px;padding:1px 8px;font-size:11px;font-weight:700;flex-shrink:0;}
+  .tag-hit{background:#DCFCE7;color:#15803D;}
+  .tag-half{background:#FEF3C7;color:#B45309;}
+  .tag-miss{background:#FEE2E2;color:#DC2626;}
+  .hidden{display:none!important;}
+  .fade{animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .modal-mask{position:fixed;inset:0;background:rgba(32,32,32,.5);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{background:#fff;border-radius:24px;max-width:640px;width:100%;max-height:84vh;overflow-y:auto;padding:24px;}
+  pre.prompt{white-space:pre-wrap;background:#FAF8F3;border-radius:14px;padding:14px;font-size:12px;line-height:1.8;font-family:inherit;max-height:260px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<div id="app" class="mx-auto w-full max-w-3xl px-4" style="padding-top:20px;padding-bottom:48px;">
+  <div id="loading" style="text-align:center;padding:80px 0;color:#8A8378;">题库加载中…</div>
+</div>
+
+<script src="./assets/shl-bank-1.js?v=slb1"></script>
+<script src="./assets/zy-bank-1.js?v=zyb1"></script>
+<script>
+(function(){
+  var SHL = window.YC_SHL_BANK || [];
+  var ZY = window.YC_ZY_BANK || [];
+  var app = document.getElementById('app');
+  var params = new URLSearchParams(location.search);
+  var state = {
+    tab: params.get('cat') === 'zy' ? 'zy' : 'shl',
+    cat: '全部',
+    cur: null,        // 当前题目
+    draft: '',
+    review: null,     // 批阅结果
+    history: JSON.parse(localStorage.getItem('yc_essay_history') || '{}')
+  };
+
+  function banks(){ return state.tab === 'shl' ? SHL : ZY; }
+  function tabName(){ return state.tab === 'shl' ? '申论' : '综应'; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function countChars(s){ return (s||'').replace(/\s/g,'').length; }
+  function saveHistory(){ localStorage.setItem('yc_essay_history', JSON.stringify(state.history)); }
+
+  function norm(s){
+    return (s||'').replace(/[，。、；：""''（）()【】\s,.;:!?？!]/g,'');
+  }
+  // 子序列模糊匹配：采分点各字按顺序出现在答案中即算命中（容忍插入修饰语）
+  function isSubseq(needle, hay){
+    var i = 0;
+    for(var j = 0; j < hay.length && i < needle.length; j++){
+      if(hay[j] === needle[i]) i++;
+    }
+    return i === needle.length;
+  }
+  function matchOne(key, ans){
+    return ans.indexOf(key) >= 0 || (key.length >= 4 && isSubseq(key, ans));
+  }
+  // 规则批阅：采分点同义词命中判定
+  function grade(q, answer){
+    var ans = norm(answer);
+    var results = q.scorePoints.map(function(sp){
+      if(sp.aiOnly){
+        return {point:sp.point, synonyms:sp.synonyms||[], score:sp.score, got:0, status:'ai', hitWords:[], aiOnly:true};
+      }
+      var hitWords = [];
+      // 主表述：包含或子序列命中即满分
+      var mainKey = norm(sp.point);
+      var hitMain = mainKey && matchOne(mainKey, ans);
+      if(hitMain) hitWords.push(sp.point);
+      // 同义表述：命中数计分
+      var synHits = 0;
+      (sp.synonyms||[]).forEach(function(c){
+        var key = norm(c);
+        if(key && matchOne(key, ans)){ synHits++; hitWords.push(c); }
+      });
+      var status = (hitMain || synHits >= 2) ? 'hit' : (synHits === 1 ? 'half' : 'miss');
+      var got = status === 'hit' ? sp.score : (status === 'half' ? Math.ceil(sp.score/2) : 0);
+      return {point:sp.point, synonyms:sp.synonyms||[], score:sp.score, got:got, status:status, hitWords:hitWords};
+    });
+    var total = results.reduce(function(a,r){return a+r.got;},0);
+    var full = results.reduce(function(a,r){return a+r.score;},0);
+    var aiFull = results.reduce(function(a,r){return a+(r.aiOnly?r.score:0);},0);
+    return {results:results, total:total, full:full, aiFull:aiFull};
+  }
+
+  function buildAiPrompt(q, answer){
+    var lines = [];
+    lines.push('请作为公考阅卷专家，按采分点批阅下面这道' + tabName() + '题。');
+    lines.push('');
+    lines.push('【题目】' + q.question);
+    lines.push('');
+    lines.push('【材料】');
+    q.material.forEach(function(m){ lines.push(m); });
+    lines.push('');
+    lines.push('【评分采分点】（共' + q.scorePoints.reduce(function(a,s){return a+s.score;},0) + '分）');
+    q.scorePoints.forEach(function(sp,i){
+      lines.push((i+1) + '. ' + sp.point + '（' + sp.score + '分；同义表述：' + (sp.synonyms||[]).join('、') + '）');
+    });
+    lines.push('');
+    lines.push('【参考答案】' + q.referenceAnswer);
+    lines.push('');
+    lines.push('【学生作答】');
+    lines.push(answer);
+    lines.push('');
+    lines.push('【批阅要求】');
+    lines.push('1. 逐个采分点判定：命中（给满分）/ 部分命中（给一半分）/ 未命中（0分），并引用学生答案中的原句作为依据；');
+    lines.push('2. 指出学生答案里表述不规范、口语化或偏离材料的地方，给出更规范的写法；');
+    lines.push('3. 给出总分（按采分点合计，满分' + q.scorePoints.reduce(function(a,s){return a+s.score;},0) + '分）和一句鼓励语；');
+    lines.push('4. 最后给一条最优先的改进建议。');
+    return lines.join('\n');
+  }
+
+  function render(){
+    if(state.cur){ renderPractice(); return; }
+    var bs = banks().filter(function(q){ return state.cat === '全部' || q.category === state.cat; });
+    var cats = ['全部'].concat(banks().map(function(q){return q.category;}).filter(function(c,i,a){return a.indexOf(c)===i;}));
+    var done = bs.filter(function(q){ return (state.history[state.tab + ':' + q.id]||[]).length > 0; }).length;
+    var html = '';
+    html += '<div class="fade">';
+    html += '<div style="display:flex;align-items:center;gap:12px;">';
+    html += '<a href="./index.html" style="color:#6B6558;text-decoration:none;"><span class="material-icons">arrow_back</span></a>';
+    html += '<div><h1 style="margin:0;font-size:22px;font-weight:800;">' + tabName() + '练习专区</h1>';
+    html += '<p style="margin:2px 0 0;font-size:12px;color:#8A8378;">真题材料 · 电脑/平板打字作答 · AI 智能批阅</p></div></div>';
+    // 统计条
+    html += '<div class="card" style="margin-top:16px;padding:16px 20px;display:flex;gap:0;text-align:center;">';
+    html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">在练题目</p></div>';
+    html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#15803D;">' + done + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">已练过</p></div>';
+    html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">AI 批阅支持</p></div>';
+    html += '</div>';
+    // 提示卡
+    html += '<div class="card" style="margin-top:12px;padding:14px 18px;font-size:12px;line-height:1.8;color:#6B6558;">';
+    html += '💡 建议用<strong>平板或电脑</strong>打开本页，直接打字作答更顺手；写完点「交卷批阅」立刻看到逐条采分点判定，再点「AI 深度批阅」把答案交给灵光做精细点评。</div>';
+    // 分类 chips
+    html += '<div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;">';
+    cats.forEach(function(c){
+      html += '<button class="chip' + (state.cat===c?' on':'') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
+    });
+    html += '</div>';
+    // 题目列表
+    if(bs.length === 0){
+      html += '<div class="card" style="margin-top:16px;padding:40px 20px;text-align:center;color:#8A8378;font-size:14px;">这个类目的题目正在路上，命题专家组正在加紧整理，很快上新。</div>';
+    }
+    bs.forEach(function(q){
+      var hist = state.history[state.tab + ':' + q.id] || [];
+      var best = hist.length ? Math.max.apply(null, hist.map(function(h){return h.total;})) : null;
+      var full = q.scorePoints.reduce(function(a,s){return a+s.score;},0);
+      html += '<div class="card" style="margin-top:12px;padding:18px;cursor:pointer;" data-q="' + esc(q.id) + '">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">';
+      html += '<span class="tag" style="background:rgba(181,72,60,.08);color:#B5483C;">' + esc(q.category) + '</span>';
+      html += '<span style="font-size:11px;color:#8A8378;">' + esc(q.exam || '') + (q.year ? ' · ' + q.year : '') + '</span></div>';
+      html += '<p style="margin:8px 0 0;font-size:15px;font-weight:700;">' + esc(q.title) + '</p>';
+      html += '<p style="margin:6px 0 0;font-size:12px;color:#8A8378;">' + esc(q.question) + '</p>';
+      html += '<div style="margin-top:10px;display:flex;gap:10px;align-items:center;font-size:11px;color:#8A8378;">';
+      html += '<span>限 ' + q.wordLimit + ' 字</span><span>满分 ' + full + ' 分</span>';
+      if(best != null){ html += '<span style="color:#15803D;font-weight:700;">我的最好成绩 ' + best + '/' + full + '</span>'; }
+      html += '</div></div>';
+    });
+    html += '</div>';
+    app.innerHTML = html;
+    app.querySelectorAll('[data-cat]').forEach(function(b){
+      b.onclick = function(){ state.cat = b.getAttribute('data-cat'); render(); };
+    });
+    app.querySelectorAll('[data-q]').forEach(function(card){
+      card.onclick = function(){
+        var q = banks().find(function(x){return x.id === card.getAttribute('data-q');});
+        if(q){ state.cur = q; state.review = null;
+          state.draft = localStorage.getItem('yc_essay_draft_' + state.tab + ':' + q.id) || '';
+          render(); window.scrollTo(0,0); }
+      };
+    });
+  }
+
+  function renderPractice(){
+    var q = state.cur;
+    var full = q.scorePoints.reduce(function(a,s){return a+s.score;},0);
+    var hist = state.history[state.tab + ':' + q.id] || [];
+    var html = '';
+    html += '<div class="fade">';
+    html += '<div style="display:flex;align-items:center;gap:12px;">';
+    html += '<button id="backList" style="background:none;border:none;color:#6B6558;cursor:pointer;padding:0;"><span class="material-icons">arrow_back</span></button>';
+    html += '<div><p style="margin:0;font-size:12px;color:#8A8378;">' + esc(q.exam || '') + (q.year ? ' · ' + q.year : '') + ' · ' + esc(q.category) + '</p>';
+    html += '<h1 style="margin:2px 0 0;font-size:20px;font-weight:800;">' + esc(q.title) + '</h1></div></div>';
+
+    // 材料
+    html += '<div class="card" style="margin-top:16px;padding:18px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;"><p style="margin:0;font-size:14px;font-weight:700;">给定材料</p>';
+    html += '<button id="matToggle" class="chip" style="font-size:11px;">收起</button></div>';
+    html += '<div id="matBody" style="margin-top:12px;">';
+    q.material.forEach(function(m){ html += '<div class="material-para">' + esc(m) + '</div>'; });
+    html += '</div></div>';
+
+    // 设问
+    html += '<div class="card" style="margin-top:12px;padding:18px;">';
+    html += '<p style="margin:0;font-size:14px;font-weight:700;">作答要求</p>';
+    html += '<p style="margin:8px 0 0;font-size:14px;line-height:1.8;">' + esc(q.question) + '</p>';
+    if(q.tips){ html += '<p style="margin:10px 0 0;font-size:12px;color:#B45309;background:rgba(180,83,9,.06);border-radius:12px;padding:8px 12px;">📌 ' + esc(q.tips) + '</p>'; }
+    html += '</div>';
+
+    // 作答区
+    html += '<div class="card" style="margin-top:12px;padding:18px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    html += '<p style="margin:0;font-size:14px;font-weight:700;">我的作答</p>';
+    html += '<p id="wc" style="margin:0;font-size:12px;color:#8A8378;"></p></div>';
+    html += '<textarea id="ans" class="ans" style="margin-top:10px;" placeholder="在这里直接打字作答…建议用电脑或平板，作答会自动保存草稿。"></textarea>';
+    html += '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">';
+    html += '<button id="submitBtn" class="btn-primary">交卷批阅</button>';
+    html += '<button id="aiBtn" class="btn-ghost">AI 深度批阅（复制给灵光）</button>';
+    html += '</div>';
+    html += '<p id="aiTip" style="margin:10px 0 0;font-size:12px;color:#8A8378;">交卷后先看逐条采分点判定；「AI 深度批阅」会把题目、材料和你的答案打包成一段批阅指令，复制后发给灵光即可获得精细点评。</p>';
+    html += '</div>';
+
+    // 批阅结果
+    html += '<div id="reviewBox"></div>';
+
+    // 历史记录
+    if(hist.length){
+      html += '<div class="card" style="margin-top:12px;padding:18px;">';
+      html += '<p style="margin:0;font-size:14px;font-weight:700;">我的批阅记录</p>';
+      hist.slice().reverse().slice(0,5).forEach(function(h){
+        html += '<div style="margin-top:10px;font-size:12px;color:#6B6558;display:flex;justify-content:space-between;gap:10px;">';
+        html += '<span>' + esc(h.at) + '</span><span style="font-weight:700;color:#B45309;">' + h.total + '/' + h.full + ' 分</span></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+    app.innerHTML = html;
+
+    var ta = document.getElementById('ans');
+    var wc = document.getElementById('wc');
+    ta.value = state.draft;
+    function updWc(){
+      var n = countChars(ta.value);
+      wc.innerHTML = '已写 <strong style="color:' + (n > q.wordLimit ? '#DC2626' : '#15803D') + '">' + n + '</strong> / 限 ' + q.wordLimit + ' 字' + (n > q.wordLimit ? '（超字数啦，精简一下）' : '');
+    }
+    updWc();
+    ta.oninput = function(){
+      state.draft = ta.value; updWc();
+      localStorage.setItem('yc_essay_draft_' + state.tab + ':' + q.id, ta.value);
+    };
+    document.getElementById('backList').onclick = function(){ state.cur = null; state.review = null; render(); window.scrollTo(0,0); };
+    var matOpen = true;
+    document.getElementById('matToggle').onclick = function(){
+      matOpen = !matOpen;
+      document.getElementById('matBody').classList.toggle('hidden', !matOpen);
+      this.textContent = matOpen ? '收起' : '展开材料';
+    };
+    document.getElementById('submitBtn').onclick = function(){
+      var answer = ta.value.trim();
+      if(countChars(answer) < 10){ alert('作答太短啦，先认真写一写再交卷～'); return; }
+      var g = grade(q, answer);
+      state.review = g;
+      state.history[state.tab + ':' + q.id] = state.history[state.tab + ':' + q.id] || [];
+      state.history[state.tab + ':' + q.id].push({at: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}), total:g.total, full:g.full});
+      if(state.history[state.tab + ':' + q.id].length > 20) state.history[state.tab + ':' + q.id].shift();
+      saveHistory();
+      renderReview(q, g, answer);
+      document.getElementById('reviewBox').scrollIntoView({behavior:'smooth'});
+    };
+    document.getElementById('aiBtn').onclick = function(){
+      var answer = ta.value.trim();
+      if(countChars(answer) < 10){ alert('先写一段作答，再让 AI 深度批阅～'); return; }
+      showAiModal(buildAiPrompt(q, answer));
+    };
+    if(state.review) renderReview(q, state.review, state.draft);
+  }
+
+  function renderReview(q, g, answer){
+    var box = document.getElementById('reviewBox');
+    var ruleFull = g.full - (g.aiFull || 0);
+    var pct = ruleFull ? Math.round(g.total / ruleFull * 100) : 0;
+    var praise = pct >= 80 ? '采分点抓得很准，保持这个状态，考场稳了！' : pct >= 60 ? '已经过半了，把没命中的点补上，下一遍就是高分答案。' : '别灰心，对照参考答案把漏点找出来，再写一遍印象最深。';
+    var html = '<div class="card fade" style="margin-top:12px;padding:18px;border-color:#B5483C33;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    html += '<p style="margin:0;font-size:14px;font-weight:700;">批阅结果</p>';
+    html += '<p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + g.total + '<span style="font-size:13px;color:#8A8378;"> / ' + g.full + ' 分</span></p></div>';
+    html += '<p style="margin:8px 0 0;font-size:12px;color:#6B6558;">' + praise;
+    if(g.aiFull){ html += '（规则初判 ' + g.total + ' 分，另有 ' + g.aiFull + ' 分格式/综合项由「AI 深度批阅」判定）'; }
+    else { html += '（规则初判，点「AI 深度批阅」可获得更精细的逐句点评）'; }
+    html += '</p>';
+    html += '<div style="margin-top:14px;">';
+    g.results.forEach(function(r){
+      if(r.aiOnly){
+        html += '<div class="pt-row" style="background:#F5F3EE;"><span style="margin-top:2px;"><span class="tag" style="background:#E7E5E4;color:#57534E;">AI 判定</span></span><span><strong>' + esc(r.point) + '</strong><span style="color:#8A8378;">（' + r.score + '分）</span><br><span style="font-size:11px;color:#8A8378;">此项由 AI 深度批阅综合判定，规则初判不计分</span></span></div>';
+        return;
+      }
+      var cls = r.status === 'hit' ? 'pt-hit' : (r.status === 'half' ? 'pt-half' : 'pt-miss');
+      var tag = r.status === 'hit' ? '<span class="tag tag-hit">命中 +' + r.got + '</span>' : (r.status === 'half' ? '<span class="tag tag-half">部分 +' + r.got + '</span>' : '<span class="tag tag-miss">未中 +0</span>');
+      html += '<div class="pt-row ' + cls + '"><span style="margin-top:2px;">' + tag + '</span><span><strong>' + esc(r.point) + '</strong><span style="color:#8A8378;">（' + r.score + '分）</span>';
+      if(r.hitWords.length){ html += '<br><span style="font-size:11px;color:#15803D;">你的答案提到：' + esc(r.hitWords.slice(0,3).join('、')) + '</span>'; }
+      if(r.status === 'miss'){ html += '<br><span style="font-size:11px;color:#8A8378;">可参考同义写法：' + esc((r.synonyms||[]).slice(0,3).join('、') || r.point) + '</span>'; }
+      html += '</span></div>';
+    });
+    html += '</div>';
+    html += '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #E5E1D8;">';
+    html += '<p style="margin:0 0 6px;font-size:13px;font-weight:700;">参考答案</p>';
+    html += '<p style="margin:0;font-size:13px;line-height:1.9;color:#444;">' + esc(q.referenceAnswer) + '</p></div>';
+    html += '</div>';
+    box.innerHTML = html;
+  }
+
+  function showAiModal(prompt){
+    var mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.innerHTML = '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<p style="margin:0;font-size:16px;font-weight:800;">AI 深度批阅 · 两步搞定</p>'
+      + '<button id="mClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
+      + '<ol style="font-size:13px;line-height:2;color:#444;padding-left:20px;margin:12px 0;">'
+      + '<li>点下面「复制批阅指令」，批阅内容已打包好；</li>'
+      + '<li>打开灵光 App 对话框，<strong>粘贴并发送</strong>，AI 阅卷专家逐点给你点评。</li></ol>'
+      + '<pre class="prompt" id="mPrompt">' + esc(prompt) + '</pre>'
+      + '<div style="margin-top:14px;display:flex;gap:10px;">'
+      + '<button id="mCopy" class="btn-primary" style="flex:1;">复制批阅指令</button></div></div>';
+    document.body.appendChild(mask);
+    mask.querySelector('#mClose').onclick = function(){ mask.remove(); };
+    mask.onclick = function(e){ if(e.target === mask) mask.remove(); };
+    mask.querySelector('#mCopy').onclick = function(){
+      var done = function(){ this.textContent = '已复制 ✓ 去灵光粘贴吧'; }.bind(this);
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(prompt).then(done).catch(function(){ fallbackCopy(prompt); done(); });
+      } else { fallbackCopy(prompt); done(); }
+    };
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    ta.remove();
+  }
+
+  // 启动
+  if(!SHL.length && !ZY.length){
+    document.getElementById('loading').textContent = '题库暂时没有内容，请稍后再试。';
+  } else {
+    render();
+  }
+})();
+</script>
+</body>
+</html>
