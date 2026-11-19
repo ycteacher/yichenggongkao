@@ -3,7 +3,7 @@ var CACHE = 'ycgk-v4';
 var CORE = [
   './',
   './assets/index-C2M5URtc.css?v=ttfix10',
-  './assets/index-b33.js?v=ttfix28',
+  './assets/index-b34.js?v=ttfix76',
   './base.js',
   './assets/icon-yc-red-512.png?v=2'
 ];
