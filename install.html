@@ -48,6 +48,13 @@
   .ritem{text-align:center;padding:12px 8px;background:#F9F7F2;border-radius:12px}
   .ritem svg{width:34px;height:34px}
   .ritem div{font-size:12px;margin-top:6px;color:#555;line-height:1.5}
+  .entries{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 4px}
+  .entry{display:block;text-align:center;border-radius:16px;padding:16px 10px;text-decoration:none;font-weight:900;font-size:16px;box-shadow:0 3px 12px rgba(0,0,0,.08)}
+  .entry span{display:block;font-size:11.5px;font-weight:600;margin-top:5px;opacity:.85}
+  .entry:active{transform:scale(.97)}
+  .ev{background:linear-gradient(135deg,#B91C1C,#DC2626);color:#fff}
+  .ep{background:#fff;color:#B91C1C;border:2px solid #B91C1C}
+  @media(max-width:720px){.entries{grid-template-columns:1fr}}
   .back{display:block;max-width:960px;margin:22px auto 0;text-align:center;background:#B91C1C;color:#fff;border-radius:14px;padding:14px;font-size:15px;font-weight:700;text-decoration:none}
   @media(max-width:720px){.grid,.rgrid{grid-template-columns:1fr}}
 </style>
@@ -61,6 +68,11 @@
 <div class="wrap">
   <div class="note">
     <b>先说清楚：</b>不装也能用——直接用浏览器打开网址就能刷题。装到桌面只是为了<b>下次一点即开、全屏无地址栏</b>，体验和 App 一样。资料在"资料领取专区"里点保存即可下载。
+  </div>
+
+  <div class="entries">
+    <a class="entry ev" href="./install-video.html">📺 视频讲解<span>动画一步一步演示 · 跟着点就行</span></a>
+    <a class="entry ep" href="./install-guide.html">🖼 图片讲解<span>每一步都有大图和说明</span></a>
   </div>
 
   <div class="grid">
