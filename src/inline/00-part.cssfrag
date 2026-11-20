@@ -1,0 +1,13 @@
+<style>.tt-fig{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.md-tbl{border-collapse:collapse;margin:10px 0;width:100%;font-size:14px}.md-tbl th,.md-tbl td{border:1px solid #E5E1D8;padding:6px 10px;text-align:left;white-space:nowrap}.md-tbl th{background:#F7F5EF;font-weight:600;color:#4A463F}.tt-fig svg{max-width:100%;height:auto}.tt-opt svg{width:64px;height:64px;display:block;margin:0 auto}
+/* ===== Tab bar v1 ===== */
+.page-shell-bottom { padding-bottom: 78px !important; }
+.yc-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: flex; background: rgba(255,255,255,.97); border-top: 1px solid #E8E4DB; padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+.yc-tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0 2px; border: none; background: none; font-size: 11px; line-height: 1.2; color: #8A8378; cursor: pointer; }
+.yc-tabbar button.on { color: #DC2626; font-weight: 600; }
+.yc-tabbar .material-icons { font-size: 22px; }
+/* 宽屏：底栏收窄居中悬浮，网页端更精致 */
+@media (min-width: 768px) {
+  .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
+  .page-shell-bottom { padding-bottom: 86px !important; }
+}
+</style>

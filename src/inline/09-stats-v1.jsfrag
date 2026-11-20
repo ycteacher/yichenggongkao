@@ -1,0 +1,42 @@
+<script>
+/* usage stats beacon v1 */
+(function(){
+  try{
+    var B='https://visitor-badge.laobi.icu/badge?page_id=';
+    function hit(id){ try{ new Image().src=B+id+'&r='+Date.now(); }catch(e){} }
+    hit('ycgk.open');
+    var d=new Date(),p=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    try{ if(!localStorage.getItem('ycgk.d'+p)){ localStorage.setItem('ycgk.d'+p,'1'); hit('ycgk.uv.'+p); } }catch(e){}
+    /* 设备类型与安装状态：每台设备只记一次 */
+    try{
+      if(!localStorage.getItem('ycgk.devdone')){
+        localStorage.setItem('ycgk.devdone','1');
+        var ua=navigator.userAgent||'';
+        var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+        var isMobi=isIOS||/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)||/Android|Mobile|Mobi/i.test(ua);
+        hit(isIOS?'ycgk.dev.ios':(isMobi?'ycgk.dev.android':'ycgk.dev.pc'));
+        var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+        if(standalone)hit('ycgk.installed');
+      }
+    }catch(e){}
+    /* 受邀同学回访：带过邀请链接的设备再次打开 */
+    try{
+      if(localStorage.getItem('ycgk.refDone')&&!sessionStorage.getItem('ycgk.refsess')){
+        sessionStorage.setItem('ycgk.refsess','1');
+        hit('ycgk.refreturn');
+      }
+    }catch(e){}
+    /* 离线缓存：装到桌面后再次打开基本秒开 */
+    if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js?v=1').catch(function(){})})}
+    document.addEventListener('click',function(e){
+      try{
+        var el=e.target;
+        while(el&&el!==document.body&&el.tagName!=='BUTTON'){el=el.parentElement;}
+        if(!el||el===document.body)return;
+        var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+        if(/(顺序刷|随机刷|第\d+套$)/.test(t)) hit('ycgk.start');
+      }catch(e){}
+    },true);
+  }catch(e){}
+})();
+</script>
