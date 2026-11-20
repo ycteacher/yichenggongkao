@@ -1588,15 +1588,16 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
-/* material-icons 字体加载失败兜底：某些 iOS/WebView 上字体渲染不出来，
-   图标连字会裸露成英文单词（apartment/school/redeem…）。
-   检测到字体不可用时，把所有 .material-icons 的连字替换成对应 emoji。*/
+/* material-icons 字体加载失败兜底 v2：
+   旧方案改 textContent 会和 React 重渲染打架→闪烁(截图emoji、平时英文)。
+   新方案：给图标元素打 data-emoji 属性，用 CSS ::after 显示 emoji、font-size:0 藏英文原文。
+   React 重渲染只改 textContent(英文)，改不动 data-emoji 属性和 CSS 显示→彻底消除闪烁。 */
 (function(){
   var MAP={
     apartment:'🏢',account_balance:'🏦',school:'🎓',military_tech:'🎖️',
-    group_add:'👥',groups:'👥',redeem:'🎁',install_mobile:'📲',
+    group_add:'👥',groups:'👥',redeem:'🎁',install_mobile:'📲',download:'📥',
     home:'🏠',history_edu:'📜',assignment:'📋',star:'⭐',star_border:'☆',
-    arrow_back:'←',chevron_right:'›',expand_more:'⌄',expand_less:'⌃',
+    arrow_back:'←',arrow_forward:'→',chevron_right:'›',chevron_left:'‹',expand_more:'⌄',expand_less:'⌃',
     check:'✓',check_circle:'✅',check_circle_outline:'☑️',task_alt:'✅',
     close:'✕',cancel:'✕',clear:'✕',search:'🔍',edit:'✏️',edit_note:'📝',
     delete_sweep:'🗑️',lightbulb:'💡',tips_and_updates:'💡',bolt:'⚡',
@@ -1604,12 +1605,15 @@ document.addEventListener('click', function(e){
     grid_on:'▦',account_tree:'🌳',speed:'⚡',target:'🎯',tracking:'🎯',
     keyboard:'⌨️',warning:'⚠️',error:'❗',checklist:'📋',badge:'🏅',
     comment:'💬',sync:'🔄',repeat:'🔁',undo:'↩️',upload:'⬆️',
-    cleaning_services:'🧹',hand:'✋',list:'📃',paper:'📄',comment:'💬'
+    cleaning_services:'🧹',hand:'✋',list:'📃',paper:'📄',folder:'📁',
+    description:'📄',menu_book:'📖',quiz:'❓',help:'❓',info:'ℹ️',
+    person:'👤',account_circle:'👤',people:'👥',work:'💼',business:'🏢'
   };
-  var tried=0, done=false;
+  var SEL='.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp,.material-icons-two-tone';
+  var tried=0, active=false, done=false;
+  function emoji(name){ return MAP[name] || '•'; }
 
-  // 用测量法判断 Material Icons 是否真的渲染成图标：
-  // 同字号下，连字"home"若被渲染成字形，宽度与普通字体明显不同。
+  // 测量法判断 Material Icons 字体是否真的渲染成图标
   function fontWorks(){
     try{
       var m=document.createElement('span');
@@ -1621,51 +1625,66 @@ document.addEventListener('click', function(e){
       document.body.appendChild(m);document.body.appendChild(t);
       var a=m.getBoundingClientRect().width,b=t.getBoundingClientRect().width;
       document.body.removeChild(m);document.body.removeChild(t);
-      return Math.abs(a-b)>3; // 宽度差明显 => 字体生效
+      return Math.abs(a-b)>3;
     }catch(e){ return false; }
   }
-  function emoji(name){ return MAP[name] || '•'; }
-  function swapOne(el){
-    if(el.getAttribute('data-icofix')) return;
+  // 反查：若 textContent 已是 emoji(旧脚本留痕)，找回对应连字名
+  function keyOf(name){
+    if(MAP[name]) return name;
+    for(var k in MAP){ if(MAP[k]===name) return k; }
+    return name;
+  }
+  function tagOne(el){
+    if(!el || el.nodeType!==1 || el.getAttribute('data-emoji')) return;
     var name=(el.textContent||'').trim();
     if(!name) return;
-    el.setAttribute('data-icofix','1');
-    el.textContent=emoji(name);
-    // emoji 用系统字体，别再套 Material Icons
-    el.style.fontFamily='inherit';
-    el.style.fontFeatureSettings='normal';
+    el.setAttribute('data-emoji', emoji(keyOf(name)));
   }
-  function swapAll(){
-    if(done) return; done=true;
-    try{
-      document.querySelectorAll('.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp').forEach(swapOne);
-    }catch(e){}
-    // React 后续可能重渲染，持续观察
+  function tagAll(){
+    try{ document.querySelectorAll(SEL).forEach(tagOne); }catch(e){}
+  }
+  function activate(){
+    if(active) return; active=true;
+    var css=document.createElement('style');
+    css.id='yc-icon-emoji-css';
+    css.textContent=
+      'html.yc-emoji-mode '+SEL+'{font-size:0!important;line-height:1!important;}'+
+      'html.yc-emoji-mode '+SEL+'::after{content:attr(data-emoji);font-size:20px;line-height:1;font-family:system-ui,-apple-system,"Segoe UI Emoji","Apple Color Emoji",sans-serif;}'+
+      'html.yc-emoji-mode .yc-tabbar '+SEL+'::after{font-size:22px;}'+
+      'html.yc-emoji-mode .yc-mat-ic::after,html.yc-emoji-mode .yc-share-ic::after{font-size:26px;}';
+    document.head.appendChild(css);
+    document.documentElement.classList.add('yc-emoji-mode');
+    tagAll();
+    // React 动态渲染的新图标：持续补 data-emoji 属性
     try{
       var mo=new MutationObserver(function(list){
         list.forEach(function(r){
           r.addedNodes.forEach(function(n){
-            if(!n.querySelectorAll) return;
-            if(n.nodeType===1 && /material-icons/.test(n.className||'')) swapOne(n);
-            n.querySelectorAll('.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp').forEach(swapOne);
+            if(n.nodeType===1){
+              if(n.matches&&n.matches(SEL)) tagOne(n);
+              if(n.querySelectorAll) n.querySelectorAll(SEL).forEach(tagOne);
+            }
           });
         });
       });
       mo.observe(document.documentElement,{childList:true,subtree:true});
     }catch(e){}
+    // 定时兜底：覆盖 React 反复重渲染，确保每个图标都有 data-emoji
+    var ticks=0;
+    var iv=setInterval(function(){ tagAll(); if(++ticks>40) clearInterval(iv); }, 500);
+    done=true;
   }
   function attempt(){
     tried++;
-    if(fontWorks()) return;          // 字体正常，不干预
-    if(tried>=3){ swapAll(); return; } // 连续多次检测都失败 => 兜底
+    if(fontWorks()) return;
+    if(tried>=3){ activate(); return; }
     setTimeout(attempt, 600);
   }
   function boot(){
     if(document.readyState==='loading'){
       document.addEventListener('DOMContentLoaded',function(){ setTimeout(attempt,300); });
     } else { setTimeout(attempt,300); }
-    // 最长 4 秒仍未成功也兜底，避免一直等
-    setTimeout(function(){ if(!done && !fontWorks()) swapAll(); }, 4000);
+    setTimeout(function(){ if(!done) activate(); }, 4000);
   }
   boot();
 })();
