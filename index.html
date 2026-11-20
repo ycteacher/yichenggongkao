@@ -5,7 +5,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix96";
+      var V="ttfix97";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
@@ -54,8 +54,8 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix96"></script>
-        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix96">
+</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix97"></script>
+        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix97">
   <script>
     window.artifactId = "ycgk-20261120";
     window.artifactVersion = "27";
@@ -1597,18 +1597,17 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
-/* material-icons 兜底 v3 —— 无条件激活，彻底不依赖字体检测
-   历史问题：v1改textContent与React打架闪烁；v2用fontWorks测量法检测，但iPad/部分WebView
-   测量失准→兜底不激活→连字裸奔成 group/home 等英文。
-   v3：不再检测，页面加载即注入CSS(emoji覆盖+英文透明)，并持续给动态图标补data-emoji。
-   字体正常时图标也被透明化、统一显示emoji，视觉一致，永不露英文。 */
+/* material-icons 兜底 v4 —— 源头已全 emoji(index-b34.js 编译产物已替换)
+   本脚本只做轻量兜底：万一有动态/漏网的英文连字图标，就地换成 emoji 字符。
+   不再使用 font-size:0 + ::after 隐藏方案（那会引入 data-emoji 依赖,动态节点漏抓会变圆点）。
+   emoji 文本是普通 Unicode,任何浏览器/WebView 都能渲染,零字体依赖。 */
 (function(){
   var MAP={
     apartment:'🏢',account_balance:'🏦',school:'🎓',military_tech:'🎖️',
     group:'👥',group_add:'👥',groups:'👥',people:'👥',redeem:'🎁',
     install_mobile:'📲',download:'📥',functions:'➗',gesture:'👆',
     home:'🏠',history_edu:'📜',assignment:'📋',star:'⭐',star_border:'☆',
-    arrow_back:'←',arrow_forward:'→',chevron_right:'›',chevron_left:'‹',expand_more:'⌄',expand_less:'⌃',
+    arrow_back:'⬅',arrow_forward:'➡',chevron_right:'›',chevron_left:'‹',expand_more:'⌄',expand_less:'⌃',
     check:'✓',check_circle:'✅',check_circle_outline:'☑️',task_alt:'✅',
     close:'✕',cancel:'✕',clear:'✕',search:'🔍',edit:'✏️',edit_note:'📝',
     delete_sweep:'🗑️',lightbulb:'💡',tips_and_updates:'💡',bolt:'⚡',
@@ -1629,59 +1628,35 @@ document.addEventListener('click', function(e){
     analytics:'📊',insights:'💡',summarize:'📋',article:'📄'
   };
   var SEL='.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp,.material-icons-two-tone';
-  function emoji(name){ return MAP[name] || '•'; }
-  function keyOf(name){
-    if(MAP[name]) return name;
-    for(var k in MAP){ if(MAP[k]===name) return k; }
-    return name;
+  function fixOne(el){
+    if(!el||el.nodeType!==1||el.getAttribute('data-yc-emoji')) return;
+    var t=(el.textContent||'').trim();
+    if(!t) return;
+    if(MAP[t]){
+      try{ el.textContent=MAP[t]; }catch(e){}
+    }
+    el.setAttribute('data-yc-emoji','1');
   }
-  function tagOne(el){
-    if(!el || el.nodeType!==1 || el.getAttribute('data-emoji')) return;
-    var name=(el.textContent||'').trim();
-    if(!name) return;
-    el.setAttribute('data-emoji', emoji(keyOf(name)));
-  }
-  function tagAll(){ try{ document.querySelectorAll(SEL).forEach(tagOne); }catch(e){} }
-  function activate(){
-    if(document.getElementById('yc-icon-emoji-css')) return;
-    var css=document.createElement('style');
-    css.id='yc-icon-emoji-css';
-    css.textContent=
-      /* 英文连字透明化，emoji用::after显示；font-size归零藏原文 */
-      'html.yc-emoji-mode '+SEL+'{font-size:0!important;line-height:1!important;color:inherit!important;}'+
-      'html.yc-emoji-mode '+SEL+'::after{content:attr(data-emoji);font-size:20px;line-height:1;font-family:system-ui,-apple-system,"Segoe UI Emoji","Apple Color Emoji",sans-serif;}'+
-      'html.yc-emoji-mode '+SEL+':not([data-emoji])::after{content:"•";}'+
-      'html.yc-emoji-mode .yc-tabbar '+SEL+'::after{font-size:22px;}'+
-      'html.yc-emoji-mode .yc-mat-ic::after,html.yc-emoji-mode .yc-share-ic::after{font-size:26px;}'+
-      'html.yc-emoji-mode .yc-top-actions '+SEL+'::after{font-size:18px;}';
-    document.head.appendChild(css);
-    document.documentElement.classList.add('yc-emoji-mode');
-    tagAll();
-    /* 持续补 data-emoji：React动态渲染的新图标 */
+  function fixAll(){ try{ document.querySelectorAll(SEL).forEach(fixOne); }catch(e){} }
+  function boot(){
+    fixAll();
     try{
       var mo=new MutationObserver(function(list){
-        list.forEach(function(r){
-          if(r.type==='attributes'){ if(r.target&&r.target.matches) tagOne(r.target); return; }
-          r.addedNodes.forEach(function(n){
-            if(n.nodeType===1){
-              if(n.matches&&n.matches(SEL)) tagOne(n);
-              if(n.querySelectorAll) n.querySelectorAll(SEL).forEach(tagOne);
-            }
-          });
-          /* 文本节点变化(React改children英文)时重新打标记 */
-          if(r.target&&r.target.nodeType===1&&r.target.matches&&r.target.matches(SEL)) tagOne(r.target);
-        });
+        var need=false;
+        for(var i=0;i<list.length;i++){
+          var r=list[i];
+          if(r.type==='childList'&&r.addedNodes&&r.addedNodes.length){ need=true; break; }
+          if(r.type==='characterData'){ need=true; break; }
+        }
+        if(need) fixAll();
       });
-      mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
+      mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
     }catch(e){}
-    /* 高频定时兜底：前10秒每200ms，之后每1秒，确保覆盖所有重渲染 */
-    var fast=0;
-    var ivFast=setInterval(function(){ tagAll(); if(++fast>50)clearInterval(ivFast); },200);
-    setInterval(tagAll,1000);
+    var n=0,iv=setInterval(function(){ fixAll(); if(++n>40)clearInterval(iv); },250);
+    setTimeout(fixAll,3000);
   }
-  /* DOM就绪即无条件激活，不等字体检测 */
-  if(document.documentElement) activate();
-  else document.addEventListener('DOMContentLoaded',activate);
+  if(document.documentElement) boot();
+  else document.addEventListener('DOMContentLoaded',boot);
 })();
 </script>
 
