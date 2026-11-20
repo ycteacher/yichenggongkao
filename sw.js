@@ -1,9 +1,9 @@
 /* 亿成公考离线缓存 v1：装到桌面后再次打开基本秒开 */
-var CACHE = 'ycgk-v7';
+var CACHE = 'ycgk-v8';
 var CORE = [
   './',
-  './assets/index-C2M5URtc.css?v=ttfix92',
-  './assets/index-b34.js?v=ttfix94',
+  './assets/index-C2M5URtc.css?v=ttfix96',
+  './assets/index-b34.js?v=ttfix96',
   './base.js',
   './assets/material-icons.css?v=1',
   './assets/material-icons.woff2?v=1',
