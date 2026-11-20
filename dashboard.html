@@ -156,8 +156,8 @@ td b{color:var(--txt)}
 @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:repeat(2,1fr)}.card.w2{grid-column:span 2}}
 @media(max-width:700px){.wrap{padding:16px 14px 50px}.kpis{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}.card.w2{grid-column:span 1}.clock{font-size:19px}.funnel{flex-direction:column}.farr{transform:rotate(90deg);justify-content:center;padding:2px 0}.fbmini{grid-template-columns:repeat(2,1fr)}.brand h1{font-size:17px}}
 /* 实时运营数据 */
-.kpis.live-kpis{grid-template-columns:repeat(5,1fr)}
-@media(max-width:1100px){.kpis.live-kpis{grid-template-columns:repeat(3,1fr)}}
+.kpis.live-kpis{grid-template-columns:repeat(7,1fr)}
+@media(max-width:1100px){.kpis.live-kpis{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:700px){.kpis.live-kpis{grid-template-columns:repeat(2,1fr)}}
 .live-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
 .live-box .v{font-size:26px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
@@ -278,6 +278,15 @@ td b{color:var(--txt)}
       <div id="todayOs"></div>
       <div class="desc" style="margin:12px 0 4px">今日设备按系统</div>
       <div id="liveOs2"></div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card w2">
+      <h3>资料使用趋势 <span class="hint">近 14 天 · 保存 vs 打开</span></h3>
+      <div class="desc" id="matNote">资料领取页的「保存下载」与「打开预览」次数，按天统计</div>
+      <div class="chart" id="matTrend"></div>
+      <div class="lg"><span><i style="background:#22c55e"></i>保存下载</span><span><i style="background:#fbbf24"></i>打开预览</span></div>
     </div>
   </div>
 
@@ -524,6 +533,8 @@ function refreshFb(){
 }
 /* ===== 实时运营数据（独立数据池） ===== */
 var LIVE_URL='https://textdb.dev/api/data/ycgk-live-v1';
+var MAT_URL='https://textdb.dev/api/data/ycgk-mat-v1';
+var MAT_DATA=null;
 var LIVE_WINDOW=10*60*1000;
 var LIVE_DATA=null;
 var LIVE_OK=false;
@@ -648,7 +659,9 @@ function renderLive(ok,data){
     {t:'累计设备',n:ok?keys.length:dash,c:'var(--cyan)',x:'数据池去重设备数'},
     {t:'今日新增设备',n:ok?nNew:dash,c:'var(--amber)',x:'首次访问 '+today},
     {t:'回访设备',n:ok?nBack:dash,c:'var(--violet)',x:'最后访问 ≠ 首次'},
-    {t:'已安装到本地',n:ok?nInst:dash,c:'var(--pink)',x:'安装率 '+rate}
+    {t:'已安装到本地',n:ok?nInst:dash,c:'var(--pink)',x:'安装率 '+rate},
+    {t:'资料保存次数',n:MAT_DATA?(MAT_DATA.save||0):dash,c:'var(--green)',x:'累计下载资料 '+((MAT_DATA&&MAT_DATA.days&&MAT_DATA.days[liveToday()]&&MAT_DATA.days[liveToday()].save)||0)+' 次今日'},
+    {t:'资料打开次数',n:MAT_DATA?(MAT_DATA.open||0):dash,c:'var(--amber)',x:'累计预览资料 '+((MAT_DATA&&MAT_DATA.days&&MAT_DATA.days[liveToday()]&&MAT_DATA.days[liveToday()].open)||0)+' 次今日'}
   ];
   el('liveKpis').innerHTML=cards.map(function(i){
     return '<div class="kpi" style="--c:'+i.c+'"><div class="t">'+i.t+'</div><div class="n"'+(i.id?' id="'+i.id+'"':'')+'>'+i.n+'</div><div class="x">'+i.x+'</div></div>';
@@ -697,11 +710,42 @@ function loadLive(){
     .catch(function(){LIVE_OK=false;LIVE_DATA=null;renderLive(false,null)});
 }
 renderLive(false,null);loadLive();setInterval(loadLive,15000);
+function renderMatTrend(){
+  var host=el('matTrend');if(!host)return;
+  var days=lastDays(14);
+  var save=days.map(function(d){var x=(MAT_DATA&&MAT_DATA.days&&MAT_DATA.days[d])||{};return x.save||0});
+  var open=days.map(function(d){var x=(MAT_DATA&&MAT_DATA.days&&MAT_DATA.days[d])||{};return x.open||0});
+  var totS=MAT_DATA?(MAT_DATA.save||0):0, totO=MAT_DATA?(MAT_DATA.open||0):0;
+  if(el('matNote'))el('matNote').textContent='累计保存 '+totS+' 次 · 累计打开 '+totO+' 次 · 按天统计（20秒防重复）';
+  var max=Math.max.apply(null,save.concat(open).concat([1]));
+  var W=920,H=170,padL=8,padR=8,padT=8,padB=22,bw=(W-padL-padR)/days.length;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="资料使用趋势">';
+  /* 网格线 */
+  for(var g=1;g<=3;g++){var gy=padT+(H-padT-padB)*g/4;s+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(148,163,184,.12)" stroke-width="1"/>'}
+  days.forEach(function(d,i){
+    var x=padL+i*bw;
+    /* 双柱：保存绿 / 打开黄 */
+    var sw=bw*0.3,sh=(save[i]/max)*(H-padT-padB),oh=(open[i]/max)*(H-padT-padB);
+    var sy=H-padB-sh,oy=H-padB-oh;
+    if(save[i]>0)s+='<rect x="'+(x+bw*0.16).toFixed(1)+'" y="'+sy.toFixed(1)+'" width="'+sw.toFixed(1)+'" height="'+Math.max(2,sh).toFixed(1)+'" rx="2" fill="#22c55e"/>';
+    if(open[i]>0)s+='<rect x="'+(x+bw*0.52).toFixed(1)+'" y="'+oy.toFixed(1)+'" width="'+sw.toFixed(1)+'" height="'+Math.max(2,oh).toFixed(1)+'" rx="2" fill="#fbbf24"/>';
+    if(i%2===0||days.length<=8)s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-6)+'" fill="#64748b" font-size="9" text-anchor="middle">'+d.slice(4,6)+'/'+d.slice(6,8)+'</text>';
+  });
+  s+='</svg>';
+  host.innerHTML=s;
+}
+function loadMat(){
+  fetch(MAT_URL+(MAT_URL.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.json()})
+    .then(function(d){if(d&&typeof d==='object'&&!Array.isArray(d)){MAT_DATA=d;renderLive(LIVE_OK,LIVE_DATA);renderMatTrend()}})
+    .catch(function(){});
+}
+loadMat();setInterval(loadMat,15000);
 
 renderAll(STATS,FB);tick();setInterval(tick,1000);
 fetchBank();refreshMetrics();refreshFb();
 setInterval(refreshMetrics,30000);setInterval(refreshFb,300000);setInterval(fetchBank,300000);
-el('refreshBtn').addEventListener('click',function(){fetchBank();refreshMetrics();refreshFb();loadLive()});
+el('refreshBtn').addEventListener('click',function(){fetchBank();refreshMetrics();refreshFb();loadLive();loadMat()});
 
 /* 保存长图 */
 var btn=el('saveImgBtn');
