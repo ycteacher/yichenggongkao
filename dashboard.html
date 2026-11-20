@@ -227,7 +227,7 @@ td b{color:var(--txt)}
     </div>
     <div class="hero-chart">
       <h3>访问趋势 <span class="hint">近 14 天 · 每日访问次数</span></h3>
-      <div class="desc">数据池实时聚合 · 柱=当日访问人次 · 线=当日活跃设备</div>
+      <div class="desc">数据池实时聚合 · 柱=当日活跃设备数 · 线=趋势</div>
       <div class="spark" id="sparkTrend"></div>
     </div>
   </div>
@@ -556,21 +556,21 @@ function liveAggregate(data){
   var res={days:{},hours:{},todayActive:0,todayNew:0,todayOs:{},totalPv:0};
   Object.keys(dev).forEach(function(k){
     var it=dev[k]||{};
-    /* 按天：访问次数 = pv(若有) 否则按 hr 各小时求和 */
+    var lastDay=it.last&&/^\d{8}$/.test(String(it.last))?String(it.last):today;
+    /* 每日活跃设备：用 last 日期聚合(现有数据即有)，趋势图立刻可见 */
+    res.days[lastDay]=(res.days[lastDay]||0)+1;
+    /* 有 hr 分时数据时用它做24小时分布 + 覆盖当天访问次数 */
     if(it.hr&&typeof it.hr==='object'){
       Object.keys(it.hr).forEach(function(day){
         var hm=it.hr[day]||{},sum=0;
         Object.keys(hm).forEach(function(h){sum+=(hm[h]||0)});
-        res.days[day]=(res.days[day]||0)+sum;
-        if(day===today){res.todayActive++;Object.keys(hm).forEach(function(h){res.hours[h]=(res.hours[h]||0)+(hm[h]||0)})}
+        if(sum>0){res.days[day]=Math.max(res.days[day]||0,sum)}
+        if(day===today){Object.keys(hm).forEach(function(h){res.hours[h]=(res.hours[h]||0)+(hm[h]||0)})}
       });
-    } else if(it.pv){
-      var day=it.last||today;
-      res.days[day]=(res.days[day]||0)+it.pv;
-      if(day===today)res.todayActive++;
     }
+    if(lastDay===today)res.todayActive++;
     if(it.first&&String(it.first)===today)res.todayNew++;
-    if(it.last&&String(it.last)===today){var os=String(it.os||'other');res.todayOs[os]=(res.todayOs[os]||0)+1}
+    if(lastDay===today){var os=String(it.os||'other');res.todayOs[os]=(res.todayOs[os]||0)+1}
     res.totalPv+=(it.pv||0);
   });
   return res;
