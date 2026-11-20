@@ -878,6 +878,15 @@ document.addEventListener('click', function(e){
       var rec=p.devices[did]||{};
       if(!rec.first)rec.first=dayKey(new Date());
       rec.last=today;rec.m=dev.model;rec.os=dev.os;rec.inst=!!(rec.inst||dev.install);
+      /* 访问频次 + 按天分时活跃：供看板生成真实访问趋势/24小时分布 */
+      rec.pv=(rec.pv||0)+1;
+      var dObj=new Date(),hr=pad(dObj.getHours());
+      if(!rec.hr||typeof rec.hr!=='object')rec.hr={};
+      if(!rec.hr[today]||typeof rec.hr[today]!=='object')rec.hr[today]={};
+      rec.hr[today][hr]=(rec.hr[today][hr]||0)+1;
+      /* 只保留最近14天的分时，控制体积 */
+      var hkeys=Object.keys(rec.hr).sort();
+      if(hkeys.length>14){for(var hi=0;hi<hkeys.length-14;hi++)delete rec.hr[hkeys[hi]];}
       p.devices[did]=rec;
       /* 设备数上限保护：超过2000台只保留最近1500台 */
       var ids=Object.keys(p.devices);
@@ -1588,14 +1597,16 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
-/* material-icons 字体加载失败兜底 v2：
-   旧方案改 textContent 会和 React 重渲染打架→闪烁(截图emoji、平时英文)。
-   新方案：给图标元素打 data-emoji 属性，用 CSS ::after 显示 emoji、font-size:0 藏英文原文。
-   React 重渲染只改 textContent(英文)，改不动 data-emoji 属性和 CSS 显示→彻底消除闪烁。 */
+/* material-icons 兜底 v3 —— 无条件激活，彻底不依赖字体检测
+   历史问题：v1改textContent与React打架闪烁；v2用fontWorks测量法检测，但iPad/部分WebView
+   测量失准→兜底不激活→连字裸奔成 group/home 等英文。
+   v3：不再检测，页面加载即注入CSS(emoji覆盖+英文透明)，并持续给动态图标补data-emoji。
+   字体正常时图标也被透明化、统一显示emoji，视觉一致，永不露英文。 */
 (function(){
   var MAP={
     apartment:'🏢',account_balance:'🏦',school:'🎓',military_tech:'🎖️',
-    group_add:'👥',groups:'👥',redeem:'🎁',install_mobile:'📲',download:'📥',
+    group:'👥',group_add:'👥',groups:'👥',people:'👥',redeem:'🎁',
+    install_mobile:'📲',download:'📥',functions:'➗',gesture:'👆',
     home:'🏠',history_edu:'📜',assignment:'📋',star:'⭐',star_border:'☆',
     arrow_back:'←',arrow_forward:'→',chevron_right:'›',chevron_left:'‹',expand_more:'⌄',expand_less:'⌃',
     check:'✓',check_circle:'✅',check_circle_outline:'☑️',task_alt:'✅',
@@ -1607,28 +1618,18 @@ document.addEventListener('click', function(e){
     comment:'💬',sync:'🔄',repeat:'🔁',undo:'↩️',upload:'⬆️',
     cleaning_services:'🧹',hand:'✋',list:'📃',paper:'📄',folder:'📁',
     description:'📄',menu_book:'📖',quiz:'❓',help:'❓',info:'ℹ️',
-    person:'👤',account_circle:'👤',people:'👥',work:'💼',business:'🏢'
+    person:'👤',account_circle:'👤',work:'💼',business:'🏢',
+    date_range:'📅',calendar_month:'📅',schedule:'⏰',trending_up:'📈',
+    bar_chart:'📊',pie_chart:'🥧',dashboard:'📊',data_usage:'📊',
+    emoji_events:'🏆',military:'🎖️',local_hospital:'🏥',
+    phone_android:'📱',devices:'💻',laptop:'💻',computer:'💻',
+    lock:'🔒',security:'🔐',verified:'✅',star_rate:'⭐',
+    more_horiz:'⋯',more_vert:'⋮',add:'➕',remove:'➖',
+    play_arrow:'▶️',pause:'⏸️',refresh:'🔄',send:'📤',
+    analytics:'📊',insights:'💡',summarize:'📋',article:'📄'
   };
   var SEL='.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp,.material-icons-two-tone';
-  var tried=0, active=false, done=false;
   function emoji(name){ return MAP[name] || '•'; }
-
-  // 测量法判断 Material Icons 字体是否真的渲染成图标
-  function fontWorks(){
-    try{
-      var m=document.createElement('span');
-      m.style.cssText='position:absolute;left:-9999px;top:0;font-family:"Material Icons";font-size:40px;font-feature-settings:"liga";white-space:nowrap;';
-      m.textContent='home';
-      var t=document.createElement('span');
-      t.style.cssText='position:absolute;left:-9999px;top:0;font-family:serif;font-size:40px;white-space:nowrap;';
-      t.textContent='home';
-      document.body.appendChild(m);document.body.appendChild(t);
-      var a=m.getBoundingClientRect().width,b=t.getBoundingClientRect().width;
-      document.body.removeChild(m);document.body.removeChild(t);
-      return Math.abs(a-b)>3;
-    }catch(e){ return false; }
-  }
-  // 反查：若 textContent 已是 emoji(旧脚本留痕)，找回对应连字名
   function keyOf(name){
     if(MAP[name]) return name;
     for(var k in MAP){ if(MAP[k]===name) return k; }
@@ -1640,53 +1641,47 @@ document.addEventListener('click', function(e){
     if(!name) return;
     el.setAttribute('data-emoji', emoji(keyOf(name)));
   }
-  function tagAll(){
-    try{ document.querySelectorAll(SEL).forEach(tagOne); }catch(e){}
-  }
+  function tagAll(){ try{ document.querySelectorAll(SEL).forEach(tagOne); }catch(e){} }
   function activate(){
-    if(active) return; active=true;
+    if(document.getElementById('yc-icon-emoji-css')) return;
     var css=document.createElement('style');
     css.id='yc-icon-emoji-css';
     css.textContent=
-      'html.yc-emoji-mode '+SEL+'{font-size:0!important;line-height:1!important;}'+
+      /* 英文连字透明化，emoji用::after显示；font-size归零藏原文 */
+      'html.yc-emoji-mode '+SEL+'{font-size:0!important;line-height:1!important;color:inherit!important;}'+
       'html.yc-emoji-mode '+SEL+'::after{content:attr(data-emoji);font-size:20px;line-height:1;font-family:system-ui,-apple-system,"Segoe UI Emoji","Apple Color Emoji",sans-serif;}'+
+      'html.yc-emoji-mode '+SEL+':not([data-emoji])::after{content:"•";}'+
       'html.yc-emoji-mode .yc-tabbar '+SEL+'::after{font-size:22px;}'+
-      'html.yc-emoji-mode .yc-mat-ic::after,html.yc-emoji-mode .yc-share-ic::after{font-size:26px;}';
+      'html.yc-emoji-mode .yc-mat-ic::after,html.yc-emoji-mode .yc-share-ic::after{font-size:26px;}'+
+      'html.yc-emoji-mode .yc-top-actions '+SEL+'::after{font-size:18px;}';
     document.head.appendChild(css);
     document.documentElement.classList.add('yc-emoji-mode');
     tagAll();
-    // React 动态渲染的新图标：持续补 data-emoji 属性
+    /* 持续补 data-emoji：React动态渲染的新图标 */
     try{
       var mo=new MutationObserver(function(list){
         list.forEach(function(r){
+          if(r.type==='attributes'){ if(r.target&&r.target.matches) tagOne(r.target); return; }
           r.addedNodes.forEach(function(n){
             if(n.nodeType===1){
               if(n.matches&&n.matches(SEL)) tagOne(n);
               if(n.querySelectorAll) n.querySelectorAll(SEL).forEach(tagOne);
             }
           });
+          /* 文本节点变化(React改children英文)时重新打标记 */
+          if(r.target&&r.target.nodeType===1&&r.target.matches&&r.target.matches(SEL)) tagOne(r.target);
         });
       });
-      mo.observe(document.documentElement,{childList:true,subtree:true});
+      mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
     }catch(e){}
-    // 定时兜底：覆盖 React 反复重渲染，确保每个图标都有 data-emoji
-    var ticks=0;
-    var iv=setInterval(function(){ tagAll(); if(++ticks>40) clearInterval(iv); }, 500);
-    done=true;
+    /* 高频定时兜底：前10秒每200ms，之后每1秒，确保覆盖所有重渲染 */
+    var fast=0;
+    var ivFast=setInterval(function(){ tagAll(); if(++fast>50)clearInterval(ivFast); },200);
+    setInterval(tagAll,1000);
   }
-  function attempt(){
-    tried++;
-    if(fontWorks()) return;
-    if(tried>=3){ activate(); return; }
-    setTimeout(attempt, 600);
-  }
-  function boot(){
-    if(document.readyState==='loading'){
-      document.addEventListener('DOMContentLoaded',function(){ setTimeout(attempt,300); });
-    } else { setTimeout(attempt,300); }
-    setTimeout(function(){ if(!done) activate(); }, 4000);
-  }
-  boot();
+  /* DOM就绪即无条件激活，不等字体检测 */
+  if(document.documentElement) activate();
+  else document.addEventListener('DOMContentLoaded',activate);
 })();
 </script>
 
