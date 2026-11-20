@@ -235,7 +235,7 @@
   function boot(){
     handleRef();
     creditReferrals();
-    welcomeGuide();
+    /* welcomeGuide() 已由 15-onboarding 全屏引导流程接管，此处不再调用，避免两个弹窗打架 */
     var mo=new MutationObserver(function(){addShareCard();patchPointsModal()});
     mo.observe(document.body,{childList:true,subtree:true});
     addShareCard();patchPointsModal();
