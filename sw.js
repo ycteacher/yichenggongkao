@@ -46,9 +46,13 @@ self.addEventListener('fetch', function(e){
       var slow = new Promise(function(res){ setTimeout(function(){ res(null); }, 3000); });
       return Promise.race([net, slow]).then(function(winner){
         if(winner) return winner;
-        return caches.match('./').then(function(hit){
-          return hit || Promise.race([net, new Promise(function(res){ setTimeout(function(){ res(Response.error()); }, 8000); })]);
-        });
+        var isRoot = url.pathname === '/' || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/');
+        if (isRoot) {
+          return caches.match('./').then(function(hit){
+            return hit || Promise.race([net, new Promise(function(res){ setTimeout(function(){ res(Response.error()); }, 8000); })]);
+          });
+        }
+        return Promise.race([net, new Promise(function(res){ setTimeout(function(){ res(Response.error()); }, 15000); })]);
       });
     })());
     return;
