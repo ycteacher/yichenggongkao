@@ -1697,6 +1697,9 @@ document.addEventListener('click', function(e){
   '.yc-inst-st{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.6;color:#202020;margin-top:7px;text-align:left}'+
   '.yc-inst-st>b{flex:none;width:19px;height:19px;border-radius:50%;background:#15803D;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px}'+
   '.yc-inst-st .kb{background:#e7f5ec;color:#15803D;border-radius:5px;padding:1px 5px;font-weight:800;white-space:nowrap}'+
+  '.yc-inst-copy{display:block;width:100%;background:#F0FDF4;color:#15803D;border:1.5px dashed #15803D;border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;margin:10px 0 2px;font-family:inherit}'+
+  '.yc-inst-copy:active{transform:scale(.97)}'+
+  '.yc-inst-copy:disabled{opacity:.75}'+
   '.yc-inst-link{display:block;text-align:center;font-size:13px;font-weight:800;color:#15803D;text-decoration:none;border:1.5px solid #15803D;border-radius:10px;padding:10px;margin-top:14px}'+
   '.yc-inst-foot{font-size:11px;color:#9CA3AF;text-align:center;margin-top:12px;line-height:1.6}';
   var st=document.createElement('style'); st.textContent=CSS; document.head.appendChild(st);
@@ -1728,10 +1731,18 @@ document.addEventListener('click', function(e){
            '<div class="yc-inst-st"><b>2</b><span>点底部「三道杠」或右上「⋮」</span></div>'+
            '<div class="yc-inst-st"><b>3</b><span>选「<b class="kb">添加到桌面</b>」→ 确认</span></div>';
     }else if(isAndroid){
+      var isQQ=/MQQBrowser/i.test(ua), isUC=/UCBrowser|UBrowser/i.test(ua), isQuark=/Quark/i.test(ua);
+      var isMi=/XiaoMi|MiuiBrowser|MIUI/i.test(ua), isOv=/OppoBrowser|HeyTapBrowser|VivoBrowser/i.test(ua);
+      var isChrome=/Chrome|Edg\//i.test(ua)&&!isQQ&&!isUC&&!isQuark;
       head=(isPad?'安卓平板':'安卓手机')+' · 安装到桌面';
-      body='<div class="yc-inst-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>点右上「⋮」菜单</span></div>'+
-           '<div class="yc-inst-st"><b>3</b><span>选「<b class="kb">安装应用</b>」或「添加到主屏幕」</span></div>';
+      if(isChrome){
+        body='<div class="yc-inst-st"><b>1</b><span>点上方绿色「<b class="kb">一键安装到桌面</b>」→ 弹窗点「安装」</span></div>'+
+             '<div class="yc-inst-st"><b>2</b><span>或点右上「⋮」→「<b class="kb">安装应用</b> / 添加到主屏幕」</span></div>';
+      }else{
+        body='<div class="yc-inst-st"><b>1</b><span>点浏览器底部的<b class="kb">「☰」或「⋮」菜单</b></span></div>'+
+             '<div class="yc-inst-st"><b>2</b><span>找「<b class="kb">添加到桌面 / 收藏到桌面 / 安装应用</b>」→ 确认</span></div>'+
+             '<div class="yc-inst-st"><b>3</b><span>找不到？点下方「<b class="kb">复制网址</b>」，用 Chrome 打开即可一键装</span></div>';
+      }
     }else if(isMac){
       head='苹果电脑 · 安装到程序坞';
       body='<div class="yc-inst-st"><b>1</b><span>用 <b class="kb">Chrome</b>/<b class="kb">Edge</b> 打开：点地址栏右侧「安装」图标，或右上「⋮」→「安装此站点为应用」</span></div>'+
@@ -1743,7 +1754,7 @@ document.addEventListener('click', function(e){
            '<div class="yc-inst-st"><b>3</b><span>或点右上「⋮」→「<b class="kb">应用</b>」→「安装此站点为应用」</span></div>'+
            '<div class="yc-inst-st"><b>4</b><span>装好后桌面/开始菜单出现图标，<b>断网也能刷题</b></span></div>';
     }
-    var wx=inWx?'<div class="yc-inst-sec" style="background:#fff7ed"><div class="yc-inst-sec-t" style="color:#9a3412">⚠️ 你在微信里，会被拦住</div><div style="font-size:12.5px;color:#9a3412;line-height:1.6">先点右上角「···」→「在浏览器中打开」，再按上面步骤操作。</div></div>':'';
+    var wx=inWx?'<div class="yc-inst-sec" style="background:#fff7ed"><div class="yc-inst-sec-t" style="color:#9a3412">⚠️ 你在微信里，装不了</div><div style="font-size:12.5px;color:#9a3412;line-height:1.6">先点右上角「···」→「<b>在浏览器中打开</b>」，或点下方「复制网址」去 Safari / Chrome 粘贴打开，再按步骤装。</div></div>':'';
     return {head:head, body:body, wx:wx};
   }
 
@@ -1753,7 +1764,7 @@ document.addEventListener('click', function(e){
       ? '<button class="yc-inst-hero" id="ycInstGo">⬇ 一键安装到桌面（推荐）</button><div class="yc-inst-note">点它 → 系统弹窗点「安装」即可，最快</div>'
       : (installed
           ? '<button class="yc-inst-hero" disabled>✓ 已安装到本机</button><div class="yc-inst-note">从桌面图标打开即可，离线也能刷题</div>'
-          : '<button class="yc-inst-hero" disabled>当前浏览器不支持一键安装</button><div class="yc-inst-note">请用下方步骤，2 步搞定</div>');
+          : '<button class="yc-inst-hero" disabled>此浏览器不支持一键安装 · 用下面步骤照样装</button><div class="yc-inst-note">或点「复制网址」换 Chrome / Safari 打开，就能一键装</div>');
     var mask=document.getElementById('ycInstMask');
     if(!mask){
       mask=document.createElement('div'); mask.id='ycInstMask'; mask.className='yc-inst-mask';
@@ -1766,11 +1777,23 @@ document.addEventListener('click', function(e){
       '<h3>把亿成公考保存到本地</h3>'+
       '<div class="yc-inst-sub">装到桌面后一点就开、不用再找链接，题库自动缓存，离线也能刷。</div>'+
       hero+
-      '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
+      '<button class="yc-inst-copy" id="ycInstCopy">📋 复制网址 · 去别的浏览器粘贴打开</button>'+
       s.wx+
+      '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
       '<a class="yc-inst-link" href="install.html">看完整图文 / 视频指引 ›</a>'+
       '<div class="yc-inst-foot">只想存网页文件？电脑按 Ctrl+S（Mac 按 ⌘S）另存即可<br>安装完全免费 · 题库持续更新</div>';
     card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
+    var cp=card.querySelector('#ycInstCopy');
+    if(cp) cp.addEventListener('click',function(){
+      var url=location.href.split('#')[0];
+      var done=function(){ cp.textContent='✓ 已复制！去 Safari / Chrome 粘贴打开'; cp.disabled=true;
+        setTimeout(function(){ cp.textContent='📋 复制网址 · 去别的浏览器粘贴打开'; cp.disabled=false; },2600); };
+      var fb=function(){ var t=document.createElement('textarea'); t.value=url; t.style.position='fixed'; t.style.opacity='0';
+        document.body.appendChild(t); t.select();
+        try{ document.execCommand('copy'); done(); }catch(e){ cp.textContent=url; }
+        document.body.removeChild(t); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(fb); }else{ fb(); }
+    });
     var go=card.querySelector('#ycInstGo');
     if(go) go.addEventListener('click',function(){
       if(deferred){
