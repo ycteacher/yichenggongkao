@@ -1791,9 +1791,11 @@ document.addEventListener('click', function(e){
       '<button class="yc-inst-copy" id="ycInstCopy">📋 复制网址 · 去别的浏览器粘贴打开</button>'+
       s.wx+
       '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
-      '<a class="yc-inst-link" href="install.html">看完整图文 / 视频指引 ›</a>'+
+      '<a class="yc-inst-link" id="ycInstGuideLink" href="install.html">看完整图文 / 视频指引 ›</a>'+
       '<div class="yc-inst-foot">只想存网页文件？电脑按 Ctrl+S（Mac 按 ⌘S）另存即可<br>安装完全免费 · 题库持续更新</div>';
     card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
+    var gl=card.querySelector('#ycInstGuideLink');
+    if(gl) gl.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href='install.html'; });
     var cp=card.querySelector('#ycInstCopy');
     if(cp) cp.addEventListener('click',function(){
       var url=location.href.split('#')[0];
