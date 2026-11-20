@@ -295,6 +295,16 @@ function bm(){const[a,c]=G.useState(()=>{try{return location.hash==="#plan"?{nam
   function dsOf(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
   function todayStr() { return dsOf(new Date()); }
 
+  /* ---- 进入次数（按天去重） ---- */
+  var VISIT_KEY = "yicheng-gk-visits-v1";
+  (function () {
+    var v = jget(VISIT_KEY, { count: 0, last: "" });
+    var t = todayStr();
+    if (v.last !== t) { v.count = (v.count || 0) + 1; v.last = t; }
+    try { LS.setItem(VISIT_KEY, JSON.stringify(v)); } catch (e) {}
+    window.__ycVisitCount = v.count || 1;
+  })();
+
   var PROVINCES = ["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃","青海","宁夏","新疆"];
   var CATS = ["国考", "省考", "事业编", "医疗编"];
   var MOD_NAMES = { panduan: "判断推理", tuitui: "图形推理", yanyu: "言语理解", shuliang: "数量关系", ziliao: "资料分析", changshi: "常识判断", jundui: "军队文职", jiaoshi: "教师编", yiliao: "医疗编" };
@@ -589,6 +599,7 @@ function bm(){const[a,c]=G.useState(()=>{try{return location.hash==="#plan"?{nam
         '<div style="display:flex;align-items:center;justify-content:space-between">' +
         '<button id="yc-dash-close" type="button" style="border:none;background:' + t.card + ';border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:' + t.txt + ';box-shadow:0 1px 4px rgba(0,0,0,.1);cursor:pointer">‹ 返回</button>' +
         '<p style="margin:0;font-size:14px;font-weight:800;color:' + t.txt + '">个人数据看板</p>' +
+        '<span style="margin-left:8px;font-size:12px;font-weight:600;color:' + t.txt + ';opacity:.65;white-space:nowrap">第 ' + (window.__ycVisitCount || 1) + ' 次来</span>' +
         '<button id="yc-dash-theme" type="button" style="border:none;background:' + t.card + ';border-radius:999px;padding:8px 12px;font-size:14px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.1)">' + (dark ? "☀️" : "🌙") + "</button></div>" +
         '<div style="margin-top:16px;background:' + t.grad + ';border-radius:20px;padding:20px 18px;color:#fff">' +
         '<div style="display:flex;align-items:center;gap:14px">' + clockSvg({ card: "rgba(255,255,255,.14)", line: "rgba(255,255,255,.35)", txt: "#FFFFFF", sub: "rgba(255,255,255,.55)", accent: "#FDE68A" }) +
