@@ -1,0 +1,582 @@
+<script>
+/* 15-onboarding: 首启强制安装引导 → 学习计划表单 → 备考计划(底部tab+顶部常驻) → 模拟测试专区(10套卷+判分) */
+(function(){
+  'use strict';
+  var K_ONB='ycgk.onboard.v2', K_PLAN='ycgk.studyplan.v2', K_MOCK='ycgk.mock.v2';
+  function raw(k){ try{return localStorage.getItem(k)}catch(e){return null} }
+  function set(k,v){ try{localStorage.setItem(k,v)}catch(e){} }
+  function getJSON(k,fb){ try{var v=raw(k);return v?JSON.parse(v):fb}catch(e){return fb} }
+  function setJSON(k,v){ set(k,JSON.stringify(v)) }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') }
+  function $(id){ return document.getElementById(id) }
+
+  /* 修复"打开强制进备考计划"：清掉 React 读取的 #plan hash */
+  try{ if(/plan/i.test(location.hash)) history.replaceState(null,'',location.href.split('#')[0]); }catch(e){}
+  /* 停掉旧的一次性欢迎弹窗（由本流程接管） */
+  try{ set('ycgk.welcomeSeen','1'); }catch(e){}
+
+  var deferred=null, canInstall=false, installed=false;
+  try{
+    window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; canInstall=true; refreshInstallBtn(); });
+    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; refreshInstallBtn(); });
+    installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  }catch(e){}
+
+  /* ---------- CSS ---------- */
+  var CSS=''+
+  '.yc-ob-mask{position:fixed;inset:0;z-index:2147483000;background:rgba(18,14,10,.62);display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:opacity .25s}'+
+  '.yc-ob-mask.on{opacity:1;pointer-events:auto}'+
+  '.yc-ob-card{position:relative;width:100%;max-width:460px;max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:24px 20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(14px);transition:transform .25s;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}'+
+  '.yc-ob-mask.on .yc-ob-card{transform:translateY(0)}'+
+  '.yc-ob-card.wide{max-width:680px}'+
+  '.yc-ob-x{position:absolute;top:14px;right:16px;width:30px;height:30px;border:none;background:#f2f0ec;border-radius:50%;font-size:18px;color:#8a8378;cursor:pointer;line-height:30px;text-align:center}'+
+  '.yc-ob-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;font-size:27px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 6px 18px rgba(220,38,38,.3)}'+
+  '.yc-ob-h{font-size:21px;font-weight:900;color:#202020;text-align:center;margin:0 0 6px;line-height:1.3}'+
+  '.yc-ob-sub{font-size:13px;color:#8a8378;text-align:center;margin:0 0 16px;line-height:1.6}'+
+  '.yc-ob-warn{background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.65;color:#9a3412;margin-bottom:14px;font-weight:600}'+
+  '.yc-ob-why{display:flex;gap:8px;margin-bottom:14px}'+
+  '.yc-ob-why div{flex:1;background:#F7F5F0;border-radius:12px;padding:11px 6px;text-align:center}'+
+  '.yc-ob-why .ic{font-size:23px;line-height:1.2}'+
+  '.yc-ob-why .tx{font-size:11.5px;color:#5b5560;margin-top:5px;font-weight:700}'+
+  '.yc-ob-steps{background:#fef2f2;border:1.5px solid #fecaca;border-radius:14px;padding:13px 14px;margin-bottom:12px}'+
+  '.yc-ob-steps-t{font-size:13.5px;font-weight:900;color:#991b1b;margin-bottom:9px}'+
+  '.yc-ob-st{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.6;color:#202020;margin-top:8px;text-align:left}'+
+  '.yc-ob-st b{flex:none;width:21px;height:21px;border-radius:50%;background:#DC2626;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}'+
+  '.yc-ob-st .kb{background:#fee2e2;color:#b91c1c;border-radius:5px;padding:1px 5px;font-weight:800;white-space:nowrap}'+
+  '.yc-ob-wx{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.6;color:#92400e;margin-bottom:12px}'+
+  '.yc-ob-primary{display:block;width:100%;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:13px;padding:15px;font-size:16px;font-weight:900;margin-top:6px;cursor:pointer;box-shadow:0 5px 16px rgba(220,38,38,.3);font-family:inherit}'+
+  '.yc-ob-primary:active{transform:scale(.985)}'+
+  '.yc-ob-ghost{display:block;width:100%;background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:12px;padding:12px;font-size:14px;font-weight:800;margin-top:9px;cursor:pointer;font-family:inherit}'+
+  '.yc-ob-foot{font-size:11.5px;color:#9ca3af;text-align:center;margin-top:12px;line-height:1.7}'+
+  '.yc-ob-foot a{color:#6b7280;text-decoration:underline;cursor:pointer}'+
+  '.yc-ob-label{display:block;font-size:13px;font-weight:800;color:#374151;margin:14px 0 6px;text-align:left}'+
+  '.yc-ob-input,.yc-ob-select{width:100%;box-sizing:border-box;border:1.5px solid #e5e1d8;border-radius:11px;padding:12px 13px;font-size:15px;color:#202020;background:#fff;font-family:inherit;outline:none}'+
+  '.yc-ob-input:focus,.yc-ob-select:focus{border-color:#DC2626}'+
+  '.yc-ob-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}'+
+  '.yc-ob-chip{padding:9px 13px;border-radius:999px;border:1.5px solid #e5e1d8;background:#fff;font-size:13.5px;color:#5b5560;font-weight:700;cursor:pointer;user-select:none}'+
+  '.yc-ob-chip.on{background:#DC2626;color:#fff;border-color:#DC2626}'+
+  '.yc-ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}'+
+  '.yc-ob-grid .yc-ob-label{margin-top:10px}'+
+  /* 计划 */
+  '.yc-ob-profile{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 14px}'+
+  '.yc-ob-tag{background:#fef2f2;color:#b91c1c;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800}'+
+  '.yc-ob-hero{background:linear-gradient(135deg,#991b1b,#DC2626);color:#fff;border-radius:14px;padding:15px;text-align:center;margin-bottom:14px}'+
+  '.yc-ob-hero .d{font-size:34px;font-weight:900;line-height:1.1}'+
+  '.yc-ob-hero .l{font-size:12.5px;opacity:.92;margin-top:4px}'+
+  '.yc-ob-stage{background:#F7F5F0;border-radius:13px;padding:13px 14px;margin-bottom:10px;text-align:left}'+
+  '.yc-ob-stage-h{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:900;color:#202020;margin-bottom:7px}'+
+  '.yc-ob-stage-h span{font-size:11.5px;color:#b91c1c;background:#fee2e2;border-radius:999px;padding:2px 9px}'+
+  '.yc-ob-task{font-size:12.8px;color:#5b5560;line-height:1.7;padding-left:16px;position:relative}'+
+  '.yc-ob-task:before{content:"·";position:absolute;left:4px;color:#DC2626;font-weight:900}'+
+  '.yc-ob-task.go{color:#b91c1c;font-weight:800;cursor:pointer;text-decoration:underline}'+
+  /* 模考列表 */
+  '.yc-ob-filter{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}'+
+  '.yc-ob-filter button{flex:none;border:1.5px solid #e5e1d8;background:#fff;color:#5b5560;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap}'+
+  '.yc-ob-filter button.on{background:#DC2626;color:#fff;border-color:#DC2626}'+
+  '.yc-ob-papers{display:grid;grid-template-columns:1fr 1fr;gap:10px}'+
+  '.yc-ob-paper{border:1.5px solid #eee9df;border-radius:13px;padding:13px;background:#fff;text-align:left;cursor:pointer;transition:transform .12s,box-shadow .12s}'+
+  '.yc-ob-paper:active{transform:scale(.98)}'+
+  '.yc-ob-paper .bd{display:inline-block;background:#fef2f2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:900;margin-bottom:7px}'+
+  '.yc-ob-paper .nm{font-size:14px;font-weight:900;color:#202020;line-height:1.4;min-height:38px}'+
+  '.yc-ob-paper .mt{font-size:11.5px;color:#9ca3af;margin-top:8px}'+
+  '.yc-ob-paper .go{font-size:12px;color:#b91c1c;font-weight:900;margin-top:6px}'+
+  /* 答题 */
+  '.yc-ob-prog{display:flex;justify-content:space-between;font-size:12.5px;color:#8a8378;margin-bottom:10px;font-weight:700}'+
+  '.yc-ob-bar{height:6px;background:#f0ede7;border-radius:99px;overflow:hidden;margin-bottom:16px}'+
+  '.yc-ob-bar i{display:block;height:100%;background:linear-gradient(90deg,#DC2626,#B91C1C);border-radius:99px;transition:width .2s}'+
+  '.yc-ob-q{font-size:16px;font-weight:700;color:#202020;line-height:1.7;margin-bottom:16px;text-align:left}'+
+  '.yc-ob-qimg{display:block;max-width:100%;max-height:320px;margin:0 auto 16px;border-radius:10px}'+
+  '.yc-ob-opt{display:flex;gap:11px;align-items:center;border:1.5px solid #e8e4dc;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;text-align:left;font-size:14.5px;color:#374151;line-height:1.5;transition:all .12s}'+
+  '.yc-ob-opt .k{flex:none;width:26px;height:26px;border-radius:50%;background:#f4f1ec;color:#6b7280;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}'+
+  '.yc-ob-opt.sel{border-color:#DC2626;background:#fef2f2}'+
+  '.yc-ob-opt.sel .k{background:#DC2626;color:#fff}'+
+  '.yc-ob-opt.right{border-color:#15803D;background:#f0fdf4}'+
+  '.yc-ob-opt.right .k{background:#15803D;color:#fff}'+
+  '.yc-ob-opt.wrong{border-color:#DC2626;background:#fef2f2}'+
+  '.yc-ob-opt.wrong .k{background:#DC2626;color:#fff}'+
+  '.yc-ob-nav{display:flex;gap:10px;margin-top:14px}'+
+  '.yc-ob-nav button{flex:1;border-radius:11px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-ob-nav .prev{background:#f4f1ec;color:#5b5560;border:none}'+
+  '.yc-ob-nav .next{background:#DC2626;color:#fff;border:none}'+
+  /* 结果 */
+  '.yc-ob-score{text-align:center;margin:6px 0 16px}'+
+  '.yc-ob-score .n{font-size:52px;font-weight:900;color:#DC2626;line-height:1}'+
+  '.yc-ob-score .t{font-size:13px;color:#8a8378;margin-top:5px}'+
+  '.yc-ob-level{display:inline-block;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:900;margin-top:8px}'+
+  '.yc-ob-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f2efe9;font-size:13.5px;color:#374151}'+
+  '.yc-ob-row b{color:#202020}'+
+  '.yc-ob-row .r{color:#b91c1c;font-weight:800}'+
+  '.yc-ob-row .g{color:#15803D;font-weight:800}'+
+  /* 通用 */
+  '.yc-plan-btn{display:inline-flex;align-items:center;gap:3px;background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;line-height:1.1;font-family:inherit}'+
+  '.yc-plan-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}'+
+  '.yc-plan-tab .mi{font-size:22px;line-height:1}'+
+  '.yc-plan-tab .lb{font-size:10px;font-weight:700}'+
+  '@media(max-width:400px){.yc-ob-card{padding:20px 16px}.yc-ob-why .tx{font-size:10.5px}}';
+  var st=document.createElement('style'); st.id='ycObCss'; st.textContent=CSS; document.head.appendChild(st);
+
+  /* ---------- 全屏层 ---------- */
+  var ov=null, ovTimer=null;
+  function openCard(id, html, opts){
+    opts=opts||{};
+    closeCard(true);
+    ov=document.createElement('div'); ov.id=id; ov.className='yc-ob-mask';
+    ov.innerHTML='<div class="yc-ob-card'+(opts.wide?' wide':'')+'">'+html+'</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){ if(ov) ov.classList.add('on'); });
+    if(opts.closable!==false){
+      ov.addEventListener('click',function(e){ if(e.target===ov) closeCard(); });
+      var card=ov.firstChild;
+      var x=document.createElement('button'); x.className='yc-ob-x'; x.textContent='×';
+      x.addEventListener('click',closeCard); card.insertBefore(x,card.firstChild);
+    }
+    return ov;
+  }
+  function closeCard(now){
+    if(ovTimer){clearTimeout(ovTimer);ovTimer=null}
+    if(!ov) return;
+    var o=ov; ov=null; o.classList.remove('on');
+    if(now){ if(o.parentNode)o.parentNode.removeChild(o); }
+    else ovTimer=setTimeout(function(){ if(o.parentNode)o.parentNode.removeChild(o); },260);
+  }
+  function badge(id){ try{ new Image().src='https://visitor-badge.laobi.icu/badge?page_id='+id+'&r='+Date.now(); }catch(e){} }
+
+  /* ---------- 屏幕1：安装引导（强制、丰富） ---------- */
+  function screenInstall(){
+    badge('ycgk.v2.installshow');
+    var d=device();
+    var stepsHtml='';
+    for(var i=0;i<d.steps.length;i++){
+      stepsHtml+='<div class="yc-ob-st"><b>'+(i+1)+'</b><span>'+d.steps[i][0]+'</span></div>';
+    }
+    var hero=installed
+      ? '<button class="yc-ob-primary" disabled style="background:#9ca3af;box-shadow:none">✓ 已安装到本机</button>'
+      : (canInstall&&deferred
+          ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button>'
+          : '<button class="yc-ob-primary" id="obInstalled">✅ 我已装好，下一步 →</button>');
+    var html='<div class="yc-ob-logo">刷</div>'+
+      '<div class="yc-ob-h">先把亿成公考装到桌面</div>'+
+      '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
+      '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+
+      '<div class="yc-ob-why"><div><div class="ic">⚡</div><div class="tx">一点就开</div></div><div><div class="ic">📴</div><div class="tx">离线能刷</div></div><div><div class="ic">🎯</div><div class="tx">不再找链接</div></div></div>'+
+      (d.wx?'<div class="yc-ob-wx">你在微信里打开会被拦住安装。先点右上角「···」→「<b>在浏览器中打开</b>」，再按下面步骤操作。</div>':'')+
+      '<div class="yc-ob-steps"><div class="yc-ob-steps-t">📲 '+esc(d.label)+' · 安装步骤</div>'+stepsHtml+'</div>'+
+      hero+
+      '<button class="yc-ob-ghost" id="obCopy">📋 复制网址（存备忘录备用）</button>'+
+      '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再说（下次仍会提醒）</a></div>';
+    openCard('ycObInstall',html,{closable:false});
+    var one=$('obOneTap');
+    if(one) one.addEventListener('click',function(){
+      if(deferred){
+        deferred.prompt();
+        deferred.userChoice.then(function(r){
+          if(r&&r.outcome==='accepted'){ badge('ycgk.v2.installok'); set(K_ONB,'1'); screenForm(); }
+        });
+      }
+    });
+    var ok=$('obInstalled');
+    if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); set(K_ONB,'1'); screenForm(); });
+    $('obCopy').addEventListener('click',function(){ copyText(location.href.split('#')[0],'网址已复制，粘贴到备忘录即可'); });
+    $('obLater').addEventListener('click',function(){ closeCard(); });
+  }
+
+  /* ---------- 屏幕2：学习计划表单 ---------- */
+  var PROVINCES=['北京','天津','河北','山西','内蒙古','辽宁','吉林','黑龙江','上海','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','广西','海南','重庆','四川','贵州','云南','陕西','甘肃','青海','宁夏','新疆'];
+  var EXAMS=['国考','省考/省联考','事业编','军队文职','三支一扶','央国企','选调生','银行校招'];
+  var FRESH=['完全没开始','零基础','有一点基础','系统备考中','考前冲刺'];
+  var WEAK=['常识判断','言语理解','判断推理','数量关系','资料分析','申论','综合应用'];
+  function screenForm(pre){
+    badge('ycgk.v2.formshow');
+    var d=new Date(); d.setDate(d.getDate()+75); var defDate=d.toISOString().slice(0,10);
+    var examOpts='',provOpts='';
+    for(var i=0;i<EXAMS.length;i++) examOpts+='<option value="'+EXAMS[i]+'">'+EXAMS[i]+'</option>';
+    for(var j=0;j<PROVINCES.length;j++) provOpts+='<option value="'+PROVINCES[j]+'">'+PROVINCES[j]+'</option>';
+    var freshChips='',weakChips='';
+    for(var a=0;a<FRESH.length;a++) freshChips+='<span class="yc-ob-chip'+(a===0?' on':'')+'" data-fresh="'+FRESH[a]+'">'+FRESH[a]+'</span>';
+    for(var b=0;b<WEAK.length;b++) weakChips+='<span class="yc-ob-chip" data-weak="'+WEAK[b]+'">'+WEAK[b]+'</span>';
+    var html='<div class="yc-ob-h">制定你的专属备考计划</div>'+
+      '<div class="yc-ob-sub">填好这几点，按你的考试时间和薄弱项排一份「每天刷什么」的计划</div>'+
+      '<label class="yc-ob-label">怎么称呼你</label><input class="yc-ob-input" id="fName" placeholder="如：张三" value="'+(pre&&pre.name?esc(pre.name):'')+'">'+
+      '<div class="yc-ob-grid"><div><label class="yc-ob-label">考试类别</label><select class="yc-ob-select" id="fExam">'+examOpts+'</select></div>'+
+      '<div><label class="yc-ob-label">考试日期</label><input class="yc-ob-input" type="date" id="fDate" value="'+defDate+'"></div></div>'+
+      '<label class="yc-ob-label">所在省份</label><select class="yc-ob-select" id="fProv">'+provOpts+'</select>'+
+      '<label class="yc-ob-label">目前备考状态</label><div class="yc-ob-chips" id="fFresh">'+freshChips+'</div>'+
+      '<label class="yc-ob-label">薄弱板块（可多选，重点补）</label><div class="yc-ob-chips" id="fWeak">'+weakChips+'</div>'+
+      '<div class="yc-ob-grid"><div><label class="yc-ob-label">每天能刷</label><select class="yc-ob-select" id="fDaily"><option value="10">10 题</option><option value="20" selected>20 题</option><option value="30">30 题</option><option value="50">50 题</option></select></div>'+
+      '<div><label class="yc-ob-label">每日投入</label><select class="yc-ob-select" id="fMins"><option value="20">20 分钟</option><option value="40" selected>40 分钟</option><option value="60">1 小时</option><option value="120">2 小时+</option></select></div></div>'+
+      '<button class="yc-ob-primary" id="fGen">✨ 生成我的备考计划</button>'+
+      '<div class="yc-ob-foot">生成后可随时在底部「计划」入口重新定制</div>';
+    openCard('ycObForm',html,{closable:false});
+    bindChips('fFresh','data-fresh',true);
+    bindChips('fWeak','data-weak',false);
+    $('fGen').addEventListener('click',function(){
+      var fresh=oneChip('fFresh')||'完全没开始';
+      var weak=chipsVal('fWeak');
+      var plan={
+        name:($('fName').value||'同学').trim(),
+        exam:$('fExam').value,
+        date:$('fDate').value||defDate,
+        prov:$('fProv').value,
+        fresh:fresh,
+        weak:weak,
+        daily:parseInt($('fDaily').value,10)||20,
+        mins:parseInt($('fMins').value,10)||40,
+        created:Date.now()
+      };
+      setJSON(K_PLAN,plan); set(K_ONB,'2');
+      badge('ycgk.v2.plangen');
+      screenPlan();
+    });
+  }
+  function bindChips(id,attr,single){
+    var box=$(id); if(!box) return;
+    box.addEventListener('click',function(e){
+      var c=e.target.closest?e.target.closest('[data-fresh],[data-weak]'):null;
+      if(!c||c.parentNode!==box) return;
+      if(single){ var all=box.querySelectorAll('.yc-ob-chip'); for(var i=0;i<all.length;i++)all[i].classList.remove('on'); c.classList.add('on'); }
+      else c.classList.toggle('on');
+    });
+  }
+  function oneChip(id){ var c=$(id).querySelector('.yc-ob-chip.on'); return c?(c.getAttribute('data-fresh')||c.getAttribute('data-weak')):''; }
+  function chipsVal(id){ var all=$(id).querySelectorAll('.yc-ob-chip.on'),r=[]; for(var i=0;i<all.length;i++)r.push(all[i].getAttribute('data-weak')||all[i].getAttribute('data-fresh')); return r; }
+
+  /* ---------- 屏幕3：备考计划 ---------- */
+  function daysTo(dateStr){
+    try{ var d=new Date(dateStr+'T00:00:00'); var now=new Date(); now.setHours(0,0,0,0); return Math.max(0,Math.round((d-now)/86400000)); }catch(e){ return 60; }
+  }
+  function weakModules(plan){
+    var map={'常识判断':'changshi','言语理解':'yanyu','判断推理':'panduan','数量关系':'shuliang','资料分析':'ziliao','申论':'shenlun','综合应用':'zy'};
+    var r=[]; for(var i=0;i<(plan.weak||[]).length;i++){ var m=map[plan.weak[i]]; if(m)r.push(m); } return r;
+  }
+  function buildStages(plan){
+    var days=daysTo(plan.date), wm=weakModules(plan), fresh=plan.fresh;
+    var stages=[];
+    if(fresh==='零基础'||fresh==='完全没开始'||fresh==='有一点基础'){
+      stages.push({name:'第 0 步 · 水平摸底',days:1,mock:true,tasks:['先做一套模拟测试，摸清当前真实水平','★★ 这一步最重要，做完计划会自动为你校准']});
+    }
+    var b=Math.max(3,Math.round(days*0.3)), a=Math.max(3,Math.round(days*0.3)), q=Math.max(2,Math.round(days*0.25)), s=Math.max(1,days-b-a-q);
+    var focus=(wm.length?wm.slice(0,3).join(' / '):'常识、言语、判断');
+    stages.push({name:'第一阶段 · 基础夯实',days:b,tasks:['主攻 '+focus+'，每天 '+plan.daily+' 题','错题当天整理，弄清每个选项',''+plan.mins+' 分钟专注训练']});
+    stages.push({name:'第二阶段 · 专项突破',days:a,tasks:['薄弱模块加练：'+focus,'限时训练，正确率目标 70%+','每周复盘一次错题本']});
+    stages.push({name:'第三阶段 · 真题强化',days:q,tasks:['按考试类别刷真题卷（见模拟测试专区）','每 2 天做一套，做完必复盘','把高频错题回炉重做']});
+    stages.push({name:'第四阶段 · 全真模考冲刺',days:s,tasks:['严格计时做整套卷，还原考场','稳住优势项，主抓提分最快的模块','考前一两天只看错题和笔记']});
+    return stages;
+  }
+  function screenPlan(closable){
+    var plan=getJSON(K_PLAN,null);
+    if(!plan){ screenForm(); return; }
+    var days=daysTo(plan.date), stages=buildStages(plan);
+    var tags='<span class="yc-ob-tag">👤 '+esc(plan.name)+'</span><span class="yc-ob-tag">🎯 '+esc(plan.exam)+'</span><span class="yc-ob-tag">📍 '+esc(plan.prov)+'</span><span class="yc-ob-tag">📊 '+esc(plan.fresh)+'</span>'+
+      (plan.weak&&plan.weak.length?'<span class="yc-ob-tag">📌 弱项 '+esc(plan.weak.join('·'))+'</span>':'');
+    var stHtml='';
+    for(var i=0;i<stages.length;i++){
+      var s=stages[i],tasks='';
+      for(var t=0;t<s.tasks.length;t++){
+        var cls=(s.mock||/模拟测试|真题卷|整套卷/.test(s.tasks[t]))?'yc-ob-task go':'yc-ob-task';
+        var attr=(s.mock||/模拟测试/.test(s.tasks[t]))?' data-gomock="1"':(/真题卷|整套卷/.test(s.tasks[t])?' data-gomock="1"':'');
+        tasks+='<div class="'+cls+'"'+attr+'>'+esc(s.tasks[t])+(attr?' ›':'')+'</div>';
+      }
+      stHtml+='<div class="yc-ob-stage"><div class="yc-ob-stage-h"><span style="background:none;color:#202020;padding:0">'+esc(s.name)+'</span><span>约 '+s.days+' 天</span></div>'+tasks+'</div>';
+    }
+    var html='<div class="yc-ob-h">📋 '+esc(plan.name)+'的备考计划</div>'+
+      '<div class="yc-ob-profile">'+tags+'</div>'+
+      '<div class="yc-ob-hero"><div class="d">'+days+'</div><div class="l">天后开考 · 每天 '+plan.daily+' 题 / '+plan.mins+' 分钟</div></div>'+
+      stHtml+
+      '<button class="yc-ob-primary" id="pMock">📝 去做模拟测试（定位水平）</button>'+
+      '<div class="yc-ob-nav"><button class="prev" id="pEdit">重新定制</button><button class="next" id="pStart">开始今天的任务</button></div>'+
+      '<div class="yc-ob-foot">计划按你的考试日期自动推进 · 数据只存在本机</div>';
+    openCard('ycObPlan',html,{closable:closable!==false,wide:true});
+    var ovEl=$('ycObPlan');
+    ovEl.addEventListener('click',function(e){
+      var c=e.target.closest?e.target.closest('[data-gomock]'):null;
+      if(c){ closeCard(true); screenMock(); }
+    });
+    $('pMock').addEventListener('click',function(){ closeCard(true); screenMock(); });
+    $('pEdit').addEventListener('click',function(){ screenForm(plan); });
+    $('pStart').addEventListener('click',function(){
+      var wm=weakModules(plan);
+      var mods=wm.length?wm:['changshi','yanyu','panduan','shuliang','ziliao'];
+      var qs=pickByModules(mods,Math.min(plan.daily,30),77);
+      if(!qs.length){ alert('题库还在加载，请稍等几秒再试'); return; }
+      runQuiz(qs,'今日任务 · '+plan.daily+' 题',function(res){ closeCard(true); screenResult(res,null); });
+    });
+  }
+
+  /* ---------- 屏幕4：模拟测试专区 ---------- */
+  var PAPERS=[
+    {id:'gk-a',exam:'国考',name:'国考 · 行政执法卷（A类）',cls:'A类',total:20,seed:11,mix:{changshi:4,yanyu:4,panduan:4,shuliang:4,ziliao:4}},
+    {id:'gk-b',exam:'国考',name:'国考 · 综合管理卷（B类）',cls:'B类',total:20,seed:12,mix:{yanyu:5,panduan:5,ziliao:5,changshi:5}},
+    {id:'sk-a',exam:'省考',name:'省考 · 县级综合卷（A类）',cls:'A类',total:20,seed:21,mix:{changshi:4,yanyu:5,panduan:5,shuliang:3,ziliao:3}},
+    {id:'sk-b',exam:'省考',name:'省考 · 乡镇基层卷（B类）',cls:'B类',total:20,seed:22,mix:{changshi:5,yanyu:4,panduan:4,shuliang:4,ziliao:3}},
+    {id:'sy-a',exam:'事业编',name:'事业编 · 综合管理（A类）',cls:'A类',total:20,seed:31,mix:{changshi:4,yanyu:4,panduan:4,shuliang:4,ziliao:4}},
+    {id:'sy-b',exam:'事业编',name:'事业编 · 社科专技（B类）',cls:'B类',total:20,seed:32,mix:{yanyu:6,panduan:6,changshi:4,ziliao:4}},
+    {id:'sy-c',exam:'事业编',name:'事业编 · 自科专技（C类）',cls:'C类',total:20,seed:33,mix:{shuliang:6,ziliao:6,panduan:4,changshi:4}},
+    {id:'sy-d',exam:'事业编',name:'事业编 · 中小学教师（D类）',cls:'D类',total:20,seed:34,mix:{yanyu:5,panduan:5,changshi:5,ziliao:5}},
+    {id:'sy-e',exam:'事业编',name:'事业编 · 医疗卫生（E类）',cls:'E类',total:20,seed:35,mix:{changshi:6,yanyu:4,panduan:4,ziliao:6}},
+    {id:'jh',exam:'军队文职/三支一扶/央国企',name:'军队文职 · 三支一扶 · 央国企 综合卷',cls:'综合',total:20,seed:41,mix:{changshi:5,jundui:4,yanyu:4,panduan:4,ziliao:3}}
+  ];
+  var EXAM_FILTER=['全部','国考','省考','事业编','综合类'];
+  function screenMock(filter){
+    filter=filter||'全部';
+    badge('ycgk.v2.mockshow');
+    var fHtml=''; for(var i=0;i<EXAM_FILTER.length;i++) fHtml+='<button class="'+(EXAM_FILTER[i]===filter?'on':'')+'" data-f="'+EXAM_FILTER[i]+'">'+EXAM_FILTER[i]+'</button>';
+    var plan=getJSON(K_PLAN,null);
+    var firstTip=(plan&&(plan.fresh==='零基础'||plan.fresh==='完全没开始'))
+      ? '<div class="yc-ob-warn">🎯 你是<b>零基础/刚起步</b>，建议先做第 1 套卷摸底，看清强弱再按计划训练。</div>' : '';
+    var list='';
+    for(var p=0;p<PAPERS.length;p++){
+      var paper=PAPERS[p], show=(filter==='全部'||paper.exam===filter||(filter==='综合类'&&/军队|三支|央国企/.test(paper.exam)));
+      if(!show) continue;
+      var best=bestScore(paper.id);
+      list+='<div class="yc-ob-paper" data-p="'+paper.id+'"><span class="bd">'+esc(paper.cls)+' · '+esc(paper.exam)+'</span>'+
+        '<div class="nm">'+esc(paper.name)+'</div>'+
+        '<div class="mt">'+paper.total+' 题 · 建议 '+Math.round(paper.total*1.2)+' 分钟'+(best!==null?' · 最佳 '+best+' 分':'')+'</div>'+
+        '<div class="go">开始测试 ›</div></div>';
+    }
+    var html='<div class="yc-ob-h">📝 模拟测试专区</div>'+
+      '<div class="yc-ob-sub">10 套难度适中卷，做完立即判分、定位当前水平</div>'+firstTip+
+      '<div class="yc-ob-filter" id="mFilter">'+fHtml+'</div>'+
+      '<div class="yc-ob-papers" id="mList">'+list+'</div>'+
+      '<div class="yc-ob-foot">题目由命题组精选组合 · 成绩只存在本机</div>';
+    openCard('ycObMock',html,{closable:true,wide:true});
+    var ovEl=$('ycObMock');
+    ovEl.addEventListener('click',function(e){
+      var f=e.target.closest?e.target.closest('[data-f]'):null;
+      if(f){ screenMock(f.getAttribute('data-f')); return; }
+      var p=e.target.closest?e.target.closest('[data-p]'):null;
+      if(p){ startPaper(p.getAttribute('data-p')); return; }
+    });
+  }
+  function bestScore(pid){
+    var recs=getJSON(K_MOCK,[]),best=null;
+    for(var i=0;i<recs.length;i++) if(recs[i].pid===pid && (best===null||recs[i].score>best)) best=recs[i].score;
+    return best;
+  }
+
+  /* ---------- 题库读取与组卷 ---------- */
+  function allQuestions(){
+    var arr=[];
+    try{
+      var cs=window.YC_CS_BANK||[]; for(var i=0;i<cs.length;i++) arr.push(cs[i]);
+      var more=window.YC_MORE_QBANKS||[];
+      for(var j=0;j<more.length;j++){ var sub=more[j]||[]; for(var k=0;k<sub.length;k++) arr.push(sub[k]); }
+    }catch(e){}
+    var seen={},out=[];
+    for(var m=0;m<arr.length;m++){
+      var q=arr[m];
+      if(q&&q.id&&!seen[q.id]&&typeof q.prompt==='string'&&q.prompt&&q.options&&q.options.length===4&&typeof q.answer==='number'&&q.answer>=0&&q.answer<=3){
+        seen[q.id]=1; out.push(q);
+      }
+    }
+    return out;
+  }
+  function seededShuffle(a,seed){
+    var arr=a.slice(),s=seed||1;
+    function rnd(){ s=(s*9301+49297)%233280; return s/233280; }
+    for(var i=arr.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1)); var t=arr[i];arr[i]=arr[j];arr[j]=t; }
+    return arr;
+  }
+  function byModule(){
+    var qs=allQuestions(),g={};
+    for(var i=0;i<qs.length;i++){ var m=qs[i].module||'other'; (g[m]=g[m]||[]).push(qs[i]); }
+    return g;
+  }
+  function pickByModules(mods,n,seed){
+    var g=byModule(),picked=[],seen={};
+    var per=Math.max(1,Math.ceil(n/mods.length));
+    for(var a=0;a<mods.length;a++){
+      var pool=seededShuffle(g[mods[a]]||[],seed+a*13);
+      var take=Math.min(per,pool.length);
+      for(var b=0;b<take && picked.length<n;b++){ if(!seen[pool[b].id]){ seen[pool[b].id]=1; picked.push(pool[b]); } }
+    }
+    if(picked.length<n){
+      var rest=seededShuffle(allQuestions(),seed+999);
+      for(var r=0;r<rest.length && picked.length<n;r++){ if(!seen[rest[r].id]){ seen[rest[r].id]=1; picked.push(rest[r]); } }
+    }
+    return seededShuffle(picked,seed+7);
+  }
+  function startPaper(pid){
+    var paper=null; for(var i=0;i<PAPERS.length;i++) if(PAPERS[i].id===pid) paper=PAPERS[i];
+    if(!paper) return;
+    var g=byModule(),picked=[],seen={};
+    for(var mod in paper.mix){
+      var pool=seededShuffle(g[mod]||[],paper.seed+mod.length*17);
+      var take=Math.min(paper.mix[mod],pool.length);
+      for(var k=0;k<take;k++){ if(!seen[pool[k].id]){ seen[pool[k].id]=1; picked.push(pool[k]); } }
+    }
+    if(picked.length<paper.total){
+      var rest=seededShuffle(allQuestions(),paper.seed+888);
+      for(var r=0;r<rest.length && picked.length<paper.total;r++){ if(!seen[rest[r].id]){ seen[rest[r].id]=1; picked.push(rest[r]); } }
+    }
+    picked=seededShuffle(picked,paper.seed+3).slice(0,paper.total);
+    if(!picked.length){ alert('题库还在加载，请稍等几秒再试'); return; }
+    runQuiz(picked,paper.name,function(res){ saveResult(paper,res); screenResult(res,paper); });
+  }
+  function saveResult(paper,res){
+    var recs=getJSON(K_MOCK,[]);
+    recs.push({pid:paper.id,name:paper.name,score:res.score,correct:res.correct,total:res.total,rate:res.rate,mods:res.mods,ts:Date.now()});
+    if(recs.length>60) recs=recs.slice(-60);
+    setJSON(K_MOCK,recs); badge('ycgk.v2.mocksave');
+  }
+  function qImage(q){
+    var u=q.img||q.image||(q.config&&(q.config.img||q.config.url))||'';
+    if(!u) return '';
+    if(!/^https?:/i.test(u)){ u=u.replace(/^\.\//,''); u='https://ycteacher.github.io/yichenggongkao/'+(u.charAt(0)==='/'?u.slice(1):u); }
+    return '<img class="yc-ob-qimg" src="'+esc(u)+'" alt="题目图片" onerror="this.style.display=\'none\'">';
+  }
+
+  /* ---------- 屏幕5：答题 ---------- */
+  var MODN={changshi:'常识',yanyu:'言语',panduan:'判断',shuliang:'数量',ziliao:'资料',tuitui:'图推',jundui:'军队',liuda:'六大'};
+  function runQuiz(qs,title,onFinish){
+    var idx=0,answers=new Array(qs.length);
+    function render(){
+      var q=qs[idx],opts='',letters=['A','B','C','D'];
+      for(var i=0;i<q.options.length;i++){
+        opts+='<div class="yc-ob-opt'+(answers[idx]===i?' sel':'')+'" data-o="'+i+'"><span class="k">'+letters[i]+'</span><span>'+esc(q.options[i])+'</span></div>';
+      }
+      var pct=Math.round((idx)/qs.length*100);
+      var html='<div class="yc-ob-h" style="font-size:17px">'+esc(title)+'</div>'+
+        '<div class="yc-ob-prog"><span>第 '+(idx+1)+' / '+qs.length+' 题</span><span>'+esc(MODN[q.module]||'综合')+'</span></div>'+
+        '<div class="yc-ob-bar"><i style="width:'+pct+'%"></i></div>'+
+        '<div class="yc-ob-q">'+esc(q.prompt)+'</div>'+qImage(q)+
+        opts+
+        '<div class="yc-ob-nav"><button class="prev" id="qPrev"'+(idx===0?' disabled':'')+'>‹ 上一题</button>'+
+        '<button class="next" id="qNext">'+(idx===qs.length-1?'交卷看分 ›':'下一题 ›')+'</button></div>'+
+        '<div class="yc-ob-foot">选好选项会自动记录 · 可返回修改</div>';
+      openCard('ycObQuiz',html,{closable:false,wide:true});
+      var ovEl=$('ycObQuiz');
+      ovEl.addEventListener('click',function(e){
+        var o=e.target.closest?e.target.closest('[data-o]'):null;
+        if(o){ answers[idx]=parseInt(o.getAttribute('data-o'),10); var all=ovEl.querySelectorAll('.yc-ob-opt'); for(var k=0;k<all.length;k++)all[k].classList.remove('sel'); o.classList.add('sel'); }
+      });
+      $('qPrev').addEventListener('click',function(){ if(idx>0){idx--;render();} });
+      $('qNext').addEventListener('click',function(){
+        if(answers[idx]===undefined){ alert('请先选一个答案'); return; }
+        if(idx<qs.length-1){ idx++; render(); }
+        else finish();
+      });
+    }
+    function finish(){
+      var correct=0,mods={};
+      for(var i=0;i<qs.length;i++){
+        var m=qs[i].module||'other'; mods[m]=mods[m]||{c:0,t:0}; mods[m].t++;
+        if(answers[i]===qs[i].answer){ correct++; mods[m].c++; }
+      }
+      var rate=Math.round(correct/qs.length*100);
+      onFinish({correct:correct,total:qs.length,rate:rate,score:rate,mods:mods,qs:qs,answers:answers,title:title});
+    }
+    render();
+  }
+
+  /* ---------- 屏幕6：判分结果 ---------- */
+  function screenResult(res,paper){
+    badge('ycgk.v2.resultshow');
+    var level,advice;
+    if(res.rate>=85){ level='优秀 · 基础扎实'; advice='保持节奏，主攻真题和限时训练即可。'; }
+    else if(res.rate>=70){ level='良好 · 稳中有优'; advice='把错题涉及的模块再过一遍，正确率能再上一个台阶。'; }
+    else if(res.rate>=50){ level='中等 · 有提升空间'; advice='按计划重点补薄弱模块，先抓提分最快的部分。'; }
+    else { level='起步 · 需要系统补'; advice='别急，按备考计划从基础夯实开始，每天坚持就会见效。'; }
+    var rows='';
+    for(var m in res.mods){
+      var v=res.mods[m],r=Math.round(v.c/v.t*100);
+      rows+='<div class="yc-ob-row"><span>'+esc(MODN[m]||'综合')+'</span><span><b>'+v.c+'/'+v.t+'</b> · <span class="'+(r>=70?'g':'r')+'">'+r+'%</span></span></div>';
+    }
+    var html='<div class="yc-ob-h">判分结果</div><div class="yc-ob-sub">'+esc(res.title)+'</div>'+
+      '<div class="yc-ob-score"><div class="n">'+res.score+'</div><div class="t">分 · 答对 '+res.correct+'/'+res.total+' 题</div><div class="yc-ob-level">'+level+'</div></div>'+
+      '<div style="background:#F7F5F0;border-radius:12px;padding:11px 14px;font-size:13px;color:#5b5560;line-height:1.7;margin-bottom:12px">💡 '+advice+'</div>'+
+      '<div style="font-size:13px;font-weight:900;color:#374151;margin-bottom:4px">各模块正确率</div>'+rows+
+      '<div class="yc-ob-nav"><button class="prev" id="rReview">看错题</button><button class="next" id="rPlan">按结果优化计划</button></div>'+
+      '<button class="yc-ob-ghost" id="rAgain">再做一套 / 返回专区</button>';
+    openCard('ycObResult',html,{closable:true,wide:true});
+    $('rReview').addEventListener('click',function(){ reviewWrong(res); });
+    $('rPlan').addEventListener('click',function(){
+      var plan=getJSON(K_PLAN,null);
+      if(plan){
+        var weak=[]; for(var m in res.mods){ var r=res.mods[m].c/res.mods[m].t; if(r<0.7 && MODN[m]){ var nm=moduleToWeak(m); if(nm&&weak.indexOf(nm)<0)weak.push(nm); } }
+        if(weak.length) plan.weak=weak;
+        plan.fresh='有一点基础'; setJSON(K_PLAN,plan);
+      }
+      closeCard(true); screenPlan();
+    });
+    $('rAgain').addEventListener('click',function(){ closeCard(true); screenMock(); });
+  }
+  function moduleToWeak(m){ var inv={'changshi':'常识判断','yanyu':'言语理解','panduan':'判断推理','shuliang':'数量关系','ziliao':'资料分析','shenlun':'申论','zy':'综合应用'}; return inv[m]||''; }
+  function reviewWrong(res){
+    var html='<div class="yc-ob-h">错题回顾</div><div class="yc-ob-sub">'+esc(res.title)+' · 共 '+(res.total-res.correct)+' 题</div>';
+    var letters=['A','B','C','D'],n=0;
+    for(var i=0;i<res.qs.length;i++){
+      var q=res.qs[i]; if(res.answers[i]===q.answer) continue; n++;
+      html+='<div style="border-bottom:1px solid #f0ede7;padding:12px 0;text-align:left">'+
+        '<div style="font-size:13.5px;font-weight:700;color:#202020;line-height:1.6">'+n+'. '+esc(q.prompt)+'</div>'+
+        qImage(q)+
+        '<div style="font-size:12.5px;color:#15803D;margin-top:6px;font-weight:800">✓ 正确答案：'+letters[q.answer]+'. '+esc(q.options[q.answer])+'</div>'+
+        (res.answers[i]!==undefined?'<div style="font-size:12.5px;color:#b91c1c;margin-top:3px">✗ 你选的：'+letters[res.answers[i]]+'. '+esc(q.options[res.answers[i]])+'</div>':'')+
+        (q.explanation?'<div style="font-size:12px;color:#8a8378;margin-top:7px;line-height:1.6">解析：'+esc(q.explanation)+'</div>':'')+
+        '</div>';
+    }
+    if(!n) html+='<div class="yc-ob-sub" style="margin-top:20px">🎉 全对，没有错题！</div>';
+    html+='<button class="yc-ob-primary" id="rvBack">返回结果</button>';
+    openCard('ycObReview',html,{closable:true,wide:true});
+    $('rvBack').addEventListener('click',function(){ screenResult(res,null); });
+  }
+
+  /* ---------- 复制文本 ---------- */
+  function copyText(text,msg){
+    function done(){ toast(msg||'已复制'); }
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done,function(){fallback();}); }
+      else fallback();
+    }catch(e){ fallback(); }
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，请长按网址手动复制'); }
+      document.body.removeChild(ta);
+    }
+  }
+  function toast(msg){
+    var t=document.createElement('div');
+    t.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(20,16,12,.9);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;z-index:2147483647;box-shadow:0 4px 14px rgba(0,0,0,.3)';
+    t.textContent=msg; document.body.appendChild(t);
+    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2200);
+  }
+  function refreshInstallBtn(){ /* 预留：顶部安装按钮状态由 14 号维护 */ }
+
+  /* ---------- 常驻入口：顶部按钮 + 底部 tab ---------- */
+  function injectEntries(){
+    var actions=document.querySelector('.yc-top-actions');
+    if(actions && !$('ycPlanTopBtn')){
+      var b=document.createElement('button'); b.id='ycPlanTopBtn'; b.className='yc-plan-btn';
+      b.textContent='📋 计划';
+      b.addEventListener('click',function(){ screenPlan(true); });
+      actions.insertBefore(b,actions.firstChild);
+    }
+    var tabbar=document.querySelector('.yc-tabbar');
+    if(tabbar && !$('ycPlanTabBtn')){
+      var btn=document.createElement('button'); btn.id='ycPlanTabBtn'; btn.className='yc-plan-tab';
+      btn.innerHTML='<span class="mi">📋</span><span class="lb">计划</span>';
+      btn.addEventListener('click',function(){ screenPlan(true); });
+      tabbar.appendChild(btn);
+    }
+    var mockBtn=null;
+    if(tabbar && !$('ycMockTabBtn')){
+      var mb=document.createElement('button'); mb.id='ycMockTabBtn'; mb.className='yc-plan-tab';
+      mb.innerHTML='<span class="mi">📝</span><span class="lb">模考</span>';
+      mb.addEventListener('click',function(){ screenMock('全部'); });
+      tabbar.appendChild(mb);
+    }
+  }
+  var tries=0,ij=setInterval(function(){ injectEntries(); if((document.querySelector('.yc-tabbar')&&document.querySelector('.yc-top-actions'))||++tries>80) clearInterval(ij); },200);
+  document.addEventListener('DOMContentLoaded',injectEntries);
+
+  /* ---------- 启动：首启引导流程 ---------- */
+  function start(){
+    var step=raw(K_ONB)||'0';
+    if(step==='2') return; // 已完成引导，正常用
+    setTimeout(function(){
+      if(step==='0') screenInstall();
+      else if(step==='1') screenForm();
+    },650);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
