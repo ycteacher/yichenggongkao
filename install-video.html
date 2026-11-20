@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>视频讲解 · 安装演示 · 亿成公考</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#1C1917;color:#FAFAF9;padding-bottom:56px;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(28,25,23,.94);backdrop-filter:blur(8px);display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.backbtn{flex:none;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:14px;font-weight:700;padding:8px 14px 8px 10px;border-radius:999px;cursor:pointer;text-decoration:none;font-family:inherit}
+.backbtn:active{background:rgba(255,255,255,.25)}
+.topbar h1{font-size:16px;font-weight:800;letter-spacing:.5px}
+.topbar .live{margin-left:auto;font-size:11px;color:#FDE68A;font-weight:700;background:rgba(253,230,138,.12);border:1px solid rgba(253,230,138,.35);border-radius:999px;padding:3px 9px}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 0}
+.modes{display:flex;gap:10px;margin-bottom:14px}
+.mode{flex:1;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);border-radius:14px;padding:11px 8px;font-size:15px;font-weight:800;color:#A8A29E;cursor:pointer;text-align:center;font-family:inherit;transition:all .2s}
+.mode.on{border-color:#EF4444;color:#fff;background:rgba(239,68,68,.14)}
+.mode small{display:block;font-size:11px;font-weight:600;margin-top:3px;color:#78716C}
+.mode.on small{color:#FCA5A5}
+/* 播放器 */
+.player{background:#292524;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.stage{position:relative;height:400px;background:linear-gradient(160deg,#3B3733,#292524);overflow:hidden}
+.phone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:196px;height:366px;background:#0C0A09;border-radius:26px;border:3px solid #44403C;box-shadow:0 12px 34px rgba(0,0,0,.5);overflow:hidden}
+.scr{position:absolute;inset:0}
+.scene{position:absolute;inset:0;opacity:0;transition:opacity .5s;pointer-events:none}
+.scene.on{opacity:1}
+/* 通用手机内元素 */
+.urlbar{position:absolute;left:10px;right:10px;height:22px;border-radius:11px;background:#3B3733;display:flex;align-items:center;justify-content:center;font-size:8px;color:#A8A29E}
+.pagehead{position:absolute;left:12px;right:12px;top:56px;height:74px;border-radius:10px;background:linear-gradient(135deg,#B91C1C,#7F1D1D);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.pagehead .t{font-size:13px;font-weight:900;color:#fff}
+.pagehead .s{font-size:7.5px;color:#FDE68A}
+.skiplines{position:absolute;left:12px;right:12px;top:140px;bottom:60px}
+.skiplines i{display:block;height:8px;border-radius:4px;background:#3B3733;margin-bottom:9px}
+.skiplines i:nth-child(2){width:85%}.skiplines i:nth-child(4){width:70%}
+/* 高亮脉冲 */
+.pulse{animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
+/* iPhone 底栏 */
+.ios-bar{position:absolute;left:0;right:0;bottom:0;height:44px;background:#292524;display:flex;align-items:center;justify-content:space-around}
+.ios-bar .ic{width:16px;height:16px;border-radius:4px;background:#57534E}
+.ios-share{width:26px;height:26px;border-radius:8px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.ios-share b{display:block;width:9px;height:9px;border:1.6px solid #B91C1C;border-radius:2.5px;border-top:none}
+.ios-share i{display:block;width:1.6px;height:7px;background:#B91C1C;margin-top:-9px;position:relative}
+.ios-share i:before{content:'';position:absolute;top:-4px;left:-2.6px;border:2.6px solid transparent;border-bottom:4px solid #B91C1C}
+/* 分享面板 */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#F5F5F4;border-radius:16px 16px 0 0;padding:12px 12px 16px;transform:translateY(0)}
+.sheet .row{height:14px;border-radius:7px;background:#E7E5E4;margin-bottom:9px}
+.sheet .target{height:26px;border-radius:13px;background:#FFF;display:flex;align-items:center;gap:7px;padding:0 9px;border:2px solid #EF4444}
+.sheet .target .plus{width:16px;height:16px;border-radius:4px;background:#FF9500;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
+.sheet .target span{font-size:9.5px;font-weight:800;color:#B91C1C}
+/* 确认页 */
+.confirm{position:absolute;inset:0;background:#F5F5F4;display:flex;flex-direction:column;align-items:center;padding-top:52px}
+.confirm .appic{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#DC2626,#B91C1C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900}
+.confirm .nm{font-size:11px;font-weight:800;color:#111;margin-top:8px}
+.confirm .add{position:absolute;top:14px;right:16px;font-size:11px;font-weight:900;color:#157AFF}
+.confirm .addring{position:absolute;top:9px;right:11px;width:34px;height:34px;border-radius:50%;border:2px dashed #157AFF}
+/* 桌面 */
+.desk{position:absolute;inset:0;background:linear-gradient(160deg,#3B6EA5,#1E3A5F);padding:16px 12px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.desk .ap{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.28)}
+.desk .ap.new{background:linear-gradient(135deg,#DC2626,#B91C1C);border:2px solid #FFD65A;position:relative}
+.desk .ap.new:after{content:'亿成公考';position:absolute;top:33px;left:50%;transform:translateX(-50%);font-size:6.5px;color:#fff;white-space:nowrap}
+/* 安卓菜单 */
+.and-menu{position:absolute;top:34px;right:10px;width:110px;background:#F5F5F4;border-radius:10px;padding:8px;box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.and-menu .row{height:12px;border-radius:6px;background:#E7E5E4;margin-bottom:8px}
+.and-menu .target{height:18px;border-radius:9px;background:#EDF4FF;border:2px solid #1D4ED8;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:#1D4ED8}
+.and-dots{position:absolute;top:26px;right:12px;width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;gap:2px}
+.and-dots i{width:3px;height:3px;border-radius:50%;background:#44403C}
+.and-dots.pulse{background:#fff}
+/* 安卓确认 */
+.and-confirm{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.and-confirm .dlg{width:150px;background:#fff;border-radius:12px;padding:16px 14px;text-align:center}
+.and-confirm .dlg .t{font-size:10.5px;font-weight:800;color:#111}
+.and-confirm .dlg .btn{margin:12px auto 0;width:64px;height:22px;border-radius:11px;background:#1D4ED8;color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+/* 字幕与控制 */
+.caption{padding:14px 16px 6px;min-height:86px}
+.caption .stepno{font-size:11px;font-weight:800;color:#FDE68A;letter-spacing:1px}
+.caption h2{font-size:18px;font-weight:900;margin-top:4px}
+.caption p{font-size:13px;color:#D6D3D1;line-height:1.75;margin-top:6px}
+.caption p b{color:#FDE68A}
+.progress{display:flex;gap:5px;padding:10px 16px 4px}
+.progress i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden;position:relative}
+.progress i b{position:absolute;left:0;top:0;bottom:0;width:0;background:#EF4444;border-radius:2px}
+.controls{display:flex;align-items:center;gap:12px;padding:8px 16px 16px}
+.ctl{border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:12px}
+.playbtn{width:52px;height:44px;background:#EF4444;color:#fff;font-size:16px;flex:none;box-shadow:0 4px 14px rgba(239,68,68,.35)}
+.playbtn:active{transform:scale(.95)}
+.navbtn{flex:1;height:40px;background:rgba(255,255,255,.08);color:#D6D3D1;font-size:13px}
+.navbtn:active{background:rgba(255,255,255,.16)}
+.hint{font-size:11.5px;color:#78716C;text-align:center;padding:2px 16px 14px;line-height:1.6}
+.hint b{color:#FCA5A5}
+.backbar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(28,25,23,.94);backdrop-filter:blur(8px);padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08)}
+.backbar a{display:block;text-align:center;background:#B91C1C;color:#fff;border-radius:14px;padding:14px;font-size:15px;font-weight:800;text-decoration:none}
+.backbar a:active{transform:scale(.98)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="backbtn" href="./index.html" onclick="if(history.length>1){event.preventDefault();history.back()}">‹ 返回</a>
+  <h1>安装视频讲解</h1>
+  <span class="live">动画演示</span>
+</div>
+
+<div class="wrap">
+  <div class="modes">
+    <button class="mode on" id="modeIos" onclick="setMode('ios')">🍎 苹果手机<small>iPhone / iPad</small></button>
+    <button class="mode" id="modeAnd" onclick="setMode('and')">🤖 安卓手机<small>华为 / 小米等</small></button>
+  </div>
+
+  <div class="player">
+    <div class="stage">
+      <div class="phone">
+        <div class="scr" id="scrIos">
+          <!-- 场景1：Safari 打开 -->
+          <div class="scene on" data-s="0">
+            <div class="urlbar">ycteacher.github.io/yichenggongkao</div>
+            <div class="pagehead"><div class="t">亿成公考</div><div class="s">免费刷题 · 备考神器</div></div>
+            <div class="skiplines"><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <!-- 场景2：底栏分享键 -->
+          <div class="scene" data-s="1">
+            <div class="urlbar">ycteacher.github.io/yichenggongkao</div>
+            <div class="pagehead"><div class="t">亿成公考</div><div class="s">免费刷题 · 备考神器</div></div>
+            <div class="skiplines"><i></i><i></i><i></i></div>
+            <div class="ios-bar">
+              <div class="ic"></div><div class="ic"></div>
+              <div class="ios-share pulse"><i></i><b></b></div>
+              <div class="ic"></div><div class="ic"></div>
+            </div>
+          </div>
+          <!-- 场景3：分享面板 -->
+          <div class="scene" data-s="2">
+            <div class="urlbar">ycteacher.github.io/yichenggongkao</div>
+            <div class="pagehead"><div class="t">亿成公考</div><div class="s">免费刷题 · 备考神器</div></div>
+            <div class="sheet">
+              <div class="row" style="width:70%"></div>
+              <div class="row" style="width:85%"></div>
+              <div class="target pulse"><div class="plus">+</div><span>添加到主屏幕</span></div>
+              <div class="row"></div>
+              <div class="row" style="width:60%"></div>
+            </div>
+          </div>
+          <!-- 场景4：确认添加 -->
+          <div class="scene" data-s="3">
+            <div class="confirm">
+              <div class="addring pulse"></div><div class="add">添加</div>
+              <div class="appic">上岸</div>
+              <div class="nm">亿成公考</div>
+            </div>
+          </div>
+          <!-- 场景5：桌面 -->
+          <div class="scene" data-s="4">
+            <div class="desk">
+              <div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div>
+              <div class="ap"></div><div class="ap"></div><div class="ap new pulse"></div><div class="ap"></div><div class="ap"></div>
+              <div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scr" id="scrAnd" style="display:none">
+          <!-- 场景1：浏览器打开 -->
+          <div class="scene on" data-s="0">
+            <div class="urlbar" style="top:14px">ycteacher.github.io/yichenggongkao</div>
+            <div class="pagehead"><div class="t">亿成公考</div><div class="s">免费刷题 · 备考神器</div></div>
+            <div class="skiplines"><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <!-- 场景2：右上三个点 -->
+          <div class="scene" data-s="1">
+            <div class="urlbar" style="top:14px">ycteacher.github.io/yichenggongkao</div>
+            <div class="pagehead"><div class="t">亿成公考</div><div class="s">免费刷题 · 备考神器</div></div>
+            <div class="skiplines"><i></i><i></i><i></i></div>
+            <div class="and-dots pulse"><i></i><i></i><i></i></div>
+          </div>
+          <!-- 场景3：菜单 -->
+          <div class="scene" data-s="2">
+            <div class="urlbar" style="top:14px">ycteacher.github.io/yichenggongkao</div>
+            <div class="pagehead"><div class="t">亿成公考</div><div class="s">免费刷题 · 备考神器</div></div>
+            <div class="and-menu">
+              <div class="row"></div>
+              <div class="target pulse">添加到主屏幕</div>
+              <div class="row"></div>
+              <div class="row" style="width:70%"></div>
+            </div>
+          </div>
+          <!-- 场景4：确认安装 -->
+          <div class="scene" data-s="3">
+            <div class="and-confirm">
+              <div class="dlg">
+                <div class="t">将「亿成公考」<br>添加到主屏幕？</div>
+                <div class="btn pulse">安装</div>
+              </div>
+            </div>
+          </div>
+          <!-- 场景5：桌面 -->
+          <div class="scene" data-s="4">
+            <div class="desk">
+              <div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div>
+              <div class="ap"></div><div class="ap"></div><div class="ap new pulse"></div><div class="ap"></div><div class="ap"></div>
+              <div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="caption">
+      <div class="stepno" id="capNo">第 1 步 · 共 5 步</div>
+      <h2 id="capT"></h2>
+      <p id="capD"></p>
+    </div>
+
+    <div class="progress" id="prog"></div>
+
+    <div class="controls">
+      <button class="ctl playbtn" id="btnPlay" onclick="togglePlay()">⏸</button>
+      <button class="ctl navbtn" onclick="go(cur-1)">‹ 上一步</button>
+      <button class="ctl navbtn" onclick="go(cur+1)">下一步 ›</button>
+    </div>
+  </div>
+
+  <p class="hint">这是<b>动画演示</b>，红色圈住的就是你要点的位置。建议一边看一边<b>切出去照着做</b>，做完回来看下一步。</p>
+</div>
+
+<div class="backbar"><a href="./index.html">‹ 返回亿成公考，开始刷题</a></div>
+
+<script>
+(function(){
+  var STEPS = {
+    ios: [
+      {t:'用 Safari 打开刷题网址', d:'找到手机上的 <b>Safari</b>（蓝色指南针图标），打开刷题网址。<b>微信里打不开这一步</b>，要先在微信里点右上「···」→「在浏览器中打开」。'},
+      {t:'点屏幕最底部的「分享」按钮', d:'页面打开后，看屏幕<b>最下面一条</b>，中间那个<b>方框加向上箭头</b>的图标就是「分享」，点它。'},
+      {t:'在菜单里点「添加到主屏幕」', d:'底部会弹出一个白色菜单，<b>往上滑动</b>，找到带橙色 ⊕ 的「<b>添加到主屏幕</b>」，点它。'},
+      {t:'点右上角「添加」', d:'跳到确认页面后，直接点右上角蓝色的「<b>添加</b>」两个字，名字不用改。'},
+      {t:'完成！桌面点开就能刷题', d:'回到桌面，看到红色的「<b>亿成公考</b>」图标。以后<b>点这个图标</b>就直接进刷题页面，全屏显示。'}
+    ],
+    and: [
+      {t:'用浏览器打开刷题网址', d:'用 <b>Chrome</b> 或手机<b>自带浏览器</b>打开刷题网址。微信里要先点右上「···」→「在浏览器中打开」。'},
+      {t:'点右上角的「⋮」三个点', d:'在页面<b>右上角</b>找到竖着的三个点，点它，会弹出一个菜单。'},
+      {t:'点「添加到主屏幕」', d:'在菜单里找「<b>添加到主屏幕</b>」或「<b>安装应用</b>」。华为、小米自带浏览器里可能叫「<b>添加到桌面</b>」。'},
+      {t:'点「安装」确认', d:'弹出确认框后，点「<b>安装</b>」或「<b>添加</b>」；问「要添加到桌面吗」就点<b>允许</b>。'},
+      {t:'完成！桌面点开就能刷题', d:'回到桌面，看到红色的「<b>亿成公考</b>」图标。个别手机装完在文件夹或第二屏，找一下就有。'}
+    ]
+  };
+  var DUR = 5000;
+  var mode = 'ios', cur = 0, playing = true, t0 = 0, raf = null, elapsedInStep = 0;
+
+  var capNo=document.getElementById('capNo'), capT=document.getElementById('capT'), capD=document.getElementById('capD');
+  var prog=document.getElementById('prog'), btnPlay=document.getElementById('btnPlay');
+  var scrIos=document.getElementById('scrIos'), scrAnd=document.getElementById('scrAnd');
+
+  for(var m in STEPS){
+    for(var i=0;i<STEPS[m].length;i++){
+      var seg=document.createElement('i');
+      var bar=document.createElement('b'); bar.id='bar-'+m+'-'+i;
+      seg.appendChild(bar); prog.appendChild(seg);
+    }
+  }
+
+  function steps(){ return STEPS[mode]; }
+  function scenes(){ return (mode==='ios'?scrIos:scrAnd).querySelectorAll('.scene'); }
+
+  function render(){
+    var ss=steps();
+    capNo.textContent='第 '+(cur+1)+' 步 · 共 '+ss.length+' 步';
+    capT.innerHTML=ss[cur].t;
+    capD.innerHTML=ss[cur].d;
+    var sc=scenes();
+    for(var i=0;i<sc.length;i++) sc[i].classList.toggle('on', i===cur);
+    for(var m in STEPS){
+      for(var i=0;i<STEPS[m].length;i++){
+        var bar=document.getElementById('bar-'+m+'-'+i);
+        bar.style.width = (m===mode && i<cur) ? '100%' : '0';
+      }
+    }
+    elapsedInStep=0; t0=performance.now();
+  }
+
+  function tick(now){
+    if(!playing) return;
+    var el = elapsedInStep + (now - t0);
+    var bar=document.getElementById('bar-'+mode+'-'+cur);
+    if(bar) bar.style.width = Math.min(100, el/DUR*100)+'%';
+    if(el >= DUR){
+      cur++;
+      if(cur >= steps().length) cur = 0;
+      render();
+    }
+    raf=requestAnimationFrame(tick);
+  }
+
+  window.togglePlay=function(){
+    playing=!playing;
+    btnPlay.textContent = playing ? '⏸' : '▶';
+    if(playing){ t0=performance.now(); raf=requestAnimationFrame(tick); }
+    else{ elapsedInStep += performance.now()-t0; if(raf) cancelAnimationFrame(raf); }
+  };
+
+  window.go=function(i){
+    var n=steps().length;
+    cur=(i+n)%n;
+    render();
+  };
+
+  window.setMode=function(m){
+    mode=m;
+    document.getElementById('modeIos').classList.toggle('on', m==='ios');
+    document.getElementById('modeAnd').classList.toggle('on', m==='and');
+    scrIos.style.display = m==='ios' ? '' : 'none';
+    scrAnd.style.display = m==='and' ? '' : 'none';
+    cur=0; render();
+  };
+
+  render();
+  raf=requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
