@@ -1,13 +1,14 @@
 /* 亿成公考离线缓存 v1：装到桌面后再次打开基本秒开 */
-var CACHE = 'ycgk-v8';
+var CACHE = 'ycgk-v9';
 var CORE = [
   './',
-  './assets/index-C2M5URtc.css?v=ttfix96',
-  './assets/index-b34.js?v=ttfix96',
+  './assets/index-C2M5URtc.css?v=ttfix97',
+  './assets/index-b34.js?v=ttfix97',
   './base.js',
   './assets/material-icons.css?v=1',
   './assets/material-icons.woff2?v=1',
-  './assets/icon-yc-red-512.png?v=2'
+  './assets/icon-yc-red-192.png?v=3',
+  './assets/icon-yc-red-512.png?v=3'
 ];
 
 self.addEventListener('install', function(e){
