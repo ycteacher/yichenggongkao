@@ -59,3 +59,131 @@
   }catch(e){}
 })();
 </script>
+<script>
+/* live stats v1: 设备指纹 / 型号 / 新增回访 / 在线心跳 / 安装 → textdb 聚合池
+   数据契约 key=ycgk-live-v1，供数据看板实时读取。纯前端，无后端依赖。 */
+(function(){
+  var KEY='ycgk-live-v1';
+  var GETS=['https://textdb.dev/api/data/','https://textdb.online/'];
+  var PUTS=[
+    function(k,v,cb){fetch('https://textdb.online/update/?key='+encodeURIComponent(k)+'&value='+encodeURIComponent(v)).then(function(){cb(true)},function(){cb(false)})},
+    function(k,v,cb){fetch('https://textdb.dev/api/data/'+k,{method:'POST',headers:{'Content-Type':'text/plain'},body:v}).then(function(r){cb(!!r.ok)},function(){cb(false)})}
+  ];
+  function pad(n){return ('0'+n).slice(-2)}
+  function dayKey(d){return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+  /* 匿名设备ID：本地生成并长期保存；型号/系统识别 */
+  function deviceId(){
+    var id='';try{id=localStorage.getItem('ycgk.did')}catch(e){}
+    if(!id){
+      id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+      try{localStorage.setItem('ycgk.did',id)}catch(e){}
+    }
+    return id;
+  }
+  function parseDevice(){
+    var ua=navigator.userAgent||'',os='pc',model='电脑';
+    if(/iPhone/i.test(ua)){os='ios';model='iPhone'}
+    else if(/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){os='ios';model='iPad'}
+    else if(/iPod/i.test(ua)){os='ios';model='iPod'}
+    else if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)){os='harmony';model='鸿蒙设备';var hm=ua.match(/(?:HarmonyOS|ArkWeb)[^;)]*\)?\s*([A-Za-z0-9 \-]{2,20})/i);if(hm&&hm[1])model='鸿蒙 '+hm[1].trim().slice(0,16)}
+    else if(/Android/i.test(ua)){
+      os='android';
+      var br=ua.match(/Build\/([^;)]+)/i);var md=ua.match(/Android[^;)]*;\s*([^;)]+)/i);
+      if(md&&md[1])model=md[1].trim().slice(0,20);else if(br)model='Android '+br[1].trim().slice(0,14);else model='安卓设备';
+      if(/Pad|Tablet|SM-T\d|MatePad/i.test(ua))model+='(平板)';
+    }
+    var installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+    return {os:os,model:model,install:!!installed};
+  }
+  function get(cb){
+    var i=0;
+    (function next(){
+      if(i>=GETS.length){cb(null);return}
+      fetch(GETS[i++]+KEY,{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+        if(!t||t.charAt(0)!=='{'){next();return}
+        try{cb(JSON.parse(t))}catch(e){next()}
+      }).catch(function(){next()});
+    })();
+  }
+  function put(val,cb){
+    var s=JSON.stringify(val);
+    /* textdb.dev 实测写入/读回均可靠；直接写它，避免主线路"假成功" */
+    PUTS[1](KEY,s,function(ok){cb(ok)});
+  }
+  function report(){
+    var did=deviceId(),dev=parseDevice(),now=Date.now(),today=dayKey(new Date());
+    get(function(pool){
+      var p=pool&&typeof pool==='object'?pool:{};
+      if(!p.online||typeof p.online!=='object')p.online={};
+      if(!p.devices||typeof p.devices!=='object')p.devices={};
+      /* 清理10分钟前的在线记录，控制体积 */
+      Object.keys(p.online).forEach(function(k){if(now-p.online[k]>600000)delete p.online[k]});
+      p.online[did]=now;
+      var rec=p.devices[did]||{};
+      if(!rec.first)rec.first=dayKey(new Date());
+      rec.last=today;rec.m=dev.model;rec.os=dev.os;rec.inst=!!(rec.inst||dev.install);
+      p.devices[did]=rec;
+      /* 设备数上限保护：超过2000台只保留最近1500台 */
+      var ids=Object.keys(p.devices);
+      if(ids.length>2000){
+        ids.sort(function(a,b){return (p.devices[b].last||'')>(p.devices[a].last||'')?1:-1});
+        var keep={};for(var i=0;i<1500;i++)keep[ids[i]]=p.devices[ids[i]];
+        p.devices=keep;
+      }
+      p.ts=now;
+      put(p,function(){});
+    });
+  }
+  try{ report(); setInterval(report,120000); }catch(e){}
+})();
+</script>
+<script>
+/* 刷满10分钟弹问卷邀请：礼品=专业老师一对一问诊1小时。每人只弹一次。 */
+(function(){
+  var DONE='ycgk.fbinvite.done', ACC='ycgk.fbinvite.sec';
+  try{if(localStorage.getItem(DONE))return}catch(e){return}
+  var acc=0,last=Date.now(),timing=false;
+  try{acc=parseInt(localStorage.getItem(ACC)||'0',10)||0}catch(e){}
+  function tick(){
+    var now=Date.now();
+    if(!document.hidden&&timing){ acc+=Math.min(10,Math.round((now-last)/1000)); }
+    last=now;
+    try{localStorage.setItem(ACC,String(acc))}catch(e){}
+    if(acc>=600){ showInvite(); }
+  }
+  /* 用户点了刷题按钮后开始计时 */
+  document.addEventListener('click',function(e){
+    if(timing)return;
+    var el=e.target;while(el&&el!==document.body&&el.tagName!=='BUTTON')el=el.parentElement;
+    if(!el||el===document.body)return;
+    var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+    if(/(顺序刷|随机刷|开始刷题|继续刷题|第\d+套$)/.test(t)){timing=true;last=Date.now();}
+  },true);
+  setInterval(tick,1000);
+  function showInvite(){
+    try{localStorage.setItem(DONE,'1')}catch(e){}
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.fbinvite&r="+Date.now()}catch(e){}
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:22px;opacity:0;transition:opacity .25s';
+    ov.innerHTML='<div style="background:#fff;border-radius:20px;width:100%;max-width:400px;padding:26px 22px 22px;box-shadow:0 16px 48px rgba(0,0,0,.28);position:relative;text-align:center">'+
+      '<button id="ycFbX" style="position:absolute;top:12px;right:16px;font-size:24px;color:#aaa;background:none;border:none;line-height:1">×</button>'+
+      '<div style="font-size:34px;line-height:1">🎁</div>'+
+      '<h3 style="font-size:20px;color:#15803D;margin:10px 0 8px;font-weight:800">刷题辛苦了，帮个小忙？</h3>'+
+      '<p style="font-size:14px;color:#555;line-height:1.75;margin:0 0 14px">你已经认真刷了 10 分钟啦 👏<br>花 1 分钟填个<b>小问卷</b>，告诉我们哪里还能做得更好。</p>'+
+      '<div style="background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:16px">'+
+        '<div style="font-size:13px;color:#92400E;margin-bottom:4px">填写即可参与抽取</div>'+
+        '<div style="font-size:16px;color:#B45309;font-weight:800;line-height:1.5">🎓 专业老师 1 对 1 问诊 1 小时</div>'+
+        '<div style="font-size:12px;color:#92400E;margin-top:4px">考前政策解读 · 报考指导 · 备考答疑</div>'+
+      '</div>'+
+      '<a href="./feedback.html" style="display:block;width:100%;background:#15803D;color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:800;text-decoration:none">去填问卷 · 抽问诊名额</a>'+
+      '<button id="ycFbNo" style="display:block;width:100%;background:none;border:none;color:#999;font-size:13px;margin-top:12px">下次再说</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    setTimeout(function(){ov.style.opacity='1'},10);
+    function close(){ov.style.opacity='0';setTimeout(function(){ov.remove()},250)}
+    ov.querySelector('#ycFbX').onclick=close;
+    ov.querySelector('#ycFbNo').onclick=close;
+    ov.addEventListener('click',function(e){if(e.target===ov)close()});
+  }
+})();
+</script>
