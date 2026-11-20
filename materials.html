@@ -81,9 +81,13 @@
   .dlg .row .n{width:26px;height:26px;flex:none;border-radius:50%;background:#15803D;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center}
   .dlg .row .t{font-size:14px;line-height:1.6;color:#222}
   .dlg .row .t b{color:#15803D}
-  .dlg .open-now{display:block;width:100%;margin-top:14px;background:#15803D;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:800;text-align:center;text-decoration:none}
+  .dlg .open-now{display:block;width:100%;margin-top:14px;background:#15803D;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer}
+  .dlg .copy-btn{display:block;width:100%;margin-top:10px;background:#fff;color:#15803D;border:2px solid #15803D;border-radius:12px;padding:13px;font-size:15px;font-weight:800;text-align:center;cursor:pointer}
+  .dlg .copy-btn:active,.dlg .open-now:active{transform:scale(.98)}
   .dlg .close{position:absolute;top:14px;right:16px;font-size:22px;color:#999;background:none;border:none;cursor:pointer;line-height:1}
-  .dlg .hint{font-size:12px;color:#888;margin-top:10px;text-align:center}
+  .dlg .hint{font-size:12px;color:#888;margin-top:10px;text-align:center;line-height:1.7}
+  .dlg .url-box{margin-top:12px;background:#F4F8F3;border:1px solid #DCEADC;border-radius:10px;padding:10px 12px;font-size:11px;color:#2F5D3C;word-break:break-all;line-height:1.6;user-select:all;-webkit-user-select:all}
+  .dlg .ok-msg{display:none;margin-top:10px;background:#DCFCE7;color:#15803D;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;text-align:center}
 </style>
 </head>
 <body>
@@ -661,8 +665,11 @@
     <h3 id="dlgTitle">怎么把资料存下来</h3>
     <div class="lead" id="dlgLead"></div>
     <div id="dlgSteps"></div>
-    <a class="open-now" id="dlgBtn" href="#">知道了，去保存</a>
-    <div class="hint">存好后回到这里继续刷题即可</div>
+    <div class="url-box" id="dlgUrl"></div>
+    <button class="open-now" id="dlgBtn">复制资料链接</button>
+    <button class="copy-btn" id="dlgOpen" style="display:none;">直接打开资料</button>
+    <div class="ok-msg" id="dlgOk">✓ 已复制！打开手机浏览器，长按地址栏粘贴访问即可下载</div>
+    <div class="hint" id="dlgHint">存好后回到这里继续刷题即可</div>
   </div>
 </div>
 
@@ -679,50 +686,90 @@ var supportDownload = 'download' in document.createElement('a');
 
 function closeDlMask(){ document.getElementById('dlMask').classList.remove('show'); }
 
+var curUrl = '';
+// 真正复制文本到剪贴板：优先 Clipboard API，失败回退 execCommand
+function copyText(text, cb){
+  var ok = false;
+  function fallback(){
+    try{
+      var ta=document.createElement('textarea');
+      ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px'; ta.style.top='0';
+      document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+      ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+    }catch(e){ ok=false; }
+    cb(ok);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ cb(true); }).catch(fallback);
+  } else { fallback(); }
+}
+
 function showGuide(kind, url){
+  curUrl = url;
   var title=document.getElementById('dlgTitle'),
       lead=document.getElementById('dlgLead'),
       steps=document.getElementById('dlgSteps'),
-      btn=document.getElementById('dlgBtn');
+      urlBox=document.getElementById('dlgUrl'),
+      btn=document.getElementById('dlgBtn'),
+      openBtn=document.getElementById('dlgOpen'),
+      okMsg=document.getElementById('dlgOk'),
+      hint=document.getElementById('dlgHint');
+  okMsg.style.display='none';
+  urlBox.textContent = url;   // 长按也可以手动全选复制
+  openBtn.style.display='';
+  btn.textContent='① 复制资料链接';
+  openBtn.textContent='② 直接打开资料';
+
   if(kind==='weixin'){
-    title.textContent='在微信里存资料，按这 2 步';
-    lead.innerHTML='微信会拦住直接下载，先切到浏览器就能正常保存（一次就好，之后都行）。';
+    title.textContent='微信里存资料，按这 3 步';
+    lead.innerHTML='微信会拦住直接下载。复制链接后切到手机浏览器打开，就能正常保存（一次就好）。';
     steps.innerHTML=
-      '<div class="row"><div class="n">1</div><div class="t">点屏幕<b>右上角的「···」</b>（三个点）</div></div>'+
-      '<div class="row"><div class="n">2</div><div class="t">选<b>「在浏览器中打开」</b>→ 再点绿色的「保存」按钮</div></div>';
-    btn.textContent='知道了，去浏览器打开';
-    btn.href='javascript:closeDlMask()';
+      '<div class="row"><div class="n">1</div><div class="t">点绿色按钮<b>「复制资料链接」</b></div></div>'+
+      '<div class="row"><div class="n">2</div><div class="t">退出微信，打开<b>手机浏览器</b>（Safari / Chrome / QQ浏览器），长按地址栏<b>粘贴访问</b></div></div>'+
+      '<div class="row"><div class="n">3</div><div class="t">在浏览器页面点绿色<b>「保存」</b>即可下载</div></div>';
+    hint.innerHTML='也可以点右上角「··· → 在浏览器中打开」，再点保存。';
   } else if(kind==='ios'){
-    title.textContent='苹果设备存资料，按这 2 步';
-    lead.innerHTML='点保存后会打开资料预览，再存到「文件」App 即可。';
+    title.textContent='苹果设备存资料，按这 3 步';
+    lead.innerHTML='iPhone 不给网页直接下载 PDF。复制链接到浏览器，或用下方按钮打开后存到「文件」。';
     steps.innerHTML=
-      '<div class="row"><div class="n">1</div><div class="t">点绿色「保存」→ 会打开资料预览</div></div>'+
-      '<div class="row"><div class="n">2</div><div class="t">点底部/左上<b>「分享」图标 →「存储到文件」</b>，选好位置存下</div></div>';
-    btn.textContent='知道了，去保存';
-    btn.href='javascript:closeDlMask()';
+      '<div class="row"><div class="n">1</div><div class="t">点<b>「复制资料链接」</b>，到 Safari 长按地址栏<b>粘贴访问</b></div></div>'+
+      '<div class="row"><div class="n">2</div><div class="t">资料打开后，点底部/左上<b>「分享」图标 →「存储到文件」</b></div></div>'+
+      '<div class="row"><div class="n">3</div><div class="t">选好位置（如「我的iPhone」）存下即可</div></div>';
+    hint.innerHTML='若点保存直接预览了资料，同样在预览页点「分享 → 存储到文件」。';
   }
   document.getElementById('dlMask').classList.add('show');
 }
 
+// 绑定复制按钮：真实复制，成功后给明确反馈
+document.getElementById('dlgBtn').addEventListener('click', function(){
+  copyText(curUrl, function(ok){
+    var okMsg=document.getElementById('dlgOk');
+    if(ok){ okMsg.style.display='block'; }
+    else {
+      // 复制失败：选中 URL 让用户手动长按复制
+      var box=document.getElementById('dlgUrl');
+      var r=document.createRange(); r.selectNodeContents(box);
+      var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      okMsg.textContent='自动复制未成功，请长按下方绿色地址手动复制';
+      okMsg.style.display='block';
+    }
+  });
+});
+// 直接打开资料：新窗口打开直链
+document.getElementById('dlgOpen').addEventListener('click', function(){
+  window.open(curUrl, '_blank', 'noopener');
+});
+
 document.addEventListener('click', function(e){
   var a = e.target.closest ? e.target.closest('a.op-save[data-file]') : null;
   if(!a) return;
-  // 微信：拦截，弹引导去浏览器（微信内 download 完全失效）
-  if(IS_WEIXIN){
-    e.preventDefault();
-    showGuide('weixin', a.href);
-    return;
-  }
-  // 苹果：download 属性在 iOS Safari 常失效，弹引导（不拦截，让它尽量下载/预览）
-  if(IS_IOS){
-    showGuide('ios', a.href);
-    return;
-  }
+  // 微信：download 完全失效，拦截弹引导（复制/跳转）
+  if(IS_WEIXIN){ e.preventDefault(); showGuide('weixin', a.href); return; }
+  // 苹果：download 属性常失效，拦截弹引导，不再让它悄悄打开预览
+  if(IS_IOS){ e.preventDefault(); showGuide('ios', a.href); return; }
   // 安卓/电脑/其他：若不支持 download 属性，兜底直接打开
-  if(!supportDownload){
-    e.preventDefault();
-    window.open(a.href, '_blank');
-  }
+  if(!supportDownload){ e.preventDefault(); window.open(a.href, '_blank'); }
 });
 </script>
 </body>
