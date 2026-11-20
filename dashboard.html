@@ -9,6 +9,12 @@
 <meta name="apple-mobile-web-app-title" content="亿成看板">
 <meta name="theme-color" content="#0d1117">
 <title>亿成公考 · 数据看板</title>
+    <meta name="description" content="亿成公考——免费刷题、押题资料、备考数据看板。">
+    <meta property="og:title" content="亿成公考 · 免费刷题应用">
+    <meta property="og:description" content="常识、行测、申论全模块免费刷题，押题资料一键保存。">
+    <meta property="og:image" content="https://ycteacher.github.io/yichenggongkao/assets/icon-yc-red-512.png">
+    <meta property="og:type" content="website">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0d1117;--panel:#151b26;--panel2:#1a2230;--line:rgba(148,163,184,.14);--txt:#e8edf5;--sub:#93a2b8;--mut:#64748b;--green:#22c55e;--cyan:#38bdf8;--amber:#fbbf24;--violet:#a78bfa;--pink:#f472b6;--red:#f87171}
@@ -116,6 +122,10 @@ tr:last-child td{border-bottom:none}td b{color:var(--txt)}
 .notes li{padding-left:13px;position:relative}.notes li:before{content:"·";position:absolute;left:3px;color:var(--cyan)}
 .tip{margin-top:18px;text-align:center;font-size:10.5px;color:var(--mut);line-height:1.8}
 .err{display:none;margin-top:12px;background:#1a2230;border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:10px;font-size:12px;color:var(--red)}
+/* 实时运营数据 */
+.live-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
+.live-box .v{font-size:26px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
+.live-box .l{font-size:10px;color:var(--mut);margin-top:3px}
 </style>
 </head>
 <body>
@@ -132,6 +142,24 @@ tr:last-child td{border-bottom:none}td b{color:var(--txt)}
 
   <div class="sec"><span class="bar"></span><h2>核心指标</h2><span class="note">累计 · 校正后</span></div>
   <div class="kpis" id="kpis"></div>
+
+  <div class="sec"><span class="bar"></span><h2>实时运营数据</h2><span class="note" id="liveTs">实时数据池 · 15 秒刷新</span></div>
+  <div class="kpis" id="liveKpis"></div>
+  <div class="card">
+    <h3>手机系统分布 <span class="hint">按 os</span></h3>
+    <div class="desc">iOS / 安卓 / 鸿蒙 / 电脑 及设备构成</div>
+    <div id="liveOs"></div>
+  </div>
+  <div class="card">
+    <h3>手机型号 TOP <span class="hint">前 6</span></h3>
+    <div class="desc">设备池中出现最多的机型</div>
+    <div id="liveModels"></div>
+  </div>
+  <div class="card">
+    <h3>流失预警 <span class="hint">按最后访问</span></h3>
+    <div class="desc">超 7 天 / 30 天未回访的设备</div>
+    <div id="liveChurn"></div>
+  </div>
 
   <div class="sec"><span class="bar"></span><h2>转化漏斗</h2><span class="note">占打开比例</span></div>
   <div class="card"><div class="funnel" id="funnel"></div></div>
@@ -202,7 +230,7 @@ function c(d){return (d&&d.corrected&&d.corrected.totals)||{}}
 function cuv(d){return (d&&d.corrected&&d.corrected.uv)||{}}
 function uvTotal(d){var u=cuv(d),t=0;Object.keys(u).forEach(function(k){t+=u[k]});return t||((d&&d.totals&&d.totals.dev_pc)||0)}
 
-function tick(){var n=new Date(),h=('0'+n.getHours()).slice(-2),m=('0'+n.getMinutes()).slice(-2),s=('0'+n.getSeconds()).slice(-2);var diff=EXAM_AT-n;if(diff<0)diff=0;var d=Math.floor(diff/86400000),hh=Math.floor(diff%86400000/3600000),mm=Math.floor(diff%3600000/60000),ss=Math.floor(diff%60000/1000);txt('cdDays',d);txt('cdTime',('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+':'+('0'+ss).slice(-2))}
+function tick(){var n=new Date(),h=('0'+n.getHours()).slice(-2),m=('0'+n.getMinutes()).slice(-2),s=('0'+n.getSeconds()).slice(-2);var diff=EXAM_AT-n;if(diff<0)diff=0;var d=Math.floor(diff/86400000),hh=Math.floor(diff%86400000/3600000),mm=Math.floor(diff%3600000/60000),ss=Math.floor(diff%60000/1000);txt('cdDays',d);txt('cdTime',('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+':'+('0'+ss).slice(-2));refreshLiveOnline()}
 
 function renderKpis(d){
   var k=c(d),days=d.days||[],today=days[days.length-1]||{},yest=days[days.length-2]||{};
@@ -245,6 +273,93 @@ function renderAll(d,fb){renderKpis(d);renderFunnel(d);renderTrend(d);renderHour
 function fetchBank(){fetch(BANK_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(s){if(s&&s.total){BANK=s;renderBank()}}).catch(function(){})}
 function refreshMetrics(){fetch(METRICS_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(d){if(d){STATS=d;renderAll(d,FB);el('err').style.display='none'}}).catch(function(){})}
 function refreshFb(){function go(urls,i){if(i>=urls.length)return;fetch(urls[i]+(urls[i].indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.list){FB=d;renderFb(d)}}).catch(function(){go(urls,i+1)})}go([FB_URL,FB_FALLBACK],0)}
+/* ===== 实时运营数据（独立数据池） ===== */
+var LIVE_URL='https://textdb.dev/api/data/ycgk-live-v1';
+var LIVE_WINDOW=10*60*1000;
+var LIVE_DATA=null;
+var LIVE_OK=false;
+function liveToday(){var n=new Date();return ''+n.getFullYear()+('0'+(n.getMonth()+1)).slice(-2)+('0'+n.getDate()).slice(-2)}
+function liveDate(s){s=String(s||'');if(!/^\d{8}$/.test(s))return null;var d=new Date(+s.slice(0,4),+s.slice(4,6)-1,+s.slice(6,8));return isNaN(d.getTime())?null:d}
+function liveDays(s){var d=liveDate(s);if(!d)return null;var t=new Date();t.setHours(0,0,0,0);return Math.floor((t-d)/86400000)}
+function liveOnline(data){
+  var now=Date.now(),m=(data&&data.online)||{},n=0;
+  Object.keys(m).forEach(function(k){var v=m[k];if(typeof v==='number'&&isFinite(v)){var age=now-v;if(age<LIVE_WINDOW&&age>-60000)n++}});
+  return n;
+}
+function liveBars(host,rows,cols){
+  var mx=Math.max.apply(null,rows.map(function(r){return r[1]}).concat([1]));
+  el(host).innerHTML=rows.map(function(r,i){
+    var col=r[2]||cols[i%cols.length];
+    return '<div class="brow"><div class="bl"><span>'+esc(r[0])+'</span><b>'+r[1]+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(2,r[1]/mx*100).toFixed(1)+'%;background:'+col+'"></div></div></div>';
+  }).join('');
+}
+function refreshLiveOnline(){
+  if(!LIVE_OK||!LIVE_DATA)return;
+  var n=el('liveOnlineN');if(n)n.textContent=liveOnline(LIVE_DATA);
+}
+function renderLive(ok,data){
+  var dev=(data&&data.devices)||{},keys=Object.keys(dev),dash='—';
+  var nOnline=ok?liveOnline(data):dash;
+  var today=liveToday(),nNew=0,nBack=0,nInst=0,c7=0,c30=0,osM={},modelM={};
+  if(ok){
+    keys.forEach(function(k){
+      var it=dev[k]||{};
+      if(it.first&&String(it.first)===today)nNew++;
+      if(it.first&&it.last&&String(it.last)!==String(it.first))nBack++;
+      if(it.inst===true)nInst++;
+      var os=String(it.os||'other');osM[os]=(osM[os]||0)+1;
+      var mo=String(it.m||'').trim();if(mo)modelM[mo]=(modelM[mo]||0)+1;
+      var da=liveDays(it.last);
+      if(da!==null){if(da>7)c7++;if(da>30)c30++}
+    });
+  }
+  var rate=ok&&keys.length?(nInst/keys.length*100).toFixed(1).replace(/\.0$/,'')+'%':(ok?'0%':dash);
+  var cards=[
+    {t:'当前在线',n:nOnline,c:'var(--green)',id:'liveOnlineN',x:'近 10 分钟心跳 · 每秒更新'},
+    {t:'累计设备',n:ok?keys.length:dash,c:'var(--cyan)',x:'数据池去重设备数'},
+    {t:'今日新增设备',n:ok?nNew:dash,c:'var(--amber)',x:'首次访问 '+today},
+    {t:'回访设备',n:ok?nBack:dash,c:'var(--violet)',x:'最后访问 ≠ 首次'},
+    {t:'已安装到本地',n:ok?nInst:dash,c:'var(--pink)',x:'安装率 '+rate}
+  ];
+  el('liveKpis').innerHTML=cards.map(function(i){
+    return '<div class="kpi" style="--c:'+i.c+'"><div class="t">'+i.t+'</div><div class="n"'+(i.id?' id="'+i.id+'"':'')+'>'+i.n+'</div><div class="x">'+i.x+'</div></div>';
+  }).join('');
+
+  if(!ok){
+    ['liveOs','liveModels','liveChurn'].forEach(function(id){el(id).innerHTML='<div style="color:var(--mut);font-size:12px;padding:8px 0">—</div>'});
+    txt('liveTs','实时数据池 · 暂不可用');
+    return;
+  }
+  var ts=data&&data.ts;
+  txt('liveTs','池更新 '+(ts?new Date(ts).toTimeString().slice(0,8):'—')+' · 15 秒刷新');
+
+  var osDefs=[['ios','iOS','#38bdf8'],['android','安卓','#22c55e'],['harmony','鸿蒙','#fbbf24'],['pc','电脑','#a78bfa']];
+  var osRows=osDefs.map(function(d){return [d[1],osM[d[0]]||0,d[2]]});
+  Object.keys(osM).forEach(function(k){if(!/^(ios|android|harmony|pc)$/.test(k))osRows.push([k,osM[k],'#f472b6'])});
+  liveBars('liveOs',osRows,['#38bdf8']);
+
+  var models=Object.keys(modelM).sort(function(a,b){return modelM[b]-modelM[a]}).slice(0,6);
+  var modelColors=['#38bdf8','#22c55e','#fbbf24','#a78bfa','#f472b6','#f87171'];
+  if(models.length)liveBars('liveModels',models.map(function(m){return [m,modelM[m]]}),modelColors);
+  else el('liveModels').innerHTML='<div style="color:var(--mut);font-size:12px;padding:8px 0">暂无机型数据（0 台设备）</div>';
+
+  el('liveChurn').innerHTML=
+    '<div style="display:flex;gap:10px">'+
+      '<div class="live-box" style="flex:1"><div class="v" style="color:var(--amber)">'+c7+'</div><div class="l">超 7 天未回访</div></div>'+
+      '<div class="live-box" style="flex:1"><div class="v" style="color:var(--pink)">'+c30+'</div><div class="l">超 30 天未回访</div></div>'+
+    '</div><div style="font-size:10px;color:var(--mut);margin-top:8px">基于设备最后访问日期 · 共 '+keys.length+' 台设备</div>';
+}
+function loadLive(){
+  fetch(LIVE_URL+(LIVE_URL.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r.json()})
+    .then(function(d){
+      if(!d||typeof d!=='object'||Array.isArray(d))throw new Error('bad data');
+      LIVE_OK=true;LIVE_DATA=d;renderLive(true,d);
+    })
+    .catch(function(){LIVE_OK=false;LIVE_DATA=null;renderLive(false,null)});
+}
+renderLive(false,null);loadLive();setInterval(loadLive,15000);
+
 renderAll(STATS,FB);tick();setInterval(tick,1000);fetchBank();refreshMetrics();refreshFb();
 setInterval(refreshMetrics,30000);setInterval(refreshFb,300000);setInterval(fetchBank,300000);
 </script>
