@@ -30,6 +30,7 @@
 
   /* ===== 作文格子纸（严格一格一字，标点占一格）===== */
   .paper-wrap{position:relative;margin-top:10px;border:1px solid #E5E1D8;border-radius:12px;overflow:hidden;background:#FFFDF7;}
+  @media (min-width:900px){.paper-wrap{max-width:900px;margin-left:auto;margin-right:auto;}}
   .paper-hint{position:absolute;top:0;left:0;right:0;height:26px;line-height:26px;padding:0 12px;font-size:11px;color:#B9A98F;background:repeating-linear-gradient(to bottom,#FFFDF7 0,#FFFDF7 25px,#EBD9C4 25px,#EBD9C4 26px);pointer-events:none;z-index:1;}
   /* 网格由 JS 按 CSS 变量 --cell 精确绘制：横向每 --cell 一条竖线，正文行高=--cell；
      文字用等宽全角字体 + 字间距0，使每个汉字/全角标点恰好落在一格里 */
@@ -373,7 +374,7 @@
     function layoutPaper(){
       if(!state.paperMode) return;
       var avail = ta.clientWidth; if(!avail) return;
-      var cell = avail < 420 ? 20 : (avail < 760 ? 22 : 24); // 手机20/平板22/大屏24，观感精致
+      var cell = avail < 420 ? 20 : (avail < 900 ? 23 : 26); // 手机20/平板23/大屏26，一行字数随屏宽按比例增加
       var cols = Math.max(8, Math.floor(avail / cell));       // 一行能放几格
       var used = cols * cell;
       var pad = Math.max(0, Math.floor((avail - used) / 2));  // 居中余量并入padding
