@@ -771,6 +771,49 @@ document.addEventListener('click', function(e){
   // 安卓/电脑/其他：若不支持 download 属性，兜底直接打开
   if(!supportDownload){ e.preventDefault(); window.open(a.href, '_blank'); }
 });
+
+/* ===== 资料预览层：手机/平板/PWA 点「打开」立即预览，不依赖 target=_blank（会被拦） ===== */
+(function(){
+  var CSS='.yc-pv-mask{position:fixed;inset:0;z-index:10000;background:#fff;display:none;flex-direction:column}'
+    +'.yc-pv-mask.on{display:flex}'
+    +'.yc-pv-bar{flex:none;display:flex;align-items:center;gap:7px;padding:9px 10px;background:#B91C1C;color:#fff;min-height:50px}'
+    +'.yc-pv-bar .t{flex:1;min-width:0;font-size:13.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
+    +'.yc-pv-bar button{flex:none;background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:8px 9px;font-size:12px;font-weight:700;white-space:nowrap}'
+    +'.yc-pv-frame{flex:1;width:100%;border:0;background:#fff;min-height:0}'
+    +'.yc-pv-tip{flex:none;padding:8px 12px;background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.5;text-align:center;display:none}';
+  var s=document.createElement('style'); s.textContent=CSS; document.head.appendChild(s);
+  var mask=document.createElement('div'); mask.className='yc-pv-mask'; mask.id='ycPvMask';
+  mask.innerHTML='<div class="yc-pv-bar"><button id="ycPvBack">‹ 返回</button><div class="t" id="ycPvTitle">资料预览</div><button id="ycPvNew">新窗口</button><button id="ycPvCopy">复制链接</button></div>'+
+    '<iframe class="yc-pv-frame" id="ycPvFrame" src="" title="资料预览"></iframe>'+
+    '<div class="yc-pv-tip" id="ycPvTip">PDF 若显示不出来，点右上「新窗口」或「复制链接」用浏览器打开；苹果设备可在预览里点「分享 → 存储到文件」</div>';
+  document.body.appendChild(mask);
+  var cur='';
+  function closePv(){ mask.classList.remove('on'); document.getElementById('ycPvFrame').src=''; }
+  function openPv(url,title){
+    cur=url;
+    document.getElementById('ycPvTitle').textContent=title||'资料预览';
+    document.getElementById('ycPvFrame').src=url;
+    document.getElementById('ycPvTip').style.display=/\\.pdf(\\?|$)/i.test(url)||IS_WEIXIN||IS_IOS?'block':'none';
+    mask.classList.add('on');
+    try{ new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.pvopen&r='+Date.now(); }catch(e){}
+  }
+  document.getElementById('ycPvBack').addEventListener('click',closePv);
+  document.getElementById('ycPvNew').addEventListener('click',function(){ window.open(cur,'_blank','noopener'); });
+  document.getElementById('ycPvCopy').addEventListener('click',function(){
+    if(typeof copyText==='function'){ copyText(cur,function(ok){ alert(ok?'链接已复制，粘贴到浏览器打开即可':'请长按资料链接手动复制'); }); }
+    else { prompt('复制这个资料链接：',cur); }
+  });
+  document.addEventListener('click',function(e){
+    var a=e.target.closest ? e.target.closest('a.op-open[data-file]') : null;
+    if(!a) return;
+    e.preventDefault();
+    var row=a.parentElement||a;
+    var sv=row.querySelector ? row.querySelector('a.op-save[download]') : null;
+    var title=sv?sv.getAttribute('download'):(a.textContent||'资料预览').trim();
+    openPv(a.href,title);
+  },true);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePv(); });
+})();
 </script>
 </body>
 </html>
