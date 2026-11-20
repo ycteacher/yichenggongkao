@@ -122,6 +122,15 @@
       var rec=p.devices[did]||{};
       if(!rec.first)rec.first=dayKey(new Date());
       rec.last=today;rec.m=dev.model;rec.os=dev.os;rec.inst=!!(rec.inst||dev.install);
+      /* 访问频次 + 按天分时活跃：供看板生成真实访问趋势/24小时分布 */
+      rec.pv=(rec.pv||0)+1;
+      var dObj=new Date(),hr=pad(dObj.getHours());
+      if(!rec.hr||typeof rec.hr!=='object')rec.hr={};
+      if(!rec.hr[today]||typeof rec.hr[today]!=='object')rec.hr[today]={};
+      rec.hr[today][hr]=(rec.hr[today][hr]||0)+1;
+      /* 只保留最近14天的分时，控制体积 */
+      var hkeys=Object.keys(rec.hr).sort();
+      if(hkeys.length>14){for(var hi=0;hi<hkeys.length-14;hi++)delete rec.hr[hkeys[hi]];}
       p.devices[did]=rec;
       /* 设备数上限保护：超过2000台只保留最近1500台 */
       var ids=Object.keys(p.devices);
