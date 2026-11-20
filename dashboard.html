@@ -2,158 +2,251 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="亿成看板">
-<meta name="theme-color" content="#15803D">
+<meta name="theme-color" content="#0d1117">
 <title>亿成公考 · 数据看板</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-       background:#FAF8F3;color:#1F2937;min-height:100vh;padding:20px 16px 40px}
-  .wrap{max-width:480px;margin:0 auto}
-  h1{font-size:21px;font-weight:800;display:flex;align-items:center;gap:8px}
-  h1 .dot{width:10px;height:10px;border-radius:50%;background:#15803D;flex:none}
-  .sub{font-size:12px;color:#8A8378;margin-top:5px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-  .card{background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:16px 14px;
-        box-shadow:0 1px 8px rgba(31,41,55,.04)}
-  .card .num{font-size:28px;font-weight:800;color:#15803D;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .card .lab{font-size:12px;color:#8A8378;margin-top:4px}
-  .card .raw{font-size:10.5px;color:#B3AC9E;margin-top:2px}
-  .card.hl{background:#15803D;border-color:#15803D}
-  .card.hl .num,.card.hl .lab{color:#fff}
-  .card.hl .raw{color:rgba(255,255,255,.72)}
-  .rates{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-  .rate{background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:12px 14px;display:flex;align-items:baseline;gap:8px}
-  .rate b{font-size:20px;font-weight:800;color:#15803D;font-variant-numeric:tabular-nums}
-  .rate span{font-size:12px;color:#8A8378}
-  .brief{margin-top:14px;background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:16px}
-  .brief h2,.fb h2,.sum h2{font-size:15px;font-weight:700;margin-bottom:10px}
-  .brief p{font-size:14px;line-height:1.9;color:#374151}
-  .brief b{color:#15803D}
-  .fb{margin-top:14px;background:#fff;border:1px solid #EFECE4;border-radius:16px;padding:16px}
-  .fb .cnt{font-size:12.5px;color:#8A8378;margin-bottom:10px}
-  .q{margin-bottom:12px}
-  .q:last-child{margin-bottom:0}
-  .q .qt{font-size:13px;font-weight:700;color:#374151;margin-bottom:6px}
-  .bar{display:flex;align-items:center;gap:8px;margin-top:4px}
-  .bar .track{flex:1;height:8px;border-radius:4px;background:#F3F1EA;overflow:hidden}
-  .bar .fill{height:100%;border-radius:4px;background:#15803D}
-  .bar .fill.gray{background:#C9C3B6}
-  .bar .ol{font-size:11.5px;color:#4A463F;white-space:nowrap;min-width:72px;text-align:right;font-variant-numeric:tabular-nums}
-  .sum{margin-top:14px;background:#15803D;border-radius:16px;padding:18px 16px}
-  .sum h2{color:#fff}
-  .sum p{font-size:14px;line-height:1.9;color:rgba(255,255,255,.92)}
-  .sum b{color:#FDE68A}
-  .tip{margin-top:14px;text-align:center;font-size:11.5px;color:#B3AC9E;line-height:1.8}
-  .err{display:none;margin-top:14px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:12px;font-size:13px;color:#9A3412}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1117;--panel:#151b26;--panel2:#1a2230;--line:rgba(148,163,184,.14);--txt:#e8edf5;--sub:#93a2b8;--mut:#64748b;--green:#22c55e;--cyan:#38bdf8;--amber:#fbbf24;--violet:#a78bfa;--pink:#f472b6;--red:#f87171}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding:16px 14px calc(40px + env(safe-area-inset-bottom));line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:520px;margin:0 auto}
+
+/* 头部 */
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#b91c1c);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;box-shadow:0 4px 14px rgba(220,38,38,.35)}
+.brand h1{font-size:17px;font-weight:800}
+.brand .sub{font-size:10px;color:var(--mut);letter-spacing:.5px}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);padding:4px 9px;border-radius:99px;font-weight:600;white-space:nowrap}
+.live i{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.subline{font-size:11px;color:var(--mut);margin-top:8px;display:flex;justify-content:space-between;gap:10px}
+.subline b{color:var(--cyan);font-weight:700}
+
+/* 倒计时条 */
+.cd{margin-top:12px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(100deg,rgba(251,191,36,.14),rgba(251,191,36,.05));border:1px solid rgba(251,191,36,.28);border-radius:14px;padding:11px 15px}
+.cd .lab{font-size:12px;color:var(--amber);font-weight:600}
+.cd .num{font-size:22px;font-weight:900;color:var(--amber);font-variant-numeric:tabular-nums}
+.cd .num small{font-size:12px}
+
+/* 结论 */
+.judge{margin-top:12px;background:linear-gradient(100deg,rgba(56,189,248,.12),rgba(167,139,250,.06));border:1px solid rgba(56,189,248,.22);border-radius:14px;padding:12px 14px;font-size:12.5px;color:#cbd9e8;line-height:1.75}
+.judge b{color:var(--cyan)}
+
+/* 分区 */
+.sec{display:flex;align-items:center;gap:8px;margin:20px 2px 10px}
+.sec .bar{width:3px;height:15px;border-radius:2px;background:var(--red)}
+.sec h2{font-size:13.5px;font-weight:800}
+.sec .note{font-size:10.5px;color:var(--mut);font-weight:400;margin-left:auto}
+
+/* KPI 网格 */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--cyan))}
+.kpi .t{font-size:11px;color:var(--sub)}
+.kpi .n{font-size:27px;font-weight:900;color:var(--c,var(--txt));font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px}
+.kpi .x{font-size:10px;color:var(--mut);margin-top:2px}
+.kpi .x b{color:var(--green)}.kpi .x b.down{color:var(--pink)}
+
+/* 卡片 */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:10px}
+.card h3{font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between}
+.card h3 .hint{font-size:10px;color:var(--mut);font-weight:400}
+.card .desc{font-size:10.5px;color:var(--mut);margin:3px 0 12px}
+
+/* 漏斗 */
+.funnel{display:flex;flex-direction:column;gap:0}
+.fstep{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(148,163,184,.08)}
+.fstep:last-child{border-bottom:none}
+.fstep .fn{width:44px;height:44px;border-radius:11px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;flex:none;border:1px solid var(--line)}
+.fstep .info{flex:1;min-width:0}
+.fstep .fl{font-size:12px;font-weight:700}
+.fstep .fr{font-size:10.5px;color:var(--mut)}
+.fstep .fbar{height:5px;border-radius:99px;background:rgba(148,163,184,.13);margin-top:5px;overflow:hidden}
+.fstep .fbar i{display:block;height:100%;border-radius:99px;background:var(--c,var(--cyan))}
+
+/* 条形 */
+.brow{margin:9px 0}
+.bl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--sub);margin-bottom:4px}
+.bl b{color:var(--txt);font-weight:700;font-variant-numeric:tabular-nums}
+.bt{height:8px;background:rgba(148,163,184,.13);border-radius:99px;overflow:hidden}
+.bfill{height:100%;border-radius:99px;min-width:2px}
+
+/* 趋势 svg */
+svg{display:block;width:100%;height:auto}
+.lg{display:flex;gap:14px;font-size:10.5px;color:var(--sub);margin-top:8px;flex-wrap:wrap}
+.lg i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:5px}
+
+/* 时段 */
+.hours{display:flex;align-items:flex-end;gap:2px;height:80px}
+.hcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.hbar-wrap{flex:1;display:flex;align-items:flex-end}
+.hbar{width:100%;border-radius:2px 2px 0 0;background:linear-gradient(180deg,var(--cyan),#1d4ed8);min-height:2px}
+.hlab{font-size:7px;color:var(--mut);text-align:center;margin-top:4px}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}
+th{text-align:left;color:var(--mut);font-weight:600;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 6px;border-bottom:1px solid rgba(148,163,184,.07);color:var(--sub)}
+tr:last-child td{border-bottom:none}td b{color:var(--txt)}
+
+/* 排行 */
+.rrow{display:flex;align-items:center;gap:8px;margin:8px 0}
+.rm{width:22px;text-align:center;font-size:14px;flex:none}
+.rn{font-size:11px;font-weight:700;flex:none;width:46px}
+.rt{flex:1;height:8px;background:rgba(148,163,184,.13);border-radius:99px;overflow:hidden}
+.rf{height:100%;background:linear-gradient(90deg,var(--amber),#d97706);border-radius:99px}
+.rv{font-size:10px;color:var(--sub);flex:none;min-width:70px;text-align:right}
+
+/* 问卷 */
+.fbmini{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:12px}
+.fbm{background:var(--panel2);border-radius:10px;padding:10px;text-align:center}
+.fbm .n{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+.fbm .t{font-size:10px;color:var(--mut)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);color:var(--cyan);font-size:10.5px;padding:3px 9px;border-radius:99px}
+.quotes{list-style:none}
+.quotes li{font-size:11.5px;color:var(--sub);padding:6px 0 6px 11px;border-left:2px solid var(--line);margin-bottom:4px;line-height:1.6}
+.bignum{font-size:30px;font-weight:900;color:var(--amber);font-variant-numeric:tabular-nums}
+.notes{list-style:none;font-size:10.5px;color:var(--mut);line-height:1.9}
+.notes li{padding-left:13px;position:relative}.notes li:before{content:"·";position:absolute;left:3px;color:var(--cyan)}
+.tip{margin-top:18px;text-align:center;font-size:10.5px;color:var(--mut);line-height:1.8}
+.err{display:none;margin-top:12px;background:#1a2230;border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:10px;font-size:12px;color:var(--red)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1><span class="dot"></span>亿成公考 · 数据看板</h1>
-  <div class="sub" id="updated">数据加载中…</div>
+  <div class="hd">
+    <div class="brand"><div class="logo">刷</div><div><h1>亿成公考 · 数据看板</h1><div class="sub">LIVE DASHBOARD</div></div></div>
+    <span class="live"><i></i>实时</span>
+  </div>
+  <div class="subline"><span>更新于 <span id="updated">…</span></span><span>今日 <b id="todayUv">—</b> 台设备</span></div>
 
-  <div class="grid" id="cards"></div>
-  <div class="rates" id="rates"></div>
+  <div class="cd"><span class="lab">距 27 国考笔试</span><span class="num"><span id="cdDays">--</span><small> 天 </small><span id="cdTime" style="font-size:14px">--:--:--</span></span></div>
 
-  <div class="brief">
-    <h2>今日简报</h2>
-    <p id="briefText">—</p>
+  <div class="judge" id="judge">数据加载中…</div>
+
+  <div class="sec"><span class="bar"></span><h2>核心指标</h2><span class="note">累计 · 校正后</span></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="sec"><span class="bar"></span><h2>转化漏斗</h2><span class="note">占打开比例</span></div>
+  <div class="card"><div class="funnel" id="funnel"></div></div>
+
+  <div class="sec"><span class="bar"></span><h2>访问趋势</h2><span class="note">近 10 天</span></div>
+  <div class="card"><div id="trend"></div><div class="lg"><span><i style="background:#38bdf8"></i>打开次数</span><span><i style="background:#fbbf24"></i>独立设备</span></div></div>
+
+  <div class="sec"><span class="bar"></span><h2>活跃与设备</h2></div>
+  <div class="card"><h3>24 小时活跃</h3><div class="desc" id="peakHour">—</div><div class="hours" id="hours"></div></div>
+  <div class="card"><h3>设备构成</h3><div class="desc">一次性识别 · 校正后</div><div id="devices"></div></div>
+  <div class="card"><h3>安装引导</h3><div class="desc">装到桌面的转化路径</div><div id="install"></div></div>
+
+  <div class="sec"><span class="bar"></span><h2>题库家底</h2><span class="note" id="bankAsOf">—</span></div>
+  <div class="card">
+    <div style="display:flex;align-items:baseline;gap:8px"><span class="bignum" id="bankTotal">…</span><span style="font-size:10.5px;color:var(--mut)">题 · 人均可刷 <b id="bankPer" style="color:var(--txt)">—</b> 题</span></div>
+    <div id="bankModules" style="margin-top:8px"></div>
   </div>
 
-  <div class="fb">
-    <h2>问卷反馈</h2>
-    <div class="cnt" id="fbCnt"></div>
-    <div id="fbGrid"></div>
+  <div class="sec"><span class="bar"></span><h2>分享与裂变</h2></div>
+  <div class="card"><h3>邀请链路</h3><div class="desc">从分享到受邀完成</div><div id="share"></div></div>
+  <div class="card"><h3>刷题段位 <span class="hint">匿名</span></h3><div class="desc">每满 100 题升一档</div><div id="rank"></div><div class="desc" style="margin:10px 0 2px">刷得最多：<b id="rankTop" style="color:var(--amber)">—</b></div></div>
+
+  <div class="sec"><span class="bar"></span><h2>每日明细</h2></div>
+  <div class="card"><table id="daily"></table></div>
+
+  <div class="sec"><span class="bar"></span><h2>用户反馈</h2><span class="note" id="fbCnt">—</span></div>
+  <div class="card">
+    <div class="fbmini">
+      <div class="fbm"><div class="n" style="color:var(--cyan)" id="fbTotal">…</div><div class="t">有效问卷</div></div>
+      <div class="fbm"><div class="n" style="color:var(--green)" id="fbPraise">…</div><div class="t">好评</div></div>
+      <div class="fbm"><div class="n" style="color:var(--amber)" id="fbIssue">…</div><div class="t">提到问题</div></div>
+      <div class="fbm"><div class="n" style="color:var(--pink)" id="fbRec">…</div><div class="t">愿意推荐</div></div>
+    </div>
+    <div class="desc" style="margin-bottom:6px">最想优先补充</div><div class="tags" id="fbWant"></div>
+    <div class="desc" style="margin:10px 0 6px">备考类型</div><div class="tags" id="fbExam"></div>
+    <div class="desc" style="margin:10px 0 2px">意见原文（最新 3 条）</div><ul class="quotes" id="fbQuotes"></ul>
   </div>
 
-  <div class="sum">
-    <h2>一句话总结</h2>
-    <p id="sumText">—</p>
-  </div>
+  <div class="card" style="margin-top:14px"><h3>数据口径</h3><ul class="notes">
+    <li>「校正」= 原始计数减去自查读数膨胀；独立设备按天去重。</li>
+    <li>在线与部分分布指标自 2026-11-19 起计数；段位为匿名名次。</li>
+    <li>学生端逐题明细保存在各自手机，无法远程读取。</li>
+    <li>计数服务为免费第三方，失效时显示最近快照。</li>
+  </ul></div>
 
-  <div class="tip">想像 App 一样打开？<br>iPhone：Safari 打开本页 → 分享 → 添加到主屏幕<br>安卓：浏览器菜单 → 添加到桌面</div>
-  <div class="err" id="err">数据暂时没取到，稍后再打开试试；也可以直接问小林。</div>
+  <div class="tip">亿成公考 · 数据看板<br>每 30 秒自动刷新</div>
+  <div class="err" id="err">数据暂时没取到，稍后再打开试试。</div>
 </div>
 
 <script>
-(function(){
-  var METRICS_URL = 'https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json';
-  var FB_KEY = 'ycgk-fb-v1';
-  var FB_GET = ['https://textdb.online/' + FB_KEY, 'https://textdb.dev/api/data/' + FB_KEY];
-  var OPTS = [
-    {k:'a1', q:'总体感受',      o:['非常好','还不错','一般','不太好']},
-    {k:'a2', q:'刷题量节奏',    o:['偏多','刚好','偏少']},
-    {k:'a3', q:'网络速度',      o:['很快','一般','较慢','经常加载失败']},
-    {k:'a4', q:'资料提取速度',  o:['很快','一般','较慢','还没用过']},
-    {k:'a5', q:'题目质量',      o:['没发现问题','发现少量','发现较多']},
-    {k:'a6', q:'遇到 bug',      o:['没有','偶尔有','经常有']},
-    {k:'a7', q:'备考类别',      o:['国考','省考','事业编','军队文职','教师编','医疗编','三支一扶']},
-    {k:'a8', q:'最常用功能',    o:['专项刷题','整套卷子','错题本','速算特训','领资料']},
-    {k:'a9', q:'希望优先补充',  o:['图形推理','资料分析','言语理解','判断推理','数量关系','常识']},
-    {k:'a10', q:'会推荐同学吗', o:['肯定会','可能会','不好说']}
+var FB={questions:[],list:[]};
+var BANK={total:27296,asof:"2026-11-19",modules:[["常识",10098],["言语理解",5091],["数量关系",1721],["判断推理",2363],["图形推理",3985],["资料分析",3858]],diffs:[["简单",3397],["中等",6470],["困难",2027],["暂未标注",15402]]};
+var STATS={updated_at:"2026-11-19T21:19:08+08:00",today_uv:238,online_now:0,
+  totals:{open:755,start:43,materials:180,share:29,sharecopy:26,refin:33,dev_ios:49,dev_android:30,dev_pc:215,installed:28,dev_tablet:25,wlshow:266,wlok:151},
+  corrected:{totals:{open:719,start:7,materials:146,share:4,sharecopy:1,refin:8,refstudy:1,refreturn:4,dev_ios:24,dev_android:5,dev_pc:190,installed:3,dev_tablet:3,wlshow:241,wlok:126,hr_03:23,hr_05:32,hr_08:34,hr_19:31,lvl_1:2},uv:{"20261119":214,"20261118":80}},
+  days:[{date:"2026-11-17",uv:28,open:50,start:5,guide:5,materials:34},{date:"2026-11-18",uv:114,open:390,start:11,guide:11,materials:121},{date:"2026-11-19",uv:238,open:315,start:27,guide:23,materials:25}]};
+var METRICS_URL='https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json';
+var BANK_URL='bank-stats.json';
+var FB_URL='https://textdb.online/ycgk-fb-v1/';
+var FB_FALLBACK='https://textdb.dev/api/data/ycgk-fb-v1';
+var EXAM_AT=new Date('2026-11-29T09:00:00+08:00');
+
+function el(id){return document.getElementById(id)}
+function txt(id,v){var n=el(id);if(n)n.textContent=v}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function pct(a,b){return b>0?(a/b*100).toFixed(1).replace(/\.0$/,'')+'%':'—'}
+function c(d){return (d&&d.corrected&&d.corrected.totals)||{}}
+function cuv(d){return (d&&d.corrected&&d.corrected.uv)||{}}
+function uvTotal(d){var u=cuv(d),t=0;Object.keys(u).forEach(function(k){t+=u[k]});return t||((d&&d.totals&&d.totals.dev_pc)||0)}
+
+function tick(){var n=new Date(),h=('0'+n.getHours()).slice(-2),m=('0'+n.getMinutes()).slice(-2),s=('0'+n.getSeconds()).slice(-2);var diff=EXAM_AT-n;if(diff<0)diff=0;var d=Math.floor(diff/86400000),hh=Math.floor(diff%86400000/3600000),mm=Math.floor(diff%3600000/60000),ss=Math.floor(diff%60000/1000);txt('cdDays',d);txt('cdTime',('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+':'+('0'+ss).slice(-2))}
+
+function renderKpis(d){
+  var k=c(d),days=d.days||[],today=days[days.length-1]||{},yest=days[days.length-2]||{};
+  var uvToday=d.today_uv||today.uv||0,uvYest=yest.uv||0,delta=uvYest?((uvToday-uvYest)/uvYest*100):0;
+  txt('todayUv',uvToday);
+  var items=[
+    {t:'今日独立设备',n:uvToday,col:'var(--cyan)',x:uvYest?('较昨日 <b class="'+(delta>=0?'':'down')+'">'+(delta>=0?'↑':'↓')+Math.abs(delta).toFixed(0)+'%</b>'):'昨日 '+uvYest},
+    {t:'累计打开',n:k.open||0,col:'var(--green)',x:'原始 '+((d.totals||{}).open||0)},
+    {t:'开始刷题',n:k.start||0,col:'var(--amber)',x:'转化 '+pct(k.start,k.open)},
+    {t:'领资料点击',n:k.materials||0,col:'var(--pink)',x:'转化 '+pct(k.materials,k.open)},
+    {t:'累计设备',n:uvTotal(d),col:'var(--violet)',x:'按日去重累加'},
+    {t:'经邀请进入',n:k.refin||0,col:'var(--red)',x:'分享 '+(k.share||0)+' 次'}
   ];
-  function el(id){return document.getElementById(id)}
-  function pct(a,b){ if(!b) return '—'; return (a/b*100).toFixed(1).replace(/\.0$/,'')+'%'; }
-
-  fetch(METRICS_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(m){
-    renderMetrics(m); loadFb();
-  }).catch(function(){ el('err').style.display='block'; el('updated').textContent='数据没取到'; });
-
-  function renderMetrics(m){
-    var t=(m.corrected&&m.corrected.totals)||{}, raw=m.totals||{};
-    var open=t.open||0, start=t.start||0, mat=t.materials||0, guide=t.guide||0;
-    el('updated').textContent='更新于 '+(m.updated_at||'').replace('T',' ').slice(5,16)+' · 今天 '+ (m.today_uv||0) +' 台设备打开';
-    var cards=[
-      {n:open, l:'累计打开（校正）', raw:'原始 '+raw.open, hl:true},
-      {n:m.today_uv||0, l:'今日独立设备'},
-      {n:start, l:'开始刷题（校正）', raw:'原始 '+raw.start},
-      {n:mat, l:'领资料点击（校正）', raw:'原始 '+raw.materials}
-    ];
-    el('cards').innerHTML=cards.map(function(c){
-      return '<div class="card'+(c.hl?' hl':'')+'"><div class="num">'+c.n+'</div><div class="lab">'+c.l+'</div>'+(c.raw!=null?'<div class="raw">'+c.raw+'</div>':'')+'</div>';
-    }).join('');
-    el('rates').innerHTML=
-      '<div class="rate"><b>'+pct(start,open)+'</b><span>刷题转化率</span></div>'+
-      '<div class="rate"><b>'+pct(mat,open)+'</b><span>领资料转化率</span></div>';
-    var days=m.days||[], today=days[days.length-1]||{};
-    var mainAct = mat>start ? '领资料' : '开始刷题';
-    el('briefText').innerHTML='今天已有 <b>'+(m.today_uv||0)+'</b> 台设备打开，累计打开 <b>'+open+'</b> 次，其中 <b>'+start+'</b> 次开始刷题、<b>'+mat+'</b> 次领资料。大家进来后最主要在做的动作是「<b>'+mainAct+'</b>」。';
-    el('sumText').innerHTML='流量在涨、领资料最热，<b>刷题转化是下一步的关键</b>：把针对性刷题、按考试分类和难度选择用起来，让领资料的同学留下来刷题。';
-  }
-
-  function loadFb(){
-    var done=false;
-    FB_GET.forEach(function(u){
-      fetch(u,{cache:'no-store'}).then(function(r){return r.text()}).then(function(txt){
-        if(done) return;
-        var d=JSON.parse(txt);
-        if(d&&d.list){done=true; renderFb(d.list);}
-      }).catch(function(){});
-    });
-    setTimeout(function(){ if(!done){ el('fbCnt').textContent='问卷数据暂时没取到，稍后刷新再试。'; } },8000);
-  }
-
-  function renderFb(list){
-    var rows=list.filter(function(x){return x&&x.values&&x.values.a1&&x.values.a1.indexOf('测试')<0;});
-    var n=rows.length;
-    el('fbCnt').textContent='有效问卷 '+n+' 份 · 内测链路测试记录已剔除';
-    if(!n){ el('fbGrid').innerHTML='<div class="cnt">还没有有效问卷反馈。</div>'; return; }
-    el('fbGrid').innerHTML=OPTS.map(function(qd){
-      var counts=qd.o.map(function(){return 0});
-      rows.forEach(function(r){ var v=r.values[qd.k]; var i=qd.o.indexOf(v); if(i>=0) counts[i]++; });
-      var max=Math.max.apply(null,counts)||1;
-      return '<div class="q"><div class="qt">'+qd.q+'</div>'+qd.o.map(function(o,i){
-        var w=Math.round(counts[i]/max*100);
-        return '<div class="bar"><div class="track"><div class="fill'+(counts[i]?'':' gray')+'" style="width:'+w+'%"></div></div><div class="ol">'+o+' '+counts[i]+'</div></div>';
-      }).join('')+'</div>';
-    }).join('');
-  }
-})();
+  el('kpis').innerHTML=items.map(function(i){return '<div class="kpi" style="--c:'+i.col+'"><div class="t">'+i.t+'</div><div class="n">'+i.n+'</div><div class="x">'+i.x+'</div></div>'}).join('');
+  txt('updated',(d.updated_at||'').replace('T',' ').slice(5,16));
+}
+function renderFunnel(d){
+  var k=c(d),base=k.open||1;
+  var steps=[{v:k.open||0,l:'打开应用',col:'var(--cyan)'},{v:k.materials||0,l:'领资料',col:'var(--violet)'},{v:k.start||0,l:'开始刷题',col:'var(--amber)'},{v:k.ans_t100||0,l:'刷满 100 题',col:'var(--green)'}];
+  el('funnel').innerHTML=steps.map(function(s){return '<div class="fstep" style="--c:'+s.col+'"><div class="fn" style="color:'+s.col+'">'+s.v+'</div><div class="info"><div class="fl">'+s.l+'</div><div class="fr">占打开 '+pct(s.v,base)+'</div><div class="fbar"><i style="width:'+Math.max(3,s.v/base*100).toFixed(1)+'%"></i></div></div></div>'}).join('');
+}
+function renderTrend(d){
+  var days=(d.days||[]).slice(-10);if(!days.length){el('trend').textContent='暂无数据';return}
+  var W=340,H=150,pL=26,pR=6,pT=12,pB=22,maxO=Math.max.apply(null,days.map(function(x){return x.open||0}).concat([1])),maxU=Math.max.apply(null,days.map(function(x){return x.uv||0}).concat([1])),iw=W-pL-pR,bw=iw/days.length,s='';
+  for(var g=0;g<=3;g++){var gy=pT+(H-pT-pB)*g/3;s+='<line x1="'+pL+'" y1="'+gy+'" x2="'+(W-pR)+'" y2="'+gy+'" stroke="rgba(148,163,184,.1)"/>'}
+  days.forEach(function(x,i){var bh=(x.open||0)/maxO*(H-pT-pB),bx=pL+i*bw+bw*0.25;var bw2=bw*0.5;s+='<rect x="'+bx.toFixed(1)+'" y="'+(H-pB-bh).toFixed(1)+'" width="'+bw2.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="3" fill="url(#gO)"/><text x="'+(bx+bw2/2).toFixed(1)+'" y="'+(H-6)+'" fill="#64748b" font-size="8" text-anchor="middle">'+x.date.slice(5)+'</text>'});
+  var pts=days.map(function(x,i){return (pL+i*bw+bw/2).toFixed(1)+','+(H-pB-((x.uv||0)/maxU*(H-pT-pB))).toFixed(1)});
+  s+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"/>';
+  days.forEach(function(x,i){s+='<circle cx="'+(pL+i*bw+bw/2).toFixed(1)+'" cy="'+(H-pB-((x.uv||0)/maxU*(H-pT-pB))).toFixed(1)+'" r="2.6" fill="#fbbf24"/>'});
+  el('trend').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" aria-label="访问趋势"><defs><linearGradient id="gO" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#1d4ed8" stop-opacity=".35"/></linearGradient></defs>'+s+'</svg>';
+}
+function renderHours(d){var k=c(d),vals=[],max=1;for(var h=0;h<24;h++){var v=k['hr_'+('0'+h).slice(-2)]||0;vals.push(v);if(v>max)max=v}var s='';vals.forEach(function(v,h){s+='<div class="hcol"><div class="hbar-wrap"><div class="hbar" style="height:'+Math.max(2,v/max*100).toFixed(1)+'%"></div></div><div class="hlab">'+(h%4===0?('0'+h).slice(-2):'')+'</div></div>'});el('hours').innerHTML=s;var peak=vals.indexOf(Math.max.apply(null,vals));txt('peakHour','高峰 '+('0'+peak).slice(-2)+':00 左右 · 累计 '+vals[peak]+' 次')}
+function bars(host,rows,cols){var mx=Math.max.apply(null,rows.map(function(r){return r[1]}).concat([1]));el(host).innerHTML=rows.map(function(r,i){var col=cols?cols[i%cols.length]:'#38bdf8';return '<div class="brow"><div class="bl"><span>'+esc(r[0])+'</span><b>'+r[1]+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(2,r[1]/mx*100).toFixed(1)+'%;background:'+col+'"></div></div></div>'}).join('')}
+function renderBank(){txt('bankTotal',BANK.total);txt('bankAsOf','截至 '+(BANK.asof||'—'));var uv=uvTotal(STATS);txt('bankPer',uv>0?Math.floor(BANK.total/uv):'—');bars('bankModules',BANK.modules,['#38bdf8','#22c55e','#fbbf24','#f472b6','#a78bfa','#f87171'])}
+function renderRank(d){var k=c(d),rows=[],medals=['🥇','🥈','🥉'],names=['同学A','同学B','同学C','同学D','同学E','同学F'];for(var n=49;n>=1&&rows.length<6;n--){var cnt=(k['lvl_'+n]||0)-(k['lvl_'+(n+1)]||0);if(cnt>0)rows.push({n:n,cnt:cnt})}if(!rows.length){el('rank').innerHTML='<div style="color:var(--mut);font-size:11px;padding:8px 0">暂无上榜 · 学生端更新后计数</div>';txt('rankTop','—');return}var mx=rows[0].n;el('rank').innerHTML=rows.map(function(r,i){var m=i<3?medals[i]:(i+1);return '<div class="rrow"><div class="rm">'+m+'</div><div class="rn">'+names[i]+'</div><div class="rt"><div class="rf" style="width:'+Math.max(8,r.n/mx*100)+'%"></div></div><div class="rv">≥'+(r.n*100)+'题 · '+r.cnt+'台</div></div>'}).join('');txt('rankTop','至少 '+(rows[0].n*100)+' 题')}
+function renderDaily(d){var days=(d.days||[]).slice().reverse(),h='<tr><th>日期</th><th>设备</th><th>打开</th><th>领资料</th><th>刷题</th></tr>';el('daily').innerHTML=h+days.map(function(x){return '<tr><td><b>'+x.date.slice(5)+'</b></td><td>'+(x.uv==null?'—':x.uv)+'</td><td>'+(x.open==null?'—':x.open)+'</td><td>'+(x.materials==null?'—':x.materials)+'</td><td>'+(x.start==null?'—':x.start)+'</td></tr>'}).join('')}
+function renderFb(fb){var list=(fb&&fb.list)||[],real=list.filter(function(x){return !/内测/.test((x.other||'')+(x.a1||''))});var praise=real.filter(function(x){return x.a1==='非常好'||x.a1==='还不错'}).length,issues=real.filter(function(x){return /缺失|bug|问题/.test(x.other||'')||x.a5==='发现少量'||x.a5==='发现较多'||x.a6==='偶尔有'||x.a6==='经常有'}).length,rec=real.filter(function(x){return x.a10==='肯定会'}).length;txt('fbTotal',real.length);txt('fbPraise',praise);txt('fbIssue',issues);txt('fbRec',rec);txt('fbCnt','有效 '+real.length+' 份');function tags(key){var m={};real.forEach(function(x){if(x[key])m[x[key]]=(m[x[key]]||0)+1});var ks=Object.keys(m).sort(function(a,b){return m[b]-m[a]}).slice(0,3);return ks.length?ks.map(function(k){return '<span class="tag">'+esc(k)+' ×'+m[k]+'</span>'}).join(''):'<span style="color:var(--mut);font-size:10px">暂无</span>'}el('fbWant').innerHTML=tags('a9');el('fbExam').innerHTML=tags('a7');var q=real.filter(function(x){return (x.other||'').trim()}).slice(-3).map(function(x){return esc(x.other)});el('fbQuotes').innerHTML=q.length?q.map(function(t){return '<li>'+t+'</li>'}).join(''):'<li style="color:var(--mut)">暂无文字意见</li>'}
+function renderJudge(d){var k=c(d),u=cuv(d),mx=0;Object.keys(u).forEach(function(x){if(u[x]>mx)mx=u[x]});var conv=pct(k.start,k.open);el('judge').innerHTML='单日最高 <b>'+mx+'</b> 台设备打开，领资料转化 <b>'+pct(k.materials,k.open)+'</b>，开始刷题转化 <b>'+conv+'</b>。'+(k.start<k.materials?'最大的机会是<b>把领资料的同学接住、引导开始刷题</b>。':'刷题转化已起来，继续扩大流量。')}
+function renderAll(d,fb){renderKpis(d);renderFunnel(d);renderTrend(d);renderHours(d);bars('devices',[['iPhone',c(d).dev_ios||0],['安卓',c(d).dev_android||0],['平板',c(d).dev_tablet||0],['电脑',c(d).dev_pc||0]],['#22c55e','#38bdf8','#a78bfa','#fbbf24']);bars('install',[['图标/独立窗口打开',c(d).installed||0],['应用内确认安装',c(d).devdone||0],['看到欢迎页',c(d).welcomeSeen||0]],['#22c55e','#38bdf8','#fbbf24']);renderBank();renderRank(d);bars('share',[['打开分享弹层',c(d).share||0],['复制邀请链接',c(d).sharecopy||0],['经邀请进入',c(d).refin||0],['受邀开始刷题',c(d).refstudy||0],['受邀回访',c(d).refreturn||0],['奖励领取',c(d).refClaimed||0],['流程完成',c(d).refDone||0]],['#38bdf8','#a78bfa','#22c55e','#fbbf24','#f472b6','#f87171','#38bdf8']);renderDaily(d);renderFb(fb);renderJudge(d)}
+function fetchBank(){fetch(BANK_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(s){if(s&&s.total){BANK=s;renderBank()}}).catch(function(){})}
+function refreshMetrics(){fetch(METRICS_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(d){if(d){STATS=d;renderAll(d,FB);el('err').style.display='none'}}).catch(function(){})}
+function refreshFb(){function go(urls,i){if(i>=urls.length)return;fetch(urls[i]+(urls[i].indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.list){FB=d;renderFb(d)}}).catch(function(){go(urls,i+1)})}go([FB_URL,FB_FALLBACK],0)}
+renderAll(STATS,FB);tick();setInterval(tick,1000);fetchBank();refreshMetrics();refreshFb();
+setInterval(refreshMetrics,30000);setInterval(refreshFb,300000);setInterval(fetchBank,300000);
 </script>
 </body>
 </html>
