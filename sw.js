@@ -2,13 +2,13 @@
 var CACHE = 'ycgk-v11';
 var CORE = [
   './',
-  './assets/index-C2M5URtc.css?v=ttfix97',
-  './assets/index-b34.js?v=ttfix97',
+  './assets/index-C2M5URtc.css?v=ttfix99',
+  './assets/index-b34.js?v=ttfix99',
   './base.js',
   './assets/material-icons.css?v=1',
   './assets/material-icons.woff2?v=1',
-  './assets/icon-yc-red-192.png?v=4',
-  './assets/icon-yc-red-512.png?v=4'
+  './assets/icon-yc-red-192.png?v=3',
+  './assets/icon-yc-red-512.png?v=3'
 ];
 
 self.addEventListener('install', function(e){
