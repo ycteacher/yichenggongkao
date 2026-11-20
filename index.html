@@ -2425,7 +2425,17 @@ document.addEventListener('click', function(e){
     '.yc-notice-clock{display:block;color:#FDE68A;font-weight:800;font-size:13.5px;margin-bottom:2px;}'+
     '.yc-notice-text a{color:#FDE68A;font-weight:700;text-decoration:underline;}'+
     '.yc-notice-close{position:absolute;top:5px;right:8px;background:none;border:none;'+
-      'color:#fff;font-size:19px;line-height:1;cursor:pointer;opacity:.9;padding:2px 6px;}';
+      'color:#fff;font-size:19px;line-height:1;cursor:pointer;opacity:.9;padding:2px 6px;}'+
+    '.yc-notice-upd{flex:none;align-self:center;background:#FDE68A;color:#7F1D1D;border:none;'+
+      'border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;cursor:pointer;'+
+      'box-shadow:0 2px 8px rgba(0,0,0,.2);white-space:nowrap;font-family:inherit;}'+
+    '.yc-notice-upd:active{transform:scale(.95)}'+
+    '.yc-notice-upd:disabled{opacity:.6}'+
+    '#yc-upd-float{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);'+
+      'z-index:2147483001;background:#1F2937;color:#FDE68A;border:1.5px solid #FDE68A;border-radius:999px;'+
+      'padding:10px 18px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);'+
+      'font-family:system-ui,-apple-system,"PingFang SC",sans-serif;display:none;white-space:nowrap;}'+
+    '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}';
   document.head.appendChild(css);
   var box=document.createElement('div');
   box.id='yc-notice';
@@ -2438,6 +2448,7 @@ document.addEventListener('click', function(e){
         '欢迎提交<a href="./feedback.html">最下方的调查问卷</a>，说说你的使用感受；'+
         '问卷积分可兑换考公书籍、家电、平板、手机等实物，也可换一对一视频答疑。'+
       '</span>'+
+      '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
       '<button class="yc-notice-close" aria-label="关闭">×</button>'+
     '</div>';
   function pad(n){return n<10?'0'+n:''+n;}
@@ -2447,6 +2458,45 @@ document.addEventListener('click', function(e){
     if(el) el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
   }
   tick(); setInterval(tick,1000);
+
+  function doUpdate(btn){
+    if(!confirm('发现新版本。更新只需几秒，做题记录、积分、错题本都不会丢。现在更新吗？')) return;
+    if(btn){ btn.disabled=true; btn.textContent='更新中…'; }
+    var go=function(){ location.href=location.pathname+'?upd='+Date.now(); };
+    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        return Promise.all(regs.map(function(r){ try{return r.unregister();}catch(e){} }));
+      }).then(function(){
+        if(window.caches && caches.keys){
+          return caches.keys().then(function(keys){
+            return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+          });
+        }
+      }).then(go).catch(go);
+    } else { go(); }
+  }
+
+  function bindUpd(){
+    var b=document.getElementById('yc-notice-upd');
+    if(b && !b.dataset.bound){ b.dataset.bound='1'; b.addEventListener('click',function(){ doUpdate(b); }); }
+  }
+  bindUpd();
+
+  function showFloat(){
+    if(document.getElementById('yc-upd-float')) return;
+    var f=document.createElement('button');
+    f.id='yc-upd-float';
+    f.textContent='🆕 有新版本 · 点这里一键更新';
+    f.addEventListener('click',function(){ doUpdate(f); });
+    document.body.appendChild(f);
+  }
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg) return;
+      if(reg.waiting || reg.installing) showFloat();
+      reg.addEventListener('updatefound',function(){ setTimeout(showFloat, 500); });
+    });
+  }
   function mount(){
     if(!document.body) return;
     document.body.insertBefore(box,document.body.firstChild);
