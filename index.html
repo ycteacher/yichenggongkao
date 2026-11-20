@@ -1711,6 +1711,11 @@ document.addEventListener('click', function(e){
   '.yc-inst-copy{display:block;width:100%;background:#F0FDF4;color:#15803D;border:1.5px dashed #15803D;border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;margin:10px 0 2px;font-family:inherit}'+
   '.yc-inst-copy:active{transform:scale(.97)}'+
   '.yc-inst-copy:disabled{opacity:.75}'+
+  '.yc-inst-guides{display:flex;gap:8px;margin-top:10px}'+
+  '.yc-inst-gbtn{flex:1;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-inst-gbtn:active{transform:scale(.97)}'+
+  '.yc-inst-gbtn2{flex:1;background:#fff;color:#B91C1C;border:1.5px solid #B91C1C;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-inst-gbtn2:active{transform:scale(.97)}'+
   '.yc-inst-link{display:block;text-align:center;font-size:13px;font-weight:800;color:#15803D;text-decoration:none;border:1.5px solid #15803D;border-radius:10px;padding:10px;margin-top:14px}'+
   '.yc-inst-foot{font-size:11px;color:#9CA3AF;text-align:center;margin-top:12px;line-height:1.6}';
   var st=document.createElement('style'); st.textContent=CSS; document.head.appendChild(st);
@@ -1788,6 +1793,7 @@ document.addEventListener('click', function(e){
       '<h3>把亿成公考保存到本地</h3>'+
       '<div class="yc-inst-sub">装到桌面后一点就开、不用再找链接，题库自动缓存，离线也能刷。</div>'+
       hero+
+      '<div class="yc-inst-guides"><button class="yc-inst-gbtn" id="ycInstGV">📺 视频讲解</button><button class="yc-inst-gbtn2" id="ycInstGP">🖼 图文讲解</button></div>'+
       '<button class="yc-inst-copy" id="ycInstCopy">📋 复制网址 · 去别的浏览器粘贴打开</button>'+
       s.wx+
       '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
@@ -1796,6 +1802,10 @@ document.addEventListener('click', function(e){
     card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
     var gl=card.querySelector('#ycInstGuideLink');
     if(gl) gl.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href='install.html'; });
+    function goGuide(u){ return function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href=u; }; }
+    var gv=card.querySelector('#ycInstGV'), gp=card.querySelector('#ycInstGP');
+    if(gv) gv.addEventListener('click', goGuide('install-video.html'));
+    if(gp) gp.addEventListener('click', goGuide('install-guide.html'));
     var cp=card.querySelector('#ycInstCopy');
     if(cp) cp.addEventListener('click',function(){
       var url=location.href.split('#')[0];
