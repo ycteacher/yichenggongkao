@@ -35,7 +35,7 @@
 {"navigationBar":{"visible":false,"title":"亿成公考刷题应用","backgroundColor":"#F7F4EF","foregroundColor":"#202020"},"localStorage":true}
     </script>
     <base href="https://ycteacher.github.io/yichenggongkao/">
-    <link rel="preload" as="font" type="font/woff2" href="./assets/material-icons.woff2?v=1" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="./assets/material-icons.woff2?v=1" crossorigin="anonymous">
 <link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
     <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=2">
     <link rel="manifest" href="./manifest.json?v=1">
@@ -1587,5 +1587,89 @@ document.addEventListener('click', function(e){
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
 </script>
+<script>
+/* material-icons 字体加载失败兜底：某些 iOS/WebView 上字体渲染不出来，
+   图标连字会裸露成英文单词（apartment/school/redeem…）。
+   检测到字体不可用时，把所有 .material-icons 的连字替换成对应 emoji。*/
+(function(){
+  var MAP={
+    apartment:'🏢',account_balance:'🏦',school:'🎓',military_tech:'🎖️',
+    group_add:'👥',groups:'👥',redeem:'🎁',install_mobile:'📲',
+    home:'🏠',history_edu:'📜',assignment:'📋',star:'⭐',star_border:'☆',
+    arrow_back:'←',chevron_right:'›',expand_more:'⌄',expand_less:'⌃',
+    check:'✓',check_circle:'✅',check_circle_outline:'☑️',task_alt:'✅',
+    close:'✕',cancel:'✕',clear:'✕',search:'🔍',edit:'✏️',edit_note:'📝',
+    delete_sweep:'🗑️',lightbulb:'💡',tips_and_updates:'💡',bolt:'⚡',
+    auto_awesome:'✨',gavel:'⚖️',flag:'🚩',event:'📅',fact_check:'📋',
+    grid_on:'▦',account_tree:'🌳',speed:'⚡',target:'🎯',tracking:'🎯',
+    keyboard:'⌨️',warning:'⚠️',error:'❗',checklist:'📋',badge:'🏅',
+    comment:'💬',sync:'🔄',repeat:'🔁',undo:'↩️',upload:'⬆️',
+    cleaning_services:'🧹',hand:'✋',list:'📃',paper:'📄',comment:'💬'
+  };
+  var tried=0, done=false;
+
+  // 用测量法判断 Material Icons 是否真的渲染成图标：
+  // 同字号下，连字"home"若被渲染成字形，宽度与普通字体明显不同。
+  function fontWorks(){
+    try{
+      var m=document.createElement('span');
+      m.style.cssText='position:absolute;left:-9999px;top:0;font-family:"Material Icons";font-size:40px;font-feature-settings:"liga";white-space:nowrap;';
+      m.textContent='home';
+      var t=document.createElement('span');
+      t.style.cssText='position:absolute;left:-9999px;top:0;font-family:serif;font-size:40px;white-space:nowrap;';
+      t.textContent='home';
+      document.body.appendChild(m);document.body.appendChild(t);
+      var a=m.getBoundingClientRect().width,b=t.getBoundingClientRect().width;
+      document.body.removeChild(m);document.body.removeChild(t);
+      return Math.abs(a-b)>3; // 宽度差明显 => 字体生效
+    }catch(e){ return false; }
+  }
+  function emoji(name){ return MAP[name] || '•'; }
+  function swapOne(el){
+    if(el.getAttribute('data-icofix')) return;
+    var name=(el.textContent||'').trim();
+    if(!name) return;
+    el.setAttribute('data-icofix','1');
+    el.textContent=emoji(name);
+    // emoji 用系统字体，别再套 Material Icons
+    el.style.fontFamily='inherit';
+    el.style.fontFeatureSettings='normal';
+  }
+  function swapAll(){
+    if(done) return; done=true;
+    try{
+      document.querySelectorAll('.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp').forEach(swapOne);
+    }catch(e){}
+    // React 后续可能重渲染，持续观察
+    try{
+      var mo=new MutationObserver(function(list){
+        list.forEach(function(r){
+          r.addedNodes.forEach(function(n){
+            if(!n.querySelectorAll) return;
+            if(n.nodeType===1 && /material-icons/.test(n.className||'')) swapOne(n);
+            n.querySelectorAll('.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp').forEach(swapOne);
+          });
+        });
+      });
+      mo.observe(document.documentElement,{childList:true,subtree:true});
+    }catch(e){}
+  }
+  function attempt(){
+    tried++;
+    if(fontWorks()) return;          // 字体正常，不干预
+    if(tried>=3){ swapAll(); return; } // 连续多次检测都失败 => 兜底
+    setTimeout(attempt, 600);
+  }
+  function boot(){
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded',function(){ setTimeout(attempt,300); });
+    } else { setTimeout(attempt,300); }
+    // 最长 4 秒仍未成功也兜底，避免一直等
+    setTimeout(function(){ if(!done && !fontWorks()) swapAll(); }, 4000);
+  }
+  boot();
+})();
+</script>
+
 
 </body></html>
