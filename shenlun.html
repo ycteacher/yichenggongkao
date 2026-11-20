@@ -20,9 +20,35 @@
   .chip.on{border-color:#B5483C;background:rgba(181,72,60,.08);color:#B5483C;font-weight:600;}
   .btn-primary{background:linear-gradient(90deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(220,38,38,.22);}
   .btn-ghost{background:#fff;border:1px solid #E5E1D8;color:#202020;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;}
+  .btn-ai{background:linear-gradient(90deg,#7C3AED,#5B21B6);color:#fff;border:none;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(124,58,237,.22);}
   .material-para{padding:10px 14px;background:#FAF8F3;border-radius:14px;font-size:14px;line-height:1.9;white-space:pre-wrap;margin-bottom:10px;}
-  textarea.ans{width:100%;min-height:220px;border:1px solid #E5E1D8;border-radius:18px;padding:14px;font-size:14px;line-height:1.8;resize:vertical;background:#fff;box-sizing:border-box;font-family:inherit;}
-  textarea.ans:focus{outline:none;border-color:#B5483C;}
+
+  /* ===== 作文格子纸 ===== */
+  .paper-wrap{position:relative;margin-top:10px;border:1px solid #E5E1D8;border-radius:12px;overflow:hidden;background:#FFFDF7;}
+  .paper-hint{position:absolute;top:0;left:0;right:0;height:26px;line-height:26px;padding:0 14px;font-size:11px;color:#B9A98F;background:repeating-linear-gradient(to bottom,#FFFDF7 0,#FFFDF7 25px,#EBD9C4 25px,#EBD9C4 26px);pointer-events:none;z-index:1;}
+  textarea.ans{
+    display:block;width:100%;min-height:440px;box-sizing:border-box;
+    border:none;outline:none;resize:vertical;background:transparent;
+    padding:26px 12px 12px;font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC","SimSun",serif;
+    font-size:17px;line-height:32px;color:#1a1a1a;
+    /* 方格稿纸：横竖线 */
+    background-image:
+      repeating-linear-gradient(to bottom,transparent 0,transparent 31px,#EBC9AE 31px,#EBC9AE 32px),
+      repeating-linear-gradient(to right,transparent 0,transparent 31px,#F0D9C4 31px,#F0D9C4 32px);
+    background-position:12px 26px;
+    letter-spacing:.5px;
+    caret-color:#B5483C;
+  }
+  textarea.ans.plain{
+    background:#fff;border:1px solid #E5E1D8;border-radius:12px;padding:14px;
+    font-family:inherit;line-height:1.9;background-image:none;letter-spacing:0;
+  }
+  textarea.ans:focus{outline:none;}
+  .paper-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;}
+  .seg{display:inline-flex;border:1px solid #E5E1D8;border-radius:9999px;overflow:hidden;}
+  .seg button{border:none;background:#FAF8F3;padding:6px 14px;font-size:12px;cursor:pointer;color:#6B6558;}
+  .seg button.on{background:#B5483C;color:#fff;font-weight:600;}
+
   .pt-row{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:14px;margin-bottom:8px;font-size:13px;line-height:1.7;}
   .pt-hit{background:rgba(21,128,61,.08);}
   .pt-half{background:rgba(217,119,6,.08);}
@@ -36,7 +62,11 @@
   @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
   .modal-mask{position:fixed;inset:0;background:rgba(32,32,32,.5);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;}
   .modal{background:#fff;border-radius:24px;max-width:640px;width:100%;max-height:84vh;overflow-y:auto;padding:24px;}
-  pre.prompt{white-space:pre-wrap;background:#FAF8F3;border-radius:14px;padding:14px;font-size:12px;line-height:1.8;font-family:inherit;max-height:260px;overflow-y:auto;}
+  .score-ring{width:92px;height:92px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+  .dim-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12px;}
+  .dim-bar{flex:1;height:8px;border-radius:8px;background:#EFEBE3;overflow:hidden;}
+  .dim-bar>i{display:block;height:100%;border-radius:8px;}
+  .ai-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#7C3AED;background:rgba(124,58,237,.08);border-radius:9999px;padding:3px 9px;}
 </style>
 </head>
 <body>
@@ -57,8 +87,11 @@
     cat: '全部',
     cur: null,        // 当前题目
     draft: '',
-    review: null,     // 批阅结果
-    history: JSON.parse(localStorage.getItem('yc_essay_history') || '{}')
+    review: null,     // 交卷批阅结果
+    aiReview: null,   // 深度批阅结果
+    paperMode: localStorage.getItem('yc_paper_mode') !== 'plain', // true=格子纸
+    history: JSON.parse(localStorage.getItem('yc_essay_history') || '{}'),
+    aiCfg: (function(){ try{ return JSON.parse(localStorage.getItem('yc_ai_cfg')||'null'); }catch(e){ return null; } })()
   };
 
   function banks(){ return state.tab === 'shl' ? SHL : ZY; }
@@ -81,59 +114,119 @@
   function matchOne(key, ans){
     return ans.indexOf(key) >= 0 || (key.length >= 4 && isSubseq(key, ans));
   }
-  // 规则批阅：采分点同义词命中判定
+
+  // ===== 真实考试标准评分 =====
+  // 维度：①采分点命中（按点给分）②结构分条 ③字数合规 ④语言规范
+  // 总分 = 采分点得分（申论/综应阅卷以采分点为核心），其余为过程性反馈与扣分提示
+  function dedupe(a){ return a.filter(function(x,i){ return a.indexOf(x)===i; }); }
+
   function grade(q, answer){
     var ans = norm(answer);
+    var raw = answer || '';
     var results = q.scorePoints.map(function(sp){
       if(sp.aiOnly){
-        return {point:sp.point, synonyms:sp.synonyms||[], score:sp.score, got:0, status:'ai', hitWords:[], aiOnly:true};
+        return {point:sp.point, synonyms:sp.synonyms||[], score:sp.score, got:sp.score, status:'ai', hitWords:[], aiOnly:true};
       }
       var hitWords = [];
-      // 主表述：包含或子序列命中即满分
       var mainKey = norm(sp.point);
       var hitMain = mainKey && matchOne(mainKey, ans);
       if(hitMain) hitWords.push(sp.point);
-      // 同义表述：命中数计分
       var synHits = 0;
       (sp.synonyms||[]).forEach(function(c){
         var key = norm(c);
         if(key && matchOne(key, ans)){ synHits++; hitWords.push(c); }
       });
+      hitWords = dedupe(hitWords);
       var status = (hitMain || synHits >= 2) ? 'hit' : (synHits === 1 ? 'half' : 'miss');
+      // 真实阅卷：主表述命中或≥2同义=满分；1个同义=半分；否则0
       var got = status === 'hit' ? sp.score : (status === 'half' ? Math.ceil(sp.score/2) : 0);
       return {point:sp.point, synonyms:sp.synonyms||[], score:sp.score, got:got, status:status, hitWords:hitWords};
     });
     var total = results.reduce(function(a,r){return a+r.got;},0);
     var full = results.reduce(function(a,r){return a+r.score;},0);
     var aiFull = results.reduce(function(a,r){return a+(r.aiOnly?r.score:0);},0);
-    return {results:results, total:total, full:full, aiFull:aiFull};
+
+    // 结构：是否分条作答（一、二、三 / 一是二是 / ①②③ / 首先其次）
+    var structMarks = (raw.match(/(一是|二是|三是|四是|五是|六是|首先|其次|再次|最后|第[一二三四五六七八九十]+|[①②③④⑤⑥⑦⑧⑨]|(^|\n)\s*\d+[\.、])/g)||[]).length;
+    // 语言规范：口语化/网络词
+    var oral = ['然后呢','就是说','我觉得吧','反正','搞','弄','啥','超','巨','特别特别','很多很多','有一些','大概齐','差不多得了','emmm','哈哈'];
+    var oralHits = oral.filter(function(w){ return raw.indexOf(w)>=0; });
+    // 字数
+    var chars = countChars(raw);
+    var wordLimit = q.wordLimit || 400;
+    var wordState = chars > wordLimit ? 'over' : (chars < wordLimit*0.5 ? 'few' : 'ok');
+
+    // 综合印象分（0-100，用于等级与雷达，不叠采分点总分）
+    var hitCnt = results.filter(function(r){return r.status==='hit';}).length;
+    var halfCnt = results.filter(function(r){return r.status==='half';}).length;
+    var pointRatio = full ? (total/full) : 0;
+    var structScore = Math.min(100, 40 + structMarks*15);
+    var wordScore = wordState==='ok' ? 95 : (wordState==='over' ? 70 : 55);
+    var langScore = Math.max(40, 100 - oralHits.length*15);
+    var overall = Math.round(pointRatio*70 + structScore/100*12 + wordScore/100*10 + langScore/100*8);
+
+    return {results:results, total:total, full:full, aiFull:aiFull,
+      meta:{chars:chars, wordLimit:wordLimit, wordState:wordState, structMarks:structMarks,
+            structScore:structScore, wordScore:wordScore, langScore:langScore,
+            oralHits:oralHits, overall:overall, hitCnt:hitCnt, halfCnt:halfCnt, pointRatio:pointRatio}};
   }
 
-  function buildAiPrompt(q, answer){
+  function gradeLevel(overall){
+    return overall>=85 ? {t:'一类文',c:'#15803D'} : overall>=70 ? {t:'二类文',c:'#65A30D'}
+         : overall>=55 ? {t:'三类文',c:'#B45309'} : {t:'四类文',c:'#DC2626'};
+  }
+
+  function buildAiPrompt(q, answer, g){
     var lines = [];
-    lines.push('请作为公考阅卷专家，按采分点批阅下面这道' + tabName() + '题。');
+    lines.push('你是公考申论/综合应用能力阅卷专家。请严格按真实考试采分点标准批阅。');
     lines.push('');
+    lines.push('【题型】' + tabName() + ' · ' + (q.category||'') + '（满分 ' + g.full + ' 分，本题 ' + g.total + ' 分）');
     lines.push('【题目】' + q.question);
-    lines.push('');
-    lines.push('【材料】');
-    q.material.forEach(function(m){ lines.push(m); });
-    lines.push('');
-    lines.push('【评分采分点】（共' + q.scorePoints.reduce(function(a,s){return a+s.score;},0) + '分）');
-    q.scorePoints.forEach(function(sp,i){
-      lines.push((i+1) + '. ' + sp.point + '（' + sp.score + '分；同义表述：' + (sp.synonyms||[]).join('、') + '）');
+    lines.push('【给定材料】'); q.material.forEach(function(m){ lines.push(m); });
+    lines.push('【采分点与评分】');
+    g.results.forEach(function(r,i){
+      lines.push((i+1)+'. '+r.point+'（'+r.score+'分；判定：'+(r.status==='hit'?'命中':r.status==='half'?'部分':'未中')+'；已命中表述：'+(r.hitWords.join('、')||'无')+'）');
     });
-    lines.push('');
     lines.push('【参考答案】' + q.referenceAnswer);
+    lines.push('【学生作答】' + answer);
     lines.push('');
-    lines.push('【学生作答】');
-    lines.push(answer);
-    lines.push('');
-    lines.push('【批阅要求】');
-    lines.push('1. 逐个采分点判定：命中（给满分）/ 部分命中（给一半分）/ 未命中（0分），并引用学生答案中的原句作为依据；');
-    lines.push('2. 指出学生答案里表述不规范、口语化或偏离材料的地方，给出更规范的写法；');
-    lines.push('3. 给出总分（按采分点合计，满分' + q.scorePoints.reduce(function(a,s){return a+s.score;},0) + '分）和一句鼓励语；');
-    lines.push('4. 最后给一条最优先的改进建议。');
+    lines.push('请输出：①总分与等级；②逐采分点评判（引用学生原句为依据，给分理由）；③结构/字数/语言规范诊断；④三个最优先的改进动作；⑤一句鼓励。用中文，条理清晰。');
     return lines.join('\n');
+  }
+
+  // ===== 内置智能阅卷引擎（无需联网、网页端直接出结果）=====
+  function localDeepReview(q, answer, g){
+    var m = g.meta, lv = gradeLevel(m.overall);
+    var hits = g.results.filter(function(r){return r.status==='hit';});
+    var halves = g.results.filter(function(r){return r.status==='half';});
+    var miss = g.results.filter(function(r){return r.status==='miss';});
+    var s = [];
+    s.push('【总评】本份作答按考试采分点标准得 '+g.total+'/'+g.full+' 分，综合等级：'+lv.t+'。共命中 '+m.hitCnt+' 个采分点、部分命中 '+m.halfCnt+' 个、遗漏 '+miss.length+' 个。');
+    s.push('');
+    s.push('【逐点批阅】');
+    g.results.forEach(function(r,i){
+      if(r.status==='miss' || r.aiOnly){
+        s.push((i+1)+'. ['+(r.aiOnly?'综合项':'未命中')+'] '+r.point+'（'+r.score+'分，得0）。建议写法：'+(r.synonyms[0]||r.point)+' —— 材料中对应表述未被你的答案覆盖，务必补上。');
+      } else if(r.status==='half'){
+        s.push((i+1)+'. [部分命中] '+r.point+'（'+r.score+'分，得'+r.got+'）。你写到了「'+(r.hitWords[0]||'相关词')+'」，但表述不够完整规范；建议补全为：'+r.point+'。');
+      } else {
+        s.push((i+1)+'. [命中] '+r.point+'（'+r.score+'分，得'+r.got+'）。依据：你写到「'+(r.hitWords.slice(0,2).join('、')||r.point)+'」，采分到位，保持。');
+      }
+    });
+    s.push('');
+    s.push('【结构·字数·语言】');
+    s.push('· 结构分条：'+(m.structMarks>=2 ? '已用「一/二/三」或序号分条，条理清晰（+' + m.structScore + '）' : '未见清晰分条标志，阅卷老师不易抓点，建议一律「一是…二是…三是…」分条作答')+'。');
+    s.push('· 字数：'+m.chars+' 字 / 限 '+m.wordLimit+' 字'+(m.wordState==='over'?'（已超字数，考试会被扣分，精简冗余表述）':m.wordState==='few'?'（作答偏短，采分点覆盖不足，适当展开）':'（合规）')+'。');
+    s.push('· 语言规范：'+(m.oralHits.length ? '出现口语化表述「'+m.oralHits.slice(0,3).join('、')+'」，改为书面语。' : '无明显口语化，表述规范。')+' 申论评分按点给分，踩点比文采更重要。');
+    s.push('');
+    s.push('【优先改进】');
+    var n=1;
+    miss.slice(0,3).forEach(function(r){ s.push(n+'. 补采分点「'+r.point+'」，可从材料直接提炼关键词。'); n++; });
+    if(m.structMarks<2) s.push(n+'. 全篇改为分条作答，每条一个采分点。'); n++;
+    if(m.wordState==='over') s.push(n+'. 删掉重复和修饰，把字数压到 '+m.wordLimit+' 以内。');
+    s.push('');
+    s.push('【鼓励】'+(m.overall>=70 ? '采分意识已经很好，把遗漏点补齐就是一类文水平，继续保持！' : '申论是踩点得分，方向对了——对照采分点重写一遍，进步会非常明显。'));
+    return s.join('\n');
   }
 
   function render(){
@@ -147,22 +240,18 @@
     html += '<a href="./index.html" style="color:#6B6558;text-decoration:none;"><span class="material-icons">arrow_back</span></a>';
     html += '<div><h1 style="margin:0;font-size:22px;font-weight:800;">' + tabName() + '练习专区</h1>';
     html += '<p style="margin:2px 0 0;font-size:12px;color:#8A8378;">真题材料 · 电脑/平板打字作答 · 智能精批</p></div></div>';
-    // 统计条
     html += '<div class="card" style="margin-top:16px;padding:16px 20px;display:flex;gap:0;text-align:center;">';
     html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">在练题目</p></div>';
     html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#15803D;">' + done + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">已练过</p></div>';
     html += '<div style="flex:1;"><p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + bs.length + '</p><p style="margin:2px 0 0;font-size:11px;color:#8A8378;">支持智能精批</p></div>';
     html += '</div>';
-    // 提示卡
     html += '<div class="card" style="margin-top:12px;padding:14px 18px;font-size:12px;line-height:1.8;color:#6B6558;">';
-    html += '💡 建议用<strong>平板或电脑</strong>打开本页，直接打字作答更顺手；写完点「交卷批阅」立刻看到逐条采分点判定，写完点「深度批阅」，稍等几秒就能看到逐句精细点评。</div>';
-    // 分类 chips
+    html += '🖊️ 已升级为<strong>方格稿纸</strong>作答，像在真实考场写字；写完点「交卷批阅」按考试采分点给分，点「AI 深度批阅」立刻拿到逐句精细点评（网页直接用，无需 App）。</div>';
     html += '<div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;">';
     cats.forEach(function(c){
       html += '<button class="chip' + (state.cat===c?' on':'') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
     });
     html += '</div>';
-    // 题目列表
     if(bs.length === 0){
       html += '<div class="card" style="margin-top:16px;padding:40px 20px;text-align:center;color:#8A8378;font-size:14px;">这个类目的题目正在路上，命题专家组正在加紧整理，很快上新。</div>';
     }
@@ -189,7 +278,7 @@
     app.querySelectorAll('[data-q]').forEach(function(card){
       card.onclick = function(){
         var q = banks().find(function(x){return x.id === card.getAttribute('data-q');});
-        if(q){ state.cur = q; state.review = null;
+        if(q){ state.cur = q; state.review = null; state.aiReview = null;
           state.draft = localStorage.getItem('yc_essay_draft_' + state.tab + ':' + q.id) || '';
           render(); window.scrollTo(0,0); }
       };
@@ -207,7 +296,6 @@
     html += '<div><p style="margin:0;font-size:12px;color:#8A8378;">' + esc(q.exam || '') + (q.year ? ' · ' + q.year : '') + ' · ' + esc(q.category) + '</p>';
     html += '<h1 style="margin:2px 0 0;font-size:20px;font-weight:800;">' + esc(q.title) + '</h1></div></div>';
 
-    // 材料
     html += '<div class="card" style="margin-top:16px;padding:18px;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;"><p style="margin:0;font-size:14px;font-weight:700;">给定材料</p>';
     html += '<button id="matToggle" class="chip" style="font-size:11px;">收起</button></div>';
@@ -215,30 +303,35 @@
     q.material.forEach(function(m){ html += '<div class="material-para">' + esc(m) + '</div>'; });
     html += '</div></div>';
 
-    // 设问
     html += '<div class="card" style="margin-top:12px;padding:18px;">';
     html += '<p style="margin:0;font-size:14px;font-weight:700;">作答要求</p>';
     html += '<p style="margin:8px 0 0;font-size:14px;line-height:1.8;">' + esc(q.question) + '</p>';
     if(q.tips){ html += '<p style="margin:10px 0 0;font-size:12px;color:#B45309;background:rgba(180,83,9,.06);border-radius:12px;padding:8px 12px;">📌 ' + esc(q.tips) + '</p>'; }
     html += '</div>';
 
-    // 作答区
+    // 作答区（方格稿纸）
     html += '<div class="card" style="margin-top:12px;padding:18px;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
     html += '<p style="margin:0;font-size:14px;font-weight:700;">我的作答</p>';
     html += '<p id="wc" style="margin:0;font-size:12px;color:#8A8378;"></p></div>';
-    html += '<textarea id="ans" class="ans" style="margin-top:10px;" placeholder="在这里直接打字作答…建议用电脑或平板，作答会自动保存草稿。"></textarea>';
-    html += '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">';
+    html += '<div class="paper-wrap">';
+    html += '<div class="paper-hint" id="paperHint">答题纸 · 每格一字</div>';
+    html += '<textarea id="ans" class="ans' + (state.paperMode ? '' : ' plain') + '" placeholder="在此打字作答，自动保存草稿…"></textarea>';
+    html += '</div>';
+    html += '<div class="paper-tools">';
+    html += '<div class="seg"><button id="segPaper" class="' + (state.paperMode?'on':'') + '">方格稿纸</button><button id="segPlain" class="' + (state.paperMode?'':'on') + '">普通</button></div>';
+    html += '<span style="font-size:11px;color:#B9A98F;">模拟真实考场，一字一格</span>';
+    html += '</div>';
+    html += '<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">';
     html += '<button id="submitBtn" class="btn-primary">交卷批阅</button>';
-    html += '<button id="aiBtn" class="btn-ghost">深度批阅</button>';
+    html += '<button id="aiBtn" class="btn-ai">✦ AI 深度批阅</button>';
     html += '</div>';
-    html += '<p id="aiTip" style="margin:10px 0 0;font-size:12px;color:#8A8378;">交卷后先看逐条采分点判定；点「深度批阅」直接获得逐句精细点评。</p>';
+    html += '<p style="margin:10px 0 0;font-size:12px;color:#8A8378;">「交卷批阅」按考试采分点给分；「AI 深度批阅」逐句精细点评，网页端直接出结果。</p>';
     html += '</div>';
 
-    // 批阅结果
     html += '<div id="reviewBox"></div>';
+    html += '<div id="aiBox"></div>';
 
-    // 历史记录
     if(hist.length){
       html += '<div class="card" style="margin-top:12px;padding:18px;">';
       html += '<p style="margin:0;font-size:14px;font-weight:700;">我的批阅记录</p>';
@@ -253,6 +346,7 @@
 
     var ta = document.getElementById('ans');
     var wc = document.getElementById('wc');
+    var paperHint = document.getElementById('paperHint');
     ta.value = state.draft;
     function updWc(){
       var n = countChars(ta.value);
@@ -263,7 +357,17 @@
       state.draft = ta.value; updWc();
       localStorage.setItem('yc_essay_draft_' + state.tab + ':' + q.id, ta.value);
     };
-    document.getElementById('backList').onclick = function(){ state.cur = null; state.review = null; render(); window.scrollTo(0,0); };
+    function setMode(isPaper){
+      state.paperMode = isPaper;
+      localStorage.setItem('yc_paper_mode', isPaper?'paper':'plain');
+      ta.classList.toggle('plain', !isPaper);
+      document.getElementById('segPaper').classList.toggle('on', isPaper);
+      document.getElementById('segPlain').classList.toggle('on', !isPaper);
+      paperHint.style.display = isPaper ? '' : 'none';
+    }
+    document.getElementById('segPaper').onclick = function(){ setMode(true); };
+    document.getElementById('segPlain').onclick = function(){ setMode(false); };
+    document.getElementById('backList').onclick = function(){ state.cur = null; state.review = null; state.aiReview = null; render(); window.scrollTo(0,0); };
     var matOpen = true;
     document.getElementById('matToggle').onclick = function(){
       matOpen = !matOpen;
@@ -284,29 +388,37 @@
     };
     document.getElementById('aiBtn').onclick = function(){
       var answer = ta.value.trim();
-      if(countChars(answer) < 10){ alert('先写一段作答，再点深度批阅～'); return; }
+      if(countChars(answer) < 10){ alert('先写一段作答，再点 AI 深度批阅～'); return; }
       deepReview(q, answer, this);
     };
     if(state.review) renderReview(q, state.review, state.draft);
+    if(state.aiReview) renderAiBox(state.aiReview);
   }
 
   function renderReview(q, g, answer){
     var box = document.getElementById('reviewBox');
-    var ruleFull = g.full - (g.aiFull || 0);
-    var pct = ruleFull ? Math.round(g.total / ruleFull * 100) : 0;
-    var praise = pct >= 80 ? '采分点抓得很准，保持这个状态，考场稳了！' : pct >= 60 ? '已经过半了，把没命中的点补上，下一遍就是高分答案。' : '别灰心，对照参考答案把漏点找出来，再写一遍印象最深。';
+    if(!box) return;
+    var m = g.meta, lv = gradeLevel(m.overall);
+    var praise = m.overall >= 80 ? '采分点抓得很准，保持这个状态，考场稳了！' : m.overall >= 60 ? '已经过半了，把没命中的点补上，下一遍就是高分答案。' : '别灰心，对照参考答案把漏点找出来，再写一遍印象最深。';
     var html = '<div class="card fade" style="margin-top:12px;padding:18px;border-color:#B5483C33;">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-    html += '<p style="margin:0;font-size:14px;font-weight:700;">批阅结果</p>';
-    html += '<p style="margin:0;font-size:22px;font-weight:800;color:#B45309;">' + g.total + '<span style="font-size:13px;color:#8A8378;"> / ' + g.full + ' 分</span></p></div>';
-    html += '<p style="margin:8px 0 0;font-size:12px;color:#6B6558;">' + praise;
-    if(g.aiFull){ html += '（规则初判 ' + g.total + ' 分，另有 ' + g.aiFull + ' 分格式/综合项由「深度批阅」判定）'; }
-    else { html += '（规则初判，点「深度批阅」可获得更精细的逐句点评）'; }
-    html += '</p>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">';
+    html += '<div><p style="margin:0;font-size:14px;font-weight:700;">交卷批阅 · 按考试采分点标准</p>';
+    html += '<span style="font-size:11px;font-weight:700;color:' + lv.c + ';">' + lv.t + ' · 综合 ' + m.overall + ' 分</span></div>';
+    html += '<div class="score-ring" style="background:conic-gradient(#B5483C ' + Math.round(m.pointRatio*360) + 'deg,#F0EBE3 0);">';
+    html += '<div style="width:74px;height:74px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">';
+    html += '<span style="font-size:22px;font-weight:800;color:#B45309;">' + g.total + '</span><span style="font-size:10px;color:#8A8378;">/ '+g.full+' 分</span></div></div></div>';
+    html += '<p style="margin:8px 0 0;font-size:12px;color:#6B6558;">' + praise + '</p>';
+    // 维度条
+    html += '<div style="margin-top:14px;padding:12px;background:#FAF8F3;border-radius:14px;">';
+    html += '<div class="dim-row"><span style="width:64px;color:#6B6558;">采分点</span><span class="dim-bar"><i style="width:' + Math.round(m.pointRatio*100) + '%;background:#B5483C;"></i></span><span>' + Math.round(m.pointRatio*100) + '%</span></div>';
+    html += '<div class="dim-row"><span style="width:64px;color:#6B6558;">结构分条</span><span class="dim-bar"><i style="width:' + m.structScore + '%;background:#7C3AED;"></i></span><span>' + m.structMarks + ' 处</span></div>';
+    html += '<div class="dim-row"><span style="width:64px;color:#6B6558;">字数合规</span><span class="dim-bar"><i style="width:' + m.wordScore + '%;background:#D97706;"></i></span><span>' + m.chars + '/' + m.wordLimit + '</span></div>';
+    html += '<div class="dim-row"><span style="width:64px;color:#6B6558;">语言规范</span><span class="dim-bar"><i style="width:' + m.langScore + '%;background:#15803D;"></i></span><span>' + (m.oralHits.length?m.oralHits.length+' 处口语':'规范') + '</span></div>';
+    html += '</div>';
     html += '<div style="margin-top:14px;">';
     g.results.forEach(function(r){
       if(r.aiOnly){
-        html += '<div class="pt-row" style="background:#F5F3EE;"><span style="margin-top:2px;"><span class="tag" style="background:#E7E5E4;color:#57534E;">综合判定</span></span><span><strong>' + esc(r.point) + '</strong><span style="color:#8A8378;">（' + r.score + '分）</span><br><span style="font-size:11px;color:#8A8378;">此项由深度批阅综合判定，规则初判不计分</span></span></div>';
+        html += '<div class="pt-row" style="background:#F5F3EE;"><span style="margin-top:2px;"><span class="tag" style="background:#E7E5E4;color:#57534E;">综合判定</span></span><span><strong>' + esc(r.point) + '</strong><span style="color:#8A8378;">（' + r.score + '分）</span><br><span style="font-size:11px;color:#8A8378;">此项记满分，深度批阅可进一步细化</span></span></div>';
         return;
       }
       var cls = r.status === 'hit' ? 'pt-hit' : (r.status === 'half' ? 'pt-half' : 'pt-miss');
@@ -320,76 +432,111 @@
     html += '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #E5E1D8;">';
     html += '<p style="margin:0 0 6px;font-size:13px;font-weight:700;">参考答案</p>';
     html += '<p style="margin:0;font-size:13px;line-height:1.9;color:#444;">' + esc(q.referenceAnswer) + '</p></div>';
+    html += '<p style="margin:12px 0 0;font-size:12px;color:#7C3AED;">✦ 想看逐句精细点评？点上方「AI 深度批阅」。</p>';
     html += '</div>';
     box.innerHTML = html;
   }
 
+  // ===== 深度批阅：网页端直接出结果（内置引擎 + 可选在线大模型）=====
   function deepReview(q, answer, btn){
-    var ai = (typeof window !== 'undefined') && window.lingguang && window.lingguang.ai;
-    if(!ai || typeof ai.chat !== 'function'){
-      showAiModal('深度批阅需要在「亿成公考」App 内打开本页使用，网页端暂不支持。');
-      return;
-    }
+    var g = state.review || grade(q, answer);
+    state.review = g;
     var oldText = btn.textContent;
-    btn.disabled = true; btn.textContent = '批阅中，请稍候…';
-    var prompt = buildAiPrompt(q, answer);
-    var done = false;
-    var finish = function(fn){
-      if(done) return; done = true;
+    btn.disabled = true; btn.textContent = '批阅中…';
+
+    var finish = function(detail, src){
       btn.disabled = false; btn.textContent = oldText;
-      fn();
+      state.aiReview = {text:detail, src:src, at:new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})};
+      renderAiBox(state.aiReview);
+      var box = document.getElementById('aiBox');
+      if(box) box.scrollIntoView({behavior:'smooth'});
     };
-    var timer = setTimeout(function(){ finish(function(){ showAiModal('批阅超时了，请再点一次「深度批阅」试试。'); }); }, 120000);
-    try {
-      ai.chat({ messages: [{ role: 'user', content: prompt }] }).then(function(res){
-        clearTimeout(timer);
-        finish(function(){
-          var d = res && res.data !== undefined ? res.data : res;
-          var text = (typeof d === 'string' ? d : (d && (d.content || d.text || (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content)))) || '';
-          if(!text){ showAiModal('这次批阅没有返回内容，请再试一次。'); return; }
-          showReviewResult(text);
-        });
-      }).catch(function(){
-        clearTimeout(timer);
-        finish(function(){ showAiModal('批阅没有成功，请再点一次「深度批阅」试试。'); });
+
+    // 有本机配置的在线大模型 → 用真·AI；否则用内置引擎（无需联网）
+    var cfg = state.aiCfg;
+    if(cfg && cfg.url && cfg.key){
+      btn.textContent = 'AI 批阅中…';
+      callOnlineAi(cfg, buildAiPrompt(q, answer, g), function(text){
+        finish(text, '在线大模型 · ' + (cfg.model||'deepseek-chat'));
+      }, function(err){
+        finish(localDeepReview(q, answer, g) + '\n\n（在线模型未成功：' + err + '，已用内置阅卷引擎批阅）', '内置智能阅卷引擎');
       });
-    } catch(e) {
-      clearTimeout(timer);
-      finish(function(){ showAiModal('批阅没有成功，请再点一次「深度批阅」试试。'); });
+    } else {
+      setTimeout(function(){ finish(localDeepReview(q, answer, g), '内置智能阅卷引擎'); }, 420);
     }
   }
-  function showReviewResult(text){
-    var mask = document.createElement('div');
-    mask.className = 'modal-mask';
-    mask.innerHTML = '<div class="modal" style="max-height:80vh;overflow-y:auto;"><div style="display:flex;justify-content:space-between;align-items:center;">'
-      + '<p style="margin:0;font-size:16px;font-weight:800;">深度批阅 · 逐句点评</p>'
-      + '<button id="mClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
-      + '<div id="mResult" style="font-size:13px;line-height:2;color:#444;margin:12px 0;white-space:pre-wrap;">' + esc(text) + '</div>'
-      + '<div style="margin-top:10px;display:flex;gap:10px;">'
-      + '<button id="mCopy2" class="btn-primary" style="flex:1;">复制点评内容</button></div></div>';
-    document.body.appendChild(mask);
-    mask.querySelector('#mClose').onclick = function(){ mask.remove(); };
-    mask.onclick = function(e){ if(e.target === mask) mask.remove(); };
-    mask.querySelector('#mCopy2').onclick = function(){
-      var done = function(){ this.textContent = '已复制 ✓'; }.bind(this);
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text); done(); });
-      } else { fallbackCopy(text); done(); }
-    };
+
+  function callOnlineAi(cfg, prompt, ok, fail){
+    var done = false;
+    var timer = setTimeout(function(){ if(!done){done=true; fail('超时');} }, 60000);
+    try{
+      fetch(cfg.url, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + cfg.key},
+        body:JSON.stringify({model:cfg.model||'deepseek-chat', messages:[{role:'user',content:prompt}], temperature:0.2, stream:false})
+      }).then(function(r){ return r.json(); }).then(function(d){
+        if(done) return; done=true; clearTimeout(timer);
+        var text = d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content;
+        if(!text && d && d.error){ fail(d.error.message||'接口返回错误'); return; }
+        if(!text){ fail('接口未返回内容'); return; }
+        ok(text);
+      }).catch(function(e){ if(!done){done=true;clearTimeout(timer);fail(e && e.message || '网络错误');} });
+    }catch(e){ if(!done){done=true;clearTimeout(timer);fail('调用失败');} }
   }
-  function showAiModal(msg){
+
+  function renderAiBox(ai){
+    var box = document.getElementById('aiBox');
+    if(!box) return;
+    var online = /^在线大模型/.test(ai.src);
+    var html = '<div class="card fade" style="margin-top:12px;padding:18px;border-color:#7C3AED44;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">';
+    html += '<p style="margin:0;font-size:15px;font-weight:800;">✦ AI 深度批阅 · 逐句点评</p>';
+    html += '<span class="ai-badge">' + esc(ai.src) + '</span></div>';
+    html += '<p style="margin:6px 0 0;font-size:11px;color:#B9A98F;">' + esc(ai.at||'') + ' · ' + (online?'由在线大模型生成':'由内置阅卷引擎按考试采分点标准生成') + '</p>';
+    html += '<pre class="prompt" style="margin-top:12px;line-height:2;font-size:13px;">' + esc(ai.text) + '</pre>';
+    html += '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">';
+    html += '<button id="aiCopy" class="btn-primary" style="flex:1;">复制点评</button>';
+    html += '<button id="aiCfgBtn" class="btn-ghost">⚙ 设置在线AI（可选）</button>';
+    html += '</div></div>';
+    box.innerHTML = html;
+    document.getElementById('aiCopy').onclick = function(){
+      var done = function(){ this.textContent='已复制 ✓'; }.bind(this);
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ai.text).then(done).catch(function(){ fallbackCopy(ai.text); done(); }); }
+      else { fallbackCopy(ai.text); done(); }
+    };
+    document.getElementById('aiCfgBtn').onclick = showAiConfig;
+  }
+
+  function showAiConfig(){
+    var c = state.aiCfg || {url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat', key:''};
     var mask = document.createElement('div');
     mask.className = 'modal-mask';
     mask.innerHTML = '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;">'
-      + '<p style="margin:0;font-size:16px;font-weight:800;">深度批阅</p>'
-      + '<button id="mClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
-      + '<p style="font-size:13px;line-height:2;color:#444;margin:12px 0;">' + esc(msg) + '</p>'
-      + '<div style="margin-top:10px;"><button id="mOk" class="btn-primary" style="width:100%;">知道了</button></div></div>';
+      + '<p style="margin:0;font-size:16px;font-weight:800;">设置在线 AI（可选）</p>'
+      + '<button id="cClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
+      + '<p style="font-size:12px;line-height:1.8;color:#6B6558;margin:10px 0;">不填也能用：默认由内置阅卷引擎按考试采分点标准批阅。想用真·大模型逐句点评，填入 OpenAI 兼容接口信息，密钥仅保存在你本机浏览器，不会上传。</p>'
+      + '<label style="font-size:12px;color:#6B6558;">接口地址</label><input id="cUrl" class="ans" style="min-height:auto;height:40px;font-size:13px;margin-top:4px;" value="' + esc(c.url) + '">'
+      + '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px;">模型名</label><input id="cModel" class="ans" style="min-height:auto;height:40px;font-size:13px;margin-top:4px;" value="' + esc(c.model||'') + '" placeholder="deepseek-chat">'
+      + '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px;">API Key</label><input id="cKey" type="password" class="ans" style="min-height:auto;height:40px;font-size:13px;margin-top:4px;" value="' + esc(c.key||'') + '" placeholder="sk-...">'
+      + '<div style="margin-top:16px;display:flex;gap:10px;"><button id="cClear" class="btn-ghost" style="flex:1;">清除</button><button id="cSave" class="btn-primary" style="flex:1;">保存</button></div></div>';
     document.body.appendChild(mask);
-    mask.querySelector('#mClose').onclick = function(){ mask.remove(); };
-    mask.querySelector('#mOk').onclick = function(){ mask.remove(); };
-    mask.onclick = function(e){ if(e.target === mask) mask.remove(); };
+    mask.querySelector('#cClose').onclick = function(){ mask.remove(); };
+    mask.onclick = function(e){ if(e.target===mask) mask.remove(); };
+    mask.querySelector('#cClear').onclick = function(){
+      state.aiCfg = null; localStorage.removeItem('yc_ai_cfg'); mask.remove();
+    };
+    mask.querySelector('#cSave').onclick = function(){
+      state.aiCfg = {
+        url: mask.querySelector('#cUrl').value.trim(),
+        model: mask.querySelector('#cModel').value.trim() || 'deepseek-chat',
+        key: mask.querySelector('#cKey').value.trim()
+      };
+      localStorage.setItem('yc_ai_cfg', JSON.stringify(state.aiCfg));
+      mask.remove();
+      alert('已保存。再次点「AI 深度批阅」即按新设置批阅。');
+    };
   }
+
   function fallbackCopy(text){
     var ta = document.createElement('textarea');
     ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
@@ -398,7 +545,6 @@
     ta.remove();
   }
 
-  // 启动
   if(!SHL.length && !ZY.length){
     document.getElementById('loading').textContent = '题库暂时没有内容，请稍后再试。';
   } else {
