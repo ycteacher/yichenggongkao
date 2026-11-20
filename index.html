@@ -2516,6 +2516,11 @@ document.addEventListener('click', function(e){
     measure();
     window.addEventListener('resize',measure);
     setTimeout(measure,600);
+    setTimeout(measure,2000);
+    if(window.ResizeObserver){
+      var ro=new ResizeObserver(function(){ measure(); });
+      ro.observe(box);
+    }
   }
   if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
 })();
