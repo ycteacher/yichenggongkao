@@ -678,6 +678,35 @@
   try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.materials&r=" + Date.now(); }catch(e){}
 })();
 
+/* ===== 资料「保存/打开」次数统计 → textdb 池 ycgk-mat-v1（与设备池分离，互不覆盖） =====
+   契约: {save:N, open:N, days:{YYYYMMDD:{save:N,open:N}}, ts:ms}
+   节流: 同一文件同一动作 20 秒内只计一次，防止刷新/连点灌水 */
+var MAT_KEY='ycgk-mat-v1';
+function matPad(n){return ('0'+n).slice(-2)}
+function matDay(){var d=new Date();return ''+d.getFullYear()+matPad(d.getMonth()+1)+matPad(d.getDate())}
+function countMat(kind,file){
+  file=file||'_';
+  try{
+    var lk='ycgk.mat.cnt.'+kind+'.'+file,now=Date.now();
+    var last=parseInt(localStorage.getItem(lk)||'0',10)||0;
+    if(now-last<20000)return; // 20秒节流
+    localStorage.setItem(lk,String(now));
+  }catch(e){}
+  fetch('https://textdb.dev/api/data/'+MAT_KEY,{cache:'no-store'})
+    .then(function(r){return r.text()})
+    .then(function(t){
+      var p={};try{p=(t&&t.charAt(0)==='{')?JSON.parse(t):{}}catch(e){p={}}
+      p.save=parseInt(p.save,10)||0; p.open=parseInt(p.open,10)||0;
+      if(!p.days||typeof p.days!=='object')p.days={};
+      var d=matDay();if(!p.days[d]||typeof p.days[d]!=='object')p.days[d]={save:0,open:0};
+      p[kind]=(p[kind]||0)+1; p.days[d][kind]=(p.days[d][kind]||0)+1;
+      /* 只保留最近30天 */
+      var ks=Object.keys(p.days).sort();if(ks.length>30){for(var i=0;i<ks.length-30;i++)delete p.days[ks[i]];}
+      p.ts=Date.now();
+      return fetch('https://textdb.dev/api/data/'+MAT_KEY,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)});
+    }).catch(function(){});
+}
+
 var UA = navigator.userAgent || '';
 var IS_WEIXIN = /MicroMessenger/i.test(UA);
 var IS_IOS = /iPhone|iPad|iPod/i.test(UA);
@@ -764,6 +793,7 @@ document.getElementById('dlgOpen').addEventListener('click', function(){
 document.addEventListener('click', function(e){
   var a = e.target.closest ? e.target.closest('a.op-save[data-file]') : null;
   if(!a) return;
+  countMat('save', a.getAttribute('data-file')||a.href); // 统计保存次数
   // 微信：download 完全失效，拦截弹引导（复制/跳转）
   if(IS_WEIXIN){ e.preventDefault(); showGuide('weixin', a.href); return; }
   // 苹果：download 属性常失效，拦截弹引导，不再让它悄悄打开预览
@@ -795,6 +825,7 @@ document.addEventListener('click', function(e){
     document.getElementById('ycPvFrame').src=url;
     document.getElementById('ycPvTip').style.display=/\\.pdf(\\?|$)/i.test(url)||IS_WEIXIN||IS_IOS?'block':'none';
     mask.classList.add('on');
+    if(typeof countMat==='function')countMat('open',url); // 统计打开次数
     try{ new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.pvopen&r='+Date.now(); }catch(e){}
   }
   document.getElementById('ycPvBack').addEventListener('click',closePv);
