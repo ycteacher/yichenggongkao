@@ -65,6 +65,19 @@
     text-decoration:none; box-shadow:0 4px 14px rgba(21,128,61,.3);
   }
   .back-big:active { transform:scale(.985); }
+  /* 下载引导弹窗 */
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}
+  .mask.show{display:flex}
+  .dlg{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:24px 22px 20px;box-shadow:0 12px 40px rgba(0,0,0,.25);position:relative}
+  .dlg h3{font-size:20px;color:#15803D;margin-bottom:6px;font-weight:800}
+  .dlg .lead{font-size:14px;color:#444;line-height:1.7;margin-bottom:16px}
+  .dlg .row{display:flex;gap:12px;align-items:flex-start;background:#F4F8F3;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .dlg .row .n{width:26px;height:26px;flex:none;border-radius:50%;background:#15803D;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .dlg .row .t{font-size:14px;line-height:1.6;color:#222}
+  .dlg .row .t b{color:#15803D}
+  .dlg .open-now{display:block;width:100%;margin-top:14px;background:#15803D;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:800;text-align:center;text-decoration:none}
+  .dlg .close{position:absolute;top:14px;right:16px;font-size:22px;color:#999;background:none;border:none;cursor:pointer;line-height:1}
+  .dlg .hint{font-size:12px;color:#888;margin-top:10px;text-align:center}
 </style>
 </head>
 <body>
@@ -83,9 +96,9 @@
       <div class="s">行政职业能力测验·行政执法卷最终版 · 可直接在小程序内刷题（含答案与逐题解析）<br>这几天会在卷子最下方陆续更新新题型，刷新即可看到</div>
       <div class="t" style="font-size:12px;color:#B45309;margin-top:6px;">刷题路径：首页 → 整套卷子 → 国考押题卷 → 最终版·行政执法卷押题卷（一）</div>
       <div class="dl-row">
-        <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷一·行测试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测册</a>
-        <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷一·申论试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论册</a>
-        <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%AD%94%E6%A1%88%E4%B8%8E%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%AD%94%E6%A1%88%E4%B8%8E%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考执法全真押题卷一·答案与解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存答案册</a>
+        <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷一·行测试题册.pdf" style="text-decoration:none;">保存行测册</a>
+        <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷一·申论试题册.pdf" style="text-decoration:none;">保存申论册</a>
+        <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%AD%94%E6%A1%88%E4%B8%8E%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%AD%94%E6%A1%88%E4%B8%8E%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考执法全真押题卷一·答案与解析册.pdf" style="text-decoration:none;">保存答案册</a>
       </div>
     </div>
     <div class="ops">
@@ -97,7 +110,7 @@
     <div class="tx">
       <div class="t">《27国考执法全真押题卷（三）》</div>
       <div class="s">行政执法类 · 行测＋申论 · 含答案与解析 · 可直接在应用内刷题</div>
-      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷三·行测试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷三·申论试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考执法全真押题卷三·行测答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考执法全真押题卷三·申论答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论解析</a></div>
+      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷三·行测试题册.pdf" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考执法全真押题卷三·申论试题册.pdf" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考执法全真押题卷三·行测答案解析册.pdf" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%89%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考执法全真押题卷三·申论答案解析册.pdf" style="text-decoration:none;">保存申论解析</a></div>
     </div>
   </div>
   <div class="item">
@@ -105,7 +118,7 @@
     <div class="tx">
       <div class="t">《27国考省级全真押题卷（一）》</div>
       <div class="s">副省级 · 行测＋申论 · 含答案与解析 · 可直接在应用内刷题</div>
-      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷一·行测试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷一·申论试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷一·行测答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷一·申论答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论解析</a></div>
+      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷一·行测试题册.pdf" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷一·申论试题册.pdf" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷一·行测答案解析册.pdf" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷一·申论答案解析册.pdf" style="text-decoration:none;">保存申论解析</a></div>
     </div>
   </div>
   <div class="item">
@@ -113,7 +126,7 @@
     <div class="tx">
       <div class="t">《27国考省级全真押题卷（二）》</div>
       <div class="s">副省级 · 行测＋申论 · 含答案与解析 · 可直接在应用内刷题</div>
-      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷二·行测试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷二·申论试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷二·行测答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷二·申论答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论解析</a></div>
+      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷二·行测试题册.pdf" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考省级全真押题卷二·申论试题册.pdf" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷二·行测答案解析册.pdf" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E7%9C%81%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考省级全真押题卷二·申论答案解析册.pdf" style="text-decoration:none;">保存申论解析</a></div>
     </div>
   </div>
   <div class="item">
@@ -121,7 +134,7 @@
     <div class="tx">
       <div class="t">《27国考地市级全真押题卷（一）》</div>
       <div class="s">地市级 · 行测＋申论 · 含答案与解析 · 可直接在应用内刷题</div>
-      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷一·行测试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷一·申论试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷一·行测答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷一·申论答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论解析</a></div>
+      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷一·行测试题册.pdf" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷一·申论试题册.pdf" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷一·行测答案解析册.pdf" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%B8%80%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷一·申论答案解析册.pdf" style="text-decoration:none;">保存申论解析</a></div>
     </div>
   </div>
   <div class="item">
@@ -129,7 +142,7 @@
     <div class="tx">
       <div class="t">《27国考地市级全真押题卷（二）》</div>
       <div class="s">地市级 · 行测＋申论 · 含答案与解析 · 可直接在应用内刷题</div>
-      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷二·行测试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷二·申论试题册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷二·行测答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷二·申论答案解析册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存申论解析</a></div>
+      <div class="dl-row"><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷二·行测试题册.pdf" style="text-decoration:none;">保存行测册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E8%AF%95%E9%A2%98%E5%86%8C.pdf" download="27国考地市级全真押题卷二·申论试题册.pdf" style="text-decoration:none;">保存申论册</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E8%A1%8C%E6%B5%8B%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷二·行测答案解析册.pdf" style="text-decoration:none;">保存行测解析</a><a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%9C%B0%E5%B8%82%E7%BA%A7%E5%85%A8%E7%9C%9F%E6%8A%BC%E9%A2%98%E5%8D%B7%E4%BA%8C%C2%B7%E7%94%B3%E8%AE%BA%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90%E5%86%8C.pdf" download="27国考地市级全真押题卷二·申论答案解析册.pdf" style="text-decoration:none;">保存申论解析</a></div>
     </div>
   </div>
   <div class="item">
@@ -139,7 +152,7 @@
       <div class="s">行测＋申论全卷 · 含答案与解析</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" download="27国考执法卷预测·行测申论全卷.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" download="27国考执法卷预测·行测申论全卷.pdf" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7.pdf" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -150,7 +163,7 @@
       <div class="s">行测＋申论全卷 · 含答案与解析</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" download="27国考执法卷预测·第2套（行测申论全卷）.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" download="27国考执法卷预测·第2套（行测申论全卷）.pdf" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E6%89%A7%E6%B3%95%E5%8D%B7%E9%A2%84%E6%B5%8B%C2%B7%E7%AC%AC2%E5%A5%97%EF%BC%88%E8%A1%8C%E6%B5%8B%E7%94%B3%E8%AE%BA%E5%85%A8%E5%8D%B7%EF%BC%89.pdf" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -161,7 +174,7 @@
       <div class="s">数量关系＋资料分析冲刺 · 34页</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" data-file="files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" download="国考倒计时13天数量资料临阵磨枪手册.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" data-file="files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" download="国考倒计时13天数量资料临阵磨枪手册.pdf" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" data-file="files/%E5%9B%BD%E8%80%83%E5%80%92%E8%AE%A1%E6%97%B613%E5%A4%A9%E6%95%B0%E9%87%8F%E8%B5%84%E6%96%99%E4%B8%B4%E9%98%B5%E7%A3%A8%E6%9E%AA%E6%89%8B%E5%86%8C.pdf" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -172,7 +185,7 @@
       <div class="s">常识高频考点精编</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" download="27国考常识100考点·亿成老师亲编.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" download="27国考常识100考点·亿成老师亲编.pdf" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%B8%B8%E8%AF%86100%E8%80%83%E7%82%B9%C2%B7%E4%BA%BF%E6%88%90%E8%80%81%E5%B8%88%E4%BA%B2%E7%BC%96.pdf" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -183,7 +196,7 @@
       <div class="s">五大模块知识体系＋300题</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" download="27国考备考知识地图·附预测题300道.pdf" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" download="27国考备考知识地图·附预测题300道.pdf" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" data-file="files/27%E5%9B%BD%E8%80%83%E5%A4%87%E8%80%83%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%C2%B7%E9%99%84%E9%A2%84%E6%B5%8B%E9%A2%98300%E9%81%93.pdf" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -194,7 +207,7 @@
       <div class="s">各模块目标正确率＋时间分配＋考前一周节奏</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E8%A1%8C%E6%B5%8B%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97%E5%86%B2%E5%88%BA%E8%A6%81%E7%82%B9.html" data-file="files/27%E5%9B%BD%E8%80%83%E8%A1%8C%E6%B5%8B%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97%E5%86%B2%E5%88%BA%E8%A6%81%E7%82%B9.html" download="27国考行测五大模块冲刺要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E8%A1%8C%E6%B5%8B%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97%E5%86%B2%E5%88%BA%E8%A6%81%E7%82%B9.html" data-file="files/27%E5%9B%BD%E8%80%83%E8%A1%8C%E6%B5%8B%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97%E5%86%B2%E5%88%BA%E8%A6%81%E7%82%B9.html" download="27国考行测五大模块冲刺要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/27%E5%9B%BD%E8%80%83%E8%A1%8C%E6%B5%8B%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97%E5%86%B2%E5%88%BA%E8%A6%81%E7%82%B9.html" data-file="files/27%E5%9B%BD%E8%80%83%E8%A1%8C%E6%B5%8B%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97%E5%86%B2%E5%88%BA%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -205,7 +218,7 @@
       <div class="s">副省级/地市级/行政执法卷三类卷对比与备考侧重</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E7%BA%A7%E5%91%BD%E9%A2%98%E5%B7%AE%E5%BC%82.html" data-file="files/%E5%9B%BD%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E7%BA%A7%E5%91%BD%E9%A2%98%E5%B7%AE%E5%BC%82.html" download="国考申论分级命题差异.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E7%BA%A7%E5%91%BD%E9%A2%98%E5%B7%AE%E5%BC%82.html" data-file="files/%E5%9B%BD%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E7%BA%A7%E5%91%BD%E9%A2%98%E5%B7%AE%E5%BC%82.html" download="国考申论分级命题差异.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E7%BA%A7%E5%91%BD%E9%A2%98%E5%B7%AE%E5%BC%82.html" data-file="files/%E5%9B%BD%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E7%BA%A7%E5%91%BD%E9%A2%98%E5%B7%AE%E5%BC%82.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -267,7 +280,7 @@
       <div class="s">题量分布 · 各模块高频考点 · 60天备考节奏</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E5%A4%87%E8%80%83%E4%B8%80%E6%9C%AC%E9%80%9A.html" data-file="files/%E7%9C%81%E8%80%83%E5%A4%87%E8%80%83%E4%B8%80%E6%9C%AC%E9%80%9A.html" download="省考备考一本通.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E5%A4%87%E8%80%83%E4%B8%80%E6%9C%AC%E9%80%9A.html" data-file="files/%E7%9C%81%E8%80%83%E5%A4%87%E8%80%83%E4%B8%80%E6%9C%AC%E9%80%9A.html" download="省考备考一本通.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E5%A4%87%E8%80%83%E4%B8%80%E6%9C%AC%E9%80%9A.html" data-file="files/%E7%9C%81%E8%80%83%E5%A4%87%E8%80%83%E4%B8%80%E6%9C%AC%E9%80%9A.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -278,7 +291,7 @@
       <div class="s">各省常考常识差异速查</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E5%B8%B8%E8%AF%86%E8%80%83%E7%82%B9%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" data-file="files/%E7%9C%81%E8%80%83%E5%B8%B8%E8%AF%86%E8%80%83%E7%82%B9%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" download="省考常识考点分省速查.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E5%B8%B8%E8%AF%86%E8%80%83%E7%82%B9%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" data-file="files/%E7%9C%81%E8%80%83%E5%B8%B8%E8%AF%86%E8%80%83%E7%82%B9%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" download="省考常识考点分省速查.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E5%B8%B8%E8%AF%86%E8%80%83%E7%82%B9%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" data-file="files/%E7%9C%81%E8%80%83%E5%B8%B8%E8%AF%86%E8%80%83%E7%82%B9%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -289,7 +302,7 @@
       <div class="s">归纳概括/对策/贯彻/大作文四题型模板</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E9%A2%98%E5%9E%8B%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF.html" data-file="files/%E7%9C%81%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E9%A2%98%E5%9E%8B%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF.html" download="省考申论分题型写作模板.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E9%A2%98%E5%9E%8B%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF.html" data-file="files/%E7%9C%81%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E9%A2%98%E5%9E%8B%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF.html" download="省考申论分题型写作模板.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E9%A2%98%E5%9E%8B%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF.html" data-file="files/%E7%9C%81%E8%80%83%E7%94%B3%E8%AE%BA%E5%88%86%E9%A2%98%E5%9E%8B%E5%86%99%E4%BD%9C%E6%A8%A1%E6%9D%BF.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -300,7 +313,7 @@
       <div class="s">五大题型答法＋高分细节</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E9%9D%A2%E8%AF%95%E7%BB%93%E6%9E%84%E5%8C%96%E8%A6%81%E7%82%B9.html" data-file="files/%E7%9C%81%E8%80%83%E9%9D%A2%E8%AF%95%E7%BB%93%E6%9E%84%E5%8C%96%E8%A6%81%E7%82%B9.html" download="省考面试结构化要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E9%9D%A2%E8%AF%95%E7%BB%93%E6%9E%84%E5%8C%96%E8%A6%81%E7%82%B9.html" data-file="files/%E7%9C%81%E8%80%83%E9%9D%A2%E8%AF%95%E7%BB%93%E6%9E%84%E5%8C%96%E8%A6%81%E7%82%B9.html" download="省考面试结构化要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E7%9C%81%E8%80%83%E9%9D%A2%E8%AF%95%E7%BB%93%E6%9E%84%E5%8C%96%E8%A6%81%E7%82%B9.html" data-file="files/%E7%9C%81%E8%80%83%E9%9D%A2%E8%AF%95%E7%BB%93%E6%9E%84%E5%8C%96%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -312,7 +325,7 @@
       <div class="s">五类区别 · 职测与行测差异 · 综应备考重点</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%94%E8%80%83%E8%80%83%E6%83%85%E4%B8%8E%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%94%E8%80%83%E8%80%83%E6%83%85%E4%B8%8E%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="事业编联考考情与备考指南.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%94%E8%80%83%E8%80%83%E6%83%85%E4%B8%8E%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%94%E8%80%83%E8%80%83%E6%83%85%E4%B8%8E%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="事业编联考考情与备考指南.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%94%E8%80%83%E8%80%83%E6%83%85%E4%B8%8E%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%94%E8%80%83%E8%80%83%E6%83%85%E4%B8%8E%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -323,7 +336,7 @@
       <div class="s">五类考点对照速查表</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96AE%E4%BA%94%E7%B1%BB%E8%80%83%E7%82%B9%E9%80%9F%E6%9F%A5.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96AE%E4%BA%94%E7%B1%BB%E8%80%83%E7%82%B9%E9%80%9F%E6%9F%A5.html" download="事业编AE五类考点速查.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96AE%E4%BA%94%E7%B1%BB%E8%80%83%E7%82%B9%E9%80%9F%E6%9F%A5.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96AE%E4%BA%94%E7%B1%BB%E8%80%83%E7%82%B9%E9%80%9F%E6%9F%A5.html" download="事业编AE五类考点速查.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96AE%E4%BA%94%E7%B1%BB%E8%80%83%E7%82%B9%E9%80%9F%E6%9F%A5.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96AE%E4%BA%94%E7%B1%BB%E8%80%83%E7%82%B9%E9%80%9F%E6%9F%A5.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -334,7 +347,7 @@
       <div class="s">一表看懂怎么复用公考行测刷题</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%8C%E6%B5%8B%E4%B8%8E%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E9%80%9F%E8%A7%88.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%8C%E6%B5%8B%E4%B8%8E%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E9%80%9F%E8%A7%88.html" download="事业编职测与行测差异速览.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%8C%E6%B5%8B%E4%B8%8E%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E9%80%9F%E8%A7%88.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%8C%E6%B5%8B%E4%B8%8E%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E9%80%9F%E8%A7%88.html" download="事业编职测与行测差异速览.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%8C%E6%B5%8B%E4%B8%8E%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E9%80%9F%E8%A7%88.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E8%81%8C%E6%B5%8B%E4%B8%8E%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E9%80%9F%E8%A7%88.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -345,7 +358,7 @@
       <div class="s">A/B/C/D/E五类综应题型与答法</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E8%83%BD%E5%8A%9B%E5%88%86%E7%B1%BB%E8%A6%81%E7%82%B9.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E8%83%BD%E5%8A%9B%E5%88%86%E7%B1%BB%E8%A6%81%E7%82%B9.html" download="事业编综合应用能力分类要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E8%83%BD%E5%8A%9B%E5%88%86%E7%B1%BB%E8%A6%81%E7%82%B9.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E8%83%BD%E5%8A%9B%E5%88%86%E7%B1%BB%E8%A6%81%E7%82%B9.html" download="事业编综合应用能力分类要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E8%83%BD%E5%8A%9B%E5%88%86%E7%B1%BB%E8%A6%81%E7%82%B9.html" data-file="files/%E4%BA%8B%E4%B8%9A%E7%BC%96%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E8%83%BD%E5%8A%9B%E5%88%86%E7%B1%BB%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -357,7 +370,7 @@
       <div class="s">公共科目+专业科目结构 · 国防军队考点 · 备考策略</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="军队文职备考指南.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="军队文职备考指南.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -368,7 +381,7 @@
       <div class="s">公共科目客观题高频考点</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" download="军队文职公共科目高频考点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" download="军队文职公共科目高频考点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -379,7 +392,7 @@
       <div class="s">政治/法律/人文/国防军队/时事五板块精讲</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86%E7%B2%BE%E8%AE%B2.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86%E7%B2%BE%E8%AE%B2.html" download="军队文职公共科目·基本知识精讲.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86%E7%B2%BE%E8%AE%B2.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86%E7%B2%BE%E8%AE%B2.html" download="军队文职公共科目·基本知识精讲.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86%E7%B2%BE%E8%AE%B2.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86%E7%B2%BE%E8%AE%B2.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -390,7 +403,7 @@
       <div class="s">言语/数量/判断/资料四模块方法</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%B2%97%E4%BD%8D%E8%83%BD%E5%8A%9B%E7%B2%BE%E8%AE%B2.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%B2%97%E4%BD%8D%E8%83%BD%E5%8A%9B%E7%B2%BE%E8%AE%B2.html" download="军队文职公共科目·岗位能力精讲.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%B2%97%E4%BD%8D%E8%83%BD%E5%8A%9B%E7%B2%BE%E8%AE%B2.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%B2%97%E4%BD%8D%E8%83%BD%E5%8A%9B%E7%B2%BE%E8%AE%B2.html" download="军队文职公共科目·岗位能力精讲.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%B2%97%E4%BD%8D%E8%83%BD%E5%8A%9B%E7%B2%BE%E8%AE%B2.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%85%AC%E5%85%B1%E7%A7%91%E7%9B%AE%C2%B7%E5%B2%97%E4%BD%8D%E8%83%BD%E5%8A%9B%E7%B2%BE%E8%AE%B2.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -401,7 +414,7 @@
       <div class="s">44个专业方向分类＋怎么查自己考什么</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E5%A4%87%E8%80%83%E6%80%BB%E8%A7%88.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E5%A4%87%E8%80%83%E6%80%BB%E8%A7%88.html" download="军队文职专业科目备考总览.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E5%A4%87%E8%80%83%E6%80%BB%E8%A7%88.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E5%A4%87%E8%80%83%E6%80%BB%E8%A7%88.html" download="军队文职专业科目备考总览.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E5%A4%87%E8%80%83%E6%80%BB%E8%A7%88.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E5%A4%87%E8%80%83%E6%80%BB%E8%A7%88.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -412,7 +425,7 @@
       <div class="s">临床/护理/药学方向基础+专项</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%8C%BB%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%8C%BB%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" download="军队文职医学类专业科目考点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%8C%BB%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%8C%BB%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" download="军队文职医学类专业科目考点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%8C%BB%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E5%8C%BB%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -423,7 +436,7 @@
       <div class="s">数学1/数学2+物理/数学3+化学三卷种</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E6%95%B0%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E6%95%B0%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" download="军队文职数学类专业科目考点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E6%95%B0%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E6%95%B0%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" download="军队文职数学类专业科目考点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E6%95%B0%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E6%95%B0%E5%AD%A6%E7%B1%BB%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -434,7 +447,7 @@
       <div class="s">管理学主干+会计基础+案例答法</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" download="军队文职管理学专业科目考点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" download="军队文职管理学专业科目考点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" data-file="files/%E5%86%9B%E9%98%9F%E6%96%87%E8%81%8C%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B8%93%E4%B8%9A%E7%A7%91%E7%9B%AE%E8%80%83%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -446,7 +459,7 @@
       <div class="s">考试内容 · 涉农政策重点 · 写作框架</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="三支一扶备考指南.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="三支一扶备考指南.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -457,7 +470,7 @@
       <div class="s">公基+行测+写作三线考点</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" download="三支一扶高频考点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" download="三支一扶高频考点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -468,7 +481,7 @@
       <div class="s">政治/法律/经济/公文/管理/科技人文六块速记</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%85%AC%E5%85%B1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BF%85%E8%83%8C100%E6%9D%A1.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%85%AC%E5%85%B1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BF%85%E8%83%8C100%E6%9D%A1.html" download="三支一扶公共基础知识必背100条.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%85%AC%E5%85%B1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BF%85%E8%83%8C100%E6%9D%A1.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%85%AC%E5%85%B1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BF%85%E8%83%8C100%E6%9D%A1.html" download="三支一扶公共基础知识必背100条.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%85%AC%E5%85%B1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BF%85%E8%83%8C100%E6%9D%A1.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%85%AC%E5%85%B1%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BF%85%E8%83%8C100%E6%9D%A1.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -479,7 +492,7 @@
       <div class="s">乡村振兴/粮食安全/土地制度/乡村治理政策要点</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%B6%89%E5%86%9C%E6%94%BF%E7%AD%96%E6%B1%87%E7%BC%96.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%B6%89%E5%86%9C%E6%94%BF%E7%AD%96%E6%B1%87%E7%BC%96.html" download="三支一扶涉农政策汇编.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%B6%89%E5%86%9C%E6%94%BF%E7%AD%96%E6%B1%87%E7%BC%96.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%B6%89%E5%86%9C%E6%94%BF%E7%AD%96%E6%B1%87%E7%BC%96.html" download="三支一扶涉农政策汇编.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%B6%89%E5%86%9C%E6%94%BF%E7%AD%96%E6%B1%87%E7%BC%96.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%B6%89%E5%86%9C%E6%94%BF%E7%AD%96%E6%B1%87%E7%BC%96.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -490,7 +503,7 @@
       <div class="s">五段三分式结构＋高频主题分论点＋人物案例</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%86%99%E4%BD%9C%E7%B4%A0%E6%9D%90%E4%B8%8E%E8%8C%83%E6%96%87%E6%A1%86%E6%9E%B6.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%86%99%E4%BD%9C%E7%B4%A0%E6%9D%90%E4%B8%8E%E8%8C%83%E6%96%87%E6%A1%86%E6%9E%B6.html" download="三支一扶写作素材与范文框架.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%86%99%E4%BD%9C%E7%B4%A0%E6%9D%90%E4%B8%8E%E8%8C%83%E6%96%87%E6%A1%86%E6%9E%B6.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%86%99%E4%BD%9C%E7%B4%A0%E6%9D%90%E4%B8%8E%E8%8C%83%E6%96%87%E6%A1%86%E6%9E%B6.html" download="三支一扶写作素材与范文框架.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%86%99%E4%BD%9C%E7%B4%A0%E6%9D%90%E4%B8%8E%E8%8C%83%E6%96%87%E6%A1%86%E6%9E%B6.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%86%99%E4%BD%9C%E7%B4%A0%E6%9D%90%E4%B8%8E%E8%8C%83%E6%96%87%E6%A1%86%E6%9E%B6.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -501,7 +514,7 @@
       <div class="s">情境处理/人际沟通/综合分析三类30例</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%9D%A2%E8%AF%95%E6%83%85%E5%A2%83%E9%A2%9830%E4%BE%8B.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%9D%A2%E8%AF%95%E6%83%85%E5%A2%83%E9%A2%9830%E4%BE%8B.html" download="三支一扶面试情境题30例.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%9D%A2%E8%AF%95%E6%83%85%E5%A2%83%E9%A2%9830%E4%BE%8B.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%9D%A2%E8%AF%95%E6%83%85%E5%A2%83%E9%A2%9830%E4%BE%8B.html" download="三支一扶面试情境题30例.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%9D%A2%E8%AF%95%E6%83%85%E5%A2%83%E9%A2%9830%E4%BE%8B.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E9%9D%A2%E8%AF%95%E6%83%85%E5%A2%83%E9%A2%9830%E4%BE%8B.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -512,7 +525,7 @@
       <div class="s">公共卫生服务规范＋支医情境题</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%8C%BB%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%8C%BB%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶支医岗备考要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%8C%BB%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%8C%BB%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶支医岗备考要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%8C%BB%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%8C%BB%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -523,7 +536,7 @@
       <div class="s">教育综合知识＋试讲说课＋情境题</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E6%95%99%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E6%95%99%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶支教岗备考要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E6%95%99%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E6%95%99%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶支教岗备考要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E6%95%99%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E6%95%99%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -534,7 +547,7 @@
       <div class="s">农技/防疫/农经知识＋支农情境题</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%86%9C%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%86%9C%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶支农岗备考要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%86%9C%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%86%9C%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶支农岗备考要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%86%9C%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E6%94%AF%E5%86%9C%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -545,7 +558,7 @@
       <div class="s">防返贫监测＋衔接政策＋情境题</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%B8%AE%E6%89%B6%E4%B9%A1%E6%9D%91%E6%8C%AF%E5%85%B4%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%B8%AE%E6%89%B6%E4%B9%A1%E6%9D%91%E6%8C%AF%E5%85%B4%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶帮扶乡村振兴岗备考要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%B8%AE%E6%89%B6%E4%B9%A1%E6%9D%91%E6%8C%AF%E5%85%B4%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%B8%AE%E6%89%B6%E4%B9%A1%E6%9D%91%E6%8C%AF%E5%85%B4%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" download="三支一扶帮扶乡村振兴岗备考要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%B8%AE%E6%89%B6%E4%B9%A1%E6%9D%91%E6%8C%AF%E5%85%B4%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%B8%AE%E6%89%B6%E4%B9%A1%E6%9D%91%E6%8C%AF%E5%85%B4%E5%B2%97%E5%A4%87%E8%80%83%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -556,7 +569,7 @@
       <div class="s">各省考试内容差异＋备考组合建议</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%8E%86%E5%B9%B4%E8%80%83%E6%83%85%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%8E%86%E5%B9%B4%E8%80%83%E6%83%85%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" download="三支一扶历年考情分省速查.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%8E%86%E5%B9%B4%E8%80%83%E6%83%85%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%8E%86%E5%B9%B4%E8%80%83%E6%83%85%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" download="三支一扶历年考情分省速查.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%8E%86%E5%B9%B4%E8%80%83%E6%83%85%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" data-file="files/%E4%B8%89%E6%94%AF%E4%B8%80%E6%89%B6%E5%8E%86%E5%B9%B4%E8%80%83%E6%83%85%E5%88%86%E7%9C%81%E9%80%9F%E6%9F%A5.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -568,7 +581,7 @@
       <div class="s">国网/烟草/银行/石油/铁路/邮政笔试构成一表看懂</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E6%8B%9B%E8%80%83%E6%80%BB%E8%A7%88.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E6%8B%9B%E8%80%83%E6%80%BB%E8%A7%88.html" download="央国企招考总览.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E6%8B%9B%E8%80%83%E6%80%BB%E8%A7%88.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E6%8B%9B%E8%80%83%E6%80%BB%E8%A7%88.html" download="央国企招考总览.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E6%8B%9B%E8%80%83%E6%80%BB%E8%A7%88.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E6%8B%9B%E8%80%83%E6%80%BB%E8%A7%88.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -579,7 +592,7 @@
       <div class="s">电工类专业课六大科目＋综合能力备考</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="国家电网备考指南.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="国家电网备考指南.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -590,7 +603,7 @@
       <div class="s">EPI+综合知识+英语三板块＋面试要点</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E9%93%B6%E8%A1%8C%E6%A0%A1%E6%8B%9B%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E9%93%B6%E8%A1%8C%E6%A0%A1%E6%8B%9B%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="银行校招备考指南.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E9%93%B6%E8%A1%8C%E6%A0%A1%E6%8B%9B%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E9%93%B6%E8%A1%8C%E6%A0%A1%E6%8B%9B%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="银行校招备考指南.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E9%93%B6%E8%A1%8C%E6%A0%A1%E6%8B%9B%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E9%93%B6%E8%A1%8C%E6%A0%A1%E6%8B%9B%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -601,7 +614,7 @@
       <div class="s">各省考情＋烟草常识＋备考节奏</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%AD%E5%9B%BD%E7%83%9F%E8%8D%89%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%B8%AD%E5%9B%BD%E7%83%9F%E8%8D%89%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="中国烟草备考指南.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%AD%E5%9B%BD%E7%83%9F%E8%8D%89%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%B8%AD%E5%9B%BD%E7%83%9F%E8%8D%89%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" download="中国烟草备考指南.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E4%B8%AD%E5%9B%BD%E7%83%9F%E8%8D%89%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" data-file="files/%E4%B8%AD%E5%9B%BD%E7%83%9F%E8%8D%89%E5%A4%87%E8%80%83%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -612,7 +625,7 @@
       <div class="s">题量/难度/计时差异＋刷题复用策略</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E8%A1%8C%E6%B5%8B%E4%B8%8E%E5%85%AC%E8%80%83%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E5%AF%B9%E7%85%A7.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E8%A1%8C%E6%B5%8B%E4%B8%8E%E5%85%AC%E8%80%83%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E5%AF%B9%E7%85%A7.html" download="央国企行测与公考行测差异对照.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E8%A1%8C%E6%B5%8B%E4%B8%8E%E5%85%AC%E8%80%83%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E5%AF%B9%E7%85%A7.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E8%A1%8C%E6%B5%8B%E4%B8%8E%E5%85%AC%E8%80%83%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E5%AF%B9%E7%85%A7.html" download="央国企行测与公考行测差异对照.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E8%A1%8C%E6%B5%8B%E4%B8%8E%E5%85%AC%E8%80%83%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E5%AF%B9%E7%85%A7.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E8%A1%8C%E6%B5%8B%E4%B8%8E%E5%85%AC%E8%80%83%E8%A1%8C%E6%B5%8B%E5%B7%AE%E5%BC%82%E5%AF%B9%E7%85%A7.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -623,7 +636,7 @@
       <div class="s">结构化/半结构化/无领导全形式要点</div>
     </div>
     <div class="ops">
-      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9.html" download="央国企面试要点.html" target="_blank" rel="noopener" style="text-decoration:none;">保存</a>
+      <a class="op op-save" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9.html" download="央国企面试要点.html" style="text-decoration:none;">保存</a>
       <a class="op op-open" href="https://ycteacher.github.io/yichenggongkao/files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9.html" data-file="files/%E5%A4%AE%E5%9B%BD%E4%BC%81%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9.html" target="_blank" rel="noopener" style="text-decoration:none;">打开</a>
     </div>
   </div>
@@ -634,33 +647,77 @@
 
   <a class="back-big" href="./index.html">‹ 返回亿成公考，继续刷题</a>
 </div>
+
+<!-- 下载引导弹窗：微信 / 苹果 环境点击「保存」时弹出 -->
+<div class="mask" id="dlMask" onclick="if(event.target===this)closeDlMask()">
+  <div class="dlg">
+    <button class="close" onclick="closeDlMask()" aria-label="关闭">×</button>
+    <h3 id="dlgTitle">怎么把资料存下来</h3>
+    <div class="lead" id="dlgLead"></div>
+    <div id="dlgSteps"></div>
+    <a class="open-now" id="dlgBtn" href="#">知道了，去保存</a>
+    <div class="hint">存好后回到这里继续刷题即可</div>
+  </div>
+</div>
+
 <script>
 (function(){
   try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.materials&r=" + Date.now(); }catch(e){}
 })();
-/* 多端兼容：链接本身是原生 <a download> + target=_blank，无需 JS 拦截。
-   这里只做环境提示与降级兜底，不阻止默认行为。 */
-(function(){
-  var ua = navigator.userAgent || '';
-  var isWeixin = /MicroMessenger/i.test(ua);
-  var isIOS = /iPhone|iPad|iPod/i.test(ua);
-  var tip = document.getElementById('dlTip');
-  if (isWeixin && tip) {
-    tip.innerHTML = '<b>微信里下载：</b>点「保存」后如没反应，请点右上角「···」→「在浏览器中打开」，再点保存即可。';
-  } else if (isIOS && tip) {
-    tip.innerHTML = '<b>苹果设备下载：</b>点「保存」会打开资料，再点左上角「分享」→「存储到文件」；或长按链接选「下载链接」。';
+
+var UA = navigator.userAgent || '';
+var IS_WEIXIN = /MicroMessenger/i.test(UA);
+var IS_IOS = /iPhone|iPad|iPod/i.test(UA);
+var IS_ANDROID = /Android/i.test(UA);
+var supportDownload = 'download' in document.createElement('a');
+
+function closeDlMask(){ document.getElementById('dlMask').classList.remove('show'); }
+
+function showGuide(kind, url){
+  var title=document.getElementById('dlgTitle'),
+      lead=document.getElementById('dlgLead'),
+      steps=document.getElementById('dlgSteps'),
+      btn=document.getElementById('dlgBtn');
+  if(kind==='weixin'){
+    title.textContent='在微信里存资料，按这 2 步';
+    lead.innerHTML='微信会拦住直接下载，先切到浏览器就能正常保存（一次就好，之后都行）。';
+    steps.innerHTML=
+      '<div class="row"><div class="n">1</div><div class="t">点屏幕<b>右上角的「···」</b>（三个点）</div></div>'+
+      '<div class="row"><div class="n">2</div><div class="t">选<b>「在浏览器中打开」</b>→ 再点绿色的「保存」按钮</div></div>';
+    btn.textContent='知道了，去浏览器打开';
+    btn.href='javascript:closeDlMask()';
+  } else if(kind==='ios'){
+    title.textContent='苹果设备存资料，按这 2 步';
+    lead.innerHTML='点保存后会打开资料预览，再存到「文件」App 即可。';
+    steps.innerHTML=
+      '<div class="row"><div class="n">1</div><div class="t">点绿色「保存」→ 会打开资料预览</div></div>'+
+      '<div class="row"><div class="n">2</div><div class="t">点底部/左上<b>「分享」图标 →「存储到文件」</b>，选好位置存下</div></div>';
+    btn.textContent='知道了，去保存';
+    btn.href='javascript:closeDlMask()';
   }
-  // 兜底：若浏览器不支持 download 属性，点保存时直接新窗口打开，用户可长按/分享保存
-  var supportDownload = 'download' in document.createElement('a');
-  if (!supportDownload) {
-    document.addEventListener('click', function(e){
-      var a = e.target.closest ? e.target.closest('a.op-save[data-file]') : null;
-      if (!a) return;
-      e.preventDefault();
-      window.open(a.href, '_blank');
-    });
+  document.getElementById('dlMask').classList.add('show');
+}
+
+document.addEventListener('click', function(e){
+  var a = e.target.closest ? e.target.closest('a.op-save[data-file]') : null;
+  if(!a) return;
+  // 微信：拦截，弹引导去浏览器（微信内 download 完全失效）
+  if(IS_WEIXIN){
+    e.preventDefault();
+    showGuide('weixin', a.href);
+    return;
   }
-})();
+  // 苹果：download 属性在 iOS Safari 常失效，弹引导（不拦截，让它尽量下载/预览）
+  if(IS_IOS){
+    showGuide('ios', a.href);
+    return;
+  }
+  // 安卓/电脑/其他：若不支持 download 属性，兜底直接打开
+  if(!supportDownload){
+    e.preventDefault();
+    window.open(a.href, '_blank');
+  }
+});
 </script>
 </body>
 </html>
