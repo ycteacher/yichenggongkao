@@ -11,7 +11,7 @@
     <meta property="og:type" content="website">
 
 <link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
-<link href="https://gw.alipayobjects.com/render/p/yuyan/180023180003946312/material-icons.css" rel="stylesheet" crossorigin="anonymous">
+<!-- icons are inline emoji, no external font needed -->
 <link rel="stylesheet" crossorigin href="./assets/index-C2M5URtc.css?v=ttfix10">
 <style>
   body{background:#F7F4EF;color:#202020;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;}
@@ -23,25 +23,30 @@
   .btn-ai{background:linear-gradient(90deg,#7C3AED,#5B21B6);color:#fff;border:none;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(124,58,237,.22);}
   .material-para{padding:10px 14px;background:#FAF8F3;border-radius:14px;font-size:14px;line-height:1.9;white-space:pre-wrap;margin-bottom:10px;}
 
-  /* ===== 作文格子纸 ===== */
+  /* ===== 作文格子纸（严格一格一字，标点占一格）===== */
   .paper-wrap{position:relative;margin-top:10px;border:1px solid #E5E1D8;border-radius:12px;overflow:hidden;background:#FFFDF7;}
-  .paper-hint{position:absolute;top:0;left:0;right:0;height:26px;line-height:26px;padding:0 14px;font-size:11px;color:#B9A98F;background:repeating-linear-gradient(to bottom,#FFFDF7 0,#FFFDF7 25px,#EBD9C4 25px,#EBD9C4 26px);pointer-events:none;z-index:1;}
+  .paper-hint{position:absolute;top:0;left:0;right:0;height:26px;line-height:26px;padding:0 12px;font-size:11px;color:#B9A98F;background:repeating-linear-gradient(to bottom,#FFFDF7 0,#FFFDF7 25px,#EBD9C4 25px,#EBD9C4 26px);pointer-events:none;z-index:1;}
+  /* 网格由 JS 按 CSS 变量 --cell 精确绘制：横向每 --cell 一条竖线，正文行高=--cell；
+     文字用等宽全角字体 + 字间距0，使每个汉字/全角标点恰好落在一格里 */
   textarea.ans{
-    display:block;width:100%;min-height:440px;box-sizing:border-box;
-    border:none;outline:none;resize:vertical;background:transparent;
-    padding:26px 12px 12px;font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC","SimSun",serif;
-    font-size:17px;line-height:32px;color:#1a1a1a;
-    /* 方格稿纸：横竖线 */
+    display:block;width:100%;min-height:448px;box-sizing:border-box;
+    border:none;outline:none;resize:none;background:transparent;
+    --cell:32px;
+    padding:26px 0 0 var(--pad,10px);
+    font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC","SimSun","Noto Serif CJK SC",serif;
+    font-size:var(--cell);line-height:var(--cell);color:#1a1a1a;
+    letter-spacing:0;word-break:break-all;overflow-wrap:anywhere;
     background-image:
-      repeating-linear-gradient(to bottom,transparent 0,transparent 31px,#EBC9AE 31px,#EBC9AE 32px),
-      repeating-linear-gradient(to right,transparent 0,transparent 31px,#F0D9C4 31px,#F0D9C4 32px);
-    background-position:12px 26px;
-    letter-spacing:.5px;
+      repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell) - 1px),#EBC9AE calc(var(--cell) - 1px),#EBC9AE var(--cell)),
+      repeating-linear-gradient(to right,transparent 0,transparent calc(var(--cell) - 1px),#F0D9C4 calc(var(--cell) - 1px),#F0D9C4 var(--cell));
+    background-position:var(--pad,10px) 26px;
+    background-attachment:local;
     caret-color:#B5483C;
   }
   textarea.ans.plain{
-    background:#fff;border:1px solid #E5E1D8;border-radius:12px;padding:14px;
-    font-family:inherit;line-height:1.9;background-image:none;letter-spacing:0;
+    --cell:17px;
+    background:#fff;border:1px solid #E5E1D8;border-radius:12px;padding:14px 12px;
+    font-family:inherit;font-size:16px;line-height:1.9;background-image:none;letter-spacing:0;
   }
   textarea.ans:focus{outline:none;}
   .paper-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;}
@@ -237,7 +242,7 @@
     var html = '';
     html += '<div class="fade">';
     html += '<div style="display:flex;align-items:center;gap:12px;">';
-    html += '<a href="./index.html" style="color:#6B6558;text-decoration:none;"><span class="material-icons">arrow_back</span></a>';
+    html += '<a href="./index.html" style="color:#6B6558;text-decoration:none;"><span class="material-icons">⬅</span></a>';
     html += '<div><h1 style="margin:0;font-size:22px;font-weight:800;">' + tabName() + '练习专区</h1>';
     html += '<p style="margin:2px 0 0;font-size:12px;color:#8A8378;">真题材料 · 电脑/平板打字作答 · 智能精批</p></div></div>';
     html += '<div class="card" style="margin-top:16px;padding:16px 20px;display:flex;gap:0;text-align:center;">';
@@ -292,7 +297,7 @@
     var html = '';
     html += '<div class="fade">';
     html += '<div style="display:flex;align-items:center;gap:12px;">';
-    html += '<button id="backList" style="background:none;border:none;color:#6B6558;cursor:pointer;padding:0;"><span class="material-icons">arrow_back</span></button>';
+    html += '<button id="backList" style="background:none;border:none;color:#6B6558;cursor:pointer;padding:0;"><span class="material-icons">⬅</span></button>';
     html += '<div><p style="margin:0;font-size:12px;color:#8A8378;">' + esc(q.exam || '') + (q.year ? ' · ' + q.year : '') + ' · ' + esc(q.category) + '</p>';
     html += '<h1 style="margin:2px 0 0;font-size:20px;font-weight:800;">' + esc(q.title) + '</h1></div></div>';
 
@@ -353,7 +358,33 @@
       wc.innerHTML = '已写 <strong style="color:' + (n > q.wordLimit ? '#DC2626' : '#15803D') + '">' + n + '</strong> / 限 ' + q.wordLimit + ' 字' + (n > q.wordLimit ? '（超字数啦，精简一下）' : '');
     }
     updWc();
+
+    /* ===== 方格稿纸：严格一格一字 ===== */
+    // 半角标点转全角，确保标点也占满一格（考场作文标点同样占格）
+    var PUNC_MAP={',':'\uff0c','.':'\u3002','?':'\uff1f','!':'\uff01',':':'\uff1a',';':'\uff1b','(':'\uff08',')':'\uff09','"':'\u201c','\'':'\u2018','<':'\u300a','>':'\u300b'};
+    function toFullwidth(s){ return (s||'').replace(/[,.?!:;()"'<>]/g,function(c){ return PUNC_MAP[c]||c; }); }
+    // 按可用宽度算每格像素，使一行容纳整数个格子、字恰好落入格中
+    function layoutPaper(){
+      if(!state.paperMode) return;
+      var avail = ta.clientWidth; if(!avail) return;
+      var pad = 10; // 左右留白，避免贴边
+      var inner = Math.max(120, avail - pad*2);
+      var cell = Math.max(18, Math.floor(inner / 20)); // 每行约20格
+      pad = Math.floor((avail - cell*Math.floor(inner/cell))/2); // 居中余量并入padding
+      ta.style.setProperty('--cell', cell + 'px');
+      ta.style.setProperty('--pad', pad + 'px');
+    }
+    layoutPaper();
+    setTimeout(layoutPaper,60);
+    window.addEventListener('resize',layoutPaper);
+
     ta.oninput = function(){
+      var pos = ta.selectionStart;
+      var converted = toFullwidth(ta.value);
+      if(converted !== ta.value){
+        ta.value = converted;
+        try{ ta.setSelectionRange(pos,pos); }catch(e){}
+      }
       state.draft = ta.value; updWc();
       localStorage.setItem('yc_essay_draft_' + state.tab + ':' + q.id, ta.value);
     };
@@ -364,6 +395,7 @@
       document.getElementById('segPaper').classList.toggle('on', isPaper);
       document.getElementById('segPlain').classList.toggle('on', !isPaper);
       paperHint.style.display = isPaper ? '' : 'none';
+      if(isPaper) setTimeout(layoutPaper,30);
     }
     document.getElementById('segPaper').onclick = function(){ setMode(true); };
     document.getElementById('segPlain').onclick = function(){ setMode(false); };
@@ -513,7 +545,7 @@
     mask.className = 'modal-mask';
     mask.innerHTML = '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;">'
       + '<p style="margin:0;font-size:16px;font-weight:800;">设置在线 AI（可选）</p>'
-      + '<button id="cClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">close</span></button></div>'
+      + '<button id="cClose" style="background:none;border:none;cursor:pointer;color:#8A8378;"><span class="material-icons">✕</span></button></div>'
       + '<p style="font-size:12px;line-height:1.8;color:#6B6558;margin:10px 0;">不填也能用：默认由内置阅卷引擎按考试采分点标准批阅。想用真·大模型逐句点评，填入 OpenAI 兼容接口信息，密钥仅保存在你本机浏览器，不会上传。</p>'
       + '<label style="font-size:12px;color:#6B6558;">接口地址</label><input id="cUrl" class="ans" style="min-height:auto;height:40px;font-size:13px;margin-top:4px;" value="' + esc(c.url) + '">'
       + '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px;">模型名</label><input id="cModel" class="ans" style="min-height:auto;height:40px;font-size:13px;margin-top:4px;" value="' + esc(c.model||'') + '" placeholder="deepseek-chat">'
