@@ -29,15 +29,15 @@
     <meta name="description" content="亿成公考刷题应用——常识、行测、申论全模块免费刷题，押题资料一键保存。">
     <meta property="og:title" content="亿成公考 · 免费刷题应用">
     <meta property="og:description" content="常识、行测、申论全模块免费刷题，押题资料一键保存。">
-    <meta property="og:image" content="https://ycteacher.github.io/yichenggongkao/assets/icon-yc-red-512.png">
+    <meta property="og:image" content="https://ycteacher.github.io/yichenggongkao/assets/icon-yc-red-512.png?v=4">
     <meta property="og:type" content="website">
     <script>window.injectInfo = { env: "PROD" };</script><script id="app-manifest" type="application/json">
 {"navigationBar":{"visible":false,"title":"亿成公考刷题应用","backgroundColor":"#F7F4EF","foregroundColor":"#202020"},"localStorage":true}
     </script>
     <base href="https://ycteacher.github.io/yichenggongkao/">
     <link rel="preload" as="font" type="font/woff2" href="./assets/material-icons.woff2?v=1" crossorigin="anonymous">
-<link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
-    <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=2">
+<link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=4">
+    <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=4">
     <link rel="manifest" href="./manifest.json?v=1">
         <link href="./assets/material-icons.css?v=1" rel="stylesheet">
     <script defer="" src="base.js"></script>
@@ -319,11 +319,22 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-sk-dots i:nth-child(2){animation-delay:.2s}
 .yc-sk-dots i:nth-child(3){animation-delay:.4s}
 @keyframes ycsk{0%,100%{opacity:.25}50%{opacity:1}}
+</style><style>
+/* 窄屏顶栏防挤压：品牌行固定，功能按钮换行横向滚动 */
+@media (max-width:700px){
+  .yc-topbar{flex-wrap:wrap;row-gap:5px;padding-top:8px;padding-bottom:8px}
+  .yc-brand{flex:0 0 auto}
+  .yc-brand-sub{display:none}
+  .yc-brand-name{white-space:nowrap}
+  .yc-top-actions{flex:1 1 100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .yc-top-actions::-webkit-scrollbar{display:none}
+  body.yc-ui{padding-top:92px!important}
+}
 </style></head>
   <body>
     <div id="root"></div>
     <div id="yc-skeleton">
-      <div class="yc-sk-logo">刷</div>
+      <div class="yc-sk-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:18px"></div>
       <div class="yc-sk-name">亿成公考 · 备考神器</div>
       <div class="yc-sk-sub">题库加载中，马上就好</div>
       <div class="yc-sk-dots"><i></i><i></i><i></i></div>
@@ -436,7 +447,7 @@ document.addEventListener('click', function(e){
   var topbar = document.createElement("div");
   topbar.className = "yc-topbar";
   topbar.innerHTML =
-    '<div class="yc-brand"><div class="yc-logo">刷</div>' +
+    '<div class="yc-brand"><div class="yc-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:11px"></div>' +
     '<div><div class="yc-brand-name">亿成公考 · 备考神器</div>' +
     '<div class="yc-brand-sub">亿成老师团队倾心打造 · 题库持续更新</div></div></div>' +
     '<div class="yc-top-actions">' +
@@ -1697,6 +1708,11 @@ document.addEventListener('click', function(e){
   '.yc-inst-st{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.6;color:#202020;margin-top:7px;text-align:left}'+
   '.yc-inst-st>b{flex:none;width:19px;height:19px;border-radius:50%;background:#15803D;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px}'+
   '.yc-inst-st .kb{background:#e7f5ec;color:#15803D;border-radius:5px;padding:1px 5px;font-weight:800;white-space:nowrap}'+
+  '.yc-inst-guides{display:flex;gap:8px;margin-top:10px}'+
+  '.yc-inst-gbtn{flex:1;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-inst-gbtn:active{transform:scale(.97)}'+
+  '.yc-inst-gbtn2{flex:1;background:#fff;color:#B91C1C;border:1.5px solid #B91C1C;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-inst-gbtn2:active{transform:scale(.97)}'+
   '.yc-inst-link{display:block;text-align:center;font-size:13px;font-weight:800;color:#15803D;text-decoration:none;border:1.5px solid #15803D;border-radius:10px;padding:10px;margin-top:14px}'+
   '.yc-inst-foot{font-size:11px;color:#9CA3AF;text-align:center;margin-top:12px;line-height:1.6}';
   var st=document.createElement('style'); st.textContent=CSS; document.head.appendChild(st);
@@ -1766,11 +1782,18 @@ document.addEventListener('click', function(e){
       '<h3>把亿成公考保存到本地</h3>'+
       '<div class="yc-inst-sub">装到桌面后一点就开、不用再找链接，题库自动缓存，离线也能刷。</div>'+
       hero+
+      '<div class="yc-inst-guides"><button class="yc-inst-gbtn" id="ycInstGV">📺 视频讲解</button><button class="yc-inst-gbtn2" id="ycInstGP">🖼 图文讲解</button></div>'+
       '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
       s.wx+
-      '<a class="yc-inst-link" href="install.html">看完整图文 / 视频指引 ›</a>'+
+      '<a class="yc-inst-link" id="ycInstGuideLink" href="install.html">看完整图文 / 视频指引 ›</a>'+
       '<div class="yc-inst-foot">只想存网页文件？电脑按 Ctrl+S（Mac 按 ⌘S）另存即可<br>安装完全免费 · 题库持续更新</div>';
     card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
+    var gl=card.querySelector('#ycInstGuideLink');
+    if(gl) gl.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href='install.html'; });
+    function goGuide(u){ return function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href=u; }; }
+    var gv=card.querySelector('#ycInstGV'), gp=card.querySelector('#ycInstGP');
+    if(gv) gv.addEventListener('click', goGuide('install-video.html'));
+    if(gp) gp.addEventListener('click', goGuide('install-guide.html'));
     var go=card.querySelector('#ycInstGo');
     if(go) go.addEventListener('click',function(){
       if(deferred){
@@ -1957,7 +1980,7 @@ document.addEventListener('click', function(e){
       : (canInstall&&deferred
           ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button>'
           : '<button class="yc-ob-primary" id="obInstalled">✅ 我已装好，下一步 →</button>');
-    var html='<div class="yc-ob-logo">刷</div>'+
+    var html='<div class="yc-ob-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:14px"></div>'+
       '<div class="yc-ob-h">先把亿成公考装到桌面</div>'+
       '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
       '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+
@@ -2385,15 +2408,12 @@ document.addEventListener('click', function(e){
 </script>
 
 <script>
-/* 亿成公考 · 系统升级公告（升级完成后删除 template 中 @@YC_SCRIPT_16@@ 挂载即可） */
+/* 亿成公考 · 内测公告（实时时间 + 问卷引导） */
 (function(){
-  if(document.getElementById('yc-upgrade-notice')) return;
-  function pad(n){return n<10?'0'+n:''+n;}
-  var d=new Date();
-  var timeStr=d.getFullYear()+'\u5e74'+(d.getMonth()+1)+'\u6708'+d.getDate()+'\u65e5 '+pad(d.getHours())+':'+pad(d.getMinutes());
+  if(document.getElementById('yc-notice')) return;
   var css=document.createElement('style');
   css.textContent=
-    '#yc-upgrade-notice{position:sticky;top:0;left:0;right:0;z-index:2147483000;'+
+    '#yc-notice{position:sticky;top:0;left:0;right:0;z-index:2147483000;'+
       'background:linear-gradient(90deg,#B91C1C,#EA580C);color:#fff;'+
       'font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;'+
       'box-shadow:0 2px 10px rgba(0,0,0,.22);}'+
@@ -2402,18 +2422,31 @@ document.addEventListener('click', function(e){
     '.yc-notice-tag{flex:none;background:rgba(255,255,255,.22);border-radius:4px;'+
       'padding:1px 7px;font-weight:700;white-space:nowrap;}'+
     '.yc-notice-text{flex:1;}'+
-    '.yc-notice-text b{color:#FDE68A;}'+
+    '.yc-notice-clock{display:block;color:#FDE68A;font-weight:800;font-size:13.5px;margin-bottom:2px;}'+
+    '.yc-notice-text a{color:#FDE68A;font-weight:700;text-decoration:underline;}'+
     '.yc-notice-close{position:absolute;top:5px;right:8px;background:none;border:none;'+
       'color:#fff;font-size:19px;line-height:1;cursor:pointer;opacity:.9;padding:2px 6px;}';
   document.head.appendChild(css);
   var box=document.createElement('div');
-  box.id='yc-upgrade-notice';
+  box.id='yc-notice';
   box.innerHTML=
     '<div class="yc-notice-inner">'+
-      '<span class="yc-notice-tag">\u7cfb\u7edf\u5347\u7ea7\u516c\u544a</span>'+
-      '<span class="yc-notice-text">'+timeStr+' \u7cfb\u7edf\u6b63\u5728\u5347\u7ea7\uff0c\u9884\u8ba1 <b>\u65e9\u4e0a 6:00</b> \u540e\u6062\u590d\u6b63\u5e38\uff0c\u4e0d\u5f71\u54cd\u767d\u5929\u5237\u9898\u3002\u5f53\u524d\u9875\u9762 bug \u4e0e\u9898\u76ee\u95ee\u9898\u6b63\u5728\u7d27\u6025\u4fee\u590d\u4e2d\u3002\u5185\u6d4b\u540c\u5b66\u8bf7\u5148\u5c06\u5e94\u7528<b>\u5b89\u88c5\u5230\u684c\u9762</b>\uff1b\u63a8\u8350\u4f18\u5148\u4f7f\u7528<b>\u5e73\u677f / \u7f51\u9875\u7248</b>\u505a\u9898\uff0c\u66f4\u65b9\u4fbf\u3002</span>'+
-      '<button class="yc-notice-close" aria-label="\u5173\u95ed">\u00d7</button>'+
+      '<span class="yc-notice-tag">公告</span>'+
+      '<span class="yc-notice-text">'+
+        '<span class="yc-notice-clock" id="yc-notice-clock"></span>'+
+        '亿成公考刷题神器正在内测、不断升级，可能遇到题目或功能的小问题，欢迎包涵与反馈。'+
+        '欢迎提交<a href="./feedback.html">最下方的调查问卷</a>，说说你的使用感受；'+
+        '问卷积分可兑换考公书籍、家电、平板、手机等实物，也可换一对一视频答疑。'+
+      '</span>'+
+      '<button class="yc-notice-close" aria-label="关闭">×</button>'+
     '</div>';
+  function pad(n){return n<10?'0'+n:''+n;}
+  function tick(){
+    var d=new Date();
+    var el=document.getElementById('yc-notice-clock');
+    if(el) el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+  tick(); setInterval(tick,1000);
   function mount(){
     if(!document.body) return;
     document.body.insertBefore(box,document.body.firstChild);
