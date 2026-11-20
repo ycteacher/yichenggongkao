@@ -2413,7 +2413,7 @@ document.addEventListener('click', function(e){
   if(document.getElementById('yc-notice')) return;
   var css=document.createElement('style');
   css.textContent=
-    '#yc-notice{position:sticky;top:0;left:0;right:0;z-index:2147483000;'+
+    '#yc-notice{position:fixed;top:0;left:0;right:0;z-index:2147483000;'+
       'background:linear-gradient(90deg,#B91C1C,#EA580C);color:#fff;'+
       'font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;'+
       'box-shadow:0 2px 10px rgba(0,0,0,.22);}'+
@@ -2435,7 +2435,11 @@ document.addEventListener('click', function(e){
       'z-index:2147483001;background:#1F2937;color:#FDE68A;border:1.5px solid #FDE68A;border-radius:999px;'+
       'padding:10px 18px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);'+
       'font-family:system-ui,-apple-system,"PingFang SC",sans-serif;display:none;white-space:nowrap;}'+
-    '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}';
+    '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}'+
+    /* 公告条固定后，顶栏与正文整体下移，滚动时顶部完全不动 */
+    '.yc-topbar{top:var(--yc-notice-h,0px)!important}'+
+    'body.yc-ui{padding-top:calc(60px + var(--yc-notice-h,0px))!important}'+
+    '@media (max-width:700px){body.yc-ui{padding-top:calc(92px + var(--yc-notice-h,0px))!important}}';
   document.head.appendChild(css);
   var box=document.createElement('div');
   box.id='yc-notice';
@@ -2501,7 +2505,17 @@ document.addEventListener('click', function(e){
     if(!document.body) return;
     document.body.insertBefore(box,document.body.firstChild);
     var btn=box.querySelector('.yc-notice-close');
-    if(btn) btn.addEventListener('click',function(){box.style.display='none';});
+    if(btn) btn.addEventListener('click',function(){
+      box.style.display='none';
+      document.documentElement.style.setProperty('--yc-notice-h','0px');
+    });
+    var measure=function(){
+      if(box.style.display==='none') return;
+      document.documentElement.style.setProperty('--yc-notice-h',(box.offsetHeight||0)+'px');
+    };
+    measure();
+    window.addEventListener('resize',measure);
+    setTimeout(measure,600);
   }
   if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
 })();
