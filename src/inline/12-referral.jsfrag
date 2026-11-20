@@ -162,42 +162,74 @@
   var css=document.createElement("style");
   css.textContent="#yc-share-card{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#4F46E5,#4338CA);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.28)}#yc-share-card:active{transform:scale(.985)}#yc-share-card .yc-share-ic{font-size:26px !important;flex:none}.yc-share-t{font-size:15px;font-weight:800;letter-spacing:.5px}.yc-share-s{font-size:11px;opacity:.92;margin-top:2px}.yc-share-go{font-size:12px;font-weight:700;flex:none;background:rgba(255,255,255,.18);border-radius:999px;padding:5px 10px}.yc-share-link{background:#f1f5f9;border:1.5px dashed #c7d2fe;border-radius:10px;padding:10px 12px;font-size:12px;word-break:break-all;color:#4338ca;margin-bottom:4px}.yc-share-stats{font-size:13px;color:#475569;margin-top:10px;text-align:center}.yc-share-rules{margin-top:12px;border-top:1px solid #eef2f7;padding-top:10px}.yc-share-rt{font-size:12px;color:#94a3b8;margin-bottom:8px}.yc-share-rule{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#0f172a;padding:4px 0}.yc-share-rule b{font-weight:700}.yc-share-rule span{color:#4f46e5;font-weight:700;font-size:12.5px;text-align:right}.yc-wl-st{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:13.5px;line-height:1.6;color:#0f172a;text-align:left}.yc-wl-st>b{flex:none;width:20px;height:20px;border-radius:50%;background:#4f46e5;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}.yc-wl-st span{flex:1}.yc-wl-st .kb{background:#eef2ff;color:#4338ca;border-radius:6px;padding:1px 6px;font-weight:800;white-space:nowrap}.yc-wl-wx{background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:#9a3412;margin-bottom:6px}";
   document.head.appendChild(css);
-  /* 新同学首次打开：安装到桌面引导 */
+  /* 新同学首次打开：安装到桌面引导（按设备详细分类） */
   function welcomeGuide(){
     var seen=false;
     try{seen=!!localStorage.getItem("ycgk.welcomeSeen")}catch(e){}
     if(seen)return;
     var ua=navigator.userAgent||"";
-    var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua);
-    var isMobi=isIOS||isHarmony||/Android|Mobile|Mobi/i.test(ua);
+    var isIPad=/iPad/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+    var isIPhone=/iPhone|iPod/i.test(ua);
+    var isIOS=isIPad||isIPhone;
+    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb|HUAWEI|HONOR/i.test(ua);
+    var isPad=/Pad|Tablet|SM-T\d|SM-P\d|MatePad|Tab\d/i.test(ua);
+    var isAndroid=/Android/i.test(ua);
     var inWx=/MicroMessenger/i.test(ua);
-    var steps="";
-    if(isIOS){
-      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器底部中间的「分享」按钮（方框加向上箭头）</span></div>'+
-            '<div class="yc-wl-st"><b>2</b><span>在弹出的菜单里选「添加到主屏幕」</span></div>'+
-            '<div class="yc-wl-st"><b>3</b><span>点右上「添加」，桌面就有亿成公考图标了</span></div>';
-    }else if(isMobi){
-      steps='<div class="yc-wl-st"><b>1</b><span>点浏览器右上角的「⋮」菜单（华为浏览器也可能在底部「⌘」）</span></div>'+
-            '<div class="yc-wl-st"><b>2</b><span>选「添加到桌面」或「安装应用」</span></div>'+
-            '<div class="yc-wl-st"><b>3</b><span>点「安装」，桌面就有图标了</span></div>';
+    var isPC=!isIOS&&!isHarmony&&!isAndroid;
+    /* 判断具体设备类别 */
+    var devLabel="设备",steps="";
+    if(isIPad){
+      devLabel="iPad 平板";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 iPad 自带的 <b class="kb">Safari</b> 浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点屏幕顶部右侧的「分享」按钮（方框+向上箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>向下滑，选「<b>添加到主屏幕</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点右上「添加」，桌面出现「亿成公考」图标，点开即用</span></div>';
+    }else if(isIPhone){
+      devLabel="iPhone 手机";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 iPhone 自带的 <b class="kb">Safari</b> 浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点屏幕<b>底部中间</b>的「分享」按钮（方框+向上箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>向下滑，选「<b>添加到主屏幕</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点右上「添加」，桌面出现图标，以后一点就开</span></div>';
+    }else if(isHarmony){
+      devLabel="鸿蒙设备"+(isPad?"（平板）":"（手机）");
+      steps='<div class="yc-wl-st"><b>1</b><span>用华为自带的 <b class="kb">浏览器</b> 打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点底部中间的「三道杠」或右上「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>选「<b>添加到桌面</b>」或「<b>添加书签</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>确认后，桌面出现图标；从桌面打开即可全屏刷题</span></div>';
+    }else if(isAndroid&&isPad){
+      devLabel="安卓平板";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点右上角的「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>选「<b>添加到主屏幕</b>」或「<b>安装应用</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点「安装」，桌面出现图标，横屏刷题更舒服</span></div>';
+    }else if(isAndroid){
+      devLabel="安卓手机";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点右上角的「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>选「<b>添加到主屏幕</b>」或「<b>安装应用</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点「安装」，桌面出现「亿成公考」图标</span></div>';
     }else{
-      steps='<div class="yc-wl-st"><b>1</b><span>按 <b class="kb">Ctrl+D</b>（Mac 按 <b class="kb">⌘+D</b>）收藏本页</span></div>'+
-            '<div class="yc-wl-st"><b>2</b><span>也可以把地址栏左边的图标直接拖到桌面</span></div>';
+      devLabel="电脑";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或 <b class="kb">Edge</b> 浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点地址栏<b>右侧</b>的「安装」图标（显示器+向下箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>若没看到图标，点右上「⋮」→「<b>安装此站点为应用</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点「安装」，桌面/开始菜单出现图标，独立窗口刷题更清爽</span></div>';
     }
     var ov=document.createElement("div");ov.className="yc-sync-ov";
     ov.innerHTML='<div class="yc-sync-card">'+
-      '<h3>欢迎来到亿成公考</h3>'+
-      '<div class="yc-sync-tip">题库全免费，内测期间不收一分钱。<b>建议先把应用添加到桌面</b>，以后从桌面图标进，不用再找链接：</div>'+
-      (inWx?'<div class="yc-wl-wx">你现在在微信里打开，请先点右上角「···」选「在浏览器打开」，再按下面步骤操作</div>':'')+
+      '<h3>欢迎来到亿成公考 👋</h3>'+
+      '<div class="yc-sync-tip">题库全免费，内测期间不收一分钱。<b>建议先把它装到桌面</b>，以后从图标一点就开，不用再找链接。检测到你用的是<b>'+devLabel+'</b>，按下面步骤操作：</div>'+
+      (inWx?'<div class="yc-wl-wx">⚠️ 你现在是在微信里打开的，微信会拦住安装。请先点右上角「···」→「<b>在浏览器中打开</b>」，再按下面步骤操作</div>':'')+
       steps+
-      '<button class="yc-sync-btn main" id="ycWlOk">好的，开始刷题</button>'+
+      '<button class="yc-sync-btn main" id="ycWlOk">知道了，开始刷题</button>'+
+      '<button class="yc-sync-btn" id="ycWlLater" style="margin-top:8px">先不装，直接刷题</button>'+
       '</div>';
     document.body.appendChild(ov);
     try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlshow&r="+Date.now()}catch(e){}
     function done(){try{localStorage.setItem("ycgk.welcomeSeen","1")}catch(e){}ov.classList.remove("on")}
     ov.addEventListener("click",function(e){if(e.target===ov)done()});
     ov.querySelector("#ycWlOk").addEventListener("click",function(){try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlok&r="+Date.now()}catch(e){}done()});
+    ov.querySelector("#ycWlLater").addEventListener("click",done);
     setTimeout(function(){ov.classList.add("on")},600);
   }
   function boot(){
