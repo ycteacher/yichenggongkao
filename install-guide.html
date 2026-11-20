@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>图文安装讲解 · 亿成公考</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#F5F3EE;color:#232323;padding-bottom:56px}
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#B91C1C,#7F1D1D);color:#fff;display:flex;align-items:center;gap:10px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.backbtn{flex:none;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);border:none;color:#fff;font-size:14px;font-weight:700;padding:8px 14px 8px 10px;border-radius:999px;cursor:pointer;text-decoration:none;font-family:inherit}
+.backbtn:active{background:rgba(255,255,255,.32)}
+.topbar h1{font-size:16px;font-weight:800;letter-spacing:.5px}
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 0}
+.hero{background:#fff;border:1px solid #EAE6DC;border-radius:16px;padding:16px;margin-bottom:14px}
+.hero h2{font-size:18px;font-weight:900;color:#B91C1C}
+.hero p{font-size:13px;color:#666;line-height:1.7;margin-top:6px}
+.hero p b{color:#232323}
+.tabs{display:flex;gap:10px;margin-bottom:14px}
+.tab{flex:1;border:2px solid #E5E0D4;background:#fff;border-radius:14px;padding:12px 8px;font-size:15px;font-weight:800;color:#777;cursor:pointer;text-align:center;font-family:inherit}
+.tab.on{border-color:#B91C1C;color:#B91C1C;background:#FFF5F5}
+.tab small{display:block;font-size:11px;font-weight:600;color:#999;margin-top:3px}
+.tab.on small{color:#C96A6A}
+.panel{display:none}
+.panel.on{display:block}
+.step{background:#fff;border:1px solid #EAE6DC;border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.step .hd{display:flex;align-items:center;gap:10px;padding:13px 16px;background:#FAF8F3;border-bottom:1px solid #F0ECE2}
+.step .num{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:#B91C1C}
+.step.android .num{background:#2563EB}
+.step .hd h3{font-size:15.5px;font-weight:800}
+.step .bd{padding:14px 16px 16px}
+.step .bd p{font-size:14px;line-height:1.8;color:#333}
+.step .bd p+p{margin-top:8px}
+.step .bd b{color:#B91C1C}
+.step.android .bd b{color:#1D4ED8}
+.k{display:inline-block;background:#F1EFE9;border:1px solid #DDD8CC;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:700;color:#444;margin:0 2px;white-space:nowrap}
+.pic{background:#F7F5F0;border-radius:12px;padding:14px;display:flex;justify-content:center;margin-top:12px}
+.pic svg{width:190px;height:auto}
+.warn{background:#FFF8E7;border:1px solid #F5D98B;border-radius:14px;padding:12px 14px;margin:14px 0;font-size:13px;line-height:1.75;color:#7A5B12}
+.warn b{color:#A06800}
+.faq{background:#fff;border:1px solid #EAE6DC;border-radius:18px;padding:16px;margin-top:4px}
+.faq h3{font-size:15px;font-weight:900;color:#B91C1C;margin-bottom:10px}
+.faq .q{font-size:13.5px;font-weight:800;margin-top:10px}
+.faq .a{font-size:13px;color:#555;line-height:1.75;margin-top:3px}
+.backbar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(245,243,238,.94);backdrop-filter:blur(8px);padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+.backbar a{display:block;text-align:center;background:#B91C1C;color:#fff;border-radius:14px;padding:14px;font-size:15px;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(185,28,28,.3)}
+.backbar a:active{transform:scale(.98)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="backbtn" href="./index.html" onclick="if(history.length>1){event.preventDefault();history.back()}">‹ 返回</a>
+  <h1>图文安装讲解</h1>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h2>把亿成公考装到手机桌面</h2>
+    <p>装好以后，桌面上有一个「亿成公考」图标，<b>点开就是全屏刷题，不用再找网址</b>。整个过程免费、不用下载任何东西，跟着下面几步点就行。</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="tabIos" onclick="showPanel('ios')">🍎 苹果手机<small>iPhone / iPad 通用</small></button>
+    <button class="tab" id="tabAnd" onclick="showPanel('and')">🤖 安卓手机<small>华为 / 小米 / OPPO 等</small></button>
+  </div>
+
+  <!-- ============ 苹果 ============ -->
+  <div class="panel on" id="panelIos">
+    <div class="warn"><b>先看一眼：</b>如果你现在是在<b>微信</b>里打开的这个页面，微信里装不了。请点右上角「<b>···</b>」→ 选「<b>在浏览器中打开</b>」，用 Safari 打开后再照着做。</div>
+
+    <div class="step">
+      <div class="hd"><div class="num">1</div><h3>用 Safari 打开刷题网址</h3></div>
+      <div class="bd">
+        <p>找到屏幕底部的 <b>Safari</b>（蓝色指南针图标），点开，在顶部地址栏输入或粘贴刷题网址，打开页面。</p>
+        <p>一定要用 <b>Safari</b>，QQ 浏览器、UC 之类的装不了。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <rect x="40" y="26" width="120" height="20" rx="10" fill="#EFEDE6"/>
+            <text x="100" y="40" font-size="9" fill="#8A8378" text-anchor="middle">ycteacher.github.io/yichenggongkao</text>
+            <rect x="40" y="54" width="120" height="60" rx="8" fill="#B91C1C"/>
+            <text x="100" y="80" font-size="13" fill="#fff" text-anchor="middle" font-weight="bold">亿成公考</text>
+            <text x="100" y="98" font-size="8" fill="#FDE68A" text-anchor="middle">免费刷题 · 备考神器</text>
+            <text x="100" y="132" font-size="8" fill="#B0AAA0" text-anchor="middle">Safari 打开后能看到这个红色页面</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="hd"><div class="num">2</div><h3>点屏幕最底部的「分享」按钮</h3></div>
+      <div class="bd">
+        <p>页面打开后，看屏幕<b>最下面一条</b>：中间有一个 <b>方框、箭头朝上</b> 的图标（分享按钮），点它。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <rect x="40" y="20" width="120" height="80" rx="8" fill="#F7F5F0"/>
+            <rect x="40" y="112" width="120" height="24" rx="12" fill="#EFEDE6"/>
+            <circle cx="58" cy="124" r="7" fill="#C9C4B8"/>
+            <circle cx="80" cy="124" r="7" fill="#C9C4B8"/>
+            <circle cx="100" cy="124" r="11" fill="#FFF0F0" stroke="#B91C1C" stroke-width="2.5"/>
+            <path d="M100 119 v8 M96.5 122 l3.5 -3.5 3.5 3.5" stroke="#B91C1C" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M93 127 h14" stroke="#B91C1C" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="122" cy="124" r="7" fill="#C9C4B8"/>
+            <circle cx="142" cy="124" r="7" fill="#C9C4B8"/>
+            <text x="100" y="146" font-size="8" fill="#B91C1C" text-anchor="middle" font-weight="bold">↑ 点这个「分享」图标</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="hd"><div class="num">3</div><h3>在菜单里找到「添加到主屏幕」</h3></div>
+      <div class="bd">
+        <p>点完分享会从底部弹出一个白色菜单。<b>用手指往上滑动</b>这个菜单，找到一行带 <b>橙色 ⊕ 号</b> 的「<b>添加到主屏幕</b>」，点它。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <rect x="40" y="30" width="120" height="100" rx="10" fill="#F7F5F0"/>
+            <rect x="48" y="38" width="104" height="12" rx="6" fill="#E5E1D6"/>
+            <rect x="48" y="54" width="104" height="12" rx="6" fill="#E5E1D6"/>
+            <rect x="48" y="70" width="104" height="18" rx="9" fill="#FFF0F0" stroke="#B91C1C" stroke-width="2"/>
+            <circle cx="60" cy="79" r="6" fill="#FF9500"/>
+            <text x="60" y="83" font-size="8" fill="#fff" text-anchor="middle" font-weight="bold">+</text>
+            <text x="106" y="83" font-size="9" fill="#B91C1C" text-anchor="middle" font-weight="bold">添加到主屏幕</text>
+            <rect x="48" y="94" width="104" height="12" rx="6" fill="#E5E1D6"/>
+            <rect x="48" y="110" width="104" height="12" rx="6" fill="#E5E1D6"/>
+            <text x="100" y="22" font-size="8" fill="#8A8378" text-anchor="middle">↑ 在弹出的菜单里往上滑</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="hd"><div class="num">4</div><h3>点右上角「添加」</h3></div>
+      <div class="bd">
+        <p>会跳到一个确认页面，上面显示图标和名字「亿成公考」。直接点右上角蓝色的「<b>添加</b>」两个字。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <text x="100" y="30" font-size="9" fill="#8A8378" text-anchor="middle">确认页面</text>
+            <rect x="82" y="42" width="36" height="36" rx="9" fill="#B91C1C"/>
+            <text x="100" y="64" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">上岸</text>
+            <text x="100" y="92" font-size="9" fill="#333" text-anchor="middle" font-weight="bold">亿成公考</text>
+            <text x="164" y="52" font-size="10" fill="#157AFF" text-anchor="middle" font-weight="bold">添加</text>
+            <circle cx="164" cy="48" r="14" fill="none" stroke="#157AFF" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <text x="100" y="130" font-size="8" fill="#8A8378" text-anchor="middle">名字不用改，直接点右上「添加」</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="hd"><div class="num">5</div><h3>完成！桌面上就有图标了</h3></div>
+      <div class="bd">
+        <p>回到手机桌面，能看到红色的「<b>亿成公考</b>」图标。以后<b>点这个图标</b>就直接进刷题页面，全屏显示，跟正经 App 一样。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <g fill="#E5E1D6"><rect x="46" y="26" width="22" height="22" rx="6"/><rect x="76" y="26" width="22" height="22" rx="6"/><rect x="106" y="26" width="22" height="22" rx="6"/><rect x="136" y="26" width="22" height="22" rx="6"/><rect x="46" y="56" width="22" height="22" rx="6"/><rect x="76" y="56" width="22" height="22" rx="6"/><rect x="136" y="56" width="22" height="22" rx="6"/></g>
+            <rect x="106" y="56" width="22" height="22" rx="6" fill="#B91C1C" stroke="#FFD65A" stroke-width="2"/>
+            <text x="117" y="71" font-size="7" fill="#fff" text-anchor="middle" font-weight="bold">上岸</text>
+            <text x="117" y="88" font-size="6.5" fill="#555" text-anchor="middle">亿成公考</text>
+            <text x="100" y="120" font-size="9" fill="#1A7F37" text-anchor="middle" font-weight="bold">✅ 装好了，点开就能刷题</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq">
+      <h3>常见问题</h3>
+      <div class="q">桌面上已经有旧图标，想换新的？</div>
+      <div class="a">在桌面上<b>长按</b>旧图标 → 点「删除 App」→ 再按上面的步骤重新添加一次，就是新图标了。</div>
+      <div class="q">点开是白屏或打不开？</div>
+      <div class="a">先用 Safari 打开网址试试；能打开的话，删掉桌面图标重新添加一次即可。一般是没有网络或缓存太旧。</div>
+      <div class="q">找不到「添加到主屏幕」这一行？</div>
+      <div class="a">说明你用的不是 Safari。回到第 1 步，确认是用 Safari 打开的页面。</div>
+    </div>
+  </div>
+
+  <!-- ============ 安卓 ============ -->
+  <div class="panel" id="panelAnd">
+    <div class="warn"><b>先看一眼：</b>如果你现在是在<b>微信</b>里打开的这个页面，微信里装不了。请点右上角「<b>···</b>」→ 选「<b>在浏览器中打开</b>」，用 Chrome 或手机自带浏览器打开后再照着做。</div>
+
+    <div class="step android">
+      <div class="hd"><div class="num">1</div><h3>用浏览器打开刷题网址</h3></div>
+      <div class="bd">
+        <p>用 <b>Chrome</b>（谷歌浏览器）或手机<b>自带浏览器</b>打开刷题网址。华为、小米、OPPO、vivo 自带的浏览器都可以。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <rect x="40" y="26" width="120" height="20" rx="10" fill="#EFEDE6"/>
+            <text x="96" y="40" font-size="9" fill="#8A8378" text-anchor="middle">ycteacher.github.io/…</text>
+            <circle cx="150" cy="36" r="2" fill="#8A8378"/><circle cx="155" cy="36" r="2" fill="#8A8378"/><circle cx="160" cy="36" r="2" fill="#8A8378"/>
+            <rect x="40" y="54" width="120" height="60" rx="8" fill="#B91C1C"/>
+            <text x="100" y="80" font-size="13" fill="#fff" text-anchor="middle" font-weight="bold">亿成公考</text>
+            <text x="100" y="98" font-size="8" fill="#FDE68A" text-anchor="middle">免费刷题 · 备考神器</text>
+            <text x="100" y="132" font-size="8" fill="#B0AAA0" text-anchor="middle">打开后能看到这个红色页面</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step android">
+      <div class="hd"><div class="num">2</div><h3>点右上角的「⋮」三个点</h3></div>
+      <div class="bd">
+        <p>在页面<b>右上角</b>找到竖着的三个点 <span class="k">⋮</span>，点它，会弹出一个菜单。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <circle cx="155" cy="36" r="11" fill="#FFF0F0" stroke="#1D4ED8" stroke-width="2"/>
+            <circle cx="155" cy="31" r="1.6" fill="#1D4ED8"/><circle cx="155" cy="36" r="1.6" fill="#1D4ED8"/><circle cx="155" cy="41" r="1.6" fill="#1D4ED8"/>
+            <text x="100" y="80" font-size="9" fill="#1D4ED8" text-anchor="middle" font-weight="bold">↑ 点右上角三个点</text>
+            <text x="100" y="130" font-size="8" fill="#B0AAA0" text-anchor="middle">弹出菜单后看下一步</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step android">
+      <div class="hd"><div class="num">3</div><h3>点「添加到主屏幕」或「安装应用」</h3></div>
+      <div class="bd">
+        <p>在弹出的菜单里找「<b>添加到主屏幕</b>」或「<b>安装应用</b>」（不同手机叫法不一样，意思相同），点它。</p>
+        <p>华为 / 小米自带浏览器里可能叫「<b>添加到桌面</b>」。</p>
+        <div class="pic">
+          <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="8" width="140" height="134" rx="16" fill="#fff" stroke="#D8D3C6" stroke-width="2"/>
+            <rect x="80" y="30" width="86" height="96" rx="10" fill="#F7F5F0" stroke="#E0DCD1"/>
+            <rect x="86" y="38" width="74" height="12" rx="6" fill="#E5E1D6"/>
+            <rect x="86" y="54" width="74" height="14" rx="7" fill="#EDF4FF" stroke="#1D4ED8" stroke-width="2"/>
+            <text x="123" y="64.5" font-size="8.5" fill="#1D4ED8" text-anchor="middle" font-weight="bold">添加到主屏幕</text>
+            <rect x="86" y="72" width="74" height="12" rx="6" fill="#E5E1D6"/>
+            <rect x="86" y="88" width="74" height="12" rx="6" fill="#E5E1D6"/>
+            <rect x="86" y="104" width="74" height="12" rx="6" fill="#E5E1D6"/>
+            <text x="100" y="22" font-size="8" fill="#8A8378" text-anchor="middle">菜单长这样（各手机略有不同）</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="step android">
+      <div class="hd"><div class="num">4</div><h3>点「安装」确认</h3></div>
+      <div class="bd">
+        <p>如果弹出确认框，点「<b>安装</b>」或「<b>添加</b>」。有的手机会问「要添加到桌面吗」，点<b>允许 / 添加</b>。</p>
+      </div>
+    </div>
+
+    <div class="step android">
+      <div class="hd"><div class="num">5</div><h3>完成！桌面出现图标</h3></div>
+      <div class="bd">
+        <p>回到桌面，看到红色的「<b>亿成公考</b>」图标，点开就是全屏刷题 ✅</p>
+        <p>个别手机装完后图标在「<b>文件夹</b>」或第二屏，找一下就有。</p>
+      </div>
+    </div>
+
+    <div class="faq">
+      <h3>常见问题</h3>
+      <div class="q">菜单里没有「添加到主屏幕」？</div>
+      <div class="a">说明当前用的浏览器不支持。换 <b>Chrome</b> 打开网址再试；或者菜单里找「工具箱 → 添加到桌面」。</div>
+      <div class="q">点开是白屏或打不开？</div>
+      <div class="a">删掉桌面图标，用浏览器重新打开网址，再添加一次。一般是没有网络或缓存太旧。</div>
+    </div>
+  </div>
+</div>
+
+<div class="backbar"><a href="./index.html">‹ 返回亿成公考，开始刷题</a></div>
+
+<script>
+function showPanel(which){
+  var ios = which === 'ios';
+  document.getElementById('panelIos').classList.toggle('on', ios);
+  document.getElementById('panelAnd').classList.toggle('on', !ios);
+  document.getElementById('tabIos').classList.toggle('on', ios);
+  document.getElementById('tabAnd').classList.toggle('on', !ios);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
