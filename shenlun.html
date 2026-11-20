@@ -15,7 +15,12 @@
 <link rel="stylesheet" crossorigin href="./assets/index-C2M5URtc.css?v=ttfix10">
 <style>
   body{background:#F7F4EF;color:#202020;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;}
-  .card{background:#fff;border:1px solid #E5E1D8;border-radius:24px;box-shadow:0 2px 12px rgba(32,32,32,.06);}
+  .card{background:#fff;border:1px solid #E5E1D8;border-radius:24px;box-shadow:0 2px 12px rgba(32,32,32,.06);box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;word-break:break-word;}
+  /* AI 点评/参考答案等长文本：必须自动折行，绝不能撑破卡片右边框 */
+  pre.prompt,.prompt{white-space:pre-wrap!important;word-break:break-word;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:2;color:#3B3730;max-width:100%;box-sizing:border-box;margin-left:0;margin-right:0;}
+  .card p,.card span,.card div{overflow-wrap:anywhere;word-break:break-word;min-width:0;}
+  .pt-row>span{min-width:0;overflow-wrap:anywhere;word-break:break-word;}
+  .dim-row>span{min-width:0;}
   .chip{border:1px solid #E5E1D8;background:#FAF8F3;border-radius:9999px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .15s;}
   .chip.on{border-color:#B5483C;background:rgba(181,72,60,.08);color:#B5483C;font-weight:600;}
   .btn-primary{background:linear-gradient(90deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:16px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(220,38,38,.22);}
@@ -31,10 +36,11 @@
   textarea.ans{
     display:block;width:100%;min-height:448px;box-sizing:border-box;
     border:none;outline:none;resize:none;background:transparent;
-    --cell:32px;
+    --cell:24px;
     padding:26px 0 0 var(--pad,10px);
-    font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC","SimSun","Noto Serif CJK SC",serif;
-    font-size:var(--cell);line-height:var(--cell);color:#1a1a1a;
+    /* 工整有设计感、绝不潦草的本地楷体栈；全部系统本地字体，零联网、零乱码 */
+    font-family:"LXGW WenKai","霞鹜文楷","Kaiti SC","STKaiti","华文楷体","KaiTi","楷体","Songti SC","SimSun",serif;
+    font-size:var(--cell);line-height:var(--cell);color:#2B2720;
     letter-spacing:0;word-break:break-all;overflow-wrap:anywhere;
     background-image:
       repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell) - 1px),#EBC9AE calc(var(--cell) - 1px),#EBC9AE var(--cell)),
@@ -363,14 +369,14 @@
     // 半角标点转全角，确保标点也占满一格（考场作文标点同样占格）
     var PUNC_MAP={',':'\uff0c','.':'\u3002','?':'\uff1f','!':'\uff01',':':'\uff1a',';':'\uff1b','(':'\uff08',')':'\uff09','"':'\u201c','\'':'\u2018','<':'\u300a','>':'\u300b'};
     function toFullwidth(s){ return (s||'').replace(/[,.?!:;()"'<>]/g,function(c){ return PUNC_MAP[c]||c; }); }
-    // 按可用宽度算每格像素，使一行容纳整数个格子、字恰好落入格中
+    // 固定舒适字号（不随屏幕放大），屏幕越宽则一行格子越多；字恰好落入格中
     function layoutPaper(){
       if(!state.paperMode) return;
       var avail = ta.clientWidth; if(!avail) return;
-      var pad = 10; // 左右留白，避免贴边
-      var inner = Math.max(120, avail - pad*2);
-      var cell = Math.max(18, Math.floor(inner / 20)); // 每行约20格
-      pad = Math.floor((avail - cell*Math.floor(inner/cell))/2); // 居中余量并入padding
+      var cell = avail < 420 ? 20 : (avail < 760 ? 22 : 24); // 手机20/平板22/大屏24，观感精致
+      var cols = Math.max(8, Math.floor(avail / cell));       // 一行能放几格
+      var used = cols * cell;
+      var pad = Math.max(0, Math.floor((avail - used) / 2));  // 居中余量并入padding
       ta.style.setProperty('--cell', cell + 'px');
       ta.style.setProperty('--pad', pad + 'px');
     }
