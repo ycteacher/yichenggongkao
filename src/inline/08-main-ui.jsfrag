@@ -290,6 +290,21 @@
       window.location.href = "materials.html";
     });
     entry.parentNode.insertBefore(card, entry);
+
+    /* 安装指引卡片：手机/平板/电脑怎么装到桌面 */
+    if (!document.getElementById("yc-install-card")) {
+      var ic = document.createElement("div");
+      ic.id = "yc-install-card";
+      ic.innerHTML =
+        '<span class="material-icons yc-mat-ic">install_mobile</span>' +
+        '<div class="yc-mat-tx"><div class="yc-mat-t">安装到桌面</div>' +
+        '<div class="yc-mat-s">手机 / 平板 / 电脑 · 一点即开，像 App 一样用</div></div>' +
+        '<span class="yc-mat-go">查看 ›</span>';
+      ic.addEventListener("click", function(){
+        window.location.href = "install.html";
+      });
+      entry.parentNode.insertBefore(ic, card);
+    }
   }
 
   /* ---------- 内测版横幅（首页顶部） ---------- */

@@ -34,6 +34,7 @@
     <link rel="preload" as="font" type="font/woff2" href="./assets/material-icons.woff2?v=1" crossorigin>
 <link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=2">
     <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=2">
+    <link rel="manifest" href="./manifest.json?v=1">
         <link href="./assets/material-icons.css?v=1" rel="stylesheet">
     <script defer="" src="base.js"></script>
     <script>window.YC_CS_BANK=window.YC_CS_BANK||[];</script>
@@ -633,6 +634,21 @@ document.addEventListener('click', function(e){
       window.location.href = "materials.html";
     });
     entry.parentNode.insertBefore(card, entry);
+
+    /* 安装指引卡片：手机/平板/电脑怎么装到桌面 */
+    if (!document.getElementById("yc-install-card")) {
+      var ic = document.createElement("div");
+      ic.id = "yc-install-card";
+      ic.innerHTML =
+        '<span class="material-icons yc-mat-ic">install_mobile</span>' +
+        '<div class="yc-mat-tx"><div class="yc-mat-t">安装到桌面</div>' +
+        '<div class="yc-mat-s">手机 / 平板 / 电脑 · 一点即开，像 App 一样用</div></div>' +
+        '<span class="yc-mat-go">查看 ›</span>';
+      ic.addEventListener("click", function(){
+        window.location.href = "install.html";
+      });
+      entry.parentNode.insertBefore(ic, card);
+    }
   }
 
   /* ---------- 内测版横幅（首页顶部） ---------- */

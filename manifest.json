@@ -1,0 +1,19 @@
+{
+  "name": "亿成公考 · 刷题资料库",
+  "short_name": "亿成公考",
+  "description": "亿成老师公考刷题与资料库 · 常识/行测/申论/综应全模块",
+  "start_url": "https://ycteacher.github.io/yichenggongkao/",
+  "scope": "https://ycteacher.github.io/yichenggongkao/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F4EF",
+  "theme_color": "#B91C1C",
+  "icons": [
+    {
+      "src": "https://ycteacher.github.io/yichenggongkao/assets/icon-yc-red-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
