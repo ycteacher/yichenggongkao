@@ -152,8 +152,8 @@ var VIDEOS = [
 var state = { view: "home", cat: null, idx: -1 };
 
 /* 调试日志（临时） */
-window.vlog = [];
-function vlog(m){ window.vlog.push(Math.round(performance.now()) + "ms " + m); }
+window.vlogArr = window.vlogArr || [];
+function vlog(m){ window.vlogArr.push(Math.round(performance.now()) + "ms " + m); }
 
 /* 注册播放辅助脚本：就绪后再挂载视频源（见 renderPlay） */
 var swReady = (function(){
