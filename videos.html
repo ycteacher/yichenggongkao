@@ -49,6 +49,12 @@
   }
   .pdf-btn:active { transform:scale(.99); }
   .pdf-btn .arr { font-size:16px; }
+  .bili-link {
+    display:block; margin-top:10px; padding:10px 14px; border-radius:12px;
+    background:#FCEEF3; color:#C2185B; font-size:13px; font-weight:600;
+    text-decoration:none;
+  }
+  .bili-link:active { transform:scale(.99); }
   .pdf-note { font-size:11px; color:#9A9387; margin-top:6px; }
   .empty {
     text-align:center; padding:64px 24px; color:#8A8378;
@@ -108,20 +114,22 @@ var VIDEOS = [
       '<div class="video-box"><iframe src="https://player.bilibili.com/player.html?bvid=' +
       encodeURIComponent(v.bvid) + '&page=1&high_quality=1&danmaku=0&autoplay=0" ' +
       'loading="lazy" allowfullscreen="true" scrolling="no" frameborder="0" ' +
+      'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" ' +
       'title="' + esc(v.title || "视频讲解") + '"></iframe></div>' +
       '<div class="body">' +
         '<h2>' + esc(v.title || "视频讲解 " + (i + 1)) + '</h2>' +
         (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
+        '<a class="bili-link" href="https://www.bilibili.com/video/' + encodeURIComponent(v.bvid) + '">▶ 视频白屏或想用B站App看？点这里 ›</a>' +
         (function(){
           var pdfs = v.pdfs || (v.pdf ? [{ name: "配套试卷", file: v.pdf }] : []);
           var out = "";
           for (var j = 0; j < pdfs.length; j++) {
             var p = pdfs[j];
             if (!p || !p.file) continue;
-            out += '<a class="pdf-btn" href="' + esc(p.file) + '" target="_blank" rel="noopener">' +
+            out += '<a class="pdf-btn" href="' + esc(p.file) + '">' +
               '<span>📄 配套试卷 · ' + esc(p.name || "试卷" + (j + 1)) + '</span><span class="arr">›</span></a>';
           }
-          if (out) out += '<p class="pdf-note">打开后可保存到手机，或打印出来对着视频做题</p>';
+          if (out) out += '<p class="pdf-note">打开试卷后，点右上角「分享」→「存储到文件」即可保存，也可以直接打印</p>';
           return out;
         })() +
       '</div></div>';
