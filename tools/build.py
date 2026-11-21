@@ -19,7 +19,7 @@ ASSETS = os.path.join(ROOT, "assets")
 INDEX_OUT = os.path.join(ASSETS, "qbank-index.json")
 IDMAP_OUT = os.path.join(ASSETS, "qbank-idmap.json")
 
-BANK_VER = "tt50"
+BANK_VER = "tt51"
 
 with open(TEMPLATE, encoding="utf-8") as fh:
     template = fh.read()
@@ -109,7 +109,7 @@ def build_bank_index():
                                   or f in ("shenlun-bank-1.js", "zongying-bank-1.js"))
     )
     files_meta = {}
-    cs_items, more_items = [], []
+    cs_items, more_items, essay_items = [], [], []
     for name in shard_names:
         text = open(os.path.join(ASSETS, name + ".js"), encoding="utf-8").read()
         payloads = _extract_json_arrays(text)
@@ -127,6 +127,7 @@ def build_bank_index():
         else:
             for p in payloads:
                 items.extend(_as_items(p))
+            essay_items.extend(items)
             module = "shenlun" if name.startswith("shenlun-") else "zongying"
         files_meta[name] = {"module": module, "count": len(items), "bytes": len(text.encode("utf-8"))}
 
@@ -178,7 +179,7 @@ def build_bank_index():
 
     index = {
         "v": BANK_VER,
-        "total": len(cs_items) + len(more_items),
+        "total": len(cs_items) + len(more_items) + len(essay_items),
         "mergedTotal": sum(merged_per_mod.values()),
         "modules": modules,
         "files": files_meta,
