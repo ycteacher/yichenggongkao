@@ -19,7 +19,7 @@ ASSETS = os.path.join(ROOT, "assets")
 INDEX_OUT = os.path.join(ASSETS, "qbank-index.json")
 IDMAP_OUT = os.path.join(ASSETS, "qbank-idmap.json")
 
-BANK_VER = "tt51"
+BANK_VER = "tt52"
 
 with open(TEMPLATE, encoding="utf-8") as fh:
     template = fh.read()
