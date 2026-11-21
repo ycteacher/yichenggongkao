@@ -21,42 +21,64 @@
     display:flex; align-items:center; justify-content:center;
     width:36px; height:36px; border-radius:999px; background:#fff;
     box-shadow:0 1px 4px rgba(32,32,32,.08); text-decoration:none;
-    color:#202020; font-size:18px; flex:none;
+    color:#202020; font-size:18px; flex:none; cursor:pointer;
   }
   .topbar .tt { flex:1; min-width:0; }
   .topbar .tt h1 { font-size:17px; font-weight:700; }
   .topbar .tt p { font-size:12px; color:#8A8378; margin-top:2px; }
-  /* 分类导航 */
-  .tabs {
-    position:sticky; top:61px; z-index:9;
-    background:#FAF8F3; padding:10px 16px 10px;
-    display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    scrollbar-width:none; border-bottom:1px solid #EDE9E0;
-  }
-  .tabs::-webkit-scrollbar { display:none; }
-  .tab {
-    flex:none; padding:7px 16px; border-radius:999px; font-size:13px; font-weight:600;
-    background:#fff; color:#6B6558; border:1px solid #EDE9E0; cursor:pointer;
-    transition:all .15s;
-  }
-  .tab.on { background:#15803D; color:#fff; border-color:#15803D; }
   .wrap { max-width:760px; margin:0 auto; padding:16px 16px 48px; }
-  .tip {
+  .foot { text-align:center; font-size:11px; color:#B3AC9E; padding:8px 0 24px; }
+
+  /* ---- 首页：六大模块大图标 ---- */
+  .cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .cat-card {
+    background:#fff; border-radius:20px; padding:22px 16px 18px;
+    box-shadow:0 2px 12px rgba(32,32,32,.06); text-align:center; cursor:pointer;
+    transition:transform .1s; border:1px solid #EDE9E0;
+  }
+  .cat-card:active { transform:scale(.97); }
+  .cat-card .ico { font-size:40px; line-height:1; }
+  .cat-card .nm { font-size:16px; font-weight:700; margin-top:10px; }
+  .cat-card .ct { font-size:12px; color:#8A8378; margin-top:4px; }
+  .home-tip {
     background:#fff; border:1px solid #EDE9E0; border-radius:16px;
     padding:12px 14px; font-size:13px; color:#6B6558; line-height:1.7; margin-bottom:16px;
   }
-  .tip b { color:#15803D; }
-  .card {
-    background:#fff; border-radius:20px; overflow:hidden;
-    box-shadow:0 2px 12px rgba(32,32,32,.06); margin-bottom:20px;
+  .home-tip b { color:#15803D; }
+
+  /* ---- 模块页：视频网格 ---- */
+  .vgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .vcard {
+    background:#fff; border-radius:16px; overflow:hidden; cursor:pointer;
+    box-shadow:0 2px 10px rgba(32,32,32,.06); border:1px solid #EDE9E0;
+    transition:transform .1s;
   }
+  .vcard:active { transform:scale(.97); }
+  .vcover {
+    position:relative; width:100%; aspect-ratio:16/9;
+    display:flex; align-items:center; justify-content:center;
+    font-size:34px; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.25);
+  }
+  .vcover img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .vcover .pdf-tag {
+    position:absolute; right:6px; top:6px; background:rgba(21,128,61,.92); color:#fff;
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px;
+  }
+  .vcard .vt { padding:9px 10px 11px; }
+  .vcard .vt h3 {
+    font-size:13px; font-weight:600; line-height:1.45; color:#202020;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .empty { text-align:center; padding:64px 24px; color:#8A8378; }
+  .empty .ico { font-size:44px; }
+  .empty p.main { font-size:15px; font-weight:600; color:#202020; margin-top:12px; }
+  .empty p.sub { font-size:13px; margin-top:6px; line-height:1.7; }
+
+  /* ---- 播放页 ---- */
+  .card { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 2px 12px rgba(32,32,32,.06); margin-bottom:20px; }
   .video-box { position:relative; width:100%; aspect-ratio:16/9; background:#000; }
   .video-box iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
   .card .body { padding:14px 16px 16px; }
-  .cat-badge {
-    display:inline-block; font-size:11px; font-weight:700; color:#15803D;
-    background:#EAF4EE; border-radius:6px; padding:2px 8px; margin-bottom:8px;
-  }
   .card .body h2 { font-size:16px; font-weight:700; line-height:1.5; }
   .card .body .desc { font-size:13px; color:#6B6558; line-height:1.7; margin-top:6px; white-space:pre-line; }
   .pdf-btn {
@@ -69,118 +91,172 @@
   .pdf-btn .arr { font-size:16px; }
   .pdf-note { font-size:11px; color:#9A9387; margin-top:6px; }
   .no-pdf { font-size:12px; color:#9A9387; margin-top:10px; }
-  .empty { text-align:center; padding:64px 24px; color:#8A8378; }
-  .empty .ico { font-size:44px; }
-  .empty p.main { font-size:15px; font-weight:600; color:#202020; margin-top:12px; }
-  .empty p.sub { font-size:13px; margin-top:6px; line-height:1.7; }
-  .foot { text-align:center; font-size:11px; color:#B3AC9E; padding:8px 0 24px; }
+  .play-tip { font-size:12px; color:#8A8378; line-height:1.7; margin-top:4px; }
+  .play-tip b { color:#15803D; }
 </style>
 </head>
 <body>
   <div class="topbar">
-    <a class="back" href="./" aria-label="返回">←</a>
+    <a class="back" id="navBack" aria-label="返回">←</a>
     <div class="tt">
-      <h1>视频讲解</h1>
-      <p>看视频 · 配套试卷打印保存 · 对着题目学</p>
+      <h1 id="pageTitle">视频讲解</h1>
+      <p id="pageSub">六大模块 · 点开就能学</p>
     </div>
   </div>
-  <div class="tabs" id="tabs"></div>
   <div class="wrap">
-    <div class="tip" id="tip">
-      💡 有<strong>配套试卷</strong>的视频，点试卷按钮就能保存或打印，边看边对照题目；没有试卷的直接看视频就行。视频右下角 <b>⚙️ 设置</b>里可以调<strong>倍速</strong>（0.5x～2x）。
-    </div>
-    <div id="list"></div>
+    <div id="view"></div>
     <div class="foot">亿成公考 · 备考神器</div>
   </div>
 
 <script>
-/* ============ 视频清单：在这里添加视频 ============
-   bvid : 视频的 BV 号（点开视频，地址里 bv 开头的那串，如 BV1xx411c7mD）
-   cat  : 分区，从下面 CATS 里选一个填
+/* ============ 模块与视频清单：在这里添加视频 ============
+   VIDEOS 每条：
+   bvid : 视频的 BV 号（点开视频，地址里 bv 开头的那串）
+   cat  : 模块名，必须和 CATS 里某个 name 一致
    title: 视频标题
    desc : 一句话介绍（可留空 ""）
-   pdfs : 配套试卷列表，可有多份，每份 { name:"试卷名", file:"files/xxx.pdf" }（没有就留空 []）
+   pic  : 封面图链接（可留空 ""，留空就用模块配色卡片）
+   pdfs : 配套试卷，可多份 { name:"试卷名", file:"files/xxx.pdf" }，没有就 []
 ================================================== */
-var CATS = ["国考", "省考", "事业编", "军队文职", "三支一扶", "央国企"];
+var CATS = [
+  { name:"政治理论", icon:"🚩", c1:"#7C3AED", c2:"#A78BFA" },
+  { name:"言语理解", icon:"💬", c1:"#0E7490", c2:"#22B8CF" },
+  { name:"判断推理", icon:"🧩", c1:"#B45309", c2:"#F59E0B" },
+  { name:"常识",     icon:"📚", c1:"#15803D", c2:"#4ADE80" },
+  { name:"数量关系", icon:"🔢", c1:"#BE185D", c2:"#F472B6" },
+  { name:"资料分析", icon:"📊", c1:"#1D4ED8", c2:"#60A5FA" },
+  { name:"套卷精讲", icon:"🎯", c1:"#374151", c2:"#6B7280" }
+];
 
 var VIDEOS = [
-  { bvid: "BV1pLyaztEZH", cat: "国考", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。",
+  { bvid: "BV1pLyaztEZH", cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
     pdfs: [
       { name: "行测试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-行测试卷.pdf") },
       { name: "申论试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-申论试卷.pdf") }
     ] },
   // 示例（上线时替换成真实视频）：
-  // { bvid:"BV1xx411c7mD", cat:"省考", title:"江苏省考资料分析速算", desc:"", pdfs:[{name:"配套试卷", file:"files/xx.pdf"}] },
+  // { bvid:"BV1xx411c7mD", cat:"资料分析", title:"基期量与增长量速算", desc:"", pic:"", pdfs:[] },
 ];
 
-var curCat = "全部";
+var state = { view: "home", cat: null, idx: -1 };
 
 function esc(s){
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-
-function renderTabs(){
-  var box = document.getElementById("tabs");
-  var cats = ["全部"].concat(CATS);
-  var html = "";
-  for (var i = 0; i < cats.length; i++) {
-    var c = cats[i];
-    html += '<button class="tab' + (c === curCat ? ' on' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
-  }
-  box.innerHTML = html;
-  var btns = box.querySelectorAll(".tab");
-  for (var j = 0; j < btns.length; j++) {
-    btns[j].addEventListener("click", function(){
-      curCat = this.getAttribute("data-cat");
-      renderTabs();
-      renderList();
-      window.scrollTo(0, 0);
-    });
-  }
+function catOf(name){
+  for (var i = 0; i < CATS.length; i++) if (CATS[i].name === name) return CATS[i];
+  return { name: name || "视频", icon: "🎬", c1: "#374151", c2: "#6B7280" };
+}
+function videosOf(cat){
+  var out = [];
+  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && VIDEOS[i].bvid && VIDEOS[i].cat === cat) out.push(i);
+  return out;
 }
 
-function renderList(){
-  var list = document.getElementById("list");
-  var items = VIDEOS.filter(function(v){ return v && v.bvid && (curCat === "全部" || v.cat === curCat); });
-  if (!items.length) {
-    list.innerHTML = '<div class="empty"><div class="ico">🎬</div>' +
-      '<p class="main">' + esc(curCat === "全部" ? "视频正在整理上传中" : curCat + " · 视频正在整理上传中") + '</p>' +
+function renderHome(){
+  document.getElementById("pageTitle").textContent = "视频讲解";
+  document.getElementById("pageSub").textContent = "六大模块 · 点开就能学";
+  document.getElementById("navBack").style.visibility = "hidden";
+  var html = '<div class="home-tip">💡 点模块进去看视频；有<strong>配套试卷</strong>的视频，卡片右上角有绿色「卷」标，点开就能保存或打印。</div><div class="cat-grid">';
+  for (var i = 0; i < CATS.length; i++) {
+    var c = CATS[i];
+    var n = videosOf(c.name).length;
+    html += '<div class="cat-card" data-cat="' + esc(c.name) + '">' +
+      '<div class="ico">' + c.icon + '</div>' +
+      '<div class="nm">' + esc(c.name) + '</div>' +
+      '<div class="ct">' + (n ? n + ' 个视频' : '即将上线') + '</div></div>';
+  }
+  html += '</div>';
+  document.getElementById("view").innerHTML = html;
+  var cards = document.querySelectorAll(".cat-card");
+  for (var j = 0; j < cards.length; j++) {
+    cards[j].addEventListener("click", function(){ state.view = "module"; state.cat = this.getAttribute("data-cat"); render(); });
+  }
+  window.scrollTo(0, 0);
+}
+
+function renderModule(){
+  var c = catOf(state.cat);
+  var list = videosOf(state.cat);
+  document.getElementById("pageTitle").textContent = c.name;
+  document.getElementById("pageSub").textContent = list.length ? list.length + " 个视频 · 点封面播放" : "视频整理中";
+  document.getElementById("navBack").style.visibility = "visible";
+  if (!list.length) {
+    document.getElementById("view").innerHTML = '<div class="empty"><div class="ico">' + c.icon + '</div>' +
+      '<p class="main">' + esc(c.name) + ' · 视频正在整理上传中</p>' +
       '<p class="sub">上传好之后会第一时间出现在这里，<br>先去刷题模块练起来吧～</p></div>';
     return;
   }
-  var html = "";
-  for (var i = 0; i < items.length; i++) {
-    var v = items[i];
-    var pdfs = v.pdfs || (v.pdf ? [{ name: "配套试卷", file: v.pdf }] : []);
-    var pdfHtml = "";
-    for (var j = 0; j < pdfs.length; j++) {
-      var p = pdfs[j];
-      if (!p || !p.file) continue;
-      pdfHtml += '<a class="pdf-btn" href="pdf.html?file=' + encodeURIComponent(p.file) + '&name=' + encodeURIComponent(p.name || "试卷") + '">' +
-        '<span>📄 配套试卷 · ' + esc(p.name || "试卷" + (j + 1)) + '</span><span class="arr">›</span></a>';
-    }
-    if (pdfHtml) pdfHtml += '<p class="pdf-note">点开即可查看，页内附保存与打印方法</p>';
-    else pdfHtml = '<p class="no-pdf">本视频无配套试卷，直接看就行</p>';
-    html += '<div class="card">' +
+  var html = '<div class="vgrid">';
+  for (var k = 0; k < list.length; k++) {
+    var v = VIDEOS[list[k]];
+    var cc = catOf(v.cat);
+    var hasPdf = (v.pdfs && v.pdfs.length) || v.pdf;
+    html += '<div class="vcard" data-idx="' + list[k] + '">' +
+      '<div class="vcover" style="background:linear-gradient(135deg,' + cc.c1 + ',' + cc.c2 + ');">' +
+        (v.pic ? '<img src="' + esc(v.pic) + '" alt="">' : '') +
+        '<span>' + cc.icon + '</span>' +
+        (hasPdf ? '<span class="pdf-tag">配试卷</span>' : '') +
+      '</div>' +
+      '<div class="vt"><h3>' + esc(v.title || "视频讲解") + '</h3></div></div>';
+  }
+  html += '</div>';
+  document.getElementById("view").innerHTML = html;
+  var cards = document.querySelectorAll(".vcard");
+  for (var j = 0; j < cards.length; j++) {
+    cards[j].addEventListener("click", function(){ state.view = "play"; state.idx = parseInt(this.getAttribute("data-idx"), 10); render(); });
+  }
+  window.scrollTo(0, 0);
+}
+
+function renderPlay(){
+  var v = VIDEOS[state.idx] || {};
+  var c = catOf(v.cat);
+  document.getElementById("pageTitle").textContent = c.name;
+  document.getElementById("pageSub").textContent = "视频播放 · 右下角⚙️可调倍速";
+  document.getElementById("navBack").style.visibility = "visible";
+  var pdfs = v.pdfs || (v.pdf ? [{ name: "配套试卷", file: v.pdf }] : []);
+  var pdfHtml = "";
+  for (var j = 0; j < pdfs.length; j++) {
+    var p = pdfs[j];
+    if (!p || !p.file) continue;
+    pdfHtml += '<a class="pdf-btn" href="pdf.html?file=' + encodeURIComponent(p.file) + '&name=' + encodeURIComponent(p.name || "试卷") + '">' +
+      '<span>📄 配套试卷 · ' + esc(p.name || "试卷" + (j + 1)) + '</span><span class="arr">›</span></a>';
+  }
+  if (pdfHtml) pdfHtml += '<p class="pdf-note">点开即可查看，页内附保存与打印方法</p>';
+  else pdfHtml = '<p class="no-pdf">本视频无配套试卷，直接看就行</p>';
+  document.getElementById("view").innerHTML =
+    '<div class="card">' +
       '<div class="video-box"><iframe src="https://player.bilibili.com/player.html?bvid=' +
-      encodeURIComponent(v.bvid) + '&page=1&high_quality=1&danmaku=0&autoplay=0" ' +
-      'loading="lazy" allowfullscreen="true" scrolling="no" frameborder="0" ' +
+      encodeURIComponent(v.bvid || "") + '&page=1&high_quality=1&danmaku=0&autoplay=0" ' +
+      'allowfullscreen="true" scrolling="no" frameborder="0" ' +
+      'sandbox="allow-scripts allow-same-origin allow-presentation" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" ' +
       'title="' + esc(v.title || "视频讲解") + '"></iframe></div>' +
       '<div class="body">' +
-        (v.cat ? '<span class="cat-badge">' + esc(v.cat) + '</span>' : '') +
-        '<h2>' + esc(v.title || "视频讲解 " + (i + 1)) + '</h2>' +
+        '<h2>' + esc(v.title || "视频讲解") + '</h2>' +
         (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
         pdfHtml +
+        '<p class="play-tip">💡 倍速：点视频右下角 <b>⚙️ 设置</b> → 倍速，0.5x～2x 随便调。</p>' +
       '</div></div>';
-  }
-  list.innerHTML = html;
+  window.scrollTo(0, 0);
 }
 
-renderTabs();
-renderList();
+function render(){
+  if (state.view === "home") renderHome();
+  else if (state.view === "module") renderModule();
+  else renderPlay();
+}
+
+document.getElementById("navBack").addEventListener("click", function(){
+  if (state.view === "play") { state.view = "module"; render(); }
+  else { state.view = "home"; render(); }
+});
+document.getElementById("navBack").href = "javascript:void(0)";
+
+render();
 </script>
 </body>
 </html>
