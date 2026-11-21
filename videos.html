@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com; media-src 'self' https:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com; media-src 'self' https:;">
 <title>视频讲解 · 亿成公考</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -154,7 +154,7 @@ var state = { view: "home", cat: null, idx: -1 };
 /* 注册播放辅助脚本：就绪后再挂载视频源（见 renderPlay） */
 var swReady = (function(){
   if (!("serviceWorker" in navigator) || location.protocol !== "https:") return Promise.resolve(false);
-  return navigator.serviceWorker.register("sw.js?v=3")
+  return navigator.serviceWorker.register("sw.js")
     .then(function(){ return navigator.serviceWorker.ready; })
     .then(function(){
       return new Promise(function(resolve){
