@@ -238,6 +238,23 @@
     if(m.wordState==='over') s.push(n+'. 删掉重复和修饰，把字数压到 '+m.wordLimit+' 以内。');
     s.push('');
     s.push('【鼓励】'+(m.overall>=70 ? '采分意识已经很好，把遗漏点补齐就是一类文水平，继续保持！' : '申论是踩点得分，方向对了——对照采分点重写一遍，进步会非常明显。'));
+    // 逐句点评：AI 判分特有视角，逐句扫描作答内容
+    var sentences = (answer||'').split(/(?<=[。！？；!?;])|\n/).map(function(x){return x.replace(/\s/g,'');}).filter(function(x){return x.length>=4;});
+    if(sentences.length){
+      s.push('');
+      s.push('【逐句点评】（AI 判分视角，逐句扫描你的作答）');
+      sentences.slice(0,12).forEach(function(sen,idx){
+        var hitPts = g.results.filter(function(r){ return !r.aiOnly && r.hitWords && r.hitWords.length && r.hitWords.some(function(w){ return sen.indexOf(norm(w))>=0 || (norm(w).length>=4 && isSubseq(norm(w), sen)); }); });
+        var oralHit = m.oralHits.filter(function(w){ return sen.indexOf(w)>=0; });
+        var cmt;
+        if(hitPts.length){ cmt = '✓ 踩到采分点「'+hitPts.map(function(r){return r.point;}).slice(0,2).join('、')+'」，这句是有效得分句，保留。'; }
+        else if(oralHit.length){ cmt = '△ 含口语化表述「'+oralHit[0]+'」，改为书面语更稳。'; }
+        else if(sen.length<12){ cmt = '△ 表述偏短，信息量不足，建议展开或与相邻句合并。'; }
+        else { cmt = '○ 未直接命中采分点关键词，若与材料要点相关可保留并补上关键词，否则精简。'; }
+        s.push((idx+1)+'. 「'+(sen.length>38 ? sen.slice(0,38)+'…' : sen)+'」'+cmt);
+      });
+      if(sentences.length>12) s.push('（其余 '+(sentences.length-12)+' 句未逐条展开，重点看上面即可）');
+    }
     return s.join('\n');
   }
 
@@ -338,7 +355,7 @@
     html += '<button id="submitBtn" class="btn-primary">交卷批阅</button>';
     html += '<button id="aiBtn" class="btn-ai">✦ AI 深度批阅</button>';
     html += '</div>';
-    html += '<p style="margin:10px 0 0;font-size:12px;color:#8A8378;">「交卷批阅」按考试采分点给分；「AI 深度批阅」逐句精细点评，网页端直接出结果。</p>';
+    html += '<p style="margin:10px 0 0;font-size:12px;color:#8A8378;">两种判分方式，结果各自标注、一眼可辨：<strong>① 考试正式标准</strong>（交卷批阅）按采分点硬判，模拟真实阅卷；<strong>② AI 判分</strong>（AI 深度批阅）逐句点评、给改进建议，两种结果会分别展示在下方。</p>';
     html += '</div>';
 
     html += '<div id="reviewBox"></div>';
@@ -349,7 +366,7 @@
       html += '<p style="margin:0;font-size:14px;font-weight:700;">我的批阅记录</p>';
       hist.slice().reverse().slice(0,5).forEach(function(h){
         html += '<div style="margin-top:10px;font-size:12px;color:#6B6558;display:flex;justify-content:space-between;gap:10px;">';
-        html += '<span>' + esc(h.at) + '</span><span style="font-weight:700;color:#B45309;">' + h.total + '/' + h.full + ' 分</span></div>';
+        html += '<span>' + esc(h.at) + (h.mode ? ' · <span style="color:#7C3AED;font-weight:600;">' + esc(h.mode) + '</span>' : '') + '</span><span style="font-weight:700;color:#B45309;">' + h.total + '/' + h.full + ' 分</span></div>';
       });
       html += '</div>';
     }
@@ -419,7 +436,7 @@
       var g = grade(q, answer);
       state.review = g;
       state.history[state.tab + ':' + q.id] = state.history[state.tab + ':' + q.id] || [];
-      state.history[state.tab + ':' + q.id].push({at: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}), total:g.total, full:g.full});
+      state.history[state.tab + ':' + q.id].push({at: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}), total:g.total, full:g.full, mode:'考试标准'});
       if(state.history[state.tab + ':' + q.id].length > 20) state.history[state.tab + ':' + q.id].shift();
       saveHistory();
       renderReview(q, g, answer);
@@ -441,7 +458,7 @@
     var praise = m.overall >= 80 ? '采分点抓得很准，保持这个状态，考场稳了！' : m.overall >= 60 ? '已经过半了，把没命中的点补上，下一遍就是高分答案。' : '别灰心，对照参考答案把漏点找出来，再写一遍印象最深。';
     var html = '<div class="card fade" style="margin-top:12px;padding:18px;border-color:#B5483C33;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">';
-    html += '<div><p style="margin:0;font-size:14px;font-weight:700;">交卷批阅 · 按考试采分点标准</p>';
+    html += '<div><p style="margin:0;font-size:14px;font-weight:700;">交卷批阅 · 按考试采分点标准 <span class="tag" style="background:#B5483C;color:#fff;">判分方式① 考试正式标准</span></p>';
     html += '<span style="font-size:11px;font-weight:700;color:' + lv.c + ';">' + lv.t + ' · 综合 ' + m.overall + ' 分</span></div>';
     html += '<div class="score-ring" style="background:conic-gradient(#B5483C ' + Math.round(m.pointRatio*360) + 'deg,#F0EBE3 0);">';
     html += '<div style="width:74px;height:74px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">';
@@ -489,6 +506,12 @@
       renderAiBox(state.aiReview);
       var box = document.getElementById('aiBox');
       if(box) box.scrollIntoView({behavior:'smooth'});
+      // 批阅记录里也记一笔 AI 判分，便于回看区分
+      var g2 = state.review || grade(q, answer);
+      state.history[state.tab + ':' + q.id] = state.history[state.tab + ':' + q.id] || [];
+      state.history[state.tab + ':' + q.id].push({at: state.aiReview.at, total:g2.total, full:g2.full, mode:'AI判分'});
+      if(state.history[state.tab + ':' + q.id].length > 20) state.history[state.tab + ':' + q.id].shift();
+      saveHistory();
     };
 
     // 有本机配置的在线大模型 → 用真·AI；否则用内置引擎（无需联网）
@@ -529,7 +552,7 @@
     var online = /^在线大模型/.test(ai.src);
     var html = '<div class="card fade" style="margin-top:12px;padding:18px;border-color:#7C3AED44;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">';
-    html += '<p style="margin:0;font-size:15px;font-weight:800;">✦ AI 深度批阅 · 逐句点评</p>';
+    html += '<p style="margin:0;font-size:15px;font-weight:800;">✦ AI 深度批阅 · 逐句点评 <span class="tag" style="background:#7C3AED;color:#fff;">判分方式② AI 判分</span></p>';
     html += '<span class="ai-badge">' + esc(ai.src) + '</span></div>';
     html += '<p style="margin:6px 0 0;font-size:11px;color:#B9A98F;">' + esc(ai.at||'') + ' · ' + (online?'由在线大模型生成':'由内置阅卷引擎按考试采分点标准生成') + '</p>';
     html += '<pre class="prompt" style="margin-top:12px;line-height:2;font-size:13px;">' + esc(ai.text) + '</pre>';
