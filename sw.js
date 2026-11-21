@@ -8,7 +8,7 @@ var dbg = { fetches: 0, lastError: null, lastStatus: null };
 
 self.addEventListener('message', function (e) {
   if (e.data === 'debug' && e.source) {
-    e.source.postMessage(JSON.stringify(dbg), { targetOrigin: e.origin });
+    e.source.postMessage(JSON.stringify(dbg));
   }
 });
 
