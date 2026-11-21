@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src 'self'; img-src 'self' data:;">
+<title>配套试卷 · 亿成公考</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#FAF8F3; color:#202020; min-height:100vh; display:flex; flex-direction:column; }
+  .topbar {
+    position:sticky; top:0; z-index:10; background:#FAF8F3; border-bottom:1px solid #EDE9E0;
+    padding:12px 16px; display:flex; align-items:center; gap:12px;
+    padding-top:calc(12px + env(safe-area-inset-top));
+  }
+  .topbar a.back {
+    display:flex; align-items:center; justify-content:center; width:36px; height:36px;
+    border-radius:999px; background:#fff; box-shadow:0 1px 4px rgba(32,32,32,.08);
+    text-decoration:none; color:#202020; font-size:18px; flex:none;
+  }
+  .topbar .tt { flex:1; min-width:0; }
+  .topbar .tt h1 { font-size:17px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .topbar .tt p { font-size:12px; color:#8A8378; margin-top:2px; }
+  .viewer { flex:1; width:100%; border:0; background:#fff; }
+  .tips { max-width:760px; margin:0 auto; width:100%; padding:16px 16px 40px; }
+  .tips .card { background:#fff; border-radius:16px; padding:14px 16px; box-shadow:0 2px 10px rgba(32,32,32,.05); margin-bottom:12px; }
+  .tips h3 { font-size:14px; font-weight:800; color:#15803D; margin-bottom:8px; }
+  .tips li { font-size:13px; color:#6B6558; line-height:1.8; margin-left:18px; }
+  .tips b { color:#202020; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back" href="videos.html" aria-label="返回视频">←</a>
+    <div class="tt">
+      <h1 id="pageTitle">配套试卷</h1>
+      <p>保存 · 打印 · 对着视频做题</p>
+    </div>
+  </div>
+  <iframe class="viewer" id="viewer" title="试卷预览"></iframe>
+  <div class="tips">
+    <div class="card">
+      <h3>📄 怎么保存到手机</h3>
+      <li>iPhone：点屏幕右上角<strong>「分享」图标</strong>（方框加箭头）→ 选<strong>「存储到文件」</strong>或「打印」。</li>
+      <li>安卓 / 电脑：页面里一般有<strong>下载按钮</strong>，或右键 →「另存为 / 打印」。</li>
+    </div>
+    <div class="card">
+      <h3>💡 边看视频边用卷子，推荐三种方式</h3>
+      <li><strong>最推荐：打印出来</strong>。保存后去打印店打一份，纸上做题，手机放视频，效率最高。</li>
+      <li><strong>两件套</strong>：电脑或平板放视频，手机看卷子；没有第二台设备就用手机分屏（iPhone 从底部上滑进分屏）。</li>
+      <li><strong>先做后听</strong>：先把卷子整份做一遍，再开视频听讲解，错的地方重点听——比边做边听记得牢。</li>
+    </div>
+  </div>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  var file = q.get("file") || "";
+  var name = q.get("name") || "配套试卷";
+  if (!/^files\//.test(file)) { file = ""; }
+  document.getElementById("pageTitle").textContent = name + " · 试卷";
+  if (file) document.getElementById("viewer").src = file;
+})();
+</script>
+</body>
+</html>
