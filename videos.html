@@ -188,7 +188,9 @@ function videosOf(cat){
 function renderHome(){
   document.getElementById("pageTitle").textContent = "视频讲解";
   document.getElementById("pageSub").textContent = "六大模块 · 点开就能学";
-  document.getElementById("navBack").style.visibility = "hidden";
+  /* 首页也显示返回：点它回到刷题 App 主页 */
+  document.getElementById("navBack").style.visibility = "visible";
+  document.getElementById("navBack").setAttribute("data-mode", "exit");
   var html = '<div class="home-tip">💡 点模块进去看视频；有<strong>配套试卷</strong>的视频，卡片右上角有绿色「卷」标，点开就能保存或打印。</div><div class="cat-grid">';
   for (var i = 0; i < CATS.length; i++) {
     var c = CATS[i];
@@ -213,6 +215,7 @@ function renderModule(){
   document.getElementById("pageTitle").textContent = c.name;
   document.getElementById("pageSub").textContent = list.length ? list.length + " 个视频 · 点封面播放" : "视频整理中";
   document.getElementById("navBack").style.visibility = "visible";
+  document.getElementById("navBack").setAttribute("data-mode", "inner");
   if (!list.length) {
     document.getElementById("view").innerHTML = '<div class="empty"><div class="ico">' + c.icon + '</div>' +
       '<p class="main">' + esc(c.name) + ' · 视频正在整理上传中</p>' +
@@ -247,6 +250,7 @@ function renderPlay(){
   document.getElementById("pageTitle").textContent = c.name;
   document.getElementById("pageSub").textContent = "视频播放 · 右下角⚙️可调倍速";
   document.getElementById("navBack").style.visibility = "visible";
+  document.getElementById("navBack").setAttribute("data-mode", "inner");
   var pdfs = v.pdfs || (v.pdf ? [{ name: "配套试卷", file: v.pdf }] : []);
   var pdfHtml = "";
   for (var j = 0; j < pdfs.length; j++) {
@@ -413,7 +417,11 @@ function render(){
 
 document.getElementById("navBack").addEventListener("click", function(){
   if (state.view === "play") { state.view = "module"; render(); }
-  else { state.view = "home"; render(); }
+  else if (state.view === "module") { state.view = "home"; render(); }
+  else { /* 首页：返回刷题 App 主页 */
+    if (document.referrer && document.referrer.indexOf("index") > -1 && history.length > 1) history.back();
+    else location.href = "index.html";
+  }
 });
 document.getElementById("navBack").href = "javascript:void(0)";
 
