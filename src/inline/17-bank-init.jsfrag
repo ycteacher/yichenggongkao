@@ -51,6 +51,7 @@
   '.yc-ob-foot a{color:#6b7280;text-decoration:underline;cursor:pointer}'+
   '.yc-ob-label{display:block;font-size:13px;font-weight:800;color:#374151;margin:14px 0 6px;text-align:left}'+
   '.yc-ob-input,.yc-ob-select{width:100%;box-sizing:border-box;border:1.5px solid #e5e1d8;border-radius:11px;padding:12px 13px;font-size:15px;color:#202020;background:#fff;font-family:inherit;outline:none}'+
+  '.yc-ob-input[type=date]{-webkit-appearance:none;appearance:none;min-height:48px;text-align:left}'+
   '.yc-ob-input:focus,.yc-ob-select:focus{border-color:#DC2626}'+
   '.yc-ob-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}'+
   '.yc-ob-chip{padding:9px 13px;border-radius:999px;border:1.5px solid #e5e1d8;background:#fff;font-size:13.5px;color:#5b5560;font-weight:700;cursor:pointer;user-select:none}'+
@@ -74,7 +75,7 @@
   '.yc-ob-filter button{flex:none;border:1.5px solid #e5e1d8;background:#fff;color:#5b5560;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap}'+
   '.yc-ob-filter button.on{background:#DC2626;color:#fff;border-color:#DC2626}'+
   '.yc-ob-papers{display:grid;grid-template-columns:1fr 1fr;gap:10px}'+
-  '.yc-ob-paper{border:1.5px solid #eee9df;border-radius:13px;padding:13px;background:#fff;text-align:left;cursor:pointer;transition:transform .12s,box-shadow .12s}'+
+  '.yc-ob-paper{border:1.5px solid #eee9df;border-radius:13px;padding:13px;background:#fff;text-align:left;cursor:pointer;transition:transform .12s,box-shadow .12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}'+
   '.yc-ob-paper:active{transform:scale(.98)}'+
   '.yc-ob-paper .bd{display:inline-block;background:#fef2f2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:900;margin-bottom:7px}'+
   '.yc-ob-paper .nm{font-size:14px;font-weight:900;color:#202020;line-height:1.4;min-height:38px}'+
@@ -124,6 +125,8 @@
     ov.innerHTML='<div class="yc-ob-card'+(opts.wide?' wide':'')+'">'+html+'</div>';
     document.body.appendChild(ov);
     requestAnimationFrame(function(){ if(ov) ov.classList.add('on'); });
+    /* 动画结束后清掉 transform：iOS 平板上带 transform 的容器会让原生日历/触摸命中失效 */
+    setTimeout(function(){ if(ov){ var c=ov.firstChild; if(c&&c.style) c.style.transform='none'; } },320);
     if(opts.closable!==false){
       ov.addEventListener('click',function(e){ if(e.target===ov) closeCard(); });
       var card=ov.firstChild;
@@ -142,6 +145,27 @@
   function badge(id){ try{ new Image().src='https://visitor-badge.laobi.icu/badge?page_id='+id+'&r='+Date.now(); }catch(e){} }
 
   /* ---------- 屏幕1：安装引导（强制、丰富） ---------- */
+  function device(){
+    var ua=navigator.userAgent||'',os='pc',model='电脑';
+    if(/iPhone/i.test(ua)){os='ios';model='iPhone'}
+    else if(/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){os='ios';model='iPad'}
+    else if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)){os='harmony';model='鸿蒙设备'}
+    else if(/Android/i.test(ua)){os='android';var md=ua.match(/Android[^;)]*;\s*([^;)]+)/i);model=md&&md[1]?md[1].trim().slice(0,20):'安卓设备';if(/Pad|Tablet|SM-T\d|MatePad/i.test(ua))model+='(平板)'}
+    var wx=/MicroMessenger/i.test(ua);
+    var osName=os==='ios'?'苹果':os==='android'?'安卓':os==='harmony'?'鸿蒙':'电脑';
+    var steps;
+    if(os==='ios'){
+      steps=[['点浏览器底部的「分享」按钮（方框加箭头）'],['选「添加到主屏幕」，再点右上角「添加」']];
+    }else if(os==='android'){
+      steps=[['点浏览器右上角「⋮」菜单'],['选「添加到主屏幕」或「安装应用」']];
+    }else if(os==='harmony'){
+      steps=[['点浏览器底部「⋮」或菜单按钮'],['选「添加到桌面」']];
+    }else{
+      steps=[['点地址栏右侧的「安装」图标（或菜单里的「安装应用」）']];
+    }
+    var label=(model.indexOf(osName)>-1)?model:model+' · '+osName;
+    return {label:label,steps:steps,wx:wx};
+  }
   function screenInstall(){
     badge('ycgk.v2.installshow');
     var d=device();
@@ -191,6 +215,7 @@
     var examOpts='',provOpts='';
     for(var i=0;i<EXAMS.length;i++) examOpts+='<option value="'+EXAMS[i]+'">'+EXAMS[i]+'</option>';
     for(var j=0;j<PROVINCES.length;j++) provOpts+='<option value="'+PROVINCES[j]+'">'+PROVINCES[j]+'</option>';
+    provOpts+='<option value="台湾省"'+(pre&&pre.prov==='台湾省'?' selected':'')+'>台湾省（待上架）</option>';
     var freshChips='',weakChips='';
     for(var a=0;a<FRESH.length;a++) freshChips+='<span class="yc-ob-chip'+(a===0?' on':'')+'" data-fresh="'+FRESH[a]+'">'+FRESH[a]+'</span>';
     for(var b=0;b<WEAK.length;b++) weakChips+='<span class="yc-ob-chip" data-weak="'+WEAK[b]+'">'+WEAK[b]+'</span>';
@@ -296,9 +321,11 @@
     $('pStart').addEventListener('click',function(){
       var wm=weakModules(plan);
       var mods=wm.length?wm:['changshi','yanyu','panduan','shuliang','ziliao'];
-      var qs=pickByModules(mods,Math.min(plan.daily,30),77);
-      if(!qs.length){ alert('题库还在加载，请稍等几秒再试'); return; }
-      runQuiz(qs,'今日任务 · '+plan.daily+' 题',function(res){ closeCard(true); screenResult(res,null); });
+      ensureBank(function(){
+        var qs=pickByModules(mods,Math.min(plan.daily,30),77);
+        if(!qs.length){ alert('题库还在加载，请稍等几秒再试'); return; }
+        runQuiz(qs,'今日任务 · '+plan.daily+' 题',function(res){ closeCard(true); screenResult(res,null); });
+      });
     });
   }
 
@@ -357,7 +384,9 @@
   function allQuestions(){
     var arr=[];
     try{
-      var cs=window.YC_CS_BANK||[]; for(var i=0;i<cs.length;i++) arr.push(cs[i]);
+      var dr=window.__ycDr||[];
+      for(var i=0;i<dr.length;i++) arr.push(dr[i]);
+      var cs=window.YC_CS_BANK||[]; for(var i2=0;i2<cs.length;i2++) arr.push(cs[i2]);
       var more=window.YC_MORE_QBANKS||[];
       for(var j=0;j<more.length;j++){ var sub=more[j]||[]; for(var k=0;k<sub.length;k++) arr.push(sub[k]); }
     }catch(e){}
@@ -395,22 +424,38 @@
     }
     return seededShuffle(picked,seed+7);
   }
+  function ensureBank(cb){
+    var MODS=['changshi','yanyu','panduan','shuliang','ziliao','jundui'];
+    if(window.__ycLoadModules&&window.__ycBanksReady){ window.__ycLoadModules(MODS,cb); return; }
+    if(window.__ycLoadModules){
+      var tries=0;
+      var t=setInterval(function(){
+        tries++;
+        if(window.__ycBanksReady){ clearInterval(t); window.__ycLoadModules(MODS,cb); }
+        else if(tries>25){ clearInterval(t); cb(); }
+      },300);
+      return;
+    }
+    cb();
+  }
   function startPaper(pid){
     var paper=null; for(var i=0;i<PAPERS.length;i++) if(PAPERS[i].id===pid) paper=PAPERS[i];
     if(!paper) return;
-    var g=byModule(),picked=[],seen={};
-    for(var mod in paper.mix){
-      var pool=seededShuffle(g[mod]||[],paper.seed+mod.length*17);
-      var take=Math.min(paper.mix[mod],pool.length);
-      for(var k=0;k<take;k++){ if(!seen[pool[k].id]){ seen[pool[k].id]=1; picked.push(pool[k]); } }
-    }
-    if(picked.length<paper.total){
-      var rest=seededShuffle(allQuestions(),paper.seed+888);
-      for(var r=0;r<rest.length && picked.length<paper.total;r++){ if(!seen[rest[r].id]){ seen[rest[r].id]=1; picked.push(rest[r]); } }
-    }
-    picked=seededShuffle(picked,paper.seed+3).slice(0,paper.total);
-    if(!picked.length){ alert('题库还在加载，请稍等几秒再试'); return; }
-    runQuiz(picked,paper.name,function(res){ saveResult(paper,res); screenResult(res,paper); });
+    ensureBank(function(){
+      var g=byModule(),picked=[],seen={};
+      for(var mod in paper.mix){
+        var pool=seededShuffle(g[mod]||[],paper.seed+mod.length*17);
+        var take=Math.min(paper.mix[mod],pool.length);
+        for(var k=0;k<take;k++){ if(!seen[pool[k].id]){ seen[pool[k].id]=1; picked.push(pool[k]); } }
+      }
+      if(picked.length<paper.total){
+        var rest=seededShuffle(allQuestions(),paper.seed+888);
+        for(var r=0;r<rest.length && picked.length<paper.total;r++){ if(!seen[rest[r].id]){ seen[rest[r].id]=1; picked.push(rest[r]); } }
+      }
+      picked=seededShuffle(picked,paper.seed+3).slice(0,paper.total);
+      if(!picked.length){ alert('题库还在加载，请稍等几秒再试'); return; }
+      runQuiz(picked,paper.name,function(res){ saveResult(paper,res); screenResult(res,paper); });
+    });
   }
   function saveResult(paper,res){
     var recs=getJSON(K_MOCK,[]);
