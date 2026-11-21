@@ -315,6 +315,11 @@ function lastDays(n){var a=[],t=new Date();t.setHours(0,0,0,0);for(var i=n-1;i>=
 function fmtDay(k){return String(k).slice(4,6)+'/'+String(k).slice(6,8)}
 function fetchJson(url){return fetch(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})}
 function fetchPool(key){return fetchJson('https://textdb.dev/api/data/'+key).catch(function(){return fetchJson('https://textdb.online/'+key)})}
+/* 视频池专用：空池（空体或 null）解析为 null，不算拉取失败 */
+function fetchVidPool(){
+  function one(url){return fetch(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text()}).then(function(t){if(!t||!t.trim())return null;return JSON.parse(t)})}
+  return one('https://textdb.dev/api/data/ycgk-vid-v1').catch(function(){return one('https://textdb.online/ycgk-vid-v1')});
+}
 
 /* ===== 数据源 ===== */
 var METRICS_URL='https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json';
@@ -529,6 +534,7 @@ function renderAlerts(L){
   if(!S.ok.live)a.push(['red','⚠️','实时数据池拉取失败，稍后自动重试']);
   else if(S.live&&S.live.ts&&Date.now()-S.live.ts>15*60000)a.push(['amber','⏱','实时池超过15分钟未更新（'+Math.round((Date.now()-S.live.ts)/60000)+'分钟），检查学生端上报']);
   if(!S.ok.vid)a.push(['red','⚠️','视频数据池拉取失败']);
+  else if(S.vidEmpty)a.push(['amber','📭','视频数据暂无数据']);
   else if(S.vid&&S.vid.ts&&Date.now()-S.vid.ts>3600000&&(S.vid.videos&&Object.keys(S.vid.videos).length))a.push(['amber','⏱','视频池超过1小时未更新']);
   if(S.ok.vid){var f=vidList().reduce(function(s,v){return s+v.fail},0);if(f>0)a.push(['amber','🎬','视频播放失败 '+f+' 次，建议检查视频源'])}
   if(S.ok.live&&L){
@@ -766,7 +772,7 @@ function fetchFb(){return fetchPool('ycgk-fb-v1')}
 function refreshAll(){
   var jobs=[
     fetchPool('ycgk-live-v1').then(function(d){S.live=d;S.ok.live=true}).catch(function(){S.ok.live=false}),
-    fetchPool('ycgk-vid-v1').then(function(d){S.vid=d;S.ok.vid=true}).catch(function(){S.ok.vid=false}),
+    fetchVidPool().then(function(d){S.vid=d;S.ok.vid=true;S.vidEmpty=!(d&&d.videos&&Object.keys(d.videos).length)}).catch(function(){S.vid=null;S.ok.vid=false;S.vidEmpty=false}),
     fetchFb().then(function(d){S.fb=d;S.ok.fb=true}).catch(function(){S.ok.fb=false}),
     fetchJson(METRICS_URL).then(function(d){S.metrics=d;S.ok.metrics=true}).catch(function(){S.ok.metrics=false}),
     fetchPool('ycgk-mat-v1').then(function(d){S.mat=d;S.ok.mat=true}).catch(function(){S.ok.mat=false})
