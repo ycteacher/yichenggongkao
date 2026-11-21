@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self'; media-src 'self' https:;">
+<title>视频讲解 · 亿成公考</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:#FAF8F3; color:#202020; min-height:100vh;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .topbar {
+    position:sticky; top:0; z-index:10;
+    background:#FAF8F3; border-bottom:1px solid #EDE9E0;
+    padding:12px 16px; display:flex; align-items:center; gap:12px;
+  }
+  .topbar a.back {
+    display:flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:999px; background:#fff;
+    box-shadow:0 1px 4px rgba(32,32,32,.08); text-decoration:none;
+    color:#202020; font-size:18px; flex:none;
+  }
+  .topbar .tt { flex:1; min-width:0; }
+  .topbar .tt h1 { font-size:17px; font-weight:700; }
+  .topbar .tt p { font-size:12px; color:#8A8378; margin-top:2px; }
+  .wrap { max-width:760px; margin:0 auto; padding:16px 16px 48px; }
+  .tip {
+    background:#fff; border:1px solid #EDE9E0; border-radius:16px;
+    padding:12px 14px; font-size:13px; color:#6B6558; line-height:1.7; margin-bottom:16px;
+  }
+  .tip b { color:#15803D; }
+  .card {
+    background:#fff; border-radius:20px; overflow:hidden;
+    box-shadow:0 2px 12px rgba(32,32,32,.06); margin-bottom:20px;
+  }
+  .video-box { position:relative; width:100%; aspect-ratio:16/9; background:#000; }
+  .video-box iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .card .body { padding:14px 16px 16px; }
+  .card .body h2 { font-size:16px; font-weight:700; line-height:1.5; }
+  .card .body .desc { font-size:13px; color:#6B6558; line-height:1.7; margin-top:6px; white-space:pre-line; }
+  .pdf-btn {
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    margin-top:12px; padding:12px 16px; border-radius:14px;
+    background:#EAF4EE; color:#15803D; font-size:14px; font-weight:600;
+    text-decoration:none; transition:active .1s;
+  }
+  .pdf-btn:active { transform:scale(.99); }
+  .pdf-btn .arr { font-size:16px; }
+  .pdf-note { font-size:11px; color:#9A9387; margin-top:6px; }
+  .empty {
+    text-align:center; padding:64px 24px; color:#8A8378;
+  }
+  .empty .ico { font-size:44px; }
+  .empty p.main { font-size:15px; font-weight:600; color:#202020; margin-top:12px; }
+  .empty p.sub { font-size:13px; margin-top:6px; line-height:1.7; }
+  .foot { text-align:center; font-size:11px; color:#B3AC9E; padding:8px 0 24px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back" href="./" aria-label="返回">←</a>
+    <div class="tt">
+      <h1>视频讲解</h1>
+      <p>看视频 · 配套试卷打印保存 · 对着题目学</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="tip" id="tip">
+      💡 每个视频下面都配了<strong>对应的试卷</strong>：点「配套试卷」可以保存到手机或打印出来，边看视频边对照题目，效果最好。
+    </div>
+    <div id="list"></div>
+    <div class="foot">亿成公考 · 备考神器</div>
+  </div>
+
+<script>
+/* ============ 视频清单：在这里添加视频 ============
+   bvid : B站视频的 BV 号（在 B站 App 或网页点开视频，地址里 bv 开头的那串，如 BV1xx411c7mD）
+   title: 视频标题
+   desc : 一句话介绍（可留空 ""）
+   pdf  : 配套试卷文件地址（把 PDF 传到仓库 files/ 文件夹后填 "files/xxx.pdf"，没有就留空 ""）
+================================================== */
+var VIDEOS = [
+  // 示例（上线时替换成真实视频）：
+  // { bvid:"BV1xx411c7mD", title:"资料分析 · 基期量与增长量速算", desc:"适合冲刺期快速提分", pdf:"files/suanfen.pdf" },
+];
+
+(function render(){
+  var list = document.getElementById("list");
+  var items = VIDEOS.filter(function(v){ return v && v.bvid; });
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><div class="ico">🎬</div>' +
+      '<p class="main">视频正在整理上传中</p>' +
+      '<p class="sub">上传好之后会第一时间出现在这里，<br>先去刷题模块练起来吧～</p></div>';
+    return;
+  }
+  var html = "";
+  for (var i = 0; i < items.length; i++) {
+    var v = items[i];
+    html += '<div class="card">' +
+      '<div class="video-box"><iframe src="https://player.bilibili.com/player.html?bvid=' +
+      encodeURIComponent(v.bvid) + '&page=1&high_quality=1&danmaku=0&autoplay=0" ' +
+      'loading="lazy" allowfullscreen="true" scrolling="no" frameborder="0" ' +
+      'title="' + esc(v.title || "视频讲解") + '"></iframe></div>' +
+      '<div class="body">' +
+        '<h2>' + esc(v.title || "视频讲解 " + (i + 1)) + '</h2>' +
+        (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
+        (v.pdf
+          ? '<a class="pdf-btn" href="' + esc(v.pdf) + '" target="_blank" rel="noopener">' +
+            '<span>📄 配套试卷 · 保存 / 打印</span><span class="arr">›</span></a>' +
+            '<p class="pdf-note">打开后可保存到手机，或打印出来对着视频做题</p>'
+          : '') +
+      '</div></div>';
+  }
+  list.innerHTML = html;
+})();
+
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+</script>
+</body>
+</html>
