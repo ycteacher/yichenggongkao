@@ -1,6 +1,6 @@
 <script>
     (function(){
-      var V="ttfix105";
+      var V="ttfix106";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
