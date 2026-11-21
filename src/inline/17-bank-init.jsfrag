@@ -174,9 +174,9 @@
       stepsHtml+='<div class="yc-ob-st"><b>'+(i+1)+'</b><span>'+d.steps[i][0]+'</span></div>';
     }
     var hero=installed
-      ? '<button class="yc-ob-primary" disabled style="background:#9ca3af;box-shadow:none">✓ 已安装到本机</button>'
+      ? '<button class="yc-ob-primary" disabled style="background:#9ca3af;box-shadow:none">✓ 已安装到本机</button><button class="yc-ob-ghost" id="obInstalled">继续制定学习计划 →</button>'
       : (canInstall&&deferred
-          ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button>'
+          ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button><button class="yc-ob-ghost" id="obInstalled">✅ 我已手动装好，下一步 →</button>'
           : '<button class="yc-ob-primary" id="obInstalled">✅ 我已装好，下一步 →</button>');
     var html='<div class="yc-ob-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:14px"></div>'+
       '<div class="yc-ob-h">先把亿成公考装到桌面</div>'+
@@ -187,21 +187,29 @@
       '<div class="yc-ob-steps"><div class="yc-ob-steps-t">📲 '+esc(d.label)+' · 安装步骤</div>'+stepsHtml+'</div>'+
       hero+
       '<button class="yc-ob-ghost" id="obCopy">📋 复制网址（存备忘录备用）</button>'+
-      '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再说（下次仍会提醒）</a></div>';
+      '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再装，先去做学习计划 →</a></div>';
     openCard('ycObInstall',html,{closable:false});
     var one=$('obOneTap');
     if(one) one.addEventListener('click',function(){
-      if(deferred){
+      if(!deferred) return;
+      var goForm=function(){ set(K_ONB,'1'); screenForm(); };
+      try{
         deferred.prompt();
         deferred.userChoice.then(function(r){
-          if(r&&r.outcome==='accepted'){ badge('ycgk.v2.installok'); set(K_ONB,'1'); screenForm(); }
-        });
+          if(r&&r.outcome==='accepted'){ badge('ycgk.v2.installok'); }
+          deferred=null; canInstall=false;
+          goForm();
+        }).catch(function(){ deferred=null; canInstall=false; goForm(); });
+      }catch(e){
+        /* 部分鸿蒙浏览器一键安装不可用：不再卡住，直接进学习计划 */
+        deferred=null; canInstall=false;
+        goForm();
       }
     });
     var ok=$('obInstalled');
     if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); set(K_ONB,'1'); screenForm(); });
     $('obCopy').addEventListener('click',function(){ copyText(location.href.split('#')[0],'网址已复制，粘贴到备忘录即可'); });
-    $('obLater').addEventListener('click',function(){ closeCard(); });
+    $('obLater').addEventListener('click',function(){ set(K_ONB,'1'); closeCard(); screenForm(); });
   }
 
   /* ---------- 屏幕2：学习计划表单 ---------- */
