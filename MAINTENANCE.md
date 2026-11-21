@@ -45,3 +45,12 @@
 - 云同步/邀请：写入上述 textdb 服务
 
 > 若日后要彻底自托管，可把统计与云同步后端换成自有服务，属二期范畴。
+
+## 题库懒加载（2026-11-22 起）
+
+- 启动只加载 `assets/qbank-index.json`（约 9KB，模块→分片映射）；进模块/组卷/错题/收藏/整卷时按需加载对应分片。
+- 分片由 `tools/regroup_banks.py` 按模块物理重组生成：`qk-<module>-NN.js`（单模块，≤450KB）、`cs-bank-N.js`（常识，规范化 JSON）、申论/综应分片不变。旧混排分片（qbank-*、tuitui-*）已删除。
+- **新增/改题后必须重跑两步**：`python3 tools/regroup_banks.py`（重组+校验）→ `python3 tools/build.py`（重建 index.html + 重新生成 qbank-index.json / qbank-idmap.json）。
+- 改 `assets/index-b34.js` 须同步：`src/inline/00-part.jsfrag` 的 `var V` 与 `src/template.html` 两处 `?v=`（当前 ttfix109）、分片 URL 戳（当前 tt50）、`tools/build.py` 的 `BANK_VER`、`sw.js` 的 CACHE 版本（当前 yc-static-v5）。
+- 运行时校验出口：全量加载后 `window.__ycDr.length` 应为 49737（合并后总题数），`window.__ycNc` 为 id 映射。
+- `sw.js` 对 index-b34.js / qbank-index.json / qbank-idmap.json 采用 stale-while-revalidate（命中缓存秒回，有网时后台更新）。

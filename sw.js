@@ -4,8 +4,10 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v4';
+var CACHE = 'yc-static-v5';
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
+/* 主文件与题库索引：有网时后台更新（stale-while-revalidate），命中缓存秒回 */
+var SWR_PAT = /(index-b34\.js|qbank-index\.json|qbank-idmap\.json)$/;
 var dbg = { fetches: 0, lastError: null, lastStatus: null, log: [] };
 function dlog(m){ dbg.log.push((dbg.fetches) + ' ' + m); if (dbg.log.length > 12) dbg.log.shift(); }
 
@@ -113,6 +115,25 @@ self.addEventListener('fetch', function (e) {
       }).catch(function () {
         return caches.match(req).then(function (hit) {
           return hit || caches.match('./index.html').then(function (h2) { return h2 || Response.error(); });
+        });
+      })
+    );
+    return;
+  }
+
+  /* 主文件与题库索引：stale-while-revalidate（命中缓存秒回，有网时后台更新） */
+  if (SWR_PAT.test(url.pathname)) {
+    e.respondWith(
+      caches.open(CACHE).then(function (c) {
+        return c.match(req).then(function (hit) {
+          var net = fetch(req).then(function (res) {
+            if (res && res.ok) {
+              c.put(req, res.clone());
+              trimCache();
+            }
+            return res;
+          }).catch(function () { return hit || Response.error(); });
+          return hit || net;
         });
       })
     );
