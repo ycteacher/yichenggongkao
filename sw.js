@@ -37,6 +37,24 @@ self.addEventListener('fetch', function (e) {
 
   dlog('req mode=' + e.request.mode + ' dest=' + e.request.destination + ' range=' + range);
 
+  /* 试验：小文件用整块缓冲响应，验证是否为流式响应兼容问题 */
+  if (url.pathname === '/test-small.mp4') {
+    e.respondWith(
+      fetch(url.href, init).then(function (resp) {
+        return resp.arrayBuffer().then(function (buf) {
+          var h = new Headers();
+          ['content-type', 'content-length', 'accept-ranges'].forEach(function (k) {
+            var v = resp.headers.get(k);
+            if (v) h.set(k, v);
+          });
+          dlog('test buffered resp ' + resp.status + ' bytes=' + buf.byteLength);
+          return new Response(buf, { status: 200, headers: h });
+        });
+      })
+    );
+    return;
+  }
+
   e.respondWith(
     fetch(url.href, init).then(function (resp) {
       dbg.fetches++;
