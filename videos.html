@@ -80,11 +80,16 @@
    bvid : B站视频的 BV 号（在 B站 App 或网页点开视频，地址里 bv 开头的那串，如 BV1xx411c7mD）
    title: 视频标题
    desc : 一句话介绍（可留空 ""）
-   pdf  : 配套试卷文件地址（把 PDF 传到仓库 files/ 文件夹后填 "files/xxx.pdf"，没有就留空 ""）
+   pdfs : 配套试卷列表，可有多份，每份 { name:"试卷名", file:"files/xxx.pdf" }（没有就留空 []）
 ================================================== */
 var VIDEOS = [
+  { bvid: "BV1pLyaztEZH", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。",
+    pdfs: [
+      { name: "行测试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-行测试卷.pdf") },
+      { name: "申论试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-申论试卷.pdf") }
+    ] },
   // 示例（上线时替换成真实视频）：
-  // { bvid:"BV1xx411c7mD", title:"资料分析 · 基期量与增长量速算", desc:"适合冲刺期快速提分", pdf:"files/suanfen.pdf" },
+  // { bvid:"BV1xx411c7mD", title:"资料分析 · 基期量与增长量速算", desc:"适合冲刺期快速提分", pdfs:[{name:"配套试卷", file:"files/suanfen.pdf"}] },
 ];
 
 (function render(){
@@ -107,11 +112,18 @@ var VIDEOS = [
       '<div class="body">' +
         '<h2>' + esc(v.title || "视频讲解 " + (i + 1)) + '</h2>' +
         (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
-        (v.pdf
-          ? '<a class="pdf-btn" href="' + esc(v.pdf) + '" target="_blank" rel="noopener">' +
-            '<span>📄 配套试卷 · 保存 / 打印</span><span class="arr">›</span></a>' +
-            '<p class="pdf-note">打开后可保存到手机，或打印出来对着视频做题</p>'
-          : '') +
+        (function(){
+          var pdfs = v.pdfs || (v.pdf ? [{ name: "配套试卷", file: v.pdf }] : []);
+          var out = "";
+          for (var j = 0; j < pdfs.length; j++) {
+            var p = pdfs[j];
+            if (!p || !p.file) continue;
+            out += '<a class="pdf-btn" href="' + esc(p.file) + '" target="_blank" rel="noopener">' +
+              '<span>📄 配套试卷 · ' + esc(p.name || "试卷" + (j + 1)) + '</span><span class="arr">›</span></a>';
+          }
+          if (out) out += '<p class="pdf-note">打开后可保存到手机，或打印出来对着视频做题</p>';
+          return out;
+        })() +
       '</div></div>';
   }
   list.innerHTML = html;
