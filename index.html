@@ -1940,7 +1940,7 @@ document.addEventListener('click', function(e){
     actions.insertBefore(b, actions.firstChild);
     return true;
   }
-  var tries=0, timer=setInterval(function(){ if(inject()||++tries>60) clearInterval(timer); },150);
+  var tries=0, timer=setInterval(function(){ if(inject()||++tries>40) clearInterval(timer); },120);
   document.addEventListener('DOMContentLoaded',inject);
 })();
 </script>
@@ -2170,6 +2170,8 @@ document.addEventListener('click', function(e){
   var FRESH=['完全没开始','零基础','有一点基础','系统备考中','考前冲刺'];
   var WEAK=['常识判断','言语理解','判断推理','数量关系','资料分析','申论','综合应用'];
   function screenForm(pre){
+    /* 已有学习计划的用户：不再强制填表，直接看现有计划（"重新定制"入口传 pre 不受影响） */
+    if(!pre && getJSON(K_PLAN,null)){ screenPlan(true); return; }
     badge('ycgk.v2.formshow');
     var d=new Date(); d.setDate(d.getDate()+75); var defDate=d.toISOString().slice(0,10);
     var examOpts='',provOpts='';
@@ -2570,18 +2572,44 @@ document.addEventListener('click', function(e){
       tabbar.appendChild(mb);
     }
   }
-  var tries=0,ij=setInterval(function(){ injectEntries(); if((document.querySelector('.yc-tabbar')&&document.querySelector('.yc-top-actions'))||++tries>80) clearInterval(ij); },200);
+  var tries=0,ij=setInterval(function(){ injectEntries(); if((document.querySelector('.yc-tabbar')&&document.querySelector('.yc-top-actions'))||++tries>40) clearInterval(ij); },150);
   document.addEventListener('DOMContentLoaded',injectEntries);
+
+  /* ---------- 低频安装轻提醒：未装桌面且距上次提醒≥3天，弹非阻断浮条（已装永不提醒） ---------- */
+  var K_REM='ycgk.installRemind.v1';
+  function softInstallRemind(){
+    if(installDone()) return;
+    var last=0; try{ last=parseInt(raw(K_REM)||'0',10)||0; }catch(e){}
+    if(Date.now()-last < 3*86400000) return;
+    try{ set(K_REM,String(Date.now())); }catch(e){}
+    setTimeout(function(){
+      if(document.getElementById('ycSoftInst')) return;
+      var bar=document.createElement('div'); bar.id='ycSoftInst';
+      bar.style.cssText='position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483001;background:#1F2937;color:#fff;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:700;box-shadow:0 6px 22px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;font-family:inherit;white-space:nowrap;max-width:92vw';
+      var tx=document.createElement('span'); tx.textContent='📱 还没装到桌面？装好一点就开，离线也能刷';
+      var go=document.createElement('button'); go.textContent='去安装';
+      go.style.cssText='background:#DC2626;color:#fff;border:none;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit';
+      go.addEventListener('click',function(){ if(bar.parentNode)bar.parentNode.removeChild(bar); window.location.href='install.html'; });
+      var x=document.createElement('button'); x.textContent='×';
+      x.style.cssText='background:none;border:none;color:#9ca3af;font-size:17px;cursor:pointer;padding:0 2px;font-family:inherit';
+      x.addEventListener('click',function(){ if(bar.parentNode)bar.parentNode.removeChild(bar); });
+      bar.appendChild(tx); bar.appendChild(go); bar.appendChild(x);
+      document.body.appendChild(bar);
+      setTimeout(function(){ if(bar.parentNode) bar.parentNode.removeChild(bar); },9000);
+    },5000);
+  }
 
   /* ---------- 启动：首启引导流程 ---------- */
   function start(){
     var step=raw(K_ONB)||'0';
-    if(step==='2') return; // 已完成引导，正常用
+    if(step==='2'){ softInstallRemind(); return; } // 已完成引导，正常用
+    /* 已填过学习计划的用户：视为已完成引导，绝不再弹表单或安装引导 */
+    if(getJSON(K_PLAN,null)){ set(K_ONB,'2'); softInstallRemind(); return; }
     if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
     setTimeout(function(){
       if(step==='0') screenInstall();
       else if(step==='1') screenForm();
-    },650);
+    },400);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();

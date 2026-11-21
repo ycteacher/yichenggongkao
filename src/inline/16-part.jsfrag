@@ -151,7 +151,7 @@
     actions.insertBefore(b, actions.firstChild);
     return true;
   }
-  var tries=0, timer=setInterval(function(){ if(inject()||++tries>60) clearInterval(timer); },150);
+  var tries=0, timer=setInterval(function(){ if(inject()||++tries>40) clearInterval(timer); },120);
   document.addEventListener('DOMContentLoaded',inject);
 })();
 </script>
