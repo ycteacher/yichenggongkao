@@ -193,7 +193,19 @@ var vtrack = (function(){
   function pad(n){ return ('0'+n).slice(-2); }
   function today(){ var d = new Date(); return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); }
 
-  var pending = {}, dayPend = {}, flushT = null;
+  var pending = {}, dayPend = {}, dayUids = {}, flushT = null;
+
+  /* 匿名设备编号：与刷题应用同规则，用于"播放人数"去重 */
+  function deviceId(){
+    try{
+      var d = localStorage.getItem('ycgk.did.v1');
+      if(d) return d;
+      d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+      localStorage.setItem('ycgk.did.v1', d);
+      return d;
+    }catch(e){ return 'danon'; }
+  }
+  var DID = deviceId();
 
   function vidKey(v){
     if (!v) return '';
@@ -207,12 +219,14 @@ var vtrack = (function(){
     return base;
   }
 
-  function add(kind, n){
+  function add(kind, n, extra){
     n = n || 1;
     var k = vidKey(VIDEOS[state.idx]);
     if (!k) return;
-    if (!pending[k]) pending[k] = { open:0, play:0, done:0, sec:0, pdf:0 };
+    if (!pending[k]) pending[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{} };
+    if (kind === 'exit' && extra != null) { pending[k].exit[extra] = (pending[k].exit[extra]||0)+1; flushSoon(); return; }
     pending[k][kind] = (pending[k][kind] || 0) + n;
+    if (kind === 'play') { pending[k]._uid = DID; dayUids[d] = dayUids[d] || {}; dayUids[d][DID] = 1; }
     var d = today();
     if (!dayPend[d]) dayPend[d] = { play:0, done:0, sec:0 };
     if (kind === 'sec') dayPend[d].sec += n;
@@ -232,21 +246,38 @@ var vtrack = (function(){
       if (!p.days || typeof p.days !== 'object') p.days = {};
       Object.keys(pending).forEach(function(k){
         var inc = pending[k];
-        if (!p.videos[k]) p.videos[k] = { open:0, play:0, done:0, sec:0, pdf:0 };
-        ['open','play','done','sec','pdf'].forEach(function(f){ p.videos[k][f] = (p.videos[k][f] || 0) + (inc[f] || 0); });
+        if (!p.videos[k]) p.videos[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{}, uids:{} };
+        ['open','play','done','sec','pdf','fail'].forEach(function(f){ p.videos[k][f] = (p.videos[k][f] || 0) + (inc[f] || 0); });
+        /* 播放人数去重：合并设备编号（上限500，防池子膨胀） */
+        if (inc._uid) {
+          if (!p.videos[k].uids || typeof p.videos[k].uids !== 'object') p.videos[k].uids = {};
+          p.videos[k].uids[inc._uid] = 1;
+          var uk = Object.keys(p.videos[k].uids);
+          if (uk.length > 500) { for (var ui = 0; ui < uk.length - 500; ui++) delete p.videos[k].uids[uk[ui]]; }
+        }
+        /* 退出节点分桶合并 */
+        if (inc.exit && typeof inc.exit === 'object') {
+          if (!p.videos[k].exit || typeof p.videos[k].exit !== 'object') p.videos[k].exit = {};
+          Object.keys(inc.exit).forEach(function(b){ p.videos[k].exit[b] = (p.videos[k].exit[b]||0) + inc.exit[b]; });
+        }
         for (var i = 0; i < VIDEOS.length; i++) {
           if (vidKey(VIDEOS[i]) === k && VIDEOS[i].title) { p.meta[k] = String(VIDEOS[i].title).slice(0, 60); break; }
         }
       });
       Object.keys(dayPend).forEach(function(d){
-        if (!p.days[d]) p.days[d] = { play:0, done:0, sec:0 };
+        if (!p.days[d]) p.days[d] = { play:0, done:0, sec:0, uids:{} };
         ['play','done','sec'].forEach(function(f){ p.days[d][f] = (p.days[d][f] || 0) + (dayPend[d][f] || 0); });
+        /* 每日播放人数：按设备去重（随30天滚动清理） */
+        if (dayUids[d]) {
+          if (!p.days[d].uids || typeof p.days[d].uids !== 'object') p.days[d].uids = {};
+          Object.keys(dayUids[d]).forEach(function(u){ p.days[d].uids[u] = 1; });
+        }
       });
       var dk = Object.keys(p.days).sort();
       if (dk.length > 30) { for (var i = 0; i < dk.length - 30; i++) delete p.days[dk[i]]; }
       p.ts = Date.now();
       put(p, function(ok){
-        if (ok) { pending = {}; dayPend = {}; }
+        if (ok) { pending = {}; dayPend = {}; dayUids = {}; }
         else flushSoon(); /* 写失败：本地计数保留，稍后重试 */
       });
     });
@@ -258,7 +289,7 @@ var vtrack = (function(){
 
   /* 播放器埋点：开始播放（每次打开播放页只计一次）、观看时长（每5秒）、完整看完（最后一段播完） */
   function bindPlayer(player, getPart, nParts){
-    var started = false, endCount = 0, watchT = null;
+    var started = false, endCount = 0, watchT = null, maxPos = 0;
     function startWatch(){
       if (watchT) return;
       watchT = setInterval(function(){
@@ -266,15 +297,32 @@ var vtrack = (function(){
       }, 5000);
     }
     function stopWatch(){ if (watchT) { clearInterval(watchT); watchT = null; } }
+    function exitBucket(){
+      /* 退出节点：按已看进度分四档（<25% / 25-50% / 50-75% / 75-100%） */
+      try{
+        var d = player.duration, c = player.currentTime || 0;
+        if (c > maxPos) maxPos = c;
+        if (!d || d <= 0) return '0-25';
+        var r = maxPos / d;
+        return r < 0.25 ? '0-25' : r < 0.5 ? '25-50' : r < 0.75 ? '50-75' : '75-100';
+      }catch(e){ return '0-25'; }
+    }
     player.addEventListener('play', function(){
       if (!started) { started = true; add('play'); }
       startWatch();
     });
-    player.addEventListener('pause', stopWatch);
+    player.addEventListener('pause', function(){
+      stopWatch();
+      if (started && !player.ended && player.currentTime > 30) add('exit', 1, exitBucket());
+    });
+    player.addEventListener('error', function(){ if (started || player.currentTime > 0) add('fail'); });
     player.addEventListener('ended', function(){
       stopWatch();
       endCount++;
       if (endCount >= nParts) add('done');
+    });
+    window.addEventListener('pagehide', function(){
+      if (started && !player.ended && player.currentTime > 30) add('exit', 1, exitBucket());
     });
   }
   return { add: add, bindPlayer: bindPlayer };

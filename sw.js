@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v3';
+var CACHE = 'yc-static-v4';
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 var dbg = { fetches: 0, lastError: null, lastStatus: null, log: [] };
 function dlog(m){ dbg.log.push((dbg.fetches) + ' ' + m); if (dbg.log.length > 12) dbg.log.shift(); }

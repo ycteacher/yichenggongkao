@@ -58,6 +58,12 @@
       /* 清理10分钟前的在线记录，控制体积 */
       Object.keys(p.online).forEach(function(k){if(now-p.online[k]>600000)delete p.online[k]});
       p.online[did]=now;
+      /* 分钟级心跳计数：供看板画实时分钟趋势（保留最近3小时） */
+      if(!p.min||typeof p.min!=='object')p.min={};
+      var mk=today+pad(new Date().getHours())+pad(new Date().getMinutes());
+      p.min[mk]=(p.min[mk]||0)+1;
+      var mks=Object.keys(p.min).sort();
+      if(mks.length>180){for(var mi=0;mi<mks.length-180;mi++)delete p.min[mks[mi]];}
       var rec=p.devices[did]||{};
       if(!rec.first)rec.first=dayKey(new Date());
       rec.last=today;rec.m=dev.model;rec.os=dev.os;rec.inst=!!(rec.inst||dev.install);
@@ -70,6 +76,17 @@
       /* 只保留最近14天的分时，控制体积 */
       var hkeys=Object.keys(rec.hr).sort();
       if(hkeys.length>14){for(var hi=0;hi<hkeys.length-14;hi++)delete rec.hr[hkeys[hi]];}
+      /* 活跃日矩阵（最近30天）：供留存/回访/DAU 计算 */
+      if(!rec.days||typeof rec.days!=='object')rec.days={};
+      rec.days[today]=1;
+      var dkeys=Object.keys(rec.days).sort();
+      if(dkeys.length>30){for(var di=0;di<dkeys.length-30;di++)delete rec.days[dkeys[di]];}
+      /* 会话：距上次心跳超过30分钟算新会话 */
+      if(!rec.lastTs||now-rec.lastTs>1800000)rec.sess=(rec.sess||0)+1;
+      rec.lastTs=now;
+      /* 来源渠道（只记首次）+ 页面加载耗时（只记首次） */
+      if(!rec.ref){try{var rf=document.referrer||'';if(rf)rec.ref=rf.replace(/^https?:\/\//,'').split(/[/?#]/)[0].slice(0,40)||'直接打开'}catch(e){}}
+      if(rec.perf===undefined){try{var t0=performance.timing,tn=performance.navigation?performance.navigation.type:0;if(t0&&t0.domContentLoadedEventStart>0)rec.perf=Math.min(9999,Math.round(t0.domContentLoadedEventStart-t0.navigationStart))}catch(e){rec.perf=0}}
       p.devices[did]=rec;
       /* 设备数上限保护：超过2000台只保留最近1500台 */
       var ids=Object.keys(p.devices);
