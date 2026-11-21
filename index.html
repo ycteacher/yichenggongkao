@@ -770,7 +770,7 @@ document.addEventListener('click', function(e){
       '<div class="yc-vb-s">亿成老师精讲视频 · 配套试卷可保存打印，边看边学</div></div>' +
       '<span class="yc-vb-r">去看 ›</span>';
     b.addEventListener("click", function(){
-      window.location.href = "videos.html?v=2";
+      window.location.href = "videos.html?v=3";
     });
     var fb = document.getElementById("yc-fb-banner");
     if (fb) shell.insertBefore(b, fb); else shell.appendChild(b);
@@ -823,8 +823,6 @@ document.addEventListener('click', function(e){
         hit('ycgk.refreturn');
       }
     }catch(e){}
-    /* 离线缓存：装到桌面后再次打开基本秒开 */
-    if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js?v=1').catch(function(){})})}
     document.addEventListener('click',function(e){
       try{
         var el=e.target;
