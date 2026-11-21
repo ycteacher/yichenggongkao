@@ -260,6 +260,8 @@ function renderPlay(){
   var playerHtml;
   if (v.oss || v.srcs) {
     playerHtml = '<video id="localPlayer" controls playsinline webkit-playsinline preload="metadata" ' +
+      'controlslist="nodownload" disablepictureinpicture disableremoteplayback ' +
+      'oncontextmenu="return false" ondragstart="return false" ' +
       'style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;"></video>';
   } else {
     playerHtml = '<iframe src="https://player.bilibili.com/player.html?bvid=' +
@@ -280,7 +282,7 @@ function renderPlay(){
     '</div>' : '';
   document.getElementById("view").innerHTML =
     '<div class="card">' +
-      '<div class="video-box">' + playerHtml + '</div>' +
+      '<div class="video-box" oncontextmenu="return false">' + playerHtml + '</div>' +
       '<div class="body">' +
         '<h2>' + esc(v.title || "视频讲解") + '</h2>' +
         (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
