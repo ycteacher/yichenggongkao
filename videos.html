@@ -138,7 +138,7 @@ var CATS = [
 ];
 
 var VIDEOS = [
-  { src: "https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-full.mp4", cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
+  { srcs: ["media/xingce130-1.mp4", "media/xingce130-2.mp4", "media/xingce130-3.mp4"], cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
     pdfs: [
       { name: "行测试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-行测试卷.pdf") },
       { name: "申论试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-申论试卷.pdf") }
@@ -160,7 +160,7 @@ function catOf(name){
 }
 function videosOf(cat){
   var out = [];
-  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && (VIDEOS[i].bvid || VIDEOS[i].src) && VIDEOS[i].cat === cat) out.push(i);
+  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && (VIDEOS[i].bvid || VIDEOS[i].src || VIDEOS[i].srcs) && VIDEOS[i].cat === cat) out.push(i);
   return out;
 }
 
@@ -237,8 +237,9 @@ function renderPlay(){
   if (pdfHtml) pdfHtml += '<p class="pdf-note">点开即可查看，页内附保存与打印方法</p>';
   else pdfHtml = '<p class="no-pdf">本视频无配套试卷，直接看就行</p>';
   var playerHtml;
-  if (v.src) {
-    playerHtml = '<video id="localPlayer" src="' + esc(v.src) + '" controls playsinline webkit-playsinline preload="metadata" ' +
+  if (v.src || v.srcs) {
+    var firstSrc = v.src || (v.srcs && v.srcs[0]) || "";
+    playerHtml = '<video id="localPlayer" src="' + esc(firstSrc) + '" controls playsinline webkit-playsinline preload="metadata" ' +
       'style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;"></video>';
   } else {
     playerHtml = '<iframe src="https://player.bilibili.com/player.html?bvid=' +
@@ -247,7 +248,7 @@ function renderPlay(){
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" ' +
       'title="' + esc(v.title || "视频讲解") + '"></iframe>';
   }
-  var speedHtml = v.src ?
+  var speedHtml = (v.src || v.srcs) ?
     '<div class="speed-bar" id="speedBar">' +
       '<span class="sp-label">倍速</span>' +
       '<button class="sp-btn" data-r="0.5">0.5x</button>' +
@@ -266,14 +267,29 @@ function renderPlay(){
         speedHtml +
         pdfHtml +
       '</div></div>';
-  if (v.src) {
+  if (v.src || v.srcs) {
     var player = document.getElementById("localPlayer");
     var bar = document.getElementById("speedBar");
+    var parts = v.srcs || null;
+    var partIdx = 0;
+    var curRate = 1;
+    if (parts && parts.length > 1) {
+      player.addEventListener("ended", function(){
+        if (partIdx < parts.length - 1) {
+          partIdx++;
+          player.src = parts[partIdx];
+          player.load();
+          player.playbackRate = curRate;
+          player.play();
+        }
+      });
+    }
     if (bar) {
       var btns = bar.querySelectorAll(".sp-btn");
       for (var s = 0; s < btns.length; s++) {
         btns[s].addEventListener("click", function(){
-          player.playbackRate = parseFloat(this.getAttribute("data-r"));
+          curRate = parseFloat(this.getAttribute("data-r"));
+          player.playbackRate = curRate;
           for (var t = 0; t < btns.length; t++) btns[t].className = "sp-btn";
           this.className = "sp-btn on";
         });
