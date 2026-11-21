@@ -151,6 +151,10 @@ var VIDEOS = [
 
 var state = { view: "home", cat: null, idx: -1 };
 
+/* 调试日志（临时） */
+window.vlog = [];
+function vlog(m){ window.vlog.push(Math.round(performance.now()) + "ms " + m); }
+
 /* 注册播放辅助脚本：就绪后再挂载视频源（见 renderPlay） */
 var swReady = (function(){
   if (!("serviceWorker" in navigator) || location.protocol !== "https:") return Promise.resolve(false);
@@ -314,16 +318,23 @@ function renderPlay(){
 
     player.addEventListener("error", function(){
       window.lastVidErr = player.error ? player.error.code : null;
+      vlog("error event, code=" + window.lastVidErr + ", src=" + (player.src || "").slice(0, 60));
       if (!useParts && parts && parts.length) playParts(0);
     });
 
+    player.addEventListener("loadedmetadata", function(){ vlog("loadedmetadata, src=" + (player.src || "").slice(0, 60)); });
+    player.addEventListener("stalled", function(){ vlog("stalled"); });
+
     swReady.then(function(ok){
-      if (!player.isConnected) return;
+      vlog("swReady ok=" + ok + " ctrl=" + !!navigator.serviceWorker.controller);
+      if (!player.isConnected) { vlog("player detached, skip"); return; }
       if (v.src) {
         player.src = v.src;
         player.load();
         player.playbackRate = curRate;
+        vlog("src set to OSS");
       } else if (parts && parts.length) {
+        vlog("no OSS src, playParts");
         playParts(0);
       }
     });
