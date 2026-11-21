@@ -4,6 +4,13 @@
    去掉该响应头后再交给播放器，实现正常在线播放与拖动进度条。
    只处理自有视频域名的请求，其他请求一律不拦截。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
+var dbg = { fetches: 0, lastError: null, lastStatus: null };
+
+self.addEventListener('message', function (e) {
+  if (e.data === 'debug' && e.source) {
+    e.source.postMessage(JSON.stringify(dbg), { targetOrigin: e.origin });
+  }
+});
 
 self.addEventListener('install', function () {
   self.skipWaiting();
@@ -24,13 +31,16 @@ self.addEventListener('fetch', function (e) {
 
   e.respondWith(
     fetch(url.href, init).then(function (resp) {
+      dbg.fetches++;
+      dbg.lastStatus = resp.status;
       var h = new Headers();
       ['content-type', 'content-length', 'content-range', 'accept-ranges', 'last-modified', 'etag'].forEach(function (k) {
         var v = resp.headers.get(k);
         if (v) h.set(k, v);
       });
       return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: h });
-    }).catch(function () {
+    }).catch(function (err) {
+      dbg.lastError = String(err && err.message || err);
       return new Response('', { status: 504, statusText: 'video fetch failed' });
     })
   );
