@@ -93,6 +93,15 @@
   .no-pdf { font-size:12px; color:#9A9387; margin-top:10px; }
   .play-tip { font-size:12px; color:#8A8378; line-height:1.7; margin-top:4px; }
   .play-tip b { color:#15803D; }
+  .speed-bar {
+    display:flex; align-items:center; gap:8px; margin-top:14px; flex-wrap:wrap;
+  }
+  .speed-bar .sp-label { font-size:12px; color:#8A8378; font-weight:600; }
+  .sp-btn {
+    border:1px solid #EDE9E0; background:#fff; color:#6B6558;
+    font-size:12px; font-weight:600; padding:6px 12px; border-radius:999px; cursor:pointer;
+  }
+  .sp-btn.on { background:#15803D; border-color:#15803D; color:#fff; }
 </style>
 </head>
 <body>
@@ -129,7 +138,7 @@ var CATS = [
 ];
 
 var VIDEOS = [
-  { bvid: "BV1pLyaztEZH", cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
+  { src: "https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-full.mp4", cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
     pdfs: [
       { name: "行测试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-行测试卷.pdf") },
       { name: "申论试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-申论试卷.pdf") }
@@ -151,7 +160,7 @@ function catOf(name){
 }
 function videosOf(cat){
   var out = [];
-  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && VIDEOS[i].bvid && VIDEOS[i].cat === cat) out.push(i);
+  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && (VIDEOS[i].bvid || VIDEOS[i].src) && VIDEOS[i].cat === cat) out.push(i);
   return out;
 }
 
@@ -227,19 +236,50 @@ function renderPlay(){
   }
   if (pdfHtml) pdfHtml += '<p class="pdf-note">点开即可查看，页内附保存与打印方法</p>';
   else pdfHtml = '<p class="no-pdf">本视频无配套试卷，直接看就行</p>';
-  document.getElementById("view").innerHTML =
-    '<div class="card">' +
-      '<div class="video-box"><iframe src="https://player.bilibili.com/player.html?bvid=' +
+  var playerHtml;
+  if (v.src) {
+    playerHtml = '<video id="localPlayer" src="' + esc(v.src) + '" controls playsinline webkit-playsinline preload="metadata" ' +
+      'style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;"></video>';
+  } else {
+    playerHtml = '<iframe src="https://player.bilibili.com/player.html?bvid=' +
       encodeURIComponent(v.bvid || "") + '&page=1&high_quality=1&danmaku=0&autoplay=0" ' +
       'allowfullscreen="true" scrolling="no" frameborder="0" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" ' +
-      'title="' + esc(v.title || "视频讲解") + '"></iframe></div>' +
+      'title="' + esc(v.title || "视频讲解") + '"></iframe>';
+  }
+  var speedHtml = v.src ?
+    '<div class="speed-bar" id="speedBar">' +
+      '<span class="sp-label">倍速</span>' +
+      '<button class="sp-btn" data-r="0.5">0.5x</button>' +
+      '<button class="sp-btn" data-r="0.75">0.75x</button>' +
+      '<button class="sp-btn on" data-r="1">1x</button>' +
+      '<button class="sp-btn" data-r="1.25">1.25x</button>' +
+      '<button class="sp-btn" data-r="1.5">1.5x</button>' +
+      '<button class="sp-btn" data-r="2">2x</button>' +
+    '</div>' : '';
+  document.getElementById("view").innerHTML =
+    '<div class="card">' +
+      '<div class="video-box">' + playerHtml + '</div>' +
       '<div class="body">' +
         '<h2>' + esc(v.title || "视频讲解") + '</h2>' +
         (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
+        speedHtml +
         pdfHtml +
-        '<p class="play-tip">💡 倍速：点视频右下角 <b>⚙️ 设置</b> → 倍速，0.5x～2x 随便调。</p>' +
       '</div></div>';
+  if (v.src) {
+    var player = document.getElementById("localPlayer");
+    var bar = document.getElementById("speedBar");
+    if (bar) {
+      var btns = bar.querySelectorAll(".sp-btn");
+      for (var s = 0; s < btns.length; s++) {
+        btns[s].addEventListener("click", function(){
+          player.playbackRate = parseFloat(this.getAttribute("data-r"));
+          for (var t = 0; t < btns.length; t++) btns[t].className = "sp-btn";
+          this.className = "sp-btn on";
+        });
+      }
+    }
+  }
   window.scrollTo(0, 0);
 }
 
