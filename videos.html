@@ -154,7 +154,7 @@ var state = { view: "home", cat: null, idx: -1 };
 /* 注册播放辅助脚本：就绪后再挂载视频源（见 renderPlay） */
 var swReady = (function(){
   if (!("serviceWorker" in navigator) || location.protocol !== "https:") return Promise.resolve(false);
-  return navigator.serviceWorker.register("sw.js")
+  return navigator.serviceWorker.register("sw.js?v=21")
     .then(function(){ return navigator.serviceWorker.ready; })
     .then(function(){
       return new Promise(function(resolve){
@@ -313,6 +313,7 @@ function renderPlay(){
     }
 
     player.addEventListener("error", function(){
+      window.lastVidErr = player.error ? player.error.code : null;
       if (!useParts && parts && parts.length) playParts(0);
     });
 
