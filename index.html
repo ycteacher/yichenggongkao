@@ -45,13 +45,13 @@
         <style>.tt-fig{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.md-tbl{border-collapse:collapse;margin:10px 0;width:100%;font-size:14px}.md-tbl th,.md-tbl td{border:1px solid #E5E1D8;padding:6px 10px;text-align:left;white-space:nowrap}.md-tbl th{background:#F7F5EF;font-weight:600;color:#4A463F}.tt-fig svg{max-width:100%;height:auto}.tt-opt svg{width:64px;height:64px;display:block;margin:0 auto}
 /* ===== Tab bar v1 ===== */
 .page-shell-bottom { padding-bottom: 78px !important; }
-.yc-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: flex; background: rgba(255,255,255,.97); border-top: 1px solid #E8E4DB; padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
-.yc-tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0 2px; border: none; background: none; font-size: 11px; line-height: 1.2; color: #8A8378; cursor: pointer; }
+.yc-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: flex; background: rgba(255,255,255,.97); border-top: 1px solid #E8E4DB; padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.yc-tabbar button { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px 2px; border: none; background: none; font-size: 11px; line-height: 1.2; color: #8A8378; cursor: pointer; white-space: nowrap; }
 .yc-tabbar button.on { color: #DC2626; font-weight: 600; }
 .yc-tabbar .material-icons { font-size: 22px; }
 /* 宽屏：底栏收窄居中悬浮，网页端更精致 */
 @media (min-width: 768px) {
-  .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
+  .yc-tabbar { left: 50%; right: auto; transform: translateX(-50%); max-width: 680px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); padding-left: 16px; padding-right: 16px; }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
 </style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix102"></script>
@@ -2021,7 +2021,7 @@ document.addEventListener('click', function(e){
   '.yc-plan-btn{display:inline-flex;align-items:center;gap:3px;background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;line-height:1.1;font-family:inherit}'+
   '.yc-plan-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}'+
   '.yc-plan-tab .mi{font-size:22px;line-height:1}'+
-  '.yc-plan-tab .lb{font-size:10px;font-weight:700}'+
+  '.yc-plan-tab .lb{font-size:11px;font-weight:700;white-space:nowrap}'+
   '@media(max-width:400px){.yc-ob-card{padding:20px 16px}.yc-ob-why .tx{font-size:10.5px}}';
   var st=document.createElement('style'); st.id='ycObCss'; st.textContent=CSS; document.head.appendChild(st);
 
