@@ -1,0 +1,258 @@
+<script>
+/* telemetry v1: 学生端埋点升级 —— PWA安装 / UA画像 / 心跳与会话 / 刷题行为聚合 / 稳定性
+   数据契约（供数据看板读取）：
+   - ycgk-stat 聚合池：{ts, inst:{t,d:{YYYYMMDD:n},os:{name:n}},
+       err:{d:{date:{n,top:{msg:n}}}}, perf:{d:{date:[ms]}},
+       quiz:{d:{date:{n,c,dur,stk,mods:{k:{n,c}},subs:{},diffs:{}}}},
+       sess:{d:{date:n},dur:{date:sec}}}
+   - ycgk-hb-0..7 心跳分片：{d:{did:lastTs}, s:{did:sessionStart}}（>3小时记录清理）
+   - 实时池(ycgk-live-v1)设备记录新增可选字段：brand/net/sc/src/srcs/osv
+   规范：读-合并-写，失败重试2次退避；单键≤100KB超出滚动裁剪；与 11-part 实时池上报分键不冲突。 */
+(function(){
+  if(window.__ycTl)return;window.__ycTl=1;
+  var LS='ycgk-stat',BUFK='ycgk.tl.buf',ANSK='ycgk.tl.ans',ACTK='ycgk.tl.lastAct';
+  var GETS=['https://textdb.dev/api/data/','https://textdb.online/'];
+  function pad(n){return ('0'+n).slice(-2)}
+  function dayKey(d){d=d||new Date();return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+  function did(){var id='';try{id=localStorage.getItem('ycgk.did')}catch(e){}return id||'anon'}
+  function shard(){var s=did(),h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%8}
+  function get(k,cb){var i=0;(function next(){if(i>=GETS.length){cb(null);return}
+    fetch(GETS[i++]+k,{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+      if(!t||t.charAt(0)!=='{'){next();return}
+      try{cb(JSON.parse(t))}catch(e){next()}}).catch(function(){next()})})()}
+  function put(k,v,cb){
+    var s=JSON.stringify(v),n=0;
+    function dev(){fetch('https://textdb.dev/api/data/'+k,{method:'POST',headers:{'Content-Type':'text/plain'},body:s}).then(function(r){if(r.ok){cb(true)}else{retry()}},retry)}
+    function retry(){n++;if(n<=2){setTimeout(dev,n===1?2000:8000)}else if(n===3){setTimeout(function(){fetch('https://textdb.online/update/?key='+encodeURIComponent(k)+'&value='+encodeURIComponent(s)).then(function(){cb(true)},function(){cb(false)})},15000)}else{cb(false)}}
+    dev();
+  }
+  /* ---- 本地缓冲（页面关闭前落盘，下次启动续传） ---- */
+  var B={inst:null,err:null,perf:[],quiz:null,sess:null};
+  try{var saved=JSON.parse(localStorage.getItem(BUFK)||'null');if(saved&&typeof saved==='object'){B.inst=saved.inst||null;B.err=saved.err||null;B.perf=saved.perf||[];B.quiz=saved.quiz||null;B.sess=saved.sess||null}}catch(e){}
+  function saveBuf(){try{localStorage.setItem(BUFK,JSON.stringify(B))}catch(e){}}
+  function takeBuf(part){
+    var snap;
+    if(part==='quiz'){snap={quiz:B.quiz};B.quiz=null}
+    else{snap={inst:B.inst,err:B.err,perf:B.perf,sess:B.sess};B.inst=null;B.err=null;B.perf=[];B.sess=null}
+    saveBuf();return snap;
+  }
+  function backBuf(snap){
+    if(snap.inst){B.inst=snap.inst}
+    if(snap.err){B.err=snap.err}
+    if(snap.perf&&snap.perf.length){B.perf=(B.perf||[]).concat(snap.perf)}
+    if(snap.sess){B.sess=snap.sess}
+    if(snap.quiz){B.quiz=snap.quiz}
+    saveBuf();
+  }
+  /* ---- 合并进聚合池 ---- */
+  function mergeKV(t,src){if(!src)return;Object.keys(src).forEach(function(k){var o=src[k]||{};var x=t[k]||(t[k]={n:0,c:0});x.n+=o.n||0;x.c+=o.c||0})}
+  function pruneStat(p){
+    function trim(o,keep){var ks=Object.keys(o).sort();if(ks.length>keep){for(var i=0;i<ks.length-keep;i++)delete o[ks[i]]}}
+    trim(p.err.d,14);trim(p.perf.d,14);trim(p.quiz.d,30);trim(p.sess.d,30);trim(p.sess.dur,30);
+    function size(){try{return JSON.stringify(p).length}catch(e){return 0}}
+    var steps=[
+      function(){Object.keys(p.perf.d).forEach(function(d){var a=p.perf.d[d];if(a.length>50)p.perf.d[d]=a.slice(-50)})},
+      function(){trim(p.err.d,7);trim(p.perf.d,7);trim(p.quiz.d,7);trim(p.sess.d,7);trim(p.sess.dur,7)},
+      function(){p.perf={d:{}}},
+      function(){trim(p.quiz.d,3);trim(p.sess.d,3);trim(p.sess.dur,3)}
+    ];
+    for(var i=0;i<steps.length&&size()>100000;i++)steps[i]();
+  }
+  function mergeStat(pool,snap){
+    var p=pool&&typeof pool==='object'?pool:{};
+    var today=dayKey();
+    if(!p.inst||typeof p.inst!=='object')p.inst={t:0,d:{},os:{}};
+    if(!p.err||typeof p.err!=='object')p.err={d:{}};
+    if(!p.perf||typeof p.perf!=='object')p.perf={d:{}};
+    if(!p.quiz||typeof p.quiz!=='object')p.quiz={d:{}};
+    if(!p.sess||typeof p.sess!=='object')p.sess={d:{},dur:{}};
+    if(snap.inst&&snap.inst.n){
+      p.inst.t=(p.inst.t||0)+snap.inst.n;
+      p.inst.d[today]=(p.inst.d[today]||0)+snap.inst.n;
+      Object.keys(snap.inst.os).forEach(function(k){p.inst.os[k]=(p.inst.os[k]||0)+snap.inst.os[k]});
+    }
+    if(snap.err&&snap.err.n){
+      var e=p.err.d[today]||(p.err.d[today]={n:0,top:{}});
+      e.n+=snap.err.n;
+      Object.keys(snap.err.top).forEach(function(m){e.top[m]=(e.top[m]||0)+snap.err.top[m]});
+      var tks=Object.keys(e.top);
+      if(tks.length>10){tks.sort(function(a,b){return e.top[b]-e.top[a]});var keep={};for(var i=0;i<10;i++)keep[tks[i]]=e.top[tks[i]];e.top=keep}
+    }
+    if(snap.perf&&snap.perf.length){
+      var arr=p.perf.d[today]||(p.perf.d[today]=[]);
+      snap.perf.forEach(function(v){arr.push(v)});
+      if(arr.length>200)p.perf.d[today]=arr.slice(-200);
+    }
+    if(snap.sess){
+      Object.keys(snap.sess.d||{}).forEach(function(d){p.sess.d[d]=(p.sess.d[d]||0)+snap.sess.d[d]});
+      Object.keys(snap.sess.dur||{}).forEach(function(d){p.sess.dur[d]=(p.sess.dur[d]||0)+snap.sess.dur[d]});
+    }
+    if(snap.quiz){
+      Object.keys(snap.quiz.d||{}).forEach(function(d){
+        var q=snap.quiz.d[d],t=p.quiz.d[d]||(p.quiz.d[d]={n:0,c:0,dur:0,stk:0,mods:{},subs:{},diffs:{}});
+        t.n+=q.n||0;t.c+=q.c||0;t.dur+=q.dur||0;t.stk=Math.max(t.stk||0,q.stk||0);
+        mergeKV(t.mods,q.mods);mergeKV(t.subs,q.subs);mergeKV(t.diffs,q.diffs);
+      });
+    }
+    p.ts=Date.now();
+    pruneStat(p);
+    return p;
+  }
+  /* ---- 上报（串行化，base=安装/错误/耗时/会话，quiz=刷题聚合） ---- */
+  var busy=false,pendQ=false;
+  function doFlush(part){
+    if(part==='quiz'){if(busy){pendQ=true;return}if(!B.quiz)return}
+    else{if(busy)return;if(!B.inst&&!B.err&&!(B.perf&&B.perf.length)&&!B.sess)return}
+    busy=true;
+    var snap=takeBuf(part);
+    get(LS,function(pool){
+      var merged=mergeStat(pool,snap);
+      put(LS,merged,function(ok){
+        if(ok){busy=false;if(pendQ){pendQ=false;doFlush('quiz')}}
+        else{backBuf(snap);busy=false}
+      });
+    });
+  }
+  setInterval(function(){doFlush('base')},600000);
+  setInterval(function(){doFlush('quiz')},3600000);
+  /* ---- 会话识别与时长 ---- */
+  try{
+    var last=+localStorage.getItem(ACTK)||0;
+    if(Date.now()-last>1800000){if(!B.sess)B.sess={d:{},dur:{}};var dk0=dayKey();B.sess.d[dk0]=(B.sess.d[dk0]||0)+1}
+    localStorage.setItem(ACTK,String(Date.now()));
+  }catch(e){}
+  var visSince=document.hidden?0:Date.now();
+  function addDur(a,b){var ms=Math.min(b-a,7200000);if(ms>5000){if(!B.sess)B.sess={d:{},dur:{}};var k=dayKey();B.sess.dur[k]=(B.sess.dur[k]||0)+Math.round(ms/1000)}}
+  /* ---- 心跳（≤60秒，仅前台；分片键 ycgk-hb-0..7） ---- */
+  var HB='ycgk-hb-'+shard(),sessStart=Date.now();
+  function beat(){
+    get(HB,function(pool){
+      var p=pool&&typeof pool==='object'?pool:{};
+      if(!p.d||typeof p.d!=='object')p.d={};
+      if(!p.s||typeof p.s!=='object')p.s={};
+      var now=Date.now();
+      Object.keys(p.d).forEach(function(k){if(now-p.d[k]>10800000){delete p.d[k];delete p.s[k]}});
+      p.d[did()]=now;
+      if(!p.s[did()])p.s[did()]=sessStart;
+      p.ts=now;
+      put(HB,p,function(){});
+    });
+  }
+  beat();
+  setInterval(function(){if(!document.hidden){beat();try{localStorage.setItem(ACTK,String(Date.now()))}catch(e){}}},60000);
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){if(visSince){addDur(visSince,Date.now());visSince=0}beat();saveBuf();doFlush('base');doFlush('quiz')}
+    else{visSince=Date.now();beat()}
+  });
+  window.addEventListener('pagehide',function(){
+    if(visSince){addDur(visSince,Date.now());visSince=0}
+    saveBuf();doFlush('base');doFlush('quiz');
+  });
+  /* ---- 刷题行为：本地聚合（模块维度），8秒轮询差分 ---- */
+  function readStudy(){try{var s=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}');return s.moduleProgress||{}}catch(e){return{}}}
+  var lastAns=null,lastDelta=0;
+  try{lastAns=JSON.parse(localStorage.getItem(ANSK)||'null')}catch(e){}
+  function pollQuiz(){
+    var mp=readStudy(),cur={},dn=0;
+    Object.keys(mp).forEach(function(k){var o=mp[k]||{};cur[k]={n:o.answered||0,c:o.correct||0}});
+    if(lastAns){
+      var now=Date.now(),dk=dayKey();
+      Object.keys(cur).forEach(function(k){
+        var l=lastAns[k]||{n:0,c:0},d1=cur[k].n-l.n,d2=cur[k].c-l.c;
+        if(d1>0){
+          dn+=d1;
+          if(!B.quiz)B.quiz={d:{}};
+          var q=B.quiz.d[dk]||(B.quiz.d[dk]={n:0,c:0,dur:0,stk:0,mods:{},subs:{},diffs:{}});
+          var c2=Math.max(0,Math.min(d2,d1));
+          q.n+=d1;q.c+=c2;
+          var m=q.mods[k]||(q.mods[k]={n:0,c:0});m.n+=d1;m.c+=c2;
+          if(lastDelta&&now-lastDelta<600000)q.dur+=Math.min(now-lastDelta,120000);
+        }
+      });
+      if(dn>0){
+        lastDelta=now;
+        try{var sd=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}').streakDays;if(sd){B.quiz.d[dk].stk=Math.max(B.quiz.d[dk].stk||0,sd)}}catch(e){}
+        if((B.quiz.d[dk].n||0)>=50)doFlush('quiz');
+      }
+    }
+    lastAns=cur;
+    try{localStorage.setItem(ANSK,JSON.stringify(cur))}catch(e){}
+  }
+  pollQuiz();setInterval(pollQuiz,8000);
+  /* ---- 稳定性：JS错误 / Promise未捕获拒绝（消息截断120字符） ---- */
+  function addErr(msg){
+    msg=String(msg||'未知错误').slice(0,120);
+    if(!B.err)B.err={n:0,top:{}};
+    B.err.n++;B.err.top[msg]=(B.err.top[msg]||0)+1;
+    var ks=Object.keys(B.err.top);
+    if(ks.length>20){ks.sort(function(a,b){return B.err.top[b]-B.err.top[a]});var keep={};for(var i=0;i<20;i++)keep[ks[i]]=B.err.top[ks[i]];B.err.top=keep}
+  }
+  window.addEventListener('error',function(e){try{addErr(e&&e.message||'script error')}catch(x){}});
+  window.addEventListener('unhandledrejection',function(e){try{var r=e&&e.reason;addErr(typeof r==='string'?r:(r&&r.message)||'promise rejection')}catch(x){}});
+  /* ---- 加载耗时：loadEventEnd - navigationStart（每次会话一条） ---- */
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      try{
+        var ms=0,nt=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+        if(nt&&nt.loadEventEnd)ms=Math.round(nt.loadEventEnd-nt.startTime);
+        else if(performance.timing&&performance.timing.loadEventEnd)ms=Math.round(performance.timing.loadEventEnd-performance.timing.navigationStart);
+        if(ms>0&&ms<600000){B.perf.push(ms);saveBuf()}
+      }catch(e){}
+    },50);
+  });
+  /* ---- PWA 安装上报（含OS；每设备每天最多记一次） ---- */
+  function osName(){var ua=navigator.userAgent||'';
+    if(/iPhone|iPad|iPod/i.test(ua))return 'ios';
+    if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua))return 'harmony';
+    if(/Android/i.test(ua))return 'android';
+    return 'pc'}
+  function recordInstall(){
+    try{var dk=dayKey();if(localStorage.getItem('ycgk.tl.inst')===dk)return;localStorage.setItem('ycgk.tl.inst',dk)}catch(e){}
+    if(!B.inst)B.inst={n:0,os:{}};
+    B.inst.n++;B.inst.os[osName()]=(B.inst.os[osName()]||0)+1;
+    saveBuf();doFlush('base');
+  }
+  window.addEventListener('appinstalled',function(){try{recordInstall()}catch(e){}});
+  window.addEventListener('beforeinstallprompt',function(e){
+    try{if(e&&e.userChoice)e.userChoice.then(function(c){if(c&&c.outcome==='accepted')recordInstall()})}catch(err){}
+  });
+  /* ---- UA画像：品牌/网络/分辨率/来源 → 实时池设备记录（每次会话写一次，随机延迟避让 11-part） ---- */
+  function brandOf(){var ua=navigator.userAgent||'';
+    if(/iPhone|iPad|iPod|Macintosh/i.test(ua))return '苹果';
+    if(/HONOR/i.test(ua))return '荣耀';
+    if(/HUAWEI|HMSCore|HarmonyOS/i.test(ua))return '华为';
+    if(/Redmi|Xiaomi|MIUI|MIX|MI \d/i.test(ua))return '小米';
+    if(/OPPO|PADM|PCTM/i.test(ua))return 'OPPO';
+    if(/vivo|V\d{4}A/i.test(ua))return 'vivo';
+    return '其他'}
+  function netType(){try{return (navigator.connection&&navigator.connection.effectiveType)||''}catch(e){return ''}}
+  function screenStr(){try{return screen.width+'x'+screen.height+'@'+(window.devicePixelRatio||1)}catch(e){return ''}}
+  function srcOf(){
+    try{
+      if((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true)return 'PWA';
+      var q=new URLSearchParams(location.search);
+      if(q.get('ref'))return '分享链接';
+      return '直接打开';
+    }catch(e){return '直接打开'}
+  }
+  function writeProfile(){
+    get('ycgk-live-v1',function(pool){
+      var p=pool&&typeof pool==='object'?pool:{};
+      if(!p.devices||typeof p.devices!=='object')p.devices={};
+      var rec=p.devices[did()]||{};
+      rec.brand=brandOf();
+      var osvM=(navigator.userAgent||'').match(/Android (\d+(?:\.\d+)?)/)||(navigator.userAgent||'').match(/OS (\d+(?:_\d+)?)/);
+      if(osvM)rec.osv=osvM[1].replace('_','.');
+      var nt=netType();if(nt)rec.net=nt;
+      var sc=screenStr();if(sc)rec.sc=sc;
+      rec.src=srcOf();
+      rec.srcs=rec.srcs||{};rec.srcs[rec.src]=(rec.srcs[rec.src]||0)+1;
+      p.devices[did()]=rec;p.ts=Date.now();
+      put('ycgk-live-v1',p,function(){});
+    });
+  }
+  setTimeout(writeProfile,5000+Math.floor(Math.random()*8000));
+  /* 启动时若有上次未上报完的缓冲，尽快补报 */
+  if(B.inst||B.err||(B.perf&&B.perf.length)||B.sess)setTimeout(function(){doFlush('base')},20000);
+})();
+</script>

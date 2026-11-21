@@ -223,8 +223,9 @@ var vtrack = (function(){
     n = n || 1;
     var k = vidKey(VIDEOS[state.idx]);
     if (!k) return;
-    if (!pending[k]) pending[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{} };
+    if (!pending[k]) pending[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{}, exit3:{} };
     if (kind === 'exit' && extra != null) { pending[k].exit[extra] = (pending[k].exit[extra]||0)+1; flushSoon(); return; }
+    if (kind === 'exit3' && extra != null) { if (!pending[k].exit3) pending[k].exit3 = {}; pending[k].exit3[extra] = (pending[k].exit3[extra]||0)+1; flushSoon(); return; }
     pending[k][kind] = (pending[k][kind] || 0) + n;
     if (kind === 'play') { pending[k]._uid = DID; dayUids[d] = dayUids[d] || {}; dayUids[d][DID] = 1; }
     var d = today();
@@ -246,7 +247,7 @@ var vtrack = (function(){
       if (!p.days || typeof p.days !== 'object') p.days = {};
       Object.keys(pending).forEach(function(k){
         var inc = pending[k];
-        if (!p.videos[k]) p.videos[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{}, uids:{} };
+        if (!p.videos[k]) p.videos[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{}, exit3:{}, uids:{} };
         ['open','play','done','sec','pdf','fail'].forEach(function(f){ p.videos[k][f] = (p.videos[k][f] || 0) + (inc[f] || 0); });
         /* 播放人数去重：合并设备编号（上限500，防池子膨胀） */
         if (inc._uid) {
@@ -259,6 +260,11 @@ var vtrack = (function(){
         if (inc.exit && typeof inc.exit === 'object') {
           if (!p.videos[k].exit || typeof p.videos[k].exit !== 'object') p.videos[k].exit = {};
           Object.keys(inc.exit).forEach(function(b){ p.videos[k].exit[b] = (p.videos[k].exit[b]||0) + inc.exit[b]; });
+        }
+        /* 退出三桶合并（开头30秒/中段/结尾，新口径） */
+        if (inc.exit3 && typeof inc.exit3 === 'object') {
+          if (!p.videos[k].exit3 || typeof p.videos[k].exit3 !== 'object') p.videos[k].exit3 = {};
+          Object.keys(inc.exit3).forEach(function(b){ p.videos[k].exit3[b] = (p.videos[k].exit3[b]||0) + inc.exit3[b]; });
         }
         for (var i = 0; i < VIDEOS.length; i++) {
           if (vidKey(VIDEOS[i]) === k && VIDEOS[i].title) { p.meta[k] = String(VIDEOS[i].title).slice(0, 60); break; }
@@ -307,13 +313,23 @@ var vtrack = (function(){
         return r < 0.25 ? '0-25' : r < 0.5 ? '25-50' : r < 0.75 ? '50-75' : '75-100';
       }catch(e){ return '0-25'; }
     }
+    function exit3Bucket(){
+      /* 退出三桶（新口径）：开头30秒内 / 中段 / 结尾（距片尾30秒内） */
+      try{
+        var d = player.duration, c = player.currentTime || 0;
+        if (c > maxPos) maxPos = c;
+        if (!d || d <= 0) return 'a';
+        if (maxPos <= 30) return 'a';
+        return (d - maxPos <= 30) ? 'c' : 'b';
+      }catch(e){ return 'a'; }
+    }
     player.addEventListener('play', function(){
       if (!started) { started = true; add('play'); }
       startWatch();
     });
     player.addEventListener('pause', function(){
       stopWatch();
-      if (started && !player.ended && player.currentTime > 30) add('exit', 1, exitBucket());
+      if (started && !player.ended && player.currentTime > 30) { add('exit', 1, exitBucket()); add('exit3', 1, exit3Bucket()); }
     });
     player.addEventListener('error', function(){ if (started || player.currentTime > 0) add('fail'); });
     player.addEventListener('ended', function(){
@@ -322,7 +338,7 @@ var vtrack = (function(){
       if (endCount >= nParts) add('done');
     });
     window.addEventListener('pagehide', function(){
-      if (started && !player.ended && player.currentTime > 30) add('exit', 1, exitBucket());
+      if (started && !player.ended && player.currentTime > 30) { add('exit', 1, exitBucket()); add('exit3', 1, exit3Bucket()); }
     });
   }
   return { add: add, bindPlayer: bindPlayer };
