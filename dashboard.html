@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f6f8f7">
+<meta name="theme-color" content="#0a0e17">
 <title>亿成公考 · 运营看板</title>
-<meta name="description" content="亿成公考运营数据看板：实时流量、视频数据、历史总结与问卷反馈。">
+<meta name="description" content="亿成公考运营数据看板：实时监测与数据库存。">
 <style>
 :root{
-  --bg:#f4f7f5; --panel:#ffffff; --panel2:#f0f4f1; --line:#e3e9e5; --line2:#edf1ee;
-  --txt:#16241c; --sub:#4f5f56; --mut:#8b968f;
-  --brand:#15803D; --brand2:#0f5c2e; --accent:#B45309;
-  --green:#16a34a; --cyan:#0e7490; --amber:#B45309; --violet:#7c3aed; --pink:#db2777; --red:#dc2626;
-  --r:14px;
+  --bg:#0a0e17; --panel:#111827; --panel2:#0c1220; --line:#1f2937; --line2:#1a2332;
+  --txt:#e5e7eb; --sub:#9ca3af; --mut:#6b7280;
+  --cyan:#22d3ee; --green:#34d399; --amber:#fbbf24; --red:#f87171; --violet:#a78bfa; --pink:#f472b6;
+  --r:12px;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -21,39 +21,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 /* 顶部 */
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#15803D,#0f5c2e);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#fff;box-shadow:0 4px 14px rgba(21,128,61,.3)}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#22d3ee,#0e7490);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#06202a;box-shadow:0 4px 14px rgba(34,211,238,.25)}
 .brand h1{font-size:19px;font-weight:800;letter-spacing:.3px}
 .brand .sub{font-size:11px;color:var(--mut);margin-top:1px}
 .topmid{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--brand);background:rgba(21,128,61,.08);border:1px solid rgba(21,128,61,.22);padding:4px 11px;border-radius:99px;font-weight:600}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);padding:4px 11px;border-radius:99px;font-weight:600}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.6s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
-.clock{font-size:22px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;letter-spacing:1px}
-.cd{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,rgba(180,83,9,.1),rgba(180,83,9,.03));border:1px solid rgba(180,83,9,.28);border-radius:11px;padding:7px 13px}
-.cd .lab{font-size:11px;color:var(--accent)}
-.cd .num{font-size:21px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+.clock{font-size:22px;font-weight:800;color:var(--cyan);font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:1px}
+.upd{font-size:11px;color:var(--mut);font-family:var(--mono)}
+.cd{display:flex;align-items:center;gap:9px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.28);border-radius:11px;padding:7px 13px}
+.cd .lab{font-size:11px;color:var(--amber)}
+.cd .num{font-size:21px;font-weight:900;color:var(--amber);font-family:var(--mono);font-variant-numeric:tabular-nums;line-height:1}
 .cd .num small{font-size:12px;font-weight:700}
 .topright{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .refresher{background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:9px;padding:6px 11px;font-size:12px;cursor:pointer;transition:.18s}
-.refresher:hover{color:var(--txt);border-color:var(--brand)}
-.refresher.on{color:#fff;background:var(--brand);border-color:var(--brand);font-weight:700}
+.refresher:hover{color:var(--txt);border-color:var(--cyan)}
+.refresher.on{color:#06202a;background:var(--cyan);border-color:var(--cyan);font-weight:700}
 .abtn{background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:9px;padding:6px 11px;font-size:12px;cursor:pointer}
-.abtn:hover{color:var(--brand);border-color:var(--brand)}
-.abtn.a{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
-.abtn.a:hover{background:var(--brand2)}
+.abtn:hover{color:var(--cyan);border-color:var(--cyan)}
+.abtn.a{background:var(--cyan);border-color:var(--cyan);color:#06202a;font-weight:600}
 /* KPI */
-.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin:16px 0 4px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin:16px 0 4px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;position:relative;overflow:hidden;transition:.2s;min-width:0}
-.kpi:hover{border-color:rgba(21,128,61,.35);transform:translateY(-2px)}
-.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--brand));opacity:.8}
+.kpi:hover{border-color:rgba(34,211,238,.4);transform:translateY(-2px)}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--cyan));opacity:.85}
 .kpi .t{font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi .n{font-size:26px;font-weight:900;color:var(--c,var(--txt));font-variant-numeric:tabular-nums;line-height:1.25;margin-top:4px}
+.kpi .n{font-size:25px;font-weight:900;color:var(--c,var(--txt));font-family:var(--mono);font-variant-numeric:tabular-nums;line-height:1.25;margin-top:4px}
 .kpi .x{font-size:10px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi .x b{color:var(--green)}.kpi .x b.down{color:var(--pink)}
-/* 标签页 */
-.tabs{display:flex;gap:8px;margin:16px 0 14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-.tab{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:99px;padding:8px 18px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.18s}
-.tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.kpi .x b{color:var(--green);font-family:var(--mono)}
+.kpi .x b.down{color:var(--amber)}
+/* 双层 + 标签页 */
+.lyrs{display:flex;gap:10px;margin:18px 0 10px}
+.lyr{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:11px;padding:10px 26px;font-size:15px;font-weight:700;cursor:pointer;transition:.18s}
+.lyr.on{background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(34,211,238,.06));border-color:var(--cyan);color:var(--cyan)}
+.tabs{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.tab{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:99px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:.18s}
+.tab.on{background:var(--cyan);border-color:var(--cyan);color:#06202a}
 .panel{display:none}.panel.on{display:block}
 /* 网格与卡片 */
 .grid{display:grid;gap:13px}
@@ -65,14 +69,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .card h3{font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .card h3 .hint{font-size:10.5px;color:var(--mut);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .desc{font-size:11px;color:var(--mut);margin:2px 0 12px}
-.card .desc .na{color:var(--accent);font-weight:600}
+.card .desc .na{color:var(--amber);font-weight:600}
+.card .n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 /* 条形 */
 .brow{margin:8px 0}
 .bl{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:3px;gap:8px}
 .bl span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bl b{color:var(--txt);font-weight:700;font-variant-numeric:tabular-nums;flex:none}
-.bt{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
-.bfill{height:100%;border-radius:99px;background:var(--c,var(--brand));min-width:2px;transition:width .4s}
+.bl b{color:var(--txt);font-weight:700;font-family:var(--mono);font-variant-numeric:tabular-nums;flex:none}
+.bt{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;border:1px solid var(--line2)}
+.bfill{height:100%;border-radius:99px;background:var(--c,var(--cyan));min-width:2px;transition:width .4s}
 /* 图表 */
 .chart{width:100%}
 svg{display:block;width:100%;height:auto;overflow:visible}
@@ -82,10 +87,10 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 /* 热力图 */
 .heat{overflow-x:auto}
 .hrow{display:flex;align-items:center;gap:2px;margin:2px 0}
-.hrow .hl{flex:none;width:52px;font-size:10px;color:var(--mut);text-align:right;padding-right:6px}
+.hrow .hl{flex:none;width:52px;font-size:10px;color:var(--mut);text-align:right;padding-right:6px;font-family:var(--mono)}
 .hcell{flex:1;min-width:10px;height:15px;border-radius:3px;background:var(--panel2)}
 .hx{display:flex;gap:2px;margin-left:58px}
-.hx span{flex:1;min-width:10px;font-size:9px;color:var(--mut);text-align:center}
+.hx span{flex:1;min-width:10px;font-size:9px;color:var(--mut);text-align:center;font-family:var(--mono)}
 /* 表格 */
 .tscroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
@@ -93,47 +98,48 @@ th{text-align:left;color:var(--mut);font-weight:600;padding:7px 9px;border-botto
 td{padding:7px 9px;border-bottom:1px solid var(--line2);color:var(--sub);white-space:nowrap}
 tr:last-child td{border-bottom:none}
 td b{color:var(--txt)}
-tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
+tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
 /* 提醒 */
 .alerts .arow{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;border-radius:10px;margin:6px 0;font-size:12.5px}
-.arow.red{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);color:#991b1b}
-.arow.amber{background:rgba(180,83,9,.07);border:1px solid rgba(180,83,9,.22);color:#92400e}
-.arow.ok{background:rgba(21,128,61,.06);border:1px solid rgba(21,128,61,.18);color:var(--brand2)}
+.arow.red{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.28);color:#fca5a5}
+.arow.amber{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);color:#fde68a}
+.arow.ok{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);color:var(--green)}
 .arow .ic{flex:none;font-size:13px}
 /* 空态/骨架 */
 .empty{color:var(--mut);font-size:12px;padding:14px 0;text-align:center}
 .empty b{color:var(--sub)}
-.skel{background:linear-gradient(90deg,var(--panel2) 25%,#e6ebe8 50%,var(--panel2) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px;height:60px;margin:8px 0}
+.skel{background:linear-gradient(90deg,var(--panel) 25%,#182236 50%,var(--panel) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px;height:60px;margin:8px 0}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* 标签 */
 .tag{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--sub);border-radius:99px;padding:2px 10px;font-size:11px;margin:3px 4px 3px 0}
-.tag.hot{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.25);color:var(--accent)}
+.tag.hot{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.28);color:var(--amber)}
 /* 弹层 */
-.mask{display:none;position:fixed;inset:0;background:rgba(22,36,28,.45);z-index:50;align-items:center;justify-content:center;padding:20px}
+.mask{display:none;position:fixed;inset:0;background:rgba(2,6,17,.7);z-index:50;align-items:center;justify-content:center;padding:20px}
 .mask.on{display:flex}
-.modal{background:var(--panel);border-radius:16px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;padding:22px 24px}
-.modal h2{font-size:16px;margin-bottom:10px;color:var(--brand2)}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;padding:22px 24px}
+.modal h2{font-size:16px;margin-bottom:10px;color:var(--cyan)}
 .modal h4{font-size:13px;margin:12px 0 4px;color:var(--txt)}
 .modal p,.modal li{font-size:12.5px;color:var(--sub)}
 .modal ul{padding-left:18px}
 .modal .close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--mut)}
-.modal a{color:var(--brand);word-break:break-all}
+.modal a{color:var(--cyan);word-break:break-all}
 /* 下钻 */
 .drill{margin-top:12px;padding:12px 14px;background:var(--panel2);border-radius:12px;border:1px dashed var(--line)}
-.drill h4{font-size:12.5px;margin-bottom:8px;color:var(--brand2)}
+.drill h4{font-size:12.5px;margin-bottom:8px;color:var(--cyan)}
 /* 引用 */
-.quote{background:var(--panel2);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:8px 12px;margin:7px 0;font-size:12px;color:var(--sub)}
+.quote{background:var(--panel2);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:8px 12px;margin:7px 0;font-size:12px;color:var(--sub)}
 .quote .qm{font-size:10.5px;color:var(--mut);margin-top:3px}
 /* 响应式 */
-@media (max-width:1100px){.kpis{grid-template-columns:repeat(4,1fr)}.g4{grid-template-columns:repeat(2,1fr)}.card.w4{grid-column:span 2}}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(2,1fr)}.card.w4{grid-column:span 2}}
 @media (max-width:760px){
   .wrap{padding:14px 13px 50px}
   .kpis{grid-template-columns:repeat(2,1fr);gap:9px}
-  .kpi .n{font-size:22px}
+  .kpi .n{font-size:21px}
   .g2,.g3,.g4{grid-template-columns:1fr}
   .card.w2,.card.w3,.card.w4{grid-column:span 1}
   .clock{font-size:18px}.cd .num{font-size:17px}
   .top{gap:10px}
+  .lyr{padding:8px 18px;font-size:13.5px}
   .hscroll{display:flex;gap:11px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}
   .hscroll>*{flex:0 0 82%;scroll-snap-align:start}
 }
@@ -145,31 +151,40 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
   <div class="top">
     <div class="brand">
       <div class="logo">亿</div>
-      <div><h1>亿成公考 · 运营看板</h1><div class="sub">实时 · 视频 · 历史 · 问卷</div></div>
+      <div><h1>亿成公考 · 运营看板</h1><div class="sub">实时监测 · 数据库存</div></div>
     </div>
     <div class="topmid">
       <span class="live"><i></i><span id="liveState">连接中</span></span>
       <span class="clock" id="clock">--:--:--</span>
+      <span class="upd" id="updAt">更新 --:--:--</span>
       <span class="cd"><span class="lab">距27国考笔试</span><span class="num"><span id="cdDays">--</span><small>天 </small><span id="cdTime">--:--:--</span></span></span>
     </div>
     <div class="topright">
       <button class="refresher" data-rf="10000">10秒</button>
       <button class="refresher on" data-rf="30000">30秒</button>
       <button class="refresher" data-rf="60000">60秒</button>
+      <button class="abtn" id="manualBtn">手动刷新</button>
       <button class="abtn" id="specBtn">口径说明</button>
       <a class="abtn" style="text-decoration:none" href="#recon" id="reconBtn">对账入口</a>
     </div>
   </div>
 
-  <!-- 核心指标 -->
+  <!-- 核心指标（9卡） -->
   <div class="kpis" id="kpis"></div>
 
-  <!-- 标签 -->
+  <!-- 双层 -->
+  <div class="lyrs">
+    <button class="lyr on" data-lyr="live">实时监测</button>
+    <button class="lyr" data-lyr="hist">数据库存</button>
+  </div>
   <div class="tabs">
-    <button class="tab on" data-tab="live">实时看板</button>
-    <button class="tab" data-tab="vid">视频专区</button>
-    <button class="tab" data-tab="hist">历史总结</button>
-    <button class="tab" data-tab="fb">好评与问卷</button>
+    <button class="tab on" data-tab="live" data-lyr="live">实时看板</button>
+    <button class="tab" data-tab="vid" data-lyr="live">视频专区</button>
+    <button class="tab" data-tab="dev" data-lyr="live">设备与安装</button>
+    <button class="tab" data-tab="stab" data-lyr="live">稳定性</button>
+    <button class="tab" data-tab="quiz" data-lyr="live">学习行为</button>
+    <button class="tab" data-tab="hist" data-lyr="hist" style="display:none">历史总结</button>
+    <button class="tab" data-tab="fb" data-lyr="hist" style="display:none">好评与问卷</button>
   </div>
 
   <!-- 实时看板 -->
@@ -178,7 +193,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
       <div class="card w2"><h3>异常提醒 <span class="hint" id="alertHint"></span></h3><div class="alerts" id="alerts"><div class="skel"></div></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
-      <div class="card"><h3>分钟级访问趋势 <span class="hint">近3小时 · 心跳计数</span></h3><div class="desc">每分钟应用心跳次数，看即时流量波动</div><div id="minTrend"><div class="skel"></div></div></div>
+      <div class="card"><h3>分钟级访问波动 <span class="hint">近60分钟 · 心跳计数</span></h3><div class="desc">每分钟应用心跳次数，看即时流量波动</div><div id="minTrend"><div class="skel"></div></div></div>
       <div class="card"><h3>今日24小时分布 <span class="hint">实时池聚合</span></h3><div class="desc" id="hourNote">今日分时访问次数</div><div id="hourTrend"><div class="skel"></div></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
@@ -195,26 +210,84 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
   <!-- 视频专区 -->
   <div class="panel" id="p-vid">
     <div class="grid g4">
-      <div class="card"><h3>累计播放次数</h3><div class="n" id="vPlay" style="font-size:26px;font-weight:900;color:var(--brand)">—</div><div class="desc" style="margin:2px 0 0">点开始播放计1次</div></div>
+      <div class="card"><h3>累计播放次数</h3><div class="n" id="vPlay" style="font-size:26px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">点开始播放计1次</div></div>
       <div class="card"><h3>累计播放人数</h3><div class="n" id="vUv" style="font-size:26px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">按匿名设备去重</div></div>
-      <div class="card"><h3>总体完播率</h3><div class="n" id="vDone" style="font-size:26px;font-weight:900;color:var(--accent)">—</div><div class="desc" style="margin:2px 0 0">完整看完 ÷ 开始播放</div></div>
-      <div class="card"><h3>今日播放</h3><div class="n" id="vToday" style="font-size:26px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0" id="vTodayX">今日 0 人</div></div>
+      <div class="card"><h3>总体完播率</h3><div class="n" id="vDone" style="font-size:26px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">完整看完 ÷ 开始播放</div></div>
+      <div class="card"><h3>今日播放</h3><div class="n" id="vToday" style="font-size:26px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0" id="vTodayX">今日 0 人</div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
-      <div class="card w2"><h3>近30天播放趋势 <span class="hint">次数（柱）· 人数（线）</span></h3><div class="desc">数据从视频功能上线后开始积累</div><div id="vidTrend"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--brand)"></i>播放次数</span><span><i style="background:var(--accent)"></i>播放人数</span></div></div>
+      <div class="card w2"><h3>近30天播放趋势 <span class="hint">次数（柱）· 人数（线）</span></h3><div class="desc">数据从视频功能上线后开始积累</div><div id="vidTrend"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--cyan)"></i>播放次数</span><span><i style="background:var(--amber)"></i>播放人数</span></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card w2"><h3>视频明细与下钻 <span class="hint">点击行查看单视频详情</span></h3><div class="desc">渗透率 = 该视频播放人数 ÷ 累计活跃设备；<span class="na">回访播放率暂不支持</span>（设备级播放次数未上报）</div><div class="tscroll"><table id="vidTable"></table></div><div class="drill" id="vidDrill" style="display:none"></div></div>
     </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card w2"><h3>观看排行 TOP20 <span class="hint">按播放次数 · 设备脱敏</span></h3><div class="desc">设备编号只显示前6位</div><div class="tscroll"><table id="vidTop"></table></div></div>
+      <div class="card w2"><h3>难点考点信号 <span class="hint">同一设备反复播放同一视频</span></h3><div class="desc">同一设备对同一视频播放 ≥3 次，可能是难点考点或视频有问题</div><div id="vidRepeat"><div class="skel"></div></div></div>
+    </div>
   </div>
 
-  <!-- 历史总结 -->
+  <!-- 设备与安装 -->
+  <div class="panel" id="p-dev">
+    <div class="grid g4">
+      <div class="card"><h3>今日安装</h3><div class="n" id="inToday" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">PWA 安装接受</div></div>
+      <div class="card"><h3>累计安装</h3><div class="n" id="inTotal" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">appinstalled 事件</div></div>
+      <div class="card"><h3>安装转化率</h3><div class="n" id="inConv" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">今日安装 ÷ 今日独立设备</div></div>
+      <div class="card"><h3>累计设备</h3><div class="n" id="inDev" style="font-size:25px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">按匿名设备去重</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card"><h3>安装按系统拆分 <span class="hint">新埋点</span></h3><div class="desc">安装事件发生时的操作系统</div><div id="inOs"><div class="skel"></div></div></div>
+      <div class="card"><h3>OS 分布 <span class="hint">累计设备</span></h3><div class="desc">全部设备按系统</div><div id="devOs"><div class="skel"></div></div></div>
+    </div>
+    <div class="grid g3" style="margin-top:13px">
+      <div class="card"><h3>品牌分布 <span class="hint">UA 画像</span></h3><div class="desc">小米 / 华为 / OPPO / vivo / 荣耀 / 苹果 / 其他</div><div id="devBrand"><div class="skel"></div></div></div>
+      <div class="card"><h3>网络类型 <span class="hint">effectiveType</span></h3><div class="desc">设备上报的网络环境</div><div id="devNet"><div class="skel"></div></div></div>
+      <div class="card"><h3>分辨率 TOP <span class="hint">屏幕 × DPR</span></h3><div class="desc">设备屏幕分辨率分布</div><div id="devScr"><div class="skel"></div></div></div>
+    </div>
+  </div>
+
+  <!-- 稳定性 -->
+  <div class="panel" id="p-stab">
+    <div class="grid g4">
+      <div class="card"><h3>今日报错次数</h3><div class="n" id="stErrN" style="font-size:25px;font-weight:900;color:var(--red)">—</div><div class="desc" style="margin:2px 0 0">JS错误 + 未处理Promise拒绝</div></div>
+      <div class="card"><h3>加载耗时 P50</h3><div class="n" id="stP50" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">毫秒 · loadEventEnd</div></div>
+      <div class="card"><h3>加载耗时 P90</h3><div class="n" id="stP90" style="font-size:25px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0">毫秒 · 慢速设备参考</div></div>
+      <div class="card"><h3>今日样本</h3><div class="n" id="stSamp" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">上报加载耗时的会话</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card"><h3>TOP错误 <span class="hint">今日 · 截断120字符</span></h3><div class="desc">出现最多的错误消息</div><div id="stTop"><div class="skel"></div></div></div>
+      <div class="card"><h3>近7日加载耗时 <span class="hint">P50 / P90（毫秒）</span></h3><div class="desc">每天加载性能走势</div><div id="stTrend"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--cyan)"></i>P50</span><span><i style="background:var(--amber)"></i>P90</span></div></div>
+    </div>
+  </div>
+
+  <!-- 学习行为 -->
+  <div class="panel" id="p-quiz">
+    <div class="grid g4">
+      <div class="card"><h3>今日答题量</h3><div class="n" id="qToday" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">学生端每60分钟聚合上报</div></div>
+      <div class="card"><h3>今日正确率</h3><div class="n" id="qAcc" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">答对 ÷ 答题</div></div>
+      <div class="card"><h3>累计答题量</h3><div class="n" id="qTotal" style="font-size:25px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">新埋点上线起累计</div></div>
+      <div class="card"><h3>每题平均耗时</h3><div class="n" id="qDur" style="font-size:25px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0">秒 · 全部答题平均</div></div>
+    </div>
+    <div class="grid g3" style="margin-top:13px">
+      <div class="card"><h3>错题率TOP · 模块 <span class="hint">样本≥5</span></h3><div class="desc">错误率&gt;90% 或正确率&gt;99% <span class="na">标红疑似坏题</span></div><div class="tscroll"><table id="qTopM"></table></div></div>
+      <div class="card"><h3>错题率TOP · 子类型 <span class="hint">样本≥5</span></h3><div class="desc">同一口径按子类型拆分</div><div class="tscroll"><table id="qTopS"></table></div></div>
+      <div class="card"><h3>错题率TOP · 难度 <span class="hint">样本≥5</span></h3><div class="desc">同一口径按难度拆分</div><div class="tscroll"><table id="qTopD"></table></div></div>
+    </div>
+  </div>
+
+  <!-- 历史总结（数据库存层） -->
   <div class="panel" id="p-hist">
     <div class="grid g4">
-      <div class="card"><h3>累计打开 PV</h3><div class="n" id="hPv" style="font-size:25px;font-weight:900;color:var(--brand)">—</div></div>
+      <div class="card"><h3>累计打开 PV</h3><div class="n" id="hPv" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div></div>
       <div class="card"><h3>累计独立设备</h3><div class="n" id="hUv" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div></div>
-      <div class="card"><h3>累计会话</h3><div class="n" id="hSess" style="font-size:25px;font-weight:900;color:var(--accent)">—</div><div class="desc" style="margin:2px 0 0">30分钟无心跳算新会话</div></div>
+      <div class="card"><h3>累计会话</h3><div class="n" id="hSess" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">30分钟无心跳算新会话</div></div>
       <div class="card"><h3>当前 MAU</h3><div class="n" id="hMau" style="font-size:25px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">近30天活跃设备</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card w2"><h3>每日新增三线趋势 <span class="hint">PV / 设备 / 播放 · 近30天</span></h3><div class="desc">历史键每日终值 + 今日实时；历史键由看板每日首次打开时自动写入</div><div id="histTrend"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--cyan)"></i>PV</span><span><i style="background:var(--green)"></i>活跃设备</span><span><i style="background:var(--violet)"></i>视频播放</span></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card w2"><h3>库存明细 <span class="hint">历史键快照</span></h3><div class="desc">每日新增与累计库存（看板唯一写入方）</div><div class="tscroll"><table id="histTable"></table></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card"><h3>近30天 DAU 趋势 <span class="hint">日活跃设备</span></h3><div class="desc" id="dauNote">—</div><div id="dauTrend"><div class="skel"></div></div></div>
@@ -222,7 +295,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card"><h3>留存曲线 <span class="hint">按新增设备队列</span></h3><div class="desc">次日 / 7日 / 30日留存（活跃日矩阵新埋点，从今天起积累）</div><div id="retain"><div class="skel"></div></div></div>
-      <div class="card"><h3>新增 vs 回访 <span class="hint">近14天</span></h3><div class="desc">每天首次打开与回访设备数</div><div id="newBack"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--brand)"></i>新增</span><span><i style="background:var(--accent)"></i>回访</span></div></div>
+      <div class="card"><h3>新增 vs 回访 <span class="hint">近14天</span></h3><div class="desc">每天首次打开与回访设备数</div><div id="newBack"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--cyan)"></i>新增</span><span><i style="background:var(--amber)"></i>回访</span></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card"><h3>时段热力图 <span class="hint">近14天 · 天 × 小时</span></h3><div class="desc">颜色越深访问越多</div><div class="heat" id="heat"><div class="skel"></div></div></div>
@@ -240,9 +313,9 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
   <!-- 好评与问卷 -->
   <div class="panel" id="p-fb">
     <div class="grid g4">
-      <div class="card"><h3>回收量</h3><div class="n" id="fTotal" style="font-size:25px;font-weight:900;color:var(--brand)">—</div></div>
+      <div class="card"><h3>回收量</h3><div class="n" id="fTotal" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div></div>
       <div class="card"><h3>好评率</h3><div class="n" id="fPraise" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">非常好 + 还不错</div></div>
-      <div class="card"><h3>推荐率（NPS近似）</h3><div class="n" id="fRec" style="font-size:25px;font-weight:900;color:var(--accent)">—</div><div class="desc" style="margin:2px 0 0">选「肯定会」占比</div></div>
+      <div class="card"><h3>推荐率（NPS近似）</h3><div class="n" id="fRec" style="font-size:25px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0">选「肯定会」占比</div></div>
       <div class="card"><h3>差评数</h3><div class="n" id="fBad" style="font-size:25px;font-weight:900;color:var(--pink)">—</div><div class="desc" style="margin:2px 0 0">选「不太好」</div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
@@ -269,16 +342,35 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
       <h4>访问与活跃</h4>
       <ul>
         <li><b>UV / 独立设备</b>：按匿名设备编号去重，是「独立设备（近似人数）」，不等于真实人数。</li>
-        <li><b>实时在线</b>：近10分钟有心跳的设备。</li>
+        <li><b>实时在线</b>：近5分钟有心跳的设备。</li>
         <li><b>会话</b>：同一设备超过30分钟无心跳后再次出现，算一次新会话。</li>
         <li><b>PV</b>：页面打开次数（心跳上报累计）。</li>
+        <li><b>今日打开次数</b>：今日会话数，来自学生端新埋点（上线后逐步积累）。</li>
+      </ul>
+      <h4>库存积累</h4>
+      <ul>
+        <li><b>历史键</b>：看板每天首次打开时，把昨日终值（日PV / 日活跃设备 / 日播放 / 累计库存）写入 <b>ycgk-hist-&lt;昨日日期&gt;</b>（读-合并-写），看板是唯一写入方。</li>
+        <li><b>环比</b>：今日指标与昨日历史键对比；无历史数据时不显示箭头。</li>
       </ul>
       <h4>视频</h4>
       <ul>
         <li><b>播放次数</b>：点「开始播放」计1次；一个视频分多段播放算1次。</li>
         <li><b>播放人数</b>：按匿名设备编号去重。</li>
         <li><b>完播率</b>：完整看完 ÷ 开始播放。</li>
-        <li><b>退出节点</b>：暂停超过30秒时按已看进度分四档（&lt;25% / 25–50% / 50–75% / 75–100%）。</li>
+        <li><b>退出节点</b>：新埋点按 开头30秒 / 中段 / 结尾 三档；历史数据按已看进度四档（&lt;25% / 25–50% / 50–75% / 75–100%）。</li>
+        <li><b>难点考点信号</b>：同一设备对同一视频播放 ≥3 次。</li>
+      </ul>
+      <h4>设备与安装</h4>
+      <ul>
+        <li><b>安装</b>：PWA beforeinstallprompt 接受 + appinstalled 事件。</li>
+        <li><b>安装转化率</b>：今日安装 ÷ 今日独立设备。</li>
+        <li><b>品牌 / 网络 / 分辨率</b>：UA 画像新埋点，上线后逐步积累。</li>
+      </ul>
+      <h4>稳定性与学习行为</h4>
+      <ul>
+        <li><b>报错</b>：window.onerror + unhandledrejection，消息截断120字符。</li>
+        <li><b>加载耗时</b>：loadEventEnd − navigationStart，看 P50 / P90。</li>
+        <li><b>学习行为</b>：学生端每60分钟聚合上报答题数据；模块错误率&gt;90% 或正确率&gt;99% 标红，疑似坏题。</li>
       </ul>
       <h4>问卷</h4>
       <ul>
@@ -287,13 +379,15 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(21,128,61,.05)}
       </ul>
       <h4>暂不支持</h4>
       <ul>
-        <li><b>精确地域</b>：无IP归属库。<b>网络类型</b>：未上报。<b>真实用户数</b>：一切按设备口径。<b>跳出率 / 人均访问时长</b>：无时长上报。<b>同比</b>：历史数据不足一年。<b>问卷回收率</b>：未记录邀请曝光。<b>视频终端拆分 / 回访播放率</b>：视频端未上报对应字段。</li>
+        <li><b>精确地域</b>：无IP归属库。<b>真实用户数</b>：一切按设备口径。<b>跳出率 / 人均访问时长</b>：无时长上报。<b>同比</b>：历史数据不足一年。<b>问卷回收率</b>：未记录邀请曝光。<b>视频终端拆分 / 回访播放率</b>：视频端未上报对应字段。</li>
       </ul>
       <h4>对账入口（原始数据）</h4>
       <ul id="recon">
         <li>实时池：<a href="https://textdb.dev/api/data/ycgk-live-v1" target="_blank" rel="noopener">textdb.dev/api/data/ycgk-live-v1</a></li>
         <li>视频池：<a href="https://textdb.dev/api/data/ycgk-vid-v1" target="_blank" rel="noopener">textdb.dev/api/data/ycgk-vid-v1</a></li>
         <li>问卷池：<a href="https://textdb.dev/api/data/ycgk-fb-v1" target="_blank" rel="noopener">textdb.dev/api/data/ycgk-fb-v1</a></li>
+        <li>学习统计池：<a href="https://textdb.dev/api/data/ycgk-stat" target="_blank" rel="noopener">textdb.dev/api/data/ycgk-stat</a></li>
+        <li>历史库存键：ycgk-hist-YYYYMMDD（如 ycgk-hist-20261122，看板每日首次打开写入昨日终值）</li>
         <li>静态快照：<a href="https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json" target="_blank" rel="noopener">metrics-7f3k9q2m.json</a></li>
       </ul>
     </div>
@@ -310,21 +404,26 @@ function pad2(n){return ('0'+n).slice(-2)}
 function num(n){return (n||0).toLocaleString('en-US')}
 function pct(a,b){return b>0?(a/b*100).toFixed(1).replace(/\.0$/,'')+'%':'—'}
 function todayKey(){var d=new Date();return ''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())}
+function yesterKey(){var d=new Date(Date.now()-86400000);return ''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())}
 function keyDate(s){if(!/^\d{8}$/.test(String(s)))return null;var d=new Date(+String(s).slice(0,4),+String(s).slice(4,6)-1,+String(s).slice(6,8));return isNaN(d.getTime())?null:d}
 function lastDays(n){var a=[],t=new Date();t.setHours(0,0,0,0);for(var i=n-1;i>=0;i--){var d=new Date(t.getTime()-i*86400000);a.push(''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()))}return a}
 function fmtDay(k){return String(k).slice(4,6)+'/'+String(k).slice(6,8)}
 function fetchJson(url){return fetch(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})}
 function fetchPool(key){return fetchJson('https://textdb.dev/api/data/'+key).catch(function(){return fetchJson('https://textdb.online/'+key)})}
-/* 视频池专用：空池（空体或 null）解析为 null，不算拉取失败 */
-function fetchVidPool(){
-  function one(url){return fetch(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text()}).then(function(t){if(!t||!t.trim())return null;return JSON.parse(t)})}
-  return one('https://textdb.dev/api/data/ycgk-vid-v1').catch(function(){return one('https://textdb.online/ycgk-vid-v1')});
+/* 容错池：空体或 null 解析为 null，不算拉取失败（视频池 / 学习统计池 / 历史键） */
+function fetchPoolText(key){
+  function one(host){return fetch('https://'+host+'/api/data/'+key+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text()}).then(function(t){if(!t||!t.trim())return null;return JSON.parse(t)})}
+  return one('textdb.dev').catch(function(){return one('textdb.online')});
 }
+function fetchVidPool(){return fetchPoolText('ycgk-vid-v1')}
+function pctl(arr,p){if(!arr||!arr.length)return null;var a=arr.slice().sort(function(x,y){return x-y});var i=Math.max(0,Math.min(a.length-1,Math.ceil(p*a.length)-1));return a[i]}
 
 /* ===== 数据源 ===== */
 var METRICS_URL='https://ycteacher.github.io/yichenggongkao/metrics-7f3k9q2m.json';
 var EXAM_AT=new Date('2026-11-29T09:00:00+08:00');
-var S={live:null,vid:null,fb:null,metrics:null,mat:null,ok:{live:false,vid:false,fb:false,metrics:false,mat:false},vidSel:-1};
+var S={live:null,vid:null,fb:null,metrics:null,mat:null,stat:null,
+  ok:{live:false,vid:false,fb:false,metrics:false,mat:false,stat:false},
+  vidSel:-1,vidEmpty:false,statEmpty:false,hist:{},histAt:0};
 
 /* ===== 时钟与倒计时 ===== */
 function tick(){
@@ -340,9 +439,9 @@ function aggLive(){
   var dev=(S.live&&S.live.devices)||{},today=todayKey();
   var r={pv:0,devN:0,sess:0,dashN:0,online:0,todayPv:0,todayDev:0,todayNew:0,
     os:{},models:{},refs:{},days:{},hours:{},perf:[],
-    osDays:{},firstDays:{},newBack:{}};
+    osDays:{},firstDays:{},newBack:{},brands:{},nets:{},screens:{}};
   var now=Date.now(),on=(S.live&&S.live.online)||{};
-  Object.keys(on).forEach(function(k){var v=on[k];if(typeof v==='number'&&isFinite(v)){var age=now-v;if(age<600000&&age>-60000)r.online++}});
+  Object.keys(on).forEach(function(k){var v=on[k];if(typeof v==='number'&&isFinite(v)){var age=now-v;if(age<300000&&age>-60000)r.online++}});
   var t0=new Date();t0.setHours(0,0,0,0);
   function inWin(k,days){var d=keyDate(k);return !!d&&(t0-d)/86400000<days}
   Object.keys(dev).forEach(function(k){
@@ -356,6 +455,9 @@ function aggLive(){
     if(act7)r.wauN=(r.wauN||0)+1;
     var os=String(it.os||'other');r.os[os]=(r.os[os]||0)+1;
     var mo=String(it.m||'').trim();if(mo)r.models[mo]=(r.models[mo]||0)+1;
+    var br=String(it.brand||'').trim();if(br)r.brands[br]=(r.brands[br]||0)+1;
+    var nt=String(it.net||'').trim();if(nt)r.nets[nt]=(r.nets[nt]||0)+1;
+    var sc=String(it.sc||'').trim();if(sc)r.screens[sc]=(r.screens[sc]||0)+1;
     if(it.ref)r.refs[String(it.ref).slice(0,30)]=(r.refs[String(it.ref).slice(0,30)]||0)+1;
     if(it.perf!==undefined&&it.perf>0)r.perf.push(it.perf);
     var first=String(it.first||''),last=String(it.last||'');
@@ -403,12 +505,12 @@ function svgBars(host,vals,labels,color,h){
   h=h||110;if(!vals.length){el(host).innerHTML='<div class="empty">暂无数据</div>';return}
   var max=Math.max.apply(null,vals.concat([1])),W=Math.max(280,vals.length*26),H=h,padB=20,padT=14;
   var bw=W/vals.length,s='';
-  for(var g=0;g<=3;g++){var gy=padT+(H-padT-padB)*g/3;s+='<line x1="0" y1="'+gy.toFixed(1)+'" x2="'+W+'" y2="'+gy.toFixed(1)+'" stroke="#e3e9e5" stroke-width="1"/>'}
+  for(var g=0;g<=3;g++){var gy=padT+(H-padT-padB)*g/3;s+='<line x1="0" y1="'+gy.toFixed(1)+'" x2="'+W+'" y2="'+gy.toFixed(1)+'" stroke="#1f2937" stroke-width="1"/>'}
   vals.forEach(function(v,i){
     var bh=v/max*(H-padT-padB),x=i*bw+bw*0.2,w=bw*0.6;
     s+='<rect x="'+x.toFixed(1)+'" y="'+(H-padB-bh).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(1.5,bh).toFixed(1)+'" rx="3" fill="'+color+'" opacity="'+(v>0?0.9:0.25)+'"/>';
-    if(v>0)s+='<text x="'+(x+w/2).toFixed(1)+'" y="'+(H-padB-bh-4).toFixed(1)+'" fill="#4f5f56" font-size="9.5" font-weight="700" text-anchor="middle">'+v+'</text>';
-    s+='<text x="'+(x+w/2).toFixed(1)+'" y="'+(H-6)+'" fill="#8b968f" font-size="9" text-anchor="middle">'+(labels[i]||'')+'</text>';
+    if(v>0)s+='<text x="'+(x+w/2).toFixed(1)+'" y="'+(H-padB-bh-4).toFixed(1)+'" fill="#9ca3af" font-size="9.5" font-weight="700" text-anchor="middle">'+v+'</text>';
+    s+='<text x="'+(x+w/2).toFixed(1)+'" y="'+(H-6)+'" fill="#6b7280" font-size="9" text-anchor="middle">'+(labels[i]||'')+'</text>';
   });
   el(host).innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+s+'</svg>';
 }
@@ -417,35 +519,49 @@ function svgLine(host,series,labels,h){
   var W=Math.max(280,labels.length*30),H=h,padL=30,padR=8,padT=12,padB=20;
   var max=1;series.forEach(function(s){s.vals.forEach(function(v){if(v>max)max=v})});
   var iw=W-padL-padR,step=labels.length>1?iw/(labels.length-1):0,s='';
-  for(var g=0;g<=3;g++){var gy=padT+(H-padT-padB)*g/3;s+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="#e3e9e5" stroke-width="1"/>';
-    s+='<text x="'+(padL-5)+'" y="'+(gy+3).toFixed(1)+'" fill="#8b968f" font-size="9" text-anchor="end">'+Math.round(max-max*g/3)+'</text>'}
+  for(var g=0;g<=3;g++){var gy=padT+(H-padT-padB)*g/3;s+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="#1f2937" stroke-width="1"/>';
+    s+='<text x="'+(padL-5)+'" y="'+(gy+3).toFixed(1)+'" fill="#6b7280" font-size="9" text-anchor="end">'+Math.round(max-max*g/3)+'</text>'}
   series.forEach(function(sr){
     var pts=sr.vals.map(function(v,i){return (padL+i*step).toFixed(1)+','+(H-padB-(v/max*(H-padT-padB))).toFixed(1)}).join(' ');
     s+='<polyline points="'+pts+'" fill="none" stroke="'+sr.color+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
     sr.vals.forEach(function(v,i){if(v>0)s+='<circle cx="'+(padL+i*step).toFixed(1)+'" cy="'+(H-padB-(v/max*(H-padT-padB))).toFixed(1)+'" r="2.6" fill="'+sr.color+'"/>'});
   });
-  labels.forEach(function(l,i){if(labels.length<=14||i%Math.ceil(labels.length/10)===0)s+='<text x="'+(padL+i*step).toFixed(1)+'" y="'+(H-5)+'" fill="#8b968f" font-size="9" text-anchor="middle">'+esc(l)+'</text>'});
+  labels.forEach(function(l,i){if(labels.length<=14||i%Math.ceil(labels.length/10)===0)s+='<text x="'+(padL+i*step).toFixed(1)+'" y="'+(H-5)+'" fill="#6b7280" font-size="9" text-anchor="middle">'+esc(l)+'</text>'});
   el(host).innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+s+'</svg>';
 }
 function barsHTML(host,rows){
   var max=Math.max.apply(null,rows.map(function(r){return r[1]}).concat([1]));
   el(host).innerHTML=rows.map(function(r){
-    return '<div class="brow" style="--c:'+(r[2]||'var(--brand)')+'"><div class="bl"><span>'+esc(r[0])+'</span><b>'+r[1]+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(2,r[1]/max*100).toFixed(1)+'%"></div></div></div>';
+    return '<div class="brow" style="--c:'+(r[2]||'var(--cyan)')+'"><div class="bl"><span>'+esc(r[0])+'</span><b>'+r[1]+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(2,r[1]/max*100).toFixed(1)+'%"></div></div></div>';
   }).join('');
 }
+function arrow(cur,prev){
+  if(prev==null||cur==null||prev===0)return '';
+  var d=(cur-prev)/prev*100;if(!isFinite(d)||d===0)return '';
+  var up=d>0;
+  return ' <b class="'+(up?'':'down')+'">'+(up?'↑':'↓')+Math.abs(Math.round(d))+'%</b>';
+}
 
-/* ===== 核心指标 ===== */
+/* ===== 核心指标（9卡） ===== */
 function renderKpis(){
   var L=aggLive(),V=vidAgg(),fb=fbList();
   var praise=fb.filter(function(x){return x.a1==='非常好'||x.a1==='还不错'}).length;
+  var tk=todayKey(),yk=yesterKey();
+  var H=S.hist[yk]||null;
+  var st=S.ok.stat?S.stat:null;
+  var opens=(st&&st.sess&&st.sess.d)?st.sess.d[tk]:null;
+  var opensY=(st&&st.sess&&st.sess.d)?st.sess.d[yk]:null;
+  var playY=H?H.cumPlay:null;
   var items=[
-    {t:'实时在线',n:L.online,c:'var(--green)',x:'近10分钟心跳'},
-    {t:'今日访问 PV',n:L.todayPv,c:'var(--brand)',x:'今日心跳累计'},
-    {t:'今日独立设备',n:L.todayDev,c:'var(--cyan)',x:'按设备去重'},
-    {t:'视频播放次数',n:V.today.play||0,c:'var(--violet)',x:'今日 · 点播放计1次'},
-    {t:'视频播放人数',n:Object.keys(V.today.uids||{}).length,c:'var(--pink)',x:'今日 · 按设备去重'},
-    {t:'看板打开人数',n:L.dashN,c:'var(--amber)',x:'打开过看板的设备'},
-    {t:'好评率',n:pct(praise,fb.length),c:'var(--accent)',x:'问卷 '+fb.length+' 份'}
+    {t:'实时在线',n:L.online,c:'var(--green)',x:'近5分钟心跳'},
+    {t:'今日PV',n:L.todayPv,c:'var(--cyan)',x:'心跳累计'+arrow(L.todayPv,H?H.pv:null)},
+    {t:'今日独立设备',n:L.todayDev,c:'var(--cyan)',x:'按设备去重'+arrow(L.todayDev,H?H.dev:null)},
+    {t:'今日打开次数',n:opens==null?'—':opens,c:'var(--cyan)',x:opens==null?'会话数 · 待新埋点':'会话数'+arrow(opens,opensY)},
+    {t:'累计PV',n:L.pv,c:'var(--cyan)',x:'今日 +'+L.todayPv+(H&&H.pv?' · 昨日 +'+H.pv:'')},
+    {t:'累计设备',n:L.devN,c:'var(--cyan)',x:'今日 +'+L.todayNew+(H&&H.dev?' · 昨日 +'+H.dev:'')},
+    {t:'视频总播放',n:V.play,c:'var(--violet)',x:'今日 +'+(V.today.play||0)+(H&&H.cumPlay!=null?' · 截昨日累计 '+num(H.cumPlay):'')},
+    {t:'视频观看人数',n:V.uv,c:'var(--violet)',x:'累计 · 按设备去重'},
+    {t:'好评率',n:pct(praise,fb.length),c:'var(--green)',x:'问卷 '+fb.length+' 份'}
   ];
   el('kpis').innerHTML=items.map(function(i){
     return '<div class="kpi" style="--c:'+i.c+'"><div class="t">'+i.t+'</div><div class="n">'+i.n+'</div><div class="x">'+i.x+'</div></div>';
@@ -456,13 +572,13 @@ function renderKpis(){
 function renderLive(){
   var ok=S.ok.live,L=ok?aggLive():null;
   el('liveState').textContent=ok?('实时 · 在线 '+L.online):'数据池暂不可用';
-  /* 分钟趋势 */
+  /* 分钟趋势（近60分钟） */
   if(ok&&S.live.min){
     var mins=[],vals=[],t=new Date();t.setSeconds(0,0);
-    for(var i=119;i>=0;i--){var d=new Date(t.getTime()-i*60000);var k=''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+pad2(d.getHours())+pad2(d.getMinutes());mins.push(pad2(d.getHours())+':'+pad2(d.getMinutes()));vals.push(S.live.min[k]||0)}
+    for(var i=59;i>=0;i--){var d=new Date(t.getTime()-i*60000);var k=''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+pad2(d.getHours())+pad2(d.getMinutes());mins.push(pad2(d.getHours())+':'+pad2(d.getMinutes()));vals.push(S.live.min[k]||0)}
     var has=vals.some(function(v){return v>0});
     el('minTrend').innerHTML=has?'':'<div class="empty">分钟心跳从 <b>今天新版本上线</b> 后开始积累，稍后再看</div>';
-    if(has)svgBars('minTrend',vals,mins.map(function(m,i){return i%15===0?m:''}),'var(--brand)',120);
+    if(has)svgBars('minTrend',vals,mins.map(function(m,i){return i%10===0?m:''}),'var(--cyan)',120);
   } else el('minTrend').innerHTML='<div class="empty">'+(ok?'暂无分钟数据':'数据池暂不可用')+'</div>';
   /* 今日24小时 */
   if(ok){
@@ -473,7 +589,7 @@ function renderLive(){
   } else el('hourTrend').innerHTML='<div class="empty">数据池暂不可用</div>';
   /* 终端趋势（近14天堆叠） */
   if(ok){
-    var defs=[['ios','iOS','#0e7490'],['android','安卓','var(--brand)'],['harmony','鸿蒙','var(--amber)'],['pc','电脑','var(--violet)']];
+    var defs=[['ios','iOS','#22d3ee'],['android','安卓','#34d399'],['harmony','鸿蒙','#fbbf24'],['pc','电脑','#a78bfa']];
     var ds=lastDays(14),max=1,stacked='';
     ds.forEach(function(d){var o=(L.osDays[d]||{});var s=(o.ios||0)+(o.android||0)+(o.harmony||0)+(o.pc||0);if(s>max)max=s});
     var W=Math.max(280,14*30),H=130,padB=20,padT=10,bw=W/14;
@@ -484,7 +600,7 @@ function renderLive(){
         stacked+='<rect x="'+(i*bw+bw*0.18).toFixed(1)+'" y="'+(y-bh).toFixed(1)+'" width="'+(bw*0.64).toFixed(1)+'" height="'+bh.toFixed(1)+'" fill="'+df[2]+'" opacity=".88"/>';
         y-=bh;
       });
-      stacked+='<text x="'+(i*bw+bw/2).toFixed(1)+'" y="'+(H-6)+'" fill="#8b968f" font-size="9" text-anchor="middle">'+(i%2===0?fmtDay(d):'')+'</text>';
+      stacked+='<text x="'+(i*bw+bw/2).toFixed(1)+'" y="'+(H-6)+'" fill="#6b7280" font-size="9" text-anchor="middle">'+(i%2===0?fmtDay(d):'')+'</text>';
     });
     el('osTrend').innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+stacked+'</svg>';
     el('osLegend').innerHTML=defs.map(function(d){return '<span><i style="background:'+d[2]+'"></i>'+d[1]+'</span>'}).join('');
@@ -500,7 +616,7 @@ function renderLive(){
     var mToday=0;if(S.metrics&&S.metrics.days){var md=S.metrics.days.filter(function(x){return x.date===tk})[0];if(md)mToday=md.start||0}
     var matT=0;if(S.mat&&S.mat.days&&S.mat.days[tk])matT=(S.mat.days[tk].save||0)+(S.mat.days[tk].open||0);
     var fbT=fb.filter(function(x){var d=new Date(x.ts||0);var k=''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate());return k===tk}).length;
-    barsHTML('topFunc',[['打开应用',L.todayPv,'var(--brand)'],['开始刷题',mToday,'var(--green)'],['领资料',matT,'var(--cyan)'],['视频播放',V.today.play||0,'var(--violet)'],['问卷提交',fbT,'var(--amber)']]);
+    barsHTML('topFunc',[['打开应用',L.todayPv,'var(--cyan)'],['开始刷题',mToday,'var(--green)'],['领资料',matT,'var(--violet)'],['视频播放',V.today.play||0,'var(--amber)'],['问卷提交',fbT,'var(--pink)']]);
   } else el('topFunc').innerHTML='<div class="empty">—</div>';
   /* TOP视频 */
   var vids=vidList();
@@ -525,9 +641,28 @@ function vidList(){
   var v=S.vid,videos=(v&&v.videos)||{},meta=(v&&v.meta)||{},out=[];
   Object.keys(videos).forEach(function(k){
     var it=videos[k]||{};
-    out.push({k:k,title:meta[k]||k,play:it.play||0,done:it.done||0,sec:it.sec||0,fail:it.fail||0,open:it.open||0,uids:Object.keys(it.uids||{}).length,exit:it.exit||{}});
+    out.push({k:k,title:meta[k]||k,play:it.play||0,done:it.done||0,sec:it.sec||0,fail:it.fail||0,open:it.open||0,uids:Object.keys(it.uids||{}).length,exit:it.exit||{},exit3:it.exit3||null});
   });
   return out.sort(function(a,b){return b.play-a.play});
+}
+/* 观看排行：uid 聚合（脱敏前6位） */
+function uidRank(){
+  var v=S.vid,videos=(v&&v.videos)||{},m={};
+  Object.keys(videos).forEach(function(k){
+    var us=videos[k].uids||{};
+    Object.keys(us).forEach(function(u){var o=m[u]||(m[u]={p:0,v:0});o.p+=(Number(us[u])||1);o.v+=1});
+  });
+  return Object.keys(m).map(function(u){return {u:u,p:m[u].p,v:m[u].v}}).sort(function(a,b){return b.p-a.p}).slice(0,20);
+}
+/* 难点考点信号：同一设备对同一视频播放≥3次 */
+function repeatSignals(){
+  var v=S.vid,videos=(v&&v.videos)||{},meta=(v&&v.meta)||{},out=[];
+  Object.keys(videos).forEach(function(k){
+    var us=videos[k].uids||{},rep=0;
+    Object.keys(us).forEach(function(u){if((Number(us[u])||1)>=3)rep++});
+    if(rep>0)out.push({k:k,title:meta[k]||k,rep:rep});
+  });
+  return out.sort(function(a,b){return b.rep-a.rep});
 }
 function renderAlerts(L){
   var a=[];
@@ -544,6 +679,19 @@ function renderAlerts(L){
       if(avg>0&&today<avg*0.5)a.push(['amber','📉','今日活跃 '+today+' 台，较7日均值('+Math.round(avg)+')下降 '+Math.round((1-today/avg)*100)+'%']);
     }
   }
+  /* 坏题预警（学习行为聚合） */
+  if(S.ok.stat&&S.stat&&S.stat.quiz){
+    var agg={};Object.keys(S.stat.quiz.d||{}).forEach(function(dk){
+      var q=S.stat.quiz.d[dk]||{},mods=q.mods||{};
+      Object.keys(mods).forEach(function(mk){var o=agg[mk]||(agg[mk]={n:0,c:0});o.n+=mods[mk].n||0;o.c+=mods[mk].c||0});
+    });
+    Object.keys(agg).forEach(function(mk){
+      var o=agg[mk];if(o.n<5)return;
+      var er=(o.n-o.c)/o.n,ac=o.c/o.n;
+      if(er>0.9)a.push(['red','🐞','「'+mk+'」错误率 '+Math.round(er*100)+'%（'+o.n+'题次），疑似坏题']);
+      else if(ac>0.99&&o.n>=20)a.push(['red','🐞','「'+mk+'」正确率 '+Math.round(ac*100)+'%（'+o.n+'题次），疑似答案标注错误']);
+    });
+  }
   if(!a.length){el('alerts').innerHTML='<div class="arow ok"><span class="ic">✓</span><span>各项运行正常，无异常提醒</span></div>';el('alertHint').textContent='';return}
   el('alerts').innerHTML=a.map(function(x){return '<div class="arow '+x[0]+'"><span class="ic">'+x[1]+'</span><span>'+esc(x[2])+'</span></div>'}).join('');
   el('alertHint').textContent=a.length+' 条';
@@ -558,24 +706,31 @@ function renderVid(){
   el('vToday').textContent=ok?num(V.today.play||0):'—';
   el('vTodayX').textContent=ok?('今日 '+Object.keys(V.today.uids||{}).length+' 人 · 昨日 '+(V.yest.play||0)+' 次'):'—';
   /* 趋势 */
-  if(ok){
-    var ds=lastDays(30).filter(function(d){return S.vid.days&&S.vid.days[d]});
+  if(ok&&S.vid&&S.vid.days&&Object.keys(S.vid.days).length){
+    var ds=lastDays(30).filter(function(d){return S.vid.days[d]});
     if(ds.length){
       var labels=ds.map(fmtDay);
       var plays=ds.map(function(d){return (S.vid.days[d].play||0)});
       var uvs=ds.map(function(d){return Object.keys((S.vid.days[d].uids)||{}).length});
-      svgBars('vidTrend',plays,labels,'var(--brand)',130);
+      svgBars('vidTrend',plays,labels,'var(--cyan)',130);
       /* 人数线叠加：用第二个 svg 简化为表格趋势，避免双轴复杂度 */
       var line='';var W=Math.max(280,ds.length*26),H=130,padB=20,padT=10;
       var max=Math.max.apply(null,uvs.concat([1])),bw=W/ds.length,pts='';
       uvs.forEach(function(v,i){pts+=(i*bw+bw/2).toFixed(1)+','+(H-padB-(v/max*(H-padT-padB))).toFixed(1)+' '});
-      line='<svg viewBox="0 0 '+W+' '+H+'" style="margin-top:-130px;pointer-events:none"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>'+uvs.map(function(v,i){return v>0?'<circle cx="'+(i*bw+bw/2).toFixed(1)+'" cy="'+(H-padB-(v/max*(H-padT-padB))).toFixed(1)+'" r="2.6" fill="var(--accent)"/>':''}).join('')+'</svg>';
+      line='<svg viewBox="0 0 '+W+' '+H+'" style="margin-top:-130px;pointer-events:none"><polyline points="'+pts+'" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linejoin="round"/>'+uvs.map(function(v,i){return v>0?'<circle cx="'+(i*bw+bw/2).toFixed(1)+'" cy="'+(H-padB-(v/max*(H-padT-padB))).toFixed(1)+'" r="2.6" fill="var(--amber)"/>':''}).join('')+'</svg>';
       el('vidTrend').innerHTML='<div style="position:relative">'+el('vidTrend').innerHTML+line+'</div>';
     } else el('vidTrend').innerHTML='<div class="empty">播放数据从 <b>今天起</b> 开始积累</div>';
-  } else el('vidTrend').innerHTML='<div class="empty">视频池暂不可用</div>';
+  } else if(ok) el('vidTrend').innerHTML='<div class="empty">播放数据从 <b>今天起</b> 开始积累</div>';
+  else el('vidTrend').innerHTML='<div class="empty">视频池暂不可用</div>';
   /* 明细表 */
   var vids=vidList(),devN=S.ok.live?aggLive().devN:0;
-  if(!vids.length){el('vidTable').innerHTML='<tr><td><div class="empty">暂无视频数据，学生开始播放后显示</div></td></tr>';el('vidDrill').style.display='none';return}
+  if(!vids.length){
+    el('vidTable').innerHTML='<tr><td><div class="empty">暂无视频数据，学生开始播放后显示</div></td></tr>';
+    el('vidDrill').style.display='none';
+    el('vidTop').innerHTML='<tr><td><div class="empty">观看排行从新埋点上线后积累</div></td></tr>';
+    el('vidRepeat').innerHTML='<div class="empty">暂无反复播放信号</div>';
+    return;
+  }
   var h='<tr><th>视频</th><th>播放次数</th><th>播放人数</th><th>人均次数</th><th>平均时长</th><th>完播率</th><th>失败</th><th>渗透率</th></tr>';
   h+=vids.map(function(v,i){
     return '<tr class="click" data-vi="'+i+'"><td><b>'+esc(v.title.length>18?v.title.slice(0,18)+'…':v.title)+'</b></td><td>'+v.play+'</td><td>'+v.uids+'</td><td>'+(v.uids?(v.play/v.uids).toFixed(1):'—')+'</td><td>'+(v.play?Math.round(v.sec/v.play/60*10)/10+'分':'—')+'</td><td>'+pct(v.done,v.play)+'</td><td>'+(v.fail||'0')+'</td><td>'+(devN?pct(v.uids,devN):'—')+'</td></tr>';
@@ -584,24 +739,178 @@ function renderVid(){
   Array.prototype.forEach.call(el('vidTable').querySelectorAll('tr.click'),function(tr){
     tr.addEventListener('click',function(){
       var v=vids[+tr.getAttribute('data-vi')];S.vidSel=+tr.getAttribute('data-vi');
-      var buckets=['0-25','25-50','50-75','75-100'],bn=['<25%','25–50%','50–75%','75–100%'];
-      var ex=buckets.map(function(b){return [bn[buckets.indexOf(b)],v.exit[b]||0]});
+      var ex;
+      if(v.exit3&&(v.exit3.a||v.exit3.b||v.exit3.c)){
+        ex=[['开头30s',v.exit3.a||0,'var(--cyan)'],['中段',v.exit3.b||0,'var(--violet)'],['结尾',v.exit3.c||0,'var(--amber)']];
+      } else {
+        var buckets=['0-25','25-50','50-75','75-100'],bn=['<25%','25–50%','50–75%','75–100%'];
+        ex=buckets.map(function(b){return [bn[buckets.indexOf(b)],v.exit[b]||0,'var(--cyan)']});
+      }
       var d='<h4>'+esc(v.title)+'</h4>';
       d+='<div class="desc">播放 '+v.play+' 次 · '+v.uids+' 人 · 平均 '+Math.round(v.sec/Math.max(1,v.play))+' 秒 · 完播 '+v.done+' 次（'+pct(v.done,v.play)+'）· 失败 '+(v.fail||0)+' 次</div>';
-      d+='<div class="desc" style="margin-top:8px"><b>退出节点分布</b>（暂停&gt;30秒时的已看进度）</div>';
-      barsHTML('vidDrillBars',ex.length?ex:[['暂无',0]]);
+      d+='<div class="desc" style="margin-top:8px"><b>退出节点分布</b>'+(v.exit3?'（开头30秒 / 中段 / 结尾）':'（暂停&gt;30秒时的已看进度 · 旧口径）')+'</div>';
       d+='<div id="vidDrillBars"></div>';
-      el('vidDrill').innerHTML=d;el('vidDrill').style.display='block';
+      el('vidDrill').innerHTML=d;
+      barsHTML('vidDrillBars',ex);
+      el('vidDrill').style.display='block';
       el('vidDrill').scrollIntoView({behavior:'smooth',block:'nearest'});
     });
   });
+  /* TOP20 排行 */
+  var rk=uidRank();
+  if(rk.length){
+    var th='<tr><th>#</th><th>设备（脱敏）</th><th>播放次数</th><th>看过视频数</th></tr>';
+    rk.forEach(function(r,i){
+      th+='<tr><td>'+(i+1)+'</td><td><b>'+esc(String(r.u).slice(0,6))+'…</b></td><td>'+r.p+'</td><td>'+r.v+'</td></tr>';
+    });
+    el('vidTop').innerHTML=th;
+  } else el('vidTop').innerHTML='<tr><td><div class="empty">观看排行从新埋点上线后积累</div></td></tr>';
+  /* 难点考点信号 */
+  var sig=repeatSignals();
+  if(sig.length){
+    el('vidRepeat').innerHTML=sig.slice(0,8).map(function(s){
+      return '<div class="arow amber"><span class="ic">🔁</span><span>《'+esc(s.title.length>26?s.title.slice(0,26)+'…':s.title)+'》— '+s.rep+' 台设备反复播放 ≥3 次（难点考点信号）</span></div>';
+    }).join('');
+  } else el('vidRepeat').innerHTML='<div class="empty">暂无反复播放信号</div>';
 }
 
-/* ===== 历史总结 ===== */
+/* ===== 设备与安装 ===== */
+function renderDev(){
+  var ok=S.ok.live,L=ok?aggLive():null;
+  var st=S.ok.stat?S.stat:null;
+  /* OS 分布 */
+  if(ok){
+    var defs=[['ios','iOS','var(--cyan)'],['android','安卓','var(--green)'],['harmony','鸿蒙','var(--amber)'],['pc','电脑','var(--violet)']];
+    var rows=defs.map(function(d){return [d[1],L.os[d[0]]||0,d[2]]});
+    var otherN=L.devN-rows.reduce(function(a,r){return a+r[1]},0);if(otherN>0)rows.push(['其他',otherN,'var(--pink)']);
+    barsHTML('devOs',rows);
+  } else el('devOs').innerHTML='<div class="empty">实时池暂不可用</div>';
+  /* UA 画像（品牌 / 网络 / 分辨率） */
+  if(ok&&L.devN){
+    var bs=Object.keys(L.brands).sort(function(a,b){return L.brands[b]-L.brands[a]}).slice(0,8);
+    el('devBrand').innerHTML=bs.length?'' :'<div class="empty">品牌画像从新埋点上线后积累</div>';
+    if(bs.length)barsHTML('devBrand',bs.map(function(k,i){return [k,L.brands[k],['var(--cyan)','var(--green)','var(--amber)','var(--violet)','var(--pink)','var(--cyan)','var(--green)','var(--amber)'][i%8]]}));
+    var ns=Object.keys(L.nets).sort(function(a,b){return L.nets[b]-L.nets[a]});
+    if(ns.length)barsHTML('devNet',ns.map(function(k,i){return [k,L.nets[k],['var(--cyan)','var(--green)','var(--amber)','var(--violet)'][i%4]]}));
+    else el('devNet').innerHTML='<div class="empty">网络类型从新埋点上线后积累</div>';
+    var ss=Object.keys(L.screens).sort(function(a,b){return L.screens[b]-L.screens[a]}).slice(0,6);
+    if(ss.length)barsHTML('devScr',ss.map(function(k,i){return [k,L.screens[k],['var(--violet)','var(--cyan)','var(--green)','var(--amber)','var(--pink)','var(--cyan)'][i%6]]}));
+    else el('devScr').innerHTML='<div class="empty">分辨率从新埋点上线后积累</div>';
+  } else {el('devBrand').innerHTML='<div class="empty">实时池暂不可用</div>';el('devNet').innerHTML='<div class="empty">实时池暂不可用</div>';el('devScr').innerHTML='<div class="empty">实时池暂不可用</div>'}
+  /* 安装统计 */
+  var inst=(st&&st.inst)?st.inst:null;
+  if(inst){
+    var tk=todayKey();
+    var tdy=(inst.d&&inst.d[tk])||0;
+    el('inToday').textContent=num(tdy);
+    el('inTotal').textContent=num(inst.t||0);
+    el('inConv').textContent=ok&&L.todayDev>0?pct(tdy,L.todayDev):'—';
+    var osm=inst.os||{},oks=Object.keys(osm).sort(function(a,b){return osm[b]-osm[a]});
+    if(oks.length)barsHTML('inOs',oks.map(function(k,i){return [k,osm[k],['var(--cyan)','var(--green)','var(--amber)','var(--violet)','var(--pink)'][i%5]]}));
+    else el('inOs').innerHTML='<div class="empty">暂无按系统数据</div>';
+  } else {
+    ['inToday','inTotal','inConv'].forEach(function(i){el(i).textContent='—'});
+    el('inOs').innerHTML='<div class="empty">安装埋点上线后开始积累</div>';
+  }
+  if(ok)el('inDev').textContent=num(L.devN);else el('inDev').textContent='—';
+}
+
+/* ===== 稳定性 ===== */
+function renderStab(){
+  var st=S.ok.stat?S.stat:null;
+  var tk=todayKey();
+  if(!st||(!st.err&&!st.perf)){
+    ['stErrN','stP50','stP90','stSamp'].forEach(function(i){el(i).textContent='—'});
+    el('stTop').innerHTML='<div class="empty">稳定性埋点上线后开始积累</div>';
+    el('stTrend').innerHTML='<div class="empty">稳定性埋点上线后开始积累</div>';
+    return;
+  }
+  var eToday=(st.err&&st.err.d&&st.err.d[tk])||null;
+  el('stErrN').textContent=eToday?num(eToday.n||0):0;
+  var top=(eToday&&eToday.top)||{};
+  var tks=Object.keys(top).sort(function(a,b){return top[b]-top[a]}).slice(0,8);
+  if(tks.length)barsHTML('stTop',tks.map(function(k,i){return [String(k).length>46?String(k).slice(0,46)+'…':String(k),top[k],i===0?'var(--red)':'var(--amber)']}));
+  else el('stTop').innerHTML='<div class="empty">今日暂无报错</div>';
+  /* 加载耗时 */
+  var ds7=lastDays(7),p50=[],p90=[],lbs=[];
+  ds7.forEach(function(d){
+    var arr=(st.perf&&st.perf.d&&st.perf.d[d])||[];
+    if(!arr.length)return;
+    p50.push(pctl(arr,0.5));p90.push(pctl(arr,0.9));lbs.push(fmtDay(d));
+  });
+  var tArr=(st.perf&&st.perf.d&&st.perf.d[tk])||[];
+  el('stP50').textContent=tArr.length?num(pctl(tArr,0.5)):'—';
+  el('stP90').textContent=tArr.length?num(pctl(tArr,0.9)):'—';
+  el('stSamp').textContent=num(tArr.length);
+  if(lbs.length>1)svgLine('stTrend',[{color:'var(--cyan)',vals:p50},{color:'var(--amber)',vals:p90}],lbs,120);
+  else el('stTrend').innerHTML='<div class="empty">至少两个样本日后显示趋势</div>';
+}
+
+/* ===== 学习行为 ===== */
+function quizAggDim(days,field){
+  var m={};
+  Object.keys(days).forEach(function(dk){
+    var q=days[dk]||{},dim=q[field]||{};
+    Object.keys(dim).forEach(function(k){var o=m[k]||(m[k]={n:0,c:0});o.n+=dim[k].n||0;o.c+=dim[k].c||0});
+  });
+  return m;
+}
+function dimTable(host,m,label){
+  var ks=Object.keys(m).filter(function(k){return m[k].n>=5})
+    .sort(function(a,b){return (m[b].n-m[b].c)/m[b].n-(m[a].n-m[a].c)/m[a].n}).slice(0,10);
+  if(!ks.length){el(host).innerHTML='<div class="empty">样本积累中（每维 ≥5 题次显示）</div>';return}
+  var h='<tr><th>'+label+'</th><th>答题数</th><th>错误率</th></tr>';
+  ks.forEach(function(k){
+    var o=m[k],er=(o.n-o.c)/o.n,ac=o.c/o.n;
+    var bad=er>0.9||(ac>0.99&&o.n>=20);
+    h+='<tr'+(bad?' style="color:var(--red)"':'')+'><td>'+esc(k)+'</td><td>'+o.n+'</td><td><b>'+Math.round(er*100)+'%</b>'+(bad?' ⚠':'')+'</td></tr>';
+  });
+  el(host).innerHTML=h+'</table>';
+}
+function renderQuiz(){
+  var st=S.ok.stat?S.stat:null;
+  if(!st||!st.quiz){
+    ['qToday','qAcc','qTotal','qDur'].forEach(function(i){el(i).textContent='—'});
+    ['qTopM','qTopS','qTopD'].forEach(function(i){el(i).innerHTML='<tr><td><div class="empty">刷题行为埋点上线后开始积累</div></td></tr>'});
+    return;
+  }
+  var days=st.quiz.d||{},tk=todayKey();
+  var tToday=days[tk]||{n:0,c:0,dur:0};
+  var tn=0,tc=0,tdur=0;
+  Object.keys(days).forEach(function(d){tn+=days[d].n||0;tc+=days[d].c||0;tdur+=days[d].dur||0});
+  el('qToday').textContent=num(tToday.n||0);
+  el('qAcc').textContent=pct(tToday.c||0,tToday.n||0);
+  el('qTotal').textContent=num(tn);
+  el('qDur').textContent=tn?(tdur/tn/1000).toFixed(1)+'s':'—';
+  dimTable('qTopM',quizAggDim(days,'mods'),'模块');
+  dimTable('qTopS',quizAggDim(days,'subs'),'子类型');
+  dimTable('qTopD',quizAggDim(days,'diffs'),'难度');
+}
+
+/* ===== 历史总结（数据库存层） ===== */
 function renderHist(){
-  if(!S.ok.live){['hPv','hUv','hSess','hMau'].forEach(function(i){el(i).textContent='—'});['dauTrend','wmTrend','retain','newBack','heat','devMix','funnel','share','daily'].forEach(function(i){el(i).innerHTML='<div class="empty">实时池暂不可用</div>'});return}
+  if(!S.ok.live){['hPv','hUv','hSess','hMau'].forEach(function(i){el(i).textContent='—'});['histTrend','histTable','dauTrend','wmTrend','retain','newBack','heat','devMix','funnel','share','daily'].forEach(function(i){el(i).innerHTML='<div class="empty">实时池暂不可用</div>'});return}
   var L=aggLive();
   el('hPv').textContent=num(L.pv);el('hUv').textContent=num(L.devN);el('hSess').textContent=num(L.sess);
+  /* 每日新增三线趋势（历史键 + 今日实时） */
+  var tk=todayKey(),ds=lastDays(30),pv=[],dv=[],pl=[],lbs=[];
+  ds.forEach(function(d){
+    var h=S.hist[d],isT=d===tk;
+    var p=h?h.pv:null,v=h?h.dev:null,y=h?h.play:null;
+    if(isT){p=L.todayPv;v=L.todayDev;y=(S.vid&&S.vid.days&&S.vid.days[d]&&S.vid.days[d].play)||0}
+    if(p==null&&v==null&&y==null)return;
+    pv.push(p||0);dv.push(v||0);pl.push(y||0);lbs.push(fmtDay(d));
+  });
+  if(lbs.length>1)svgLine('histTrend',[{color:'var(--cyan)',vals:pv},{color:'var(--green)',vals:dv},{color:'var(--violet)',vals:pl}],lbs,130);
+  else el('histTrend').innerHTML='<div class="empty">历史键从 <b>明天起</b> 逐日积累（看板每日首次打开写入昨日终值）</div>';
+  /* 库存明细 */
+  var hk=Object.keys(S.hist).sort(),ht='<tr><th>日期</th><th>日PV</th><th>日设备</th><th>日播放</th><th>累计PV</th><th>累计设备</th></tr>';
+  hk.forEach(function(d){
+    var o=S.hist[d];
+    ht+='<tr><td><b>'+fmtDay(d)+'</b></td><td>'+(o.pv!=null?o.pv:'—')+'</td><td>'+(o.dev!=null?o.dev:'—')+'</td><td>'+(o.play!=null?o.play:'—')+'</td><td>'+(o.cumPv!=null?num(o.cumPv):'—')+'</td><td>'+(o.cumDev!=null?num(o.cumDev):'—')+'</td></tr>';
+  });
+  ht+='<tr style="color:var(--cyan)"><td><b>今日</b></td><td>'+L.todayPv+'</td><td>'+L.todayDev+'</td><td>'+((S.vid&&S.vid.days&&S.vid.days[tk]&&S.vid.days[tk].play)||0)+'</td><td>'+num(L.pv)+'</td><td>'+num(L.devN)+'</td></tr>';
+  el('histTable').innerHTML=ht;
   /* MAU / WAU / DAU */
   var ds30=lastDays(30),dau=[],labels=[];
   ds30.forEach(function(d){dau.push(L.days[d]||0);labels.push(fmtDay(d))});
@@ -609,7 +918,7 @@ function renderHist(){
   el('hMau').textContent=num(mau);
   var hasDau=dau.some(function(v){return v>0});
   el('dauNote').innerHTML=hasDau?('昨日 DAU '+(dau[dau.length-2]||0)+' · 近7天活跃 '+wau+' 台'):'<span class="na">活跃日矩阵从今天起积累</span>';
-  if(hasDau)svgBars('dauTrend',dau,labels.map(function(l,i){return i%3===0?l:''}),'var(--brand)',120);
+  if(hasDau)svgBars('dauTrend',dau,labels.map(function(l,i){return i%3===0?l:''}),'var(--cyan)',120);
   else el('dauTrend').innerHTML='<div class="empty">从 <b>今天新版本上线</b> 后开始积累</div>';
   /* 周/月汇总 */
   var wk={},mo={};
@@ -644,9 +953,9 @@ function renderHist(){
   var hasNb=nArr.concat(bArr).some(function(v){return v>0});
   if(hasNb){
     var W2=Math.max(280,14*30),H2=130,pb=20,pt=10,bw2=W2/14,max2=Math.max.apply(null,nArr.concat(bArr).concat([1]));
-    var s2='';nArr.forEach(function(v,i){var bh=v/max2*(H2-pt-pb);s2+='<rect x="'+(i*bw2+bw2*0.2).toFixed(1)+'" y="'+(H2-pb-bh).toFixed(1)+'" width="'+(bw2*0.3).toFixed(1)+'" height="'+Math.max(1,bh).toFixed(1)+'" fill="var(--brand)" opacity=".9"/>'});
-    bArr.forEach(function(v,i){var bh=v/max2*(H2-pt-pb);s2+='<rect x="'+(i*bw2+bw2*0.52).toFixed(1)+'" y="'+(H2-pb-bh).toFixed(1)+'" width="'+(bw2*0.3).toFixed(1)+'" height="'+Math.max(1,bh).toFixed(1)+'" fill="var(--accent)" opacity=".85"/>'});
-    nb.forEach(function(d,i){if(i%2===0)s2+='<text x="'+(i*bw2+bw2/2).toFixed(1)+'" y="'+(H2-6)+'" fill="#8b968f" font-size="9" text-anchor="middle">'+fmtDay(d)+'</text>'});
+    var s2='';nArr.forEach(function(v,i){var bh=v/max2*(H2-pt-pb);s2+='<rect x="'+(i*bw2+bw2*0.2).toFixed(1)+'" y="'+(H2-pb-bh).toFixed(1)+'" width="'+(bw2*0.3).toFixed(1)+'" height="'+Math.max(1,bh).toFixed(1)+'" fill="var(--cyan)" opacity=".9"/>'});
+    bArr.forEach(function(v,i){var bh=v/max2*(H2-pt-pb);s2+='<rect x="'+(i*bw2+bw2*0.52).toFixed(1)+'" y="'+(H2-pb-bh).toFixed(1)+'" width="'+(bw2*0.3).toFixed(1)+'" height="'+Math.max(1,bh).toFixed(1)+'" fill="var(--amber)" opacity=".85"/>'});
+    nb.forEach(function(d,i){if(i%2===0)s2+='<text x="'+(i*bw2+bw2/2).toFixed(1)+'" y="'+(H2-6)+'" fill="#6b7280" font-size="9" text-anchor="middle">'+fmtDay(d)+'</text>'});
     el('newBack').innerHTML='<svg viewBox="0 0 '+W2+' '+H2+'">'+s2+'</svg>';
   } else el('newBack').innerHTML='<div class="empty">从今天起积累</div>';
   /* 热力图 */
@@ -663,29 +972,26 @@ function renderHist(){
       hh+='<div class="hrow"><span class="hl">'+fmtDay(day)+'</span>';
       for(var h4=0;h4<24;h4++){
         var v=(heat[day][pad2(h4)]||0),op=v>0?(0.15+0.85*v/hmax):0;
-        hh+='<div class="hcell" style="'+(v>0?('background:rgba(21,128,61,'+op.toFixed(2)+')'):'')+'" title="'+fmtDay(day)+' '+pad2(h4)+'时 · '+v+'次"></div>';
+        hh+='<div class="hcell" style="'+(v>0?('background:rgba(34,211,238,'+op.toFixed(2)+')'):'')+'" title="'+fmtDay(day)+' '+pad2(h4)+'时 · '+v+'次"></div>';
       }
       hh+='</div>';
     });
     el('heat').innerHTML=hh;
   } else el('heat').innerHTML='<div class="empty">分时数据积累中</div>';
   /* 设备构成 */
-  var osDefs=[['ios','iOS','#0e7490'],['android','安卓','var(--brand)'],['harmony','鸿蒙','var(--amber)'],['pc','电脑','var(--violet)']];
+  var osDefs=[['ios','iOS','var(--cyan)'],['android','安卓','var(--green)'],['harmony','鸿蒙','var(--amber)'],['pc','电脑','var(--violet)']];
   var osRows=osDefs.map(function(d){return [d[1],L.os[d[0]]||0,d[2]]});
-  var otherN=L.devN-osRows.reduce(function(a,r){return a+r[1]},0);if(otherN>0)osRows.push(['其他',otherN,'var(--pink)']);
+  var otherN2=L.devN-osRows.reduce(function(a,r){return a+r[1]},0);if(otherN2>0)osRows.push(['其他',otherN2,'var(--pink)']);
   var models=Object.keys(L.models).filter(function(m){return m!=='电脑'&&!/^[a-z]{2}(-[a-z]{2})?$/i.test(m)}).sort(function(a,b){return L.models[b]-L.models[a]}).slice(0,5);
-  var mh='<div class="desc" style="margin-bottom:4px">系统</div>';
-  el('devMix').innerHTML=mh;
-  var tmp=document.createElement('div');tmp.innerHTML='';
   barsHTML('devMix',osRows.concat(models.map(function(m,i){return [m,L.models[m],['var(--cyan)','var(--green)','var(--amber)','var(--violet)','var(--pink)'][i%5]]})));
   /* 漏斗 + 分享（metrics） */
   if(S.ok.metrics&&S.metrics.corrected){
     var k=S.metrics.corrected.totals||{};
     var steps=[['打开应用',k.open||0],['领资料',k.materials||0],['开始刷题',k.start||0],['刷满100题',k.ans_t100||0]];
     var base=steps[0][1]||1;
-    el('funnel').innerHTML=steps.map(function(s){return '<div class="brow" style="--c:var(--brand)"><div class="bl"><span>'+s[0]+'</span><b>'+num(s[1])+' · '+pct(s[1],base)+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(2,s[1]/base*100).toFixed(1)+'%"></div></div></div>'}).join('');
+    el('funnel').innerHTML=steps.map(function(s){return '<div class="brow" style="--c:var(--cyan)"><div class="bl"><span>'+s[0]+'</span><b>'+num(s[1])+' · '+pct(s[1],base)+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(2,s[1]/base*100).toFixed(1)+'%"></div></div></div>'}).join('');
     var sh=[['打开分享弹层',k.share||0],['复制邀请链接',k.sharecopy||0],['经邀请进入',k.refin||0],['受邀开始刷题',k.refstudy||0],['受邀回访',k.refreturn||0],['奖励领取',k.refClaimed||0],['流程完成',k.refDone||0]];
-    barsHTML('share',sh.map(function(s,i){return [s[0],s[1],['var(--cyan)','var(--violet)','var(--brand)','var(--green)','var(--amber)','var(--pink)','var(--cyan)'][i]]}));
+    barsHTML('share',sh.map(function(s,i){return [s[0],s[1],['var(--cyan)','var(--violet)','var(--green)','var(--amber)','var(--pink)','var(--cyan)','var(--green)'][i]]}));
   } else {el('funnel').innerHTML='<div class="empty">静态快照暂不可用</div>';el('share').innerHTML='<div class="empty">静态快照暂不可用</div>'}
   renderDaily(L);
 }
@@ -727,7 +1033,7 @@ function renderFb(){
   el('fRec').textContent=pct(rec,list.length);el('fBad').textContent=bad;
   /* a1 分布 */
   var a1m={};list.forEach(function(x){a1m[x.a1||'未填']=(a1m[x.a1||'未填']||0)+1});
-  var a1o=['非常好','还不错','一般','不太好','未填'],cols=['var(--green)','var(--brand)','var(--amber)','var(--pink)','var(--mut)'];
+  var a1o=['非常好','还不错','一般','不太好','未填'],cols=['var(--green)','var(--cyan)','var(--amber)','var(--pink)','var(--mut)'];
   barsHTML('a1Dist',a1o.filter(function(k){return a1m[k]}).map(function(k,i){return [k+'（'+pct(a1m[k],list.length)+'）',a1m[k],cols[a1o.indexOf(k)]]}));
   el('a1Note').textContent='共 '+list.length+' 份';
   /* 好评率趋势 */
@@ -747,7 +1053,7 @@ function renderFb(){
   el('qDist').innerHTML=qh+'</table>';
   /* 终端 */
   var dm={};list.forEach(function(x){var v=x.dev||'未记录';dm[v]=(dm[v]||0)+1});
-  barsHTML('fbDev',Object.keys(dm).sort(function(a,b){return dm[b]-dm[a]}).map(function(k,i){return [k,dm[k],['var(--brand)','var(--cyan)','var(--violet)','var(--amber)','var(--pink)'][i%5]]}));
+  barsHTML('fbDev',Object.keys(dm).sort(function(a,b){return dm[b]-dm[a]}).map(function(k,i){return [k,dm[k],['var(--cyan)','var(--green)','var(--violet)','var(--amber)','var(--pink)'][i%5]]}));
   /* 高频词 */
   var stop={'的':1,'了':1,'是':1,'我':1,'有':1,'还':1,'不':1,'很':1,'都':1,'也':1,'就':1,'但':1,'在':1,'和':1,'挺':1,'比较':1,'感觉':1,'可以':1,'一些':1,'有点':1,'希望':1,'问题':1};
   var wm2={};
@@ -767,6 +1073,46 @@ function renderFb(){
   }).join(''):'<div class="arow ok"><span class="ic">✓</span><span>暂无低分反馈</span></div>';
 }
 
+/* ===== 库存积累：历史键（看板唯一写入方） ===== */
+function histKey(d){return 'ycgk-hist-'+d}
+function buildSnap(yk){
+  var L=aggLive(),V=vidAgg(),pv=0;
+  Object.keys((S.live&&S.live.devices)||{}).forEach(function(k){
+    var it=S.live.devices[k]||{};
+    if(it.hr&&it.hr[yk]){var s=0;Object.keys(it.hr[yk]).forEach(function(h){s+=it.hr[yk][h]||0});pv+=s}
+  });
+  var dplay=(S.vid&&S.vid.days&&S.vid.days[yk])||{};
+  return {date:yk,pv:pv,dev:L.days[yk]||0,play:dplay.play||0,playUv:Object.keys(dplay.uids||{}).length,
+    cumPv:L.pv,cumDev:L.devN,cumPlay:V.play,cumPlayUv:V.uv,ts:Date.now()};
+}
+var histDone=false;
+function ensureHist(){
+  if(histDone||!(S.ok.live&&S.ok.vid))return;
+  var tk=todayKey();
+  fetchPoolText(histKey(tk)).then(function(cur){
+    if(cur){histDone=true;return}
+    var yk=yesterKey(),snap=buildSnap(yk);
+    function put(k,o){return fetch('https://textdb.online/update/?key='+k+'&value='+encodeURIComponent(JSON.stringify(o))).catch(function(){})}
+    fetchPoolText(histKey(yk)).then(function(old){return put(histKey(yk),old?Object.assign({},old,snap):snap)}).catch(function(){return put(histKey(yk),snap)})
+      .then(function(){return put(histKey(tk),{ts:Date.now(),marker:1})})
+      .then(function(){histDone=true}).catch(function(){});
+  }).catch(function(){});
+}
+/* 历史键批量读取（缓存5分钟） */
+var histFetching=null;
+function ensureHistData(){
+  if(S.histAt&&Date.now()-S.histAt<300000)return Promise.resolve();
+  if(histFetching)return histFetching;
+  var ds=lastDays(30);
+  histFetching=Promise.all(ds.map(function(d){
+    return fetchPoolText(histKey(d)).then(function(o){return (o&&o.date)?o:null}).catch(function(){return null});
+  })).then(function(arr){
+    S.hist={};arr.forEach(function(o,i){if(o)S.hist[ds[i]]=o});
+    S.histAt=Date.now();histFetching=null;
+  }).catch(function(){histFetching=null});
+  return histFetching;
+}
+
 /* ===== 刷新 ===== */
 function fetchFb(){return fetchPool('ycgk-fb-v1')}
 function refreshAll(){
@@ -775,9 +1121,17 @@ function refreshAll(){
     fetchVidPool().then(function(d){S.vid=d;S.ok.vid=true;S.vidEmpty=!(d&&d.videos&&Object.keys(d.videos).length)}).catch(function(){S.vid=null;S.ok.vid=false;S.vidEmpty=false}),
     fetchFb().then(function(d){S.fb=d;S.ok.fb=true}).catch(function(){S.ok.fb=false}),
     fetchJson(METRICS_URL).then(function(d){S.metrics=d;S.ok.metrics=true}).catch(function(){S.ok.metrics=false}),
-    fetchPool('ycgk-mat-v1').then(function(d){S.mat=d;S.ok.mat=true}).catch(function(){S.ok.mat=false})
+    fetchPool('ycgk-mat-v1').then(function(d){S.mat=d;S.ok.mat=true}).catch(function(){S.ok.mat=false}),
+    fetchPoolText('ycgk-stat').then(function(d){S.stat=d;S.ok.stat=!!d;S.statEmpty=!d}).catch(function(){S.ok.stat=false;S.statEmpty=false})
   ];
-  Promise.all(jobs).then(function(){renderKpis();renderLive();renderVid();renderHist();renderFb()});
+  Promise.all(jobs).then(function(){
+    var n=new Date();
+    el('updAt').textContent='更新 '+pad2(n.getHours())+':'+pad2(n.getMinutes())+':'+pad2(n.getSeconds());
+    ensureHistData().then(function(){
+      renderKpis();renderLive();renderVid();renderDev();renderStab();renderQuiz();renderHist();renderFb();
+      ensureHist();
+    });
+  });
 }
 var timer=null;
 function setRefresh(ms){
@@ -789,6 +1143,17 @@ Array.prototype.forEach.call(document.querySelectorAll('.refresher'),function(b)
     Array.prototype.forEach.call(document.querySelectorAll('.refresher'),function(x){x.classList.remove('on')});
     b.classList.add('on');setRefresh(+b.getAttribute('data-rf'));
   });
+});
+el('manualBtn').addEventListener('click',function(){refreshAll()});
+/* 双层切换 */
+function setLayer(name){
+  Array.prototype.forEach.call(document.querySelectorAll('.lyr'),function(x){x.classList.toggle('on',x.getAttribute('data-lyr')===name)});
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.style.display=x.getAttribute('data-lyr')===name?'':'none'});
+  var first=document.querySelector('.tab[data-lyr="'+name+'"]');
+  if(first)first.click();
+}
+Array.prototype.forEach.call(document.querySelectorAll('.lyr'),function(b){
+  b.addEventListener('click',function(){setLayer(b.getAttribute('data-lyr'))});
 });
 /* 标签切换 */
 Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(t){
@@ -824,6 +1189,16 @@ el('reconBtn').addEventListener('click',function(){el('specMask').classList.add(
 
 /* ===== 启动 ===== */
 tick();setInterval(tick,1000);
+setLayer('live');
+/* 深链：#tab=vid 直达标签页 */
+(function(){
+  var m=location.hash.match(/tab=([a-z]+)/);
+  if(!m)return;
+  var tb=document.querySelector('.tab[data-tab="'+m[1]+'"]');
+  if(!tb)return;
+  setLayer(tb.getAttribute('data-lyr'));
+  tb.click();
+})();
 refreshAll();
 setRefresh(30000);
 })();
