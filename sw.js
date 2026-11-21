@@ -49,7 +49,9 @@ self.addEventListener('fetch', function (e) {
         var v = resp.headers.get(k);
         if (v) h.set(k, v);
       });
-      return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: h });
+      var status = resp.status;
+      if (status === 206 && range === 'bytes=0-') { status = 200; h.delete('content-range'); }
+      return new Response(resp.body, { status: status, statusText: resp.statusText, headers: h });
     }).catch(function (err) {
       dbg.lastError = String(err && err.message || err);
       return new Response('', { status: 504, statusText: 'video fetch failed' });
