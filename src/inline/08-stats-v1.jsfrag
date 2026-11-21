@@ -26,8 +26,6 @@
         hit('ycgk.refreturn');
       }
     }catch(e){}
-    /* 离线缓存：装到桌面后再次打开基本秒开 */
-    if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js?v=1').catch(function(){})})}
     document.addEventListener('click',function(e){
       try{
         var el=e.target;

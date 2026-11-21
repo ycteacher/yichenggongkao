@@ -1,0 +1,165 @@
+<script>
+/* 亿成公考 · 内测公告（实时时间 + 问卷引导） */
+(function(){
+  if(document.getElementById('yc-notice')) return;
+  var css=document.createElement('style');
+  css.textContent=
+    '#yc-notice{position:fixed;top:0;left:0;right:0;z-index:2147483000;'+
+      'background:linear-gradient(90deg,#B91C1C,#EA580C);color:#fff;'+
+      'font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;'+
+      'box-shadow:0 2px 10px rgba(0,0,0,.22);}'+
+    '.yc-notice-inner{max-width:960px;margin:0 auto;display:flex;align-items:flex-start;gap:8px;'+
+      'padding:7px 40px 7px 12px;font-size:12.5px;line-height:1.55;position:relative;}'+
+    '.yc-notice-tag{flex:none;background:rgba(255,255,255,.22);border-radius:4px;'+
+      'padding:1px 7px;font-weight:700;white-space:nowrap;}'+
+    '.yc-notice-text{flex:1;}'+
+    '.yc-notice-clock{display:block;color:#FDE68A;font-weight:800;font-size:13.5px;margin-bottom:2px;}'+
+    '.yc-notice-text a{color:#FDE68A;font-weight:700;text-decoration:underline;}'+
+    '.yc-notice-close{position:absolute;top:5px;right:8px;background:none;border:none;'+
+      'color:#fff;font-size:19px;line-height:1;cursor:pointer;opacity:.9;padding:2px 6px;}'+
+    '.yc-notice-upd{flex:none;align-self:center;background:#FDE68A;color:#7F1D1D;border:none;'+
+      'border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;cursor:pointer;'+
+      'box-shadow:0 2px 8px rgba(0,0,0,.2);white-space:nowrap;font-family:inherit;}'+
+    '.yc-notice-upd:active{transform:scale(.95)}'+
+    '.yc-notice-upd:disabled{opacity:.6}'+
+    '#yc-upd-float{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);'+
+      'z-index:2147483001;background:#1F2937;color:#FDE68A;border:1.5px solid #FDE68A;border-radius:999px;'+
+      'padding:10px 18px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);'+
+      'font-family:system-ui,-apple-system,"PingFang SC",sans-serif;display:none;white-space:nowrap;}'+
+    '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}'+
+    /* 公告条固定后，顶栏与正文整体下移，滚动时顶部完全不动 */
+    '.yc-topbar{top:var(--yc-notice-h,0px)!important}'+
+    'body.yc-ui{padding-top:calc(60px + var(--yc-notice-h,0px))!important}'+
+    '@media (max-width:700px){body.yc-ui{padding-top:calc(92px + var(--yc-notice-h,0px))!important}}';
+  document.head.appendChild(css);
+  var box=document.createElement('div');
+  box.id='yc-notice';
+  box.innerHTML=
+    '<div class="yc-notice-inner">'+
+      '<span class="yc-notice-tag">公告</span>'+
+      '<span class="yc-notice-text">'+
+        '<span class="yc-notice-clock" id="yc-notice-clock"></span>'+
+        '亿成公考刷题神器正在内测、不断升级，可能遇到题目或功能的小问题，欢迎包涵与反馈。'+
+        '欢迎提交<a href="./feedback.html">最下方的调查问卷</a>，说说你的使用感受；'+
+        '问卷积分可兑换考公书籍、家电、平板、手机等实物，也可换一对一视频答疑。'+
+      '</span>'+
+      '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
+      '<button class="yc-notice-close" aria-label="关闭">×</button>'+
+    '</div>';
+  function pad(n){return n<10?'0'+n:''+n;}
+  function tick(){
+    var d=new Date();
+    var el=document.getElementById('yc-notice-clock');
+    if(el) el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+  tick(); setInterval(tick,1000);
+
+  function doUpdate(btn){
+    /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */
+    if(btn){ btn.disabled=true; btn.textContent='更新中…'; }
+    var go=function(){
+      try{ sessionStorage.setItem('ycUpdOk', String(Date.now())); }catch(e){}
+      /* 强制从网络重新拉取最新 index.html，绕过浏览器缓存，确保更新真实生效 */
+      if(window.fetch){
+        fetch(location.pathname, {cache:'reload'}).then(function(){ location.replace(location.pathname+'?upd='+Date.now()); }).catch(function(){ location.replace(location.pathname+'?upd='+Date.now()); });
+      } else {
+        location.replace(location.pathname+'?upd='+Date.now());
+      }
+    };
+    /* 把当前页面用到的所有脚本、样式也强制走一次网络，刷新浏览器缓存，
+       这样即使文件名没变（版本戳没升），更新后也立刻是最新内容 */
+    var refreshAssets=function(){
+      if(!window.fetch) return Promise.resolve();
+      var seen={}, urls=[], els=document.querySelectorAll('script[src],link[href]');
+      for(var i=0;i<els.length;i++){
+        var u=els[i].src||els[i].href;
+        if(!u) continue;
+        try{ u=new URL(u, location.href).href; }catch(e){ continue; }
+        if(!/^https?:/.test(u)) continue;
+        if(u.indexOf(location.origin)!==0) continue; /* 只刷本站资源 */
+        if(seen[u]) continue; seen[u]=1; urls.push(u);
+      }
+      return Promise.all(urls.map(function(u){
+        return fetch(u, {cache:'reload'}).catch(function(){});
+      }));
+    };
+    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        return Promise.all(regs.map(function(r){ try{return r.unregister();}catch(e){} }));
+      }).then(function(){
+        if(window.caches && caches.keys){
+          return caches.keys().then(function(keys){
+            return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+          });
+        }
+      }).then(refreshAssets).then(go).catch(go);
+    } else {
+      refreshAssets().then(go).catch(go);
+    }
+  }
+
+  function bindUpd(){
+    var b=document.getElementById('yc-notice-upd');
+    if(b && !b.dataset.bound){ b.dataset.bound='1'; b.addEventListener('click',function(){ doUpdate(b); }); }
+  }
+  bindUpd();
+
+  /* 更新完成提示：一键更新跳转回来后，明确告诉用户"已经是最新版" */
+  (function(){
+    var ok=null;
+    try{ ok=sessionStorage.getItem('ycUpdOk'); if(ok) sessionStorage.removeItem('ycUpdOk'); }catch(e){}
+    if(!ok) return;
+    var t=document.createElement('div');
+    t.id='yc-upd-toast';
+    t.textContent='✓ 已更新到最新版本';
+    t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483647;'+
+      'background:#15803D;color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;'+
+      'box-shadow:0 6px 22px rgba(21,128,61,.35);font-family:inherit;white-space:nowrap;';
+    var mount2=function(){
+      if(!document.body){ setTimeout(mount2,120); return; }
+      document.body.appendChild(t);
+      setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; },2600);
+      setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },3100);
+    };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount2); else mount2();
+  })();
+
+  function showFloat(){
+    if(document.getElementById('yc-upd-float')) return;
+    var f=document.createElement('button');
+    f.id='yc-upd-float';
+    f.textContent='🆕 有新版本 · 点这里一键更新';
+    f.addEventListener('click',function(){ doUpdate(f); });
+    document.body.appendChild(f);
+  }
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg) return;
+      if(reg.waiting || reg.installing) showFloat();
+      reg.addEventListener('updatefound',function(){ setTimeout(showFloat, 500); });
+    });
+  }
+  function mount(){
+    if(!document.body) return;
+    document.body.insertBefore(box,document.body.firstChild);
+    var btn=box.querySelector('.yc-notice-close');
+    if(btn) btn.addEventListener('click',function(){
+      box.style.display='none';
+      document.documentElement.style.setProperty('--yc-notice-h','0px');
+    });
+    var measure=function(){
+      if(box.style.display==='none') return;
+      document.documentElement.style.setProperty('--yc-notice-h',(box.offsetHeight||0)+'px');
+    };
+    measure();
+    window.addEventListener('resize',measure);
+    setTimeout(measure,600);
+    setTimeout(measure,2000);
+    if(window.ResizeObserver){
+      var ro=new ResizeObserver(function(){ measure(); });
+      ro.observe(box);
+    }
+  }
+  if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
+})();
+</script>

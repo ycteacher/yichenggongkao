@@ -111,7 +111,7 @@
   '.yc-plan-btn{display:inline-flex;align-items:center;gap:3px;background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;line-height:1.1;font-family:inherit}'+
   '.yc-plan-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}'+
   '.yc-plan-tab .mi{font-size:22px;line-height:1}'+
-  '.yc-plan-tab .lb{font-size:10px;font-weight:700}'+
+  '.yc-plan-tab .lb{font-size:11px;font-weight:700;white-space:nowrap}'+
   '@media(max-width:400px){.yc-ob-card{padding:20px 16px}.yc-ob-why .tx{font-size:10.5px}}';
   var st=document.createElement('style'); st.id='ycObCss'; st.textContent=CSS; document.head.appendChild(st);
 
@@ -154,7 +154,7 @@
       : (canInstall&&deferred
           ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button>'
           : '<button class="yc-ob-primary" id="obInstalled">✅ 我已装好，下一步 →</button>');
-    var html='<div class="yc-ob-logo">刷</div>'+
+    var html='<div class="yc-ob-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:14px"></div>'+
       '<div class="yc-ob-h">先把亿成公考装到桌面</div>'+
       '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
       '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+

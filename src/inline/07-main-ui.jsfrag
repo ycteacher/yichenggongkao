@@ -35,6 +35,35 @@
 
   /* ---------- 图标库 ---------- */
   function svg(p, c){ return '<svg class="yc-svg" viewBox="0 0 24 24" fill="none" stroke="' + (c||"currentColor") + '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
+  /* 图标字体加载失败时会露出英文原名（如 category / library_books），这里按原名全部换成内嵌图标，彻底摆脱字体依赖 */
+  var LIG = {
+    "category": svg('<rect x="3.5" y="3.5" width="7" height="7" rx="1"/><circle cx="17" cy="7" r="3.5"/><path d="M7 14.5 10.5 21h-7z"/><rect x="14" y="15" width="6" height="6" rx="1"/>'),
+    "library_books": svg('<path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v17.5H7.5A2.5 2.5 0 0 0 5 22V4.5z"/><path d="M5 19.5A2.5 2.5 0 0 1 7.5 17H19M9.5 7h5"/>'),
+    "quiz": svg('<circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.3 2.4c-.8.3-1.3 1-1.3 1.8v.4"/><path d="M11.6 16.6h.01"/>'),
+    "trending_up": svg('<path d="M3 17l6-6 4 4 8-8"/><path d="M14.5 7H21v6.5"/>'),
+    "psychology": svg('<path d="M13 3a7 7 0 0 1 4 12.7V19h-3v2h-4v-3l-2.6-.1a1.4 1.4 0 0 1-1.3-1.4V14H4.5l2-3.6A7 7 0 0 1 13 3z"/><path d="M10.5 10.5a2 2 0 1 1 3 1.7c-.7.4-1 .9-1 1.6"/>'),
+    "calculate": svg('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/>'),
+    "account_balance": svg('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 11v7M10 11v7M14 11v7M18.5 11v7M3 21h18"/>'),
+    "percent": svg('<path d="M19 5 5 19"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>'),
+    "menu_book": svg('<path d="M12 6c-1.5-1.3-3.4-2-6-2v14c2.6 0 4.5.7 6 2 1.5-1.3 3.4-2 6-2V4c-2.6 0-4.5.7-6 2z"/><path d="M12 6v14"/>'),
+    "history": svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+    "swap_horiz": svg('<path d="M7 8h11M15 4.5 18.5 8 15 11.5M17 16H6M9 12.5 5.5 16 9 19.5"/>'),
+    "science": svg('<path d="M10 3v6L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M8.5 3h7M7.5 15h9"/>'),
+    "school": svg('<path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5z"/><path d="M6.5 11.5v4.2c0 1.2 2.5 2.6 5.5 2.6s5.5-1.4 5.5-2.6v-4.2"/>'),
+    "local_hospital": svg('<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8.5v7M8.5 12h7"/>'),
+    "hub": svg('<circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M6.6 6.6 10 10M17.4 6.6 14 10M6.6 17.4 10 14M17.4 17.4 14 14"/>'),
+    "construction": svg('<path d="M14.7 4.3a5 5 0 0 1 5.6-1l-3.4 3.4 1.4 1.4 3.4-3.4a5 5 0 0 1-6.6 6.2L8 18a2.1 2.1 0 0 1-3-3l7.1-7.1a5 5 0 0 1 2.6-3.6z"/>'),
+    "pie_chart": svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l6 6"/>'),
+    "payments": svg('<rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10h.01M18 14h.01"/>'),
+    "military_tech": svg('<circle cx="12" cy="9" r="5"/><path d="M9.5 13.5 8 21l4-2.2L16 21l-1.5-7.5"/>'),
+    "fact_check": svg('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 13l2 2 4-4"/>'),
+    "emoji_events": svg('<path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 5H5a3 3 0 0 0 3 4M16 5h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/>'),
+    "lightbulb": svg('<path d="M9.5 18h5M10 21h4"/><path d="M12 3a6 6 0 0 1 3.4 10.9c-.7.5-1.1 1.3-1.1 2.1v.5h-4.6v-.5c0-.8-.4-1.6-1.1-2.1A6 6 0 0 1 12 3z"/>'),
+    "edit_note": svg('<path d="M4 5h10M4 9h16M4 13h16M4 17h7"/><path d="M16.5 19.5 20 16l-2-2-3.5 3.5v2h2z"/>'),
+    "download": svg('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>'),
+    "install_mobile": svg('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M12 8v6M9.5 11.5 12 14l2.5-2.5"/>'),
+    "redeem": svg('<rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8s-1.2-4.5-4.2-4.5a2.2 2.2 0 0 0 0 4.5h4.2zM12 8s1.2-4.5 4.2-4.5a2.2 2.2 0 0 1 0 4.5H12z"/>')
+  };
   var ICONS = {
     "module-changshi": svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/>'),
     "module-yanyu": svg('<path d="M21 12a8 8 0 0 1-8 8H4l1.6-3.2A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14.5h4"/>'),
@@ -70,6 +99,18 @@
         mi.replaceWith(s);
       });
     });
+    /* 全局兜底：凡是写着英文图标名的（字体没加载就会露出来），一律换成内嵌图标 */
+    document.querySelectorAll(".material-icons").forEach(function(mi){
+      if (mi.dataset.ycDone) return;
+      var name = (mi.textContent || "").trim();
+      var ic = LIG[name];
+      if (!ic) return;
+      var wrap = document.createElement("span");
+      wrap.innerHTML = ic;
+      var s = wrap.firstChild;
+      s.dataset.ycDone = "1";
+      mi.replaceWith(s);
+    });
   }
 
   /* ---------- 隐藏旧备考档案卡 ---------- */
@@ -90,7 +131,7 @@
   var topbar = document.createElement("div");
   topbar.className = "yc-topbar";
   topbar.innerHTML =
-    '<div class="yc-brand"><div class="yc-logo">刷</div>' +
+    '<div class="yc-brand"><div class="yc-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:11px"></div>' +
     '<div><div class="yc-brand-name">亿成公考 · 备考神器</div>' +
     '<div class="yc-brand-sub">亿成老师团队倾心打造 · 题库持续更新</div></div></div>' +
     '<div class="yc-top-actions">' +
@@ -281,7 +322,7 @@
     var card = document.createElement("div");
     card.id = "yc-materials-card";
     card.innerHTML =
-      '<span class="material-icons yc-mat-ic">redeem</span>' +
+      '<span class="yc-mat-ic">' + LIG["redeem"] + '</span>' +
       '<div class="yc-mat-tx"><div class="yc-mat-t">资料领取专区</div>' +
       '<div class="yc-mat-s">预测卷 · 常识100考点 · 临阵磨枪手册 · 免费领取</div></div>' +
       '<span class="yc-mat-go">领取 ›</span>';
@@ -296,7 +337,7 @@
       var ic = document.createElement("div");
       ic.id = "yc-install-card";
       ic.innerHTML =
-        '<span class="material-icons yc-mat-ic">install_mobile</span>' +
+        '<span class="yc-mat-ic">' + LIG["install_mobile"] + '</span>' +
         '<div class="yc-mat-tx"><div class="yc-mat-t">安装到桌面</div>' +
         '<div class="yc-mat-s">手机 / 平板 / 电脑 · 一点即开，像 App 一样用</div></div>' +
         '<span class="yc-mat-go">查看 ›</span>';
@@ -347,6 +388,24 @@
     shell.appendChild(b);
   }
 
+  /* ---------- 视频讲解横幅（首页底部） ---------- */
+  function addVideoBanner(){
+    var shell = document.querySelector(".page-shell");
+    if (!shell || document.getElementById("yc-video-banner")) return;
+    if (shell.textContent.indexOf("专项刷题") === -1) return;
+    var b = document.createElement("div");
+    b.id = "yc-video-banner";
+    b.className = "yc-video-banner";
+    b.innerHTML = '<div style="min-width:0"><div class="yc-vb-l">📺 视频讲解</div>' +
+      '<div class="yc-vb-s">亿成老师精讲视频 · 配套试卷可保存打印，边看边学</div></div>' +
+      '<span class="yc-vb-r">去看 ›</span>';
+    b.addEventListener("click", function(){
+      window.location.href = "videos.html?v=6";
+    });
+    var fb = document.getElementById("yc-fb-banner");
+    if (fb) shell.insertBefore(b, fb); else shell.appendChild(b);
+  }
+
   /* ---------- 启动 ---------- */
   function boot(){
     replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers();
@@ -355,9 +414,9 @@
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
     });
   }
-  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); addBetaBanner(); addFbBanner(); });
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
     mo.observe(document.body, {childList: true, subtree: true});
-    addMaterialsCard(); addBetaBanner(); addFbBanner();
+    addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

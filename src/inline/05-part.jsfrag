@@ -1,0 +1,7 @@
+<script>
+    (function(){
+      function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
+      var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
+      setTimeout(function(){ clearInterval(t); hide(); },25000);
+    })();
+    </script>
