@@ -155,6 +155,13 @@ var VIDEOS = [
 
 var state = { view: "home", cat: null, idx: -1 };
 
+/* 清理旧版遗留的辅助脚本（新版不再需要） */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function (rs) {
+    for (var i = 0; i < rs.length; i++) rs[i].unregister();
+  }).catch(function(){});
+}
+
 /* 调试日志（临时） */
 window.vlogArr = window.vlogArr || [];
 function vlog(m){ window.vlogArr.push(Math.round(performance.now()) + "ms " + m); }
