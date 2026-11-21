@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com; media-src 'self' https:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com; media-src 'self' https: blob:;">
 <title>视频讲解 · 亿成公考</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -78,6 +78,8 @@
   .card { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 2px 12px rgba(32,32,32,.06); margin-bottom:20px; }
   .video-box { position:relative; width:100%; aspect-ratio:16/9; background:#000; }
   .video-box iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .load-ov { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000; z-index:2; }
+  .load-txt { color:#fff; font-size:14px; letter-spacing:1px; opacity:.9; }
   .card .body { padding:14px 16px 16px; }
   .card .body h2 { font-size:16px; font-weight:700; line-height:1.5; }
   .card .body .desc { font-size:13px; color:#6B6558; line-height:1.7; margin-top:6px; white-space:pre-line; }
@@ -138,7 +140,9 @@ var CATS = [
 ];
 
 var VIDEOS = [
-  { src: "https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-full.mp4",
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-1.mp4",
+          "https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-2.mp4",
+          "https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-3.mp4"],
     srcs: ["media/xingce130-1.mp4", "media/xingce130-2.mp4", "media/xingce130-3.mp4"],
     cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
     pdfs: [
@@ -155,21 +159,6 @@ var state = { view: "home", cat: null, idx: -1 };
 window.vlogArr = window.vlogArr || [];
 function vlog(m){ window.vlogArr.push(Math.round(performance.now()) + "ms " + m); }
 
-/* 注册播放辅助脚本：就绪后再挂载视频源（见 renderPlay） */
-var swReady = (function(){
-  if (!("serviceWorker" in navigator) || location.protocol !== "https:") return Promise.resolve(false);
-  return navigator.serviceWorker.register("sw.js?v=21")
-    .then(function(){ return navigator.serviceWorker.ready; })
-    .then(function(){
-      return new Promise(function(resolve){
-        if (navigator.serviceWorker.controller) return resolve(true);
-        navigator.serviceWorker.addEventListener("controllerchange", function(){ resolve(true); });
-        setTimeout(function(){ resolve(!!navigator.serviceWorker.controller); }, 3000);
-      });
-    })
-    .catch(function(){ return false; });
-})();
-
 function esc(s){
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -181,7 +170,7 @@ function catOf(name){
 }
 function videosOf(cat){
   var out = [];
-  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && (VIDEOS[i].bvid || VIDEOS[i].src || VIDEOS[i].srcs) && VIDEOS[i].cat === cat) out.push(i);
+  for (var i = 0; i < VIDEOS.length; i++) if (VIDEOS[i] && (VIDEOS[i].bvid || VIDEOS[i].oss || VIDEOS[i].srcs) && VIDEOS[i].cat === cat) out.push(i);
   return out;
 }
 
@@ -258,7 +247,7 @@ function renderPlay(){
   if (pdfHtml) pdfHtml += '<p class="pdf-note">点开即可查看，页内附保存与打印方法</p>';
   else pdfHtml = '<p class="no-pdf">本视频无配套试卷，直接看就行</p>';
   var playerHtml;
-  if (v.src || v.srcs) {
+  if (v.oss || v.srcs) {
     playerHtml = '<video id="localPlayer" controls playsinline webkit-playsinline preload="metadata" ' +
       'style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;"></video>';
   } else {
@@ -268,7 +257,7 @@ function renderPlay(){
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" ' +
       'title="' + esc(v.title || "视频讲解") + '"></iframe>';
   }
-  var speedHtml = (v.src || v.srcs) ?
+  var speedHtml = (v.oss || v.srcs) ?
     '<div class="speed-bar" id="speedBar">' +
       '<span class="sp-label">倍速</span>' +
       '<button class="sp-btn" data-r="0.5">0.5x</button>' +
@@ -287,57 +276,106 @@ function renderPlay(){
         speedHtml +
         pdfHtml +
       '</div></div>';
-  if (v.src || v.srcs) {
+  if (v.oss || v.srcs) {
     var player = document.getElementById("localPlayer");
     var bar = document.getElementById("speedBar");
-    var parts = v.srcs || null;
+    var parts = v.oss || v.srcs;
+    var fallback = v.srcs || [];
     var partIdx = 0;
     var curRate = 1;
-    var useParts = false;
+    var blobUrl = null;
+    var preBlob = null;
 
-    function playParts(from) {
-      useParts = true;
-      partIdx = from || 0;
-      player.src = parts[partIdx];
+    var box = player.parentNode;
+    var ov = document.createElement("div");
+    ov.className = "load-ov";
+    box.appendChild(ov);
+    function setLoad(t){ ov.innerHTML = '<div class="load-txt">' + t + '</div>'; }
+    function hideLoad(){ if (ov.parentNode) ov.parentNode.removeChild(ov); }
+
+    function applyPart(blob, i){
+      if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e){} }
+      blobUrl = URL.createObjectURL(blob);
+      player.src = blobUrl;
       player.load();
       player.playbackRate = curRate;
-      player.play();
+      hideLoad();
+      var pp = player.play();
+      if (pp && pp.catch) pp.catch(function(){});
     }
 
-    if (parts && parts.length > 1) {
-      player.addEventListener("ended", function(){
-        if (useParts && partIdx < parts.length - 1) {
-          partIdx++;
-          player.src = parts[partIdx];
-          player.load();
-          player.playbackRate = curRate;
-          player.play();
+    function fetchBlob(url, onProgress){
+      return fetch(url).then(function(resp){
+        if (!resp.ok) throw new Error("http " + resp.status);
+        var cl = parseInt(resp.headers.get("content-length") || "0", 10);
+        if (resp.body && resp.body.getReader) {
+          var reader = resp.body.getReader();
+          var chunks = [], got = 0;
+          function pump(){
+            return reader.read().then(function(r){
+              if (r.done) return new Blob(chunks, {type: "video/mp4"});
+              chunks.push(r.value);
+              got += r.value.byteLength;
+              if (onProgress && cl) onProgress(got / cl);
+              return pump();
+            });
+          }
+          return pump();
         }
+        return resp.blob();
       });
     }
 
-    player.addEventListener("error", function(){
-      window.lastVidErr = player.error ? player.error.code : null;
-      vlog("error event, code=" + window.lastVidErr + ", src=" + (player.src || "").slice(0, 60));
-      if (!useParts && parts && parts.length) playParts(0);
-    });
-
-    player.addEventListener("loadedmetadata", function(){ vlog("loadedmetadata, src=" + (player.src || "").slice(0, 60)); });
-    player.addEventListener("stalled", function(){ vlog("stalled"); });
-
-    swReady.then(function(ok){
-      vlog("swReady ok=" + ok + " ctrl=" + !!navigator.serviceWorker.controller);
-      if (!player.isConnected) { vlog("player detached, skip"); return; }
-      if (v.src) {
-        player.src = v.src;
+    function loadPart(i){
+      if (i >= parts.length) return;
+      partIdx = i;
+      setLoad("视频加载中…");
+      fetchBlob(parts[i], function(f){
+        setLoad("视频加载中 " + Math.min(99, Math.round(f * 100)) + "%");
+      }).then(function(blob){
+        if (!player.isConnected) return;
+        applyPart(blob, i);
+        if (i + 1 < parts.length) {
+          fetchBlob(parts[i + 1], null).then(function(b){ preBlob = b; }).catch(function(){ preBlob = null; });
+        }
+      }).catch(function(){
+        if (!player.isConnected) return;
+        player.src = fallback[i] || fallback[0];
         player.load();
         player.playbackRate = curRate;
-        vlog("src set to OSS");
-      } else if (parts && parts.length) {
-        vlog("no OSS src, playParts");
-        playParts(0);
+        hideLoad();
+        var pp = player.play();
+        if (pp && pp.catch) pp.catch(function(){});
+      });
+    }
+
+    player.addEventListener("ended", function(){
+      if (partIdx < parts.length - 1) {
+        var next = partIdx + 1;
+        if (preBlob) {
+          var b = preBlob; preBlob = null;
+          applyPart(b, next);
+          if (next + 1 < parts.length) {
+            fetchBlob(parts[next + 1], null).then(function(x){ preBlob = x; }).catch(function(){ preBlob = null; });
+          }
+        } else {
+          loadPart(next);
+        }
       }
     });
+
+    player.addEventListener("error", function(){
+      if ((player.src || "").indexOf("blob:") === 0 && fallback[partIdx]) {
+        player.src = fallback[partIdx];
+        player.load();
+        player.playbackRate = curRate;
+        hideLoad();
+        var pp = player.play();
+        if (pp && pp.catch) pp.catch(function(){});
+      }
+    });
+
+    loadPart(0);
 
     if (bar) {
       var btns = bar.querySelectorAll(".sp-btn");
