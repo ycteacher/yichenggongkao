@@ -54,8 +54,8 @@
   .yc-tabbar { left: 50%; transform: translateX(-50%); max-width: 560px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix101"></script>
-        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix101">
+</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix102"></script>
+        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix102">
   <script>
     window.artifactId = "ycgk-20261120";
     window.artifactVersion = "27";
@@ -770,7 +770,7 @@ document.addEventListener('click', function(e){
       '<div class="yc-vb-s">亿成老师精讲视频 · 配套试卷可保存打印，边看边学</div></div>' +
       '<span class="yc-vb-r">去看 ›</span>';
     b.addEventListener("click", function(){
-      window.location.href = "videos.html?v=4";
+      window.location.href = "videos.html?v=5";
     });
     var fb = document.getElementById("yc-fb-banner");
     if (fb) shell.insertBefore(b, fb); else shell.appendChild(b);
@@ -2544,6 +2544,23 @@ document.addEventListener('click', function(e){
         location.replace(location.pathname+'?upd='+Date.now());
       }
     };
+    /* 把当前页面用到的所有脚本、样式也强制走一次网络，刷新浏览器缓存，
+       这样即使文件名没变（版本戳没升），更新后也立刻是最新内容 */
+    var refreshAssets=function(){
+      if(!window.fetch) return Promise.resolve();
+      var seen={}, urls=[], els=document.querySelectorAll('script[src],link[href]');
+      for(var i=0;i<els.length;i++){
+        var u=els[i].src||els[i].href;
+        if(!u) continue;
+        try{ u=new URL(u, location.href).href; }catch(e){ continue; }
+        if(!/^https?:/.test(u)) continue;
+        if(u.indexOf(location.origin)!==0) continue; /* 只刷本站资源 */
+        if(seen[u]) continue; seen[u]=1; urls.push(u);
+      }
+      return Promise.all(urls.map(function(u){
+        return fetch(u, {cache:'reload'}).catch(function(){});
+      }));
+    };
     if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
       navigator.serviceWorker.getRegistrations().then(function(regs){
         return Promise.all(regs.map(function(r){ try{return r.unregister();}catch(e){} }));
@@ -2553,8 +2570,10 @@ document.addEventListener('click', function(e){
             return Promise.all(keys.map(function(k){ return caches.delete(k); }));
           });
         }
-      }).then(go).catch(go);
-    } else { go(); }
+      }).then(refreshAssets).then(go).catch(go);
+    } else {
+      refreshAssets().then(go).catch(go);
+    }
   }
 
   function bindUpd(){
