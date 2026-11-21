@@ -83,19 +83,18 @@
         return fetch(u, {cache:'reload'}).catch(function(){});
       }));
     };
-    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
-      navigator.serviceWorker.getRegistrations().then(function(regs){
-        return Promise.all(regs.map(function(r){ try{return r.unregister();}catch(e){} }));
-      }).then(function(){
-        if(window.caches && caches.keys){
-          return caches.keys().then(function(keys){
-            return Promise.all(keys.map(function(k){ return caches.delete(k); }));
-          });
-        }
-      }).then(refreshAssets).then(go).catch(go);
-    } else {
-      refreshAssets().then(go).catch(go);
-    }
+    var swClear=function(){
+      return new Promise(function(resolve){
+        if(!navigator.serviceWorker || !navigator.serviceWorker.controller){ resolve(); return; }
+        try{
+          var ch=new MessageChannel(), done=false;
+          ch.port1.onmessage=function(){ if(!done){done=true;resolve();} };
+          setTimeout(function(){ if(!done){done=true;resolve();} },1500);
+          navigator.serviceWorker.controller.postMessage({type:'yc-clear-cache'},[ch.port2]);
+        }catch(e){ resolve(); }
+      });
+    };
+    swClear().then(function(){ return refreshAssets(); }).then(go).catch(go);
   }
 
   function bindUpd(){

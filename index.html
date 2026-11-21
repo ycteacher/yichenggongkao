@@ -5,17 +5,22 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix104";
+      var V="ttfix105";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
         if(prev&&prev!==V){localStorage.setItem(K,V);var p=location.pathname;location.replace(p+"?ycv="+V+"_"+Date.now());return;}
         if(!prev){localStorage.setItem(K,V);}
         if(location.search.indexOf("ycv=")===-1){
-          fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
-            var m=t.match(/index-b34\.js\?v=([a-z0-9]+)/);
-            if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
-          }).catch(function(){});
+          var LK="yc-ver-chk-at",now=Date.now(),last=0;
+          try{last=+localStorage.getItem(LK)||0}catch(e){}
+          if(now-last>6*3600*1000){
+            try{localStorage.setItem(LK,String(now))}catch(e){}
+            fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+              var m=t.match(/index-b34\.js\?v=([a-z0-9]+)/);
+              if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
+            }).catch(function(){});
+          }
         }
       }catch(e){}
     })();
@@ -54,8 +59,8 @@
   .yc-tabbar { left: 50%; right: auto; transform: translateX(-50%); max-width: 680px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); padding-left: 16px; padding-right: 16px; }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix104"></script>
-        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix104">
+</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix105"></script>
+        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix105">
   <script>
     window.artifactId = "ycgk-20261120";
     window.artifactVersion = "27";
@@ -366,6 +371,14 @@ body.yc-ui { padding-top: 60px !important; }
       <div class="yc-sk-sub">题库加载中，马上就好</div>
       <div class="yc-sk-dots"><i></i><i></i><i></i></div>
     </div>
+    <script>
+    <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',function(){
+        navigator.serviceWorker.register('./sw.js').catch(function(){});
+      });
+    }
+    </script>
     <script>
     (function(){
       function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
@@ -2576,19 +2589,18 @@ document.addEventListener('click', function(e){
         return fetch(u, {cache:'reload'}).catch(function(){});
       }));
     };
-    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
-      navigator.serviceWorker.getRegistrations().then(function(regs){
-        return Promise.all(regs.map(function(r){ try{return r.unregister();}catch(e){} }));
-      }).then(function(){
-        if(window.caches && caches.keys){
-          return caches.keys().then(function(keys){
-            return Promise.all(keys.map(function(k){ return caches.delete(k); }));
-          });
-        }
-      }).then(refreshAssets).then(go).catch(go);
-    } else {
-      refreshAssets().then(go).catch(go);
-    }
+    var swClear=function(){
+      return new Promise(function(resolve){
+        if(!navigator.serviceWorker || !navigator.serviceWorker.controller){ resolve(); return; }
+        try{
+          var ch=new MessageChannel(), done=false;
+          ch.port1.onmessage=function(){ if(!done){done=true;resolve();} };
+          setTimeout(function(){ if(!done){done=true;resolve();} },1500);
+          navigator.serviceWorker.controller.postMessage({type:'yc-clear-cache'},[ch.port2]);
+        }catch(e){ resolve(); }
+      });
+    };
+    swClear().then(function(){ return refreshAssets(); }).then(go).catch(go);
   }
 
   function bindUpd(){

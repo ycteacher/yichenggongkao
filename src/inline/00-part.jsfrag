@@ -1,16 +1,21 @@
 <script>
     (function(){
-      var V="ttfix104";
+      var V="ttfix105";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
         if(prev&&prev!==V){localStorage.setItem(K,V);var p=location.pathname;location.replace(p+"?ycv="+V+"_"+Date.now());return;}
         if(!prev){localStorage.setItem(K,V);}
         if(location.search.indexOf("ycv=")===-1){
-          fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
-            var m=t.match(/index-b34\.js\?v=([a-z0-9]+)/);
-            if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
-          }).catch(function(){});
+          var LK="yc-ver-chk-at",now=Date.now(),last=0;
+          try{last=+localStorage.getItem(LK)||0}catch(e){}
+          if(now-last>6*3600*1000){
+            try{localStorage.setItem(LK,String(now))}catch(e){}
+            fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+              var m=t.match(/index-b34\.js\?v=([a-z0-9]+)/);
+              if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
+            }).catch(function(){});
+          }
         }
       }catch(e){}
     })();

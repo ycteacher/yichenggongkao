@@ -1,6 +1,7 @@
 <script>
-document.addEventListener('click', function(e){
-  var t = e.target && e.target.closest ? e.target.closest('[class*="F4F8F3"]') : null;
-  if (t) document.documentElement.classList.toggle('review-open');
-});
-</script>
+    (function(){
+      function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
+      var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
+      setTimeout(function(){ clearInterval(t); hide(); },25000);
+    })();
+    </script>

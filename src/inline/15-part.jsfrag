@@ -1,152 +1,63 @@
 <script>
-/* 14-install-button: 常驻「安装/保存到本地」入口 —— Edge/Chrome 一键安装(PWA) + 图文兜底 */
+/* material-icons 兜底 v4 —— 源头已全 emoji(index-b34.js 编译产物已替换)
+   本脚本只做轻量兜底：万一有动态/漏网的英文连字图标，就地换成 emoji 字符。
+   不再使用 font-size:0 + ::after 隐藏方案（那会引入 data-emoji 依赖,动态节点漏抓会变圆点）。
+   emoji 文本是普通 Unicode,任何浏览器/WebView 都能渲染,零字体依赖。 */
 (function(){
-  var deferred=null, canPrompt=false, installed=false;
-  try{
-    window.addEventListener('beforeinstallprompt', function(e){
-      e.preventDefault(); deferred=e; canPrompt=true;
-      var b=document.getElementById('ycInstallTopBtn');
-      if(b){ b.disabled=false; b.textContent='⬇ 安装到桌面'; }
-    });
-    window.addEventListener('appinstalled', function(){
-      installed=true; deferred=null; canPrompt=false;
-      var b=document.getElementById('ycInstallTopBtn');
-      if(b){ b.disabled=true; b.textContent='✓ 已安装'; }
-    });
-    if(window.matchMedia && matchMedia('(display-mode: standalone)').matches) installed=true;
-  }catch(e){}
-
-  var CSS=''+
-  '.yc-install-btn{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:999px;padding:7px 11px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(220,38,38,.25);line-height:1.1;font-family:inherit}'+
-  '.yc-install-btn:active{transform:scale(.96)}'+
-  '.yc-install-btn:disabled{background:#9CA3AF;box-shadow:none;cursor:default}'+
-  '@media(max-width:560px){.yc-install-btn{font-size:11px;padding:6px 8px}}'+
-  '.yc-inst-mask{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.55);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}'+
-  '.yc-inst-mask.on{opacity:1;pointer-events:auto}'+
-  '.yc-inst-card{position:relative;width:100%;max-width:440px;max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:22px 20px 20px;box-shadow:0 18px 50px rgba(0,0,0,.25)}'+
-  '.yc-inst-card h3{margin:0 26px 4px 0;font-size:19px;font-weight:900;color:#202020}'+
-  '.yc-inst-sub{font-size:12.5px;color:#8A8378;margin-bottom:14px;line-height:1.6}'+
-  '.yc-inst-x{position:absolute;top:12px;right:14px;font-size:22px;color:#aaa;background:none;border:none;cursor:pointer;line-height:1}'+
-  '.yc-inst-hero{display:block;width:100%;background:linear-gradient(135deg,#15803D,#166534);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:900;margin-bottom:4px;cursor:pointer;box-shadow:0 4px 14px rgba(21,128,61,.28);font-family:inherit}'+
-  '.yc-inst-hero:disabled{background:#9CA3AF;box-shadow:none;cursor:default}'+
-  '.yc-inst-note{font-size:11.5px;color:#6b7280;text-align:center;margin:2px 0 14px;line-height:1.5}'+
-  '.yc-inst-sec{background:#F7F5F0;border-radius:12px;padding:12px 14px;margin-top:10px}'+
-  '.yc-inst-sec-t{font-size:13px;font-weight:800;color:#374151;margin-bottom:8px}'+
-  '.yc-inst-st{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.6;color:#202020;margin-top:7px;text-align:left}'+
-  '.yc-inst-st>b{flex:none;width:19px;height:19px;border-radius:50%;background:#15803D;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px}'+
-  '.yc-inst-st .kb{background:#e7f5ec;color:#15803D;border-radius:5px;padding:1px 5px;font-weight:800;white-space:nowrap}'+
-  '.yc-inst-guides{display:flex;gap:8px;margin-top:10px}'+
-  '.yc-inst-gbtn{flex:1;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
-  '.yc-inst-gbtn:active{transform:scale(.97)}'+
-  '.yc-inst-gbtn2{flex:1;background:#fff;color:#B91C1C;border:1.5px solid #B91C1C;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
-  '.yc-inst-gbtn2:active{transform:scale(.97)}'+
-  '.yc-inst-link{display:block;text-align:center;font-size:13px;font-weight:800;color:#15803D;text-decoration:none;border:1.5px solid #15803D;border-radius:10px;padding:10px;margin-top:14px}'+
-  '.yc-inst-foot{font-size:11px;color:#9CA3AF;text-align:center;margin-top:12px;line-height:1.6}';
-  var st=document.createElement('style'); st.textContent=CSS; document.head.appendChild(st);
-
-  function steps(){
-    var ua=navigator.userAgent||'';
-    var isIPad=/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-    var isIPhone=/iPhone|iPod/i.test(ua);
-    var isIOS=isIPad||isIPhone;
-    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb|HUAWEI|HONOR/i.test(ua);
-    var isPad=/Pad|Tablet|SM-T\d|SM-P\d|MatePad|Tab\d/i.test(ua);
-    var isAndroid=/Android/i.test(ua);
-    var inWx=/MicroMessenger/i.test(ua);
-    var isMac=/Macintosh|Mac OS X/i.test(ua)&&!(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-    var head='',body='';
-    if(isIPad){
-      head='iPad 平板 · 添加到主屏幕';
-      body='<div class="yc-inst-st"><b>1</b><span>用自带 <b class="kb">Safari</b> 打开本页</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>点顶部右侧「分享」（方框+向上箭头）</span></div>'+
-           '<div class="yc-inst-st"><b>3</b><span>下滑选「<b class="kb">添加到主屏幕</b>」→ 右上「添加」</span></div>';
-    }else if(isIPhone){
-      head='iPhone · 添加到主屏幕';
-      body='<div class="yc-inst-st"><b>1</b><span>用自带 <b class="kb">Safari</b> 打开本页</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>点底部中间「分享」（方框+向上箭头）</span></div>'+
-           '<div class="yc-inst-st"><b>3</b><span>下滑选「<b class="kb">添加到主屏幕</b>」→ 右上「添加」</span></div>';
-    }else if(isHarmony){
-      head='鸿蒙设备 · 添加到桌面';
-      body='<div class="yc-inst-st"><b>1</b><span>用华为自带 <b class="kb">浏览器</b> 打开本页</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>点底部「三道杠」或右上「⋮」</span></div>'+
-           '<div class="yc-inst-st"><b>3</b><span>选「<b class="kb">添加到桌面</b>」→ 确认</span></div>';
-    }else if(isAndroid){
-      head=(isPad?'安卓平板':'安卓手机')+' · 安装到桌面';
-      body='<div class="yc-inst-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>点右上「⋮」菜单</span></div>'+
-           '<div class="yc-inst-st"><b>3</b><span>选「<b class="kb">安装应用</b>」或「添加到主屏幕」</span></div>';
-    }else if(isMac){
-      head='苹果电脑 · 安装到程序坞';
-      body='<div class="yc-inst-st"><b>1</b><span>用 <b class="kb">Chrome</b>/<b class="kb">Edge</b> 打开：点地址栏右侧「安装」图标，或右上「⋮」→「安装此站点为应用」</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>用 <b class="kb">Safari</b> 打开：菜单「文件」→「添加到程序坞」</span></div>';
-    }else{
-      head='电脑 · 安装到本地（Windows）';
-      body='<div class="yc-inst-st"><b>1</b><span>推荐：点上方绿色「<b class="kb">一键安装到桌面</b>」按钮 → 弹窗里点「安装」</span></div>'+
-           '<div class="yc-inst-st"><b>2</b><span>或点地址栏<b>右侧</b>的「安装」图标（显示器+向下箭头）</span></div>'+
-           '<div class="yc-inst-st"><b>3</b><span>或点右上「⋮」→「<b class="kb">应用</b>」→「安装此站点为应用」</span></div>'+
-           '<div class="yc-inst-st"><b>4</b><span>装好后桌面/开始菜单出现图标，<b>断网也能刷题</b></span></div>';
+  var MAP={
+    apartment:'🏢',account_balance:'🏦',school:'🎓',military_tech:'🎖️',
+    group:'👥',group_add:'👥',groups:'👥',people:'👥',redeem:'🎁',
+    install_mobile:'📲',download:'📥',functions:'➗',gesture:'👆',
+    home:'🏠',history_edu:'📜',assignment:'📋',star:'⭐',star_border:'☆',
+    arrow_back:'⬅',arrow_forward:'➡',chevron_right:'›',chevron_left:'‹',expand_more:'⌄',expand_less:'⌃',
+    check:'✓',check_circle:'✅',check_circle_outline:'☑️',task_alt:'✅',
+    close:'✕',cancel:'✕',clear:'✕',search:'🔍',edit:'✏️',edit_note:'📝',
+    delete_sweep:'🗑️',lightbulb:'💡',tips_and_updates:'💡',bolt:'⚡',
+    auto_awesome:'✨',gavel:'⚖️',flag:'🚩',event:'📅',fact_check:'📋',
+    grid_on:'▦',account_tree:'🌳',speed:'⚡',target:'🎯',tracking:'🎯',
+    keyboard:'⌨️',warning:'⚠️',error:'❗',checklist:'📋',badge:'🏅',
+    comment:'💬',sync:'🔄',repeat:'🔁',undo:'↩️',upload:'⬆️',
+    cleaning_services:'🧹',hand:'✋',list:'📃',paper:'📄',folder:'📁',
+    description:'📄',menu_book:'📖',quiz:'❓',help:'❓',info:'ℹ️',
+    person:'👤',account_circle:'👤',work:'💼',business:'🏢',
+    date_range:'📅',calendar_month:'📅',schedule:'⏰',trending_up:'📈',
+    bar_chart:'📊',pie_chart:'🥧',dashboard:'📊',data_usage:'📊',
+    emoji_events:'🏆',military:'🎖️',local_hospital:'🏥',
+    phone_android:'📱',devices:'💻',laptop:'💻',computer:'💻',
+    lock:'🔒',security:'🔐',verified:'✅',star_rate:'⭐',
+    more_horiz:'⋯',more_vert:'⋮',add:'➕',remove:'➖',
+    play_arrow:'▶️',pause:'⏸️',refresh:'🔄',send:'📤',
+    analytics:'📊',insights:'💡',summarize:'📋',article:'📄'
+  };
+  var SEL='.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp,.material-icons-two-tone';
+  function fixOne(el){
+    if(!el||el.nodeType!==1||el.getAttribute('data-yc-emoji')) return;
+    var t=(el.textContent||'').trim();
+    if(!t) return;
+    if(MAP[t]){
+      try{ el.textContent=MAP[t]; }catch(e){}
     }
-    var wx=inWx?'<div class="yc-inst-sec" style="background:#fff7ed"><div class="yc-inst-sec-t" style="color:#9a3412">⚠️ 你在微信里，会被拦住</div><div style="font-size:12.5px;color:#9a3412;line-height:1.6">先点右上角「···」→「在浏览器中打开」，再按上面步骤操作。</div></div>':'';
-    return {head:head, body:body, wx:wx};
+    el.setAttribute('data-yc-emoji','1');
   }
-
-  function openDialog(){
-    var s=steps();
-    var hero=(canPrompt&&deferred&&!installed)
-      ? '<button class="yc-inst-hero" id="ycInstGo">⬇ 一键安装到桌面（推荐）</button><div class="yc-inst-note">点它 → 系统弹窗点「安装」即可，最快</div>'
-      : (installed
-          ? '<button class="yc-inst-hero" disabled>✓ 已安装到本机</button><div class="yc-inst-note">从桌面图标打开即可，离线也能刷题</div>'
-          : '<button class="yc-inst-hero" disabled>当前浏览器不支持一键安装</button><div class="yc-inst-note">请用下方步骤，2 步搞定</div>');
-    var mask=document.getElementById('ycInstMask');
-    if(!mask){
-      mask=document.createElement('div'); mask.id='ycInstMask'; mask.className='yc-inst-mask';
-      mask.innerHTML='<div class="yc-inst-card" id="ycInstCard"></div>';
-      document.body.appendChild(mask);
-      mask.addEventListener('click',function(e){ if(e.target===mask) mask.classList.remove('on'); });
-    }
-    var card=document.getElementById('ycInstCard');
-    card.innerHTML='<button class="yc-inst-x" id="ycInstX">×</button>'+
-      '<h3>把亿成公考保存到本地</h3>'+
-      '<div class="yc-inst-sub">装到桌面后一点就开、不用再找链接，题库自动缓存，离线也能刷。</div>'+
-      hero+
-      '<div class="yc-inst-guides"><button class="yc-inst-gbtn" id="ycInstGV">📺 视频讲解</button><button class="yc-inst-gbtn2" id="ycInstGP">🖼 图文讲解</button></div>'+
-      '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
-      s.wx+
-      '<a class="yc-inst-link" id="ycInstGuideLink" href="install.html">看完整图文 / 视频指引 ›</a>'+
-      '<div class="yc-inst-foot">只想存网页文件？电脑按 Ctrl+S（Mac 按 ⌘S）另存即可<br>安装完全免费 · 题库持续更新</div>';
-    card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
-    var gl=card.querySelector('#ycInstGuideLink');
-    if(gl) gl.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href='install.html'; });
-    function goGuide(u){ return function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href=u; }; }
-    var gv=card.querySelector('#ycInstGV'), gp=card.querySelector('#ycInstGP');
-    if(gv) gv.addEventListener('click', goGuide('install-video.html'));
-    if(gp) gp.addEventListener('click', goGuide('install-guide.html'));
-    var go=card.querySelector('#ycInstGo');
-    if(go) go.addEventListener('click',function(){
-      if(deferred){
-        deferred.prompt();
-        deferred.userChoice.then(function(r){
-          if(r&&r.outcome==='accepted'){ try{new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.instclick&r='+Date.now()}catch(e){} }
-          deferred=null; canPrompt=false; mask.classList.remove('on');
-        });
-      }
-    });
-    mask.classList.add('on');
-    try{new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.instopen&r='+Date.now()}catch(e){}
+  function fixAll(){ try{ document.querySelectorAll(SEL).forEach(fixOne); }catch(e){} }
+  function boot(){
+    fixAll();
+    try{
+      var mo=new MutationObserver(function(list){
+        var need=false;
+        for(var i=0;i<list.length;i++){
+          var r=list[i];
+          if(r.type==='childList'&&r.addedNodes&&r.addedNodes.length){ need=true; break; }
+          if(r.type==='characterData'){ need=true; break; }
+        }
+        if(need) fixAll();
+      });
+      mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+    }catch(e){}
+    var n=0,iv=setInterval(function(){ fixAll(); if(++n>40)clearInterval(iv); },250);
+    setTimeout(fixAll,3000);
   }
-
-  function inject(){
-    var actions=document.querySelector('.yc-top-actions');
-    if(!actions||document.getElementById('ycInstallTopBtn')) return false;
-    var b=document.createElement('button');
-    b.id='ycInstallTopBtn'; b.className='yc-install-btn';
-    b.textContent=installed?'✓ 已安装':(canPrompt?'⬇ 安装到桌面':'⬇ 安装/保存');
-    b.disabled=installed;
-    b.addEventListener('click',openDialog);
-    actions.insertBefore(b, actions.firstChild);
-    return true;
-  }
-  var tries=0, timer=setInterval(function(){ if(inject()||++tries>60) clearInterval(timer); },150);
-  document.addEventListener('DOMContentLoaded',inject);
+  if(document.documentElement) boot();
+  else document.addEventListener('DOMContentLoaded',boot);
 })();
 </script>
