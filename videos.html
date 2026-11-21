@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com; media-src 'self' https: blob:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; frame-src https://player.bilibili.com; img-src 'self' data: https:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com https://textdb.online https://textdb.dev; media-src 'self' https: blob:;">
 <title>视频讲解 · 亿成公考</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -159,13 +159,6 @@ var VIDEOS = [
 
 var state = { view: "home", cat: null, idx: -1 };
 
-/* 清理旧版遗留的辅助脚本（新版不再需要） */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function (rs) {
-    for (var i = 0; i < rs.length; i++) rs[i].unregister();
-  }).catch(function(){});
-}
-
 /* 调试日志（临时） */
 window.vlogArr = window.vlogArr || [];
 function vlog(m){ window.vlogArr.push(Math.round(performance.now()) + "ms " + m); }
@@ -175,6 +168,118 @@ function esc(s){
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
+
+/* ============ 视频数据统计：上报到数据池，供数据看板读取 ============
+   数据契约 key=ycgk-vid-v1，结构：
+   { ts, meta:{视频key:标题}, videos:{key:{open,play,done,sec,pdf}}, days:{'20261121':{play,done,sec}} }
+   本地先累计，定时/页面隐藏时合并写池；写失败保留本地计数下次再写。 */
+var vtrack = (function(){
+  var KEY = 'ycgk-vid-v1';
+  var GETS = ['https://textdb.dev/api/data/', 'https://textdb.online/'];
+  function get(cb){
+    var i = 0;
+    (function next(){
+      if (i >= GETS.length) { cb(null); return; }
+      fetch(GETS[i++] + KEY, { cache: 'no-store' }).then(function(r){ return r.text(); }).then(function(t){
+        if (!t || t.charAt(0) !== '{') { next(); return; }
+        try { cb(JSON.parse(t)); } catch(e) { next(); }
+      }).catch(function(){ next(); });
+    })();
+  }
+  function put(val, cb){
+    fetch('https://textdb.dev/api/data/' + KEY, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(val) })
+      .then(function(r){ cb(!!r.ok); }, function(){ cb(false); });
+  }
+  function pad(n){ return ('0'+n).slice(-2); }
+  function today(){ var d = new Date(); return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); }
+
+  var pending = {}, dayPend = {}, flushT = null;
+
+  function vidKey(v){
+    if (!v) return '';
+    if (v._vkey) return v._vkey;
+    var src = (v.oss && v.oss[0]) || (v.srcs && v.srcs[0]) || '';
+    var base = '';
+    if (src) base = String(src).split('/').pop().replace(/\.[a-z0-9]+$/i, '').replace(/-\d+$/, '');
+    else if (v.bvid) base = String(v.bvid);
+    if (!base) base = 'v' + VIDEOS.indexOf(v);
+    v._vkey = base;
+    return base;
+  }
+
+  function add(kind, n){
+    n = n || 1;
+    var k = vidKey(VIDEOS[state.idx]);
+    if (!k) return;
+    if (!pending[k]) pending[k] = { open:0, play:0, done:0, sec:0, pdf:0 };
+    pending[k][kind] = (pending[k][kind] || 0) + n;
+    var d = today();
+    if (!dayPend[d]) dayPend[d] = { play:0, done:0, sec:0 };
+    if (kind === 'sec') dayPend[d].sec += n;
+    else if (kind === 'done') dayPend[d].done += n;
+    else if (kind === 'play') dayPend[d].play += n;
+    flushSoon();
+  }
+
+  function flushSoon(){ if (!flushT) flushT = setTimeout(function(){ flushT = null; flush(); }, 4000); }
+
+  function flush(){
+    if (!Object.keys(pending).length) return;
+    get(function(pool){
+      var p = pool && typeof pool === 'object' ? pool : {};
+      if (!p.videos || typeof p.videos !== 'object') p.videos = {};
+      if (!p.meta || typeof p.meta !== 'object') p.meta = {};
+      if (!p.days || typeof p.days !== 'object') p.days = {};
+      Object.keys(pending).forEach(function(k){
+        var inc = pending[k];
+        if (!p.videos[k]) p.videos[k] = { open:0, play:0, done:0, sec:0, pdf:0 };
+        ['open','play','done','sec','pdf'].forEach(function(f){ p.videos[k][f] = (p.videos[k][f] || 0) + (inc[f] || 0); });
+        for (var i = 0; i < VIDEOS.length; i++) {
+          if (vidKey(VIDEOS[i]) === k && VIDEOS[i].title) { p.meta[k] = String(VIDEOS[i].title).slice(0, 60); break; }
+        }
+      });
+      Object.keys(dayPend).forEach(function(d){
+        if (!p.days[d]) p.days[d] = { play:0, done:0, sec:0 };
+        ['play','done','sec'].forEach(function(f){ p.days[d][f] = (p.days[d][f] || 0) + (dayPend[d][f] || 0); });
+      });
+      var dk = Object.keys(p.days).sort();
+      if (dk.length > 30) { for (var i = 0; i < dk.length - 30; i++) delete p.days[dk[i]]; }
+      p.ts = Date.now();
+      put(p, function(ok){
+        if (ok) { pending = {}; dayPend = {}; }
+        else flushSoon(); /* 写失败：本地计数保留，稍后重试 */
+      });
+    });
+  }
+
+  setInterval(flush, 30000);
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) flush(); });
+  window.addEventListener('beforeunload', flush);
+
+  /* 播放器埋点：开始播放（每次打开播放页只计一次）、观看时长（每5秒）、完整看完（最后一段播完） */
+  function bindPlayer(player, getPart, nParts){
+    var started = false, endCount = 0, watchT = null;
+    function startWatch(){
+      if (watchT) return;
+      watchT = setInterval(function(){
+        if (!player.paused && !player.ended) add('sec', 5);
+      }, 5000);
+    }
+    function stopWatch(){ if (watchT) { clearInterval(watchT); watchT = null; } }
+    player.addEventListener('play', function(){
+      if (!started) { started = true; add('play'); }
+      startWatch();
+    });
+    player.addEventListener('pause', stopWatch);
+    player.addEventListener('ended', function(){
+      stopWatch();
+      endCount++;
+      if (endCount >= nParts) add('done');
+    });
+  }
+  return { add: add, bindPlayer: bindPlayer };
+})();
+
 function catOf(name){
   for (var i = 0; i < CATS.length; i++) if (CATS[i].name === name) return CATS[i];
   return { name: name || "视频", icon: "🎬", c1: "#374151", c2: "#6B7280" };
@@ -246,6 +351,7 @@ function renderModule(){
 
 function renderPlay(){
   var v = VIDEOS[state.idx] || {};
+  vtrack.add("open");
   var c = catOf(v.cat);
   document.getElementById("pageTitle").textContent = c.name;
   document.getElementById("pageSub").textContent = "视频播放 · 右下角⚙️可调倍速";
@@ -393,6 +499,13 @@ function renderPlay(){
     });
 
     loadPart(0);
+    vtrack.bindPlayer(player, function(){ return partIdx; }, parts.length);
+
+    /* 配套试卷点击统计 */
+    var pdfLinks = document.querySelectorAll(".pdf-btn");
+    for (var pb = 0; pb < pdfLinks.length; pb++) {
+      pdfLinks[pb].addEventListener("click", function(){ vtrack.add("pdf"); });
+    }
 
     if (bar) {
       var btns = bar.querySelectorAll(".sp-btn");

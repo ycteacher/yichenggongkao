@@ -290,6 +290,21 @@ td b{color:var(--txt)}
     </div>
   </div>
 
+  <div class="sec-h"><span class="bar"></span><h2>视频讲解数据</h2><span class="note" id="vidNote">视频数据池 · 每 30 秒刷新</span></div>
+  <div class="kpis" id="vidKpis"></div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card">
+      <h3>视频播放趋势 <span class="hint">近 14 天 · 每日播放次数</span></h3>
+      <div class="desc" id="vidTrendNote">—</div>
+      <div class="chart" id="vidTrend"></div>
+    </div>
+    <div class="card">
+      <h3>单视频明细 <span class="hint">累计口径</span></h3>
+      <div class="desc">打开播放页 → 开始播放 → 完整看完</div>
+      <div style="overflow-x:auto"><table id="vidTable"></table></div>
+    </div>
+  </div>
+
   <div class="grid g3" style="margin-top:14px">
     <div class="card">
       <h3>设备构成</h3><div class="desc">一次性识别 · 校正后</div>
@@ -338,6 +353,7 @@ td b{color:var(--txt)}
       <li>当前在线按分钟心跳统计（含打开本看板的设备）；24 小时活跃、平板、刷题段位自 2026-11-19 起计数。</li>
       <li>刷题段位为匿名名次（每满 100 题升一档），不收集个人信息，显示为同学A/B/C…。</li>
       <li>学生端逐题作答明细存在各自手机本地，无法远程读取；此处仅统计跨过的段位阈值。</li>
+      <li>视频数据自 2026-11-21 晚起由视频页自动上报：打开播放页、开始播放、每 5 秒累计观看时长、最后一段播完计为完整看完、配套试卷点击；完播率 = 完整看完 ÷ 开始播放。</li>
       <li>计数服务为免费第三方，失效时显示最近一次快照；问卷剔除含「内测」字样的测试记录。</li>
     </ul>
     <div class="foot">数据来源：metrics 自动采集 + 题库统计 + 问卷云端 · 亿成公考</div>
@@ -742,10 +758,78 @@ function loadMat(){
 }
 loadMat();setInterval(loadMat,15000);
 
+/* ===== 视频讲解数据（独立数据池 ycgk-vid-v1） ===== */
+var VID_URL='https://textdb.dev/api/data/ycgk-vid-v1';
+var VID_DATA=null;
+function fmtDur(s){s=s||0;if(s<60)return s+' 秒';if(s<3600)return Math.round(s/60)+' 分钟';return (s/3600).toFixed(1).replace(/\.0$/,'')+' 小时'}
+function renderVid(){
+  var host=el('vidKpis');if(!host)return;
+  if(!VID_DATA||!VID_DATA.videos){
+    host.innerHTML='';
+    txt('vidNote','视频数据池 · 暂无数据（有同学开始看视频后自动出现）');
+    if(el('vidTable'))el('vidTable').innerHTML='<tr><td style="color:var(--mut)">暂无视频数据</td></tr>';
+    if(el('vidTrend'))el('vidTrend').innerHTML='';
+    return;
+  }
+  var vids=VID_DATA.videos||{},meta=VID_DATA.meta||{},days=VID_DATA.days||{};
+  var tPlay=0,tSec=0,tDone=0,tPdf=0,tOpen=0;
+  Object.keys(vids).forEach(function(k){var v=vids[k]||{};tPlay+=v.play||0;tSec+=v.sec||0;tDone+=v.done||0;tPdf+=v.pdf||0;tOpen+=v.open||0});
+  var td=days[liveToday()]||{};
+  var rate=tPlay>0?Math.round(tDone/tPlay*100)+'%':'—';
+  var cards=[
+    {t:'视频播放',n:tPlay,c:'var(--cyan)',x:'开始播放次数'},
+    {t:'观看总时长',n:fmtDur(tSec),c:'var(--green)',x:'全部视频累计'},
+    {t:'完整看完',n:tDone,c:'var(--violet)',x:'完播率 '+rate},
+    {t:'播放页打开',n:tOpen,c:'var(--amber)',x:'播放转化 '+pct(tPlay,tOpen)},
+    {t:'试卷/讲义点击',n:tPdf,c:'var(--pink)',x:'配套资料使用'},
+    {t:'今日播放',n:td.play||0,c:'var(--green)',x:'今日观看 '+fmtDur(td.sec||0)}
+  ];
+  host.innerHTML=cards.map(function(i){
+    return '<div class="kpi" style="--c:'+i.c+'"><div class="t">'+i.t+'</div><div class="n" style="font-size:24px">'+i.n+'</div><div class="x">'+i.x+'</div></div>';
+  }).join('');
+  /* 单视频明细表 */
+  var keys=Object.keys(vids);
+  if(el('vidTable')){
+    if(keys.length){
+      var h='<tr><th>视频</th><th>打开</th><th>播放</th><th>看完</th><th>完播率</th><th>时长</th><th>试卷</th></tr>';
+      h+=keys.map(function(k){
+        var v=vids[k]||{},nm=meta[k]||k;
+        if(nm.length>26)nm=nm.slice(0,26)+'…';
+        return '<tr><td><b>'+esc(nm)+'</b></td><td>'+(v.open||0)+'</td><td>'+(v.play||0)+'</td><td>'+(v.done||0)+'</td><td>'+pct(v.done||0,v.play||0)+'</td><td>'+fmtDur(v.sec||0)+'</td><td>'+(v.pdf||0)+'</td></tr>';
+      }).join('');
+      el('vidTable').innerHTML=h;
+    } else el('vidTable').innerHTML='<tr><td style="color:var(--mut)">暂无视频数据</td></tr>';
+  }
+  /* 播放趋势（近14天） */
+  if(el('vidTrend')){
+    var ds=lastDays(14),vals=ds.map(function(d){var x=days[d]||{};return x.play||0});
+    var tot=vals.reduce(function(a,b){return a+b},0);
+    txt('vidTrendNote','近 14 天共播放 '+tot+' 次');
+    var max=Math.max.apply(null,vals.concat([1]));
+    var W=460,H=150,pad=6,bw=(W-pad*2)/ds.length;
+    var sv='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
+    sv+='<defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".9"/><stop offset="1" stop-color="#1d4ed8" stop-opacity=".25"/></linearGradient></defs>';
+    vals.forEach(function(v,i){
+      var bh=(v/max)*(H-26),x=pad+i*bw+bw*0.18,y=H-20-bh,w=bw*0.64;
+      if(v>0)sv+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(2,bh).toFixed(1)+'" rx="2" fill="url(#vg)"/>';
+      if(i%2===0)sv+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-6)+'" fill="#64748b" font-size="9" text-anchor="middle">'+ds[i].slice(4,6)+'/'+ds[i].slice(6,8)+'</text>';
+    });
+    sv+='</svg>';
+    el('vidTrend').innerHTML=sv;
+  }
+}
+function loadVid(){
+  fetch(VID_URL+(VID_URL.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.json()})
+    .then(function(d){if(d&&typeof d==='object'&&!Array.isArray(d)){VID_DATA=d;renderVid()}})
+    .catch(function(){});
+}
+loadVid();setInterval(loadVid,30000);
+
 renderAll(STATS,FB);tick();setInterval(tick,1000);
 fetchBank();refreshMetrics();refreshFb();
 setInterval(refreshMetrics,30000);setInterval(refreshFb,300000);setInterval(fetchBank,300000);
-el('refreshBtn').addEventListener('click',function(){fetchBank();refreshMetrics();refreshFb();loadLive();loadMat()});
+el('refreshBtn').addEventListener('click',function(){fetchBank();refreshMetrics();refreshFb();loadLive();loadMat();loadVid()});
 
 /* 保存长图 */
 var btn=el('saveImgBtn');
