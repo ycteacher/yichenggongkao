@@ -5,7 +5,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix102";
+      var V="ttfix103";
       try{
         var K="yc-page-ver";
         var prev=localStorage.getItem(K);
@@ -54,8 +54,8 @@
   .yc-tabbar { left: 50%; right: auto; transform: translateX(-50%); max-width: 680px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); padding-left: 16px; padding-right: 16px; }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix102"></script>
-        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix102">
+</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix103"></script>
+        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix103">
   <script>
     window.artifactId = "ycgk-20261120";
     window.artifactVersion = "27";
@@ -2548,9 +2548,10 @@ document.addEventListener('click', function(e){
   tick(); setInterval(tick,1000);
 
   function doUpdate(btn){
-    if(!confirm('发现新版本。更新只需几秒，做题记录、积分、错题本都不会丢。现在更新吗？')) return;
+    /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */
     if(btn){ btn.disabled=true; btn.textContent='更新中…'; }
     var go=function(){
+      try{ sessionStorage.setItem('ycUpdOk', String(Date.now())); }catch(e){}
       /* 强制从网络重新拉取最新 index.html，绕过浏览器缓存，确保更新真实生效 */
       if(window.fetch){
         fetch(location.pathname, {cache:'reload'}).then(function(){ location.replace(location.pathname+'?upd='+Date.now()); }).catch(function(){ location.replace(location.pathname+'?upd='+Date.now()); });
@@ -2595,6 +2596,26 @@ document.addEventListener('click', function(e){
     if(b && !b.dataset.bound){ b.dataset.bound='1'; b.addEventListener('click',function(){ doUpdate(b); }); }
   }
   bindUpd();
+
+  /* 更新完成提示：一键更新跳转回来后，明确告诉用户"已经是最新版" */
+  (function(){
+    var ok=null;
+    try{ ok=sessionStorage.getItem('ycUpdOk'); if(ok) sessionStorage.removeItem('ycUpdOk'); }catch(e){}
+    if(!ok) return;
+    var t=document.createElement('div');
+    t.id='yc-upd-toast';
+    t.textContent='✓ 已更新到最新版本';
+    t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483647;'+
+      'background:#15803D;color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;'+
+      'box-shadow:0 6px 22px rgba(21,128,61,.35);font-family:inherit;white-space:nowrap;';
+    var mount2=function(){
+      if(!document.body){ setTimeout(mount2,120); return; }
+      document.body.appendChild(t);
+      setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; },2600);
+      setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },3100);
+    };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount2); else mount2();
+  })();
 
   function showFloat(){
     if(document.getElementById('yc-upd-float')) return;
