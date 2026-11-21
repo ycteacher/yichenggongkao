@@ -332,8 +332,10 @@
     });
     entry.parentNode.insertBefore(card, entry);
 
-    /* 安装指引卡片：手机/平板/电脑怎么装到桌面 */
-    if (!document.getElementById("yc-install-card")) {
+    /* 安装指引卡片：手机/平板/电脑怎么装到桌面（已装过的用户不再显示） */
+    var instDone=false;
+    try{ instDone=localStorage.getItem('ycgk.installDone.v1')==='1'; }catch(e){}
+    if (!instDone && !document.getElementById("yc-install-card")) {
       var ic = document.createElement("div");
       ic.id = "yc-install-card";
       ic.innerHTML =

@@ -3,6 +3,10 @@
 (function(){
   'use strict';
   var K_ONB='ycgk.onboard.v2', K_PLAN='ycgk.studyplan.v2', K_MOCK='ycgk.mock.v2';
+  /* 已装到桌面的永久标记：装过就不再弹任何安装提醒（右上角按钮、首页卡片、首启引导） */
+  var K_INST='ycgk.installDone.v1';
+  function installDone(){ try{return localStorage.getItem(K_INST)==='1'}catch(e){return false} }
+  function markInstalled(){ try{localStorage.setItem(K_INST,'1')}catch(e){} }
   function raw(k){ try{return localStorage.getItem(k)}catch(e){return null} }
   function set(k,v){ try{localStorage.setItem(k,v)}catch(e){} }
   function getJSON(k,fb){ try{var v=raw(k);return v?JSON.parse(v):fb}catch(e){return fb} }
@@ -18,8 +22,9 @@
   var deferred=null, canInstall=false, installed=false;
   try{
     window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; canInstall=true; refreshInstallBtn(); });
-    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; refreshInstallBtn(); });
+    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; markInstalled(); refreshInstallBtn(); });
     installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+    if(installed) markInstalled();
   }catch(e){}
 
   /* ---------- CSS ---------- */
@@ -207,7 +212,7 @@
       }
     });
     var ok=$('obInstalled');
-    if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); set(K_ONB,'1'); screenForm(); });
+    if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); markInstalled(); set(K_ONB,'1'); screenForm(); });
     $('obCopy').addEventListener('click',function(){ copyText(location.href.split('#')[0],'网址已复制，粘贴到备忘录即可'); });
     $('obLater').addEventListener('click',function(){ set(K_ONB,'1'); closeCard(); screenForm(); });
   }
@@ -625,6 +630,7 @@
   function start(){
     var step=raw(K_ONB)||'0';
     if(step==='2') return; // 已完成引导，正常用
+    if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
     setTimeout(function(){
       if(step==='0') screenInstall();
       else if(step==='1') screenForm();

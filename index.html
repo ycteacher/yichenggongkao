@@ -729,8 +729,10 @@ document.addEventListener('click', function(e){
     });
     entry.parentNode.insertBefore(card, entry);
 
-    /* 安装指引卡片：手机/平板/电脑怎么装到桌面 */
-    if (!document.getElementById("yc-install-card")) {
+    /* 安装指引卡片：手机/平板/电脑怎么装到桌面（已装过的用户不再显示） */
+    var instDone=false;
+    try{ instDone=localStorage.getItem('ycgk.installDone.v1')==='1'; }catch(e){}
+    if (!instDone && !document.getElementById("yc-install-card")) {
       var ic = document.createElement("div");
       ic.id = "yc-install-card";
       ic.innerHTML =
@@ -1797,10 +1799,13 @@ document.addEventListener('click', function(e){
     });
     window.addEventListener('appinstalled', function(){
       installed=true; deferred=null; canPrompt=false;
+      try{ localStorage.setItem('ycgk.installDone.v1','1'); }catch(e){}
       var b=document.getElementById('ycInstallTopBtn');
       if(b){ b.disabled=true; b.textContent='✓ 已安装'; }
     });
     if(window.matchMedia && matchMedia('(display-mode: standalone)').matches) installed=true;
+    /* 已确认装过桌面的用户：不再注入右上角安装入口 */
+    try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') installed=true; }catch(e){}
   }catch(e){}
 
   var CSS=''+
@@ -1925,6 +1930,8 @@ document.addEventListener('click', function(e){
   function inject(){
     var actions=document.querySelector('.yc-top-actions');
     if(!actions||document.getElementById('ycInstallTopBtn')) return false;
+    /* 已确认装过桌面：完全不放安装按钮 */
+    try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') return true; }catch(e){}
     var b=document.createElement('button');
     b.id='ycInstallTopBtn'; b.className='yc-install-btn';
     b.textContent=installed?'✓ 已安装':(canPrompt?'⬇ 安装到桌面':'⬇ 安装/保存');
@@ -1943,6 +1950,10 @@ document.addEventListener('click', function(e){
 (function(){
   'use strict';
   var K_ONB='ycgk.onboard.v2', K_PLAN='ycgk.studyplan.v2', K_MOCK='ycgk.mock.v2';
+  /* 已装到桌面的永久标记：装过就不再弹任何安装提醒（右上角按钮、首页卡片、首启引导） */
+  var K_INST='ycgk.installDone.v1';
+  function installDone(){ try{return localStorage.getItem(K_INST)==='1'}catch(e){return false} }
+  function markInstalled(){ try{localStorage.setItem(K_INST,'1')}catch(e){} }
   function raw(k){ try{return localStorage.getItem(k)}catch(e){return null} }
   function set(k,v){ try{localStorage.setItem(k,v)}catch(e){} }
   function getJSON(k,fb){ try{var v=raw(k);return v?JSON.parse(v):fb}catch(e){return fb} }
@@ -1958,8 +1969,9 @@ document.addEventListener('click', function(e){
   var deferred=null, canInstall=false, installed=false;
   try{
     window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; canInstall=true; refreshInstallBtn(); });
-    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; refreshInstallBtn(); });
+    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; markInstalled(); refreshInstallBtn(); });
     installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+    if(installed) markInstalled();
   }catch(e){}
 
   /* ---------- CSS ---------- */
@@ -2147,7 +2159,7 @@ document.addEventListener('click', function(e){
       }
     });
     var ok=$('obInstalled');
-    if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); set(K_ONB,'1'); screenForm(); });
+    if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); markInstalled(); set(K_ONB,'1'); screenForm(); });
     $('obCopy').addEventListener('click',function(){ copyText(location.href.split('#')[0],'网址已复制，粘贴到备忘录即可'); });
     $('obLater').addEventListener('click',function(){ set(K_ONB,'1'); closeCard(); screenForm(); });
   }
@@ -2565,6 +2577,7 @@ document.addEventListener('click', function(e){
   function start(){
     var step=raw(K_ONB)||'0';
     if(step==='2') return; // 已完成引导，正常用
+    if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
     setTimeout(function(){
       if(step==='0') screenInstall();
       else if(step==='1') screenForm();

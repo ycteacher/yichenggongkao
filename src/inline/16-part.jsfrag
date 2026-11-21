@@ -10,10 +10,13 @@
     });
     window.addEventListener('appinstalled', function(){
       installed=true; deferred=null; canPrompt=false;
+      try{ localStorage.setItem('ycgk.installDone.v1','1'); }catch(e){}
       var b=document.getElementById('ycInstallTopBtn');
       if(b){ b.disabled=true; b.textContent='✓ 已安装'; }
     });
     if(window.matchMedia && matchMedia('(display-mode: standalone)').matches) installed=true;
+    /* 已确认装过桌面的用户：不再注入右上角安装入口 */
+    try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') installed=true; }catch(e){}
   }catch(e){}
 
   var CSS=''+
@@ -138,6 +141,8 @@
   function inject(){
     var actions=document.querySelector('.yc-top-actions');
     if(!actions||document.getElementById('ycInstallTopBtn')) return false;
+    /* 已确认装过桌面：完全不放安装按钮 */
+    try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') return true; }catch(e){}
     var b=document.createElement('button');
     b.id='ycInstallTopBtn'; b.className='yc-install-btn';
     b.textContent=installed?'✓ 已安装':(canPrompt?'⬇ 安装到桌面':'⬇ 安装/保存');
