@@ -25,6 +25,11 @@ self.addEventListener('fetch', function (e) {
   try { url = new URL(e.request.url); } catch (err) { return; }
   if (url.hostname !== VIDEO_HOST || e.request.method !== 'GET') return;
 
+  if (url.pathname === '/__dbg') {
+    e.respondWith(new Response(JSON.stringify(dbg), { headers: { 'Content-Type': 'application/json' } }));
+    return;
+  }
+
   var range = e.request.headers.get('range');
   var init = { method: 'GET' };
   if (range) init.headers = { 'Range': range };
