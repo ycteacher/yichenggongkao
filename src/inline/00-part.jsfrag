@@ -1,22 +1,36 @@
 <script>
     (function(){
-      var V="ttfix117";
+      /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
       try{
         var K="yc-page-ver";
-        var prev=localStorage.getItem(K);
-        if(prev&&prev!==V){localStorage.setItem(K,V);var p=location.pathname;location.replace(p+"?ycv="+V+"_"+Date.now());return;}
-        if(!prev){localStorage.setItem(K,V);}
-        if(location.search.indexOf("ycv=")===-1){
-          var LK="yc-ver-chk-at",now=Date.now(),last=0;
-          try{last=+localStorage.getItem(LK)||0}catch(e){}
-          if(now-last>6*3600*1000){
-            try{localStorage.setItem(LK,String(now))}catch(e){}
-            fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
-              var m=t.match(/index-b34\.js\?v=([a-z0-9]+)/);
-              if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
-            }).catch(function(){});
-          }
+        var FALLBACK="tt62"; /* 兜底：仅首次访问且索引请求失败时使用 */
+        function fixIcons(v){
+          try{
+            var i1=document.querySelector('link[rel="icon"]'),i2=document.querySelector('link[rel="apple-touch-icon"]'),og=document.querySelector('meta[property="og:image"]');
+            [i1,i2].forEach(function(el){ if(el&&el.href) el.href=el.href.replace(/\?v=[^&"]*/,'?v='+v); });
+            if(og&&og.content) og.content=og.content.replace(/\?v=[^&"]*/,'?v='+v);
+          }catch(e){}
         }
+        function applyV(v){
+          try{
+            var sc=document.createElement('script');
+            sc.type='module';sc.crossOrigin='';sc.src='./assets/index-b34.js?v='+v;
+            document.head.appendChild(sc);
+            var lk=document.createElement('link');
+            lk.rel='stylesheet';lk.crossOrigin='';lk.href='./assets/index-C2M5URtc.css?v='+v;
+            document.head.appendChild(lk);
+            if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ fixIcons(v); }); }
+            else { fixIcons(v); }
+          }catch(e){}
+        }
+        var cached=localStorage.getItem(K);
+        if(cached) applyV(cached);
+        fetch("./assets/qbank-index.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(idx){
+          var v=idx&&idx.v?String(idx.v):'';
+          if(!v) return;
+          if(cached&&cached!==v){localStorage.setItem(K,v);location.replace(location.pathname+"?ycv="+v+"_"+Date.now());return;}
+          if(!cached){localStorage.setItem(K,v);applyV(v);}
+        }).catch(function(){ if(!cached){localStorage.setItem(K,FALLBACK);applyV(FALLBACK);} });
       }catch(e){}
     })();
     </script>
