@@ -1,0 +1,82 @@
+{
+ "cnt_shape": {
+  "n": 40,
+  "pass80": 40,
+  "pass_both": 40
+ },
+ "cnt_region": {
+  "n": 40,
+  "pass80": 40,
+  "pass_both": 40
+ },
+ "cnt_inter": {
+  "n": 40,
+  "pass80": 15,
+  "pass_both": 0
+ },
+ "pos_rot": {
+  "n": 40,
+  "pass80": 39,
+  "pass_both": 37
+ },
+ "pos_trans": {
+  "n": 40,
+  "pass80": 38,
+  "pass_both": 38
+ },
+ "pos_flip": {
+  "n": 40,
+  "pass80": 40,
+  "pass_both": 40
+ },
+ "sty_xor": {
+  "n": 40,
+  "pass80": 37,
+  "pass_both": 35
+ },
+ "sty_latin": {
+  "n": 40,
+  "pass80": 33,
+  "pass_both": 30
+ },
+ "sty_bw": {
+  "n": 40,
+  "pass80": 33,
+  "pass_both": 33
+ },
+ "sty_addsub": {
+  "n": 40,
+  "pass80": 38,
+  "pass_both": 38
+ },
+ "spa_cube": {
+  "n": 40,
+  "pass80": 24,
+  "pass_both": 23
+ },
+ "spa_view": {
+  "n": 40,
+  "pass80": 28,
+  "pass_both": 24
+ },
+ "attr_sym": {
+  "n": 40,
+  "pass80": 40,
+  "pass_both": 40
+ },
+ "attr_curve": {
+  "n": 40,
+  "pass80": 35,
+  "pass_both": 31
+ },
+ "attr_closed": {
+  "n": 40,
+  "pass80": 35,
+  "pass_both": 35
+ },
+ "euler": {
+  "n": 40,
+  "pass80": 38,
+  "pass_both": 38
+ }
+}

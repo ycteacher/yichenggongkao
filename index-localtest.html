@@ -1,0 +1,3268 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+    (function(){
+      /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
+      try{
+        var K="yc-page-ver";
+        var FALLBACK="tt69"; /* 兜底：仅首次访问且索引请求失败时使用 */
+        function fixIcons(v){
+          try{
+            var i1=document.querySelector('link[rel="icon"]'),i2=document.querySelector('link[rel="apple-touch-icon"]'),og=document.querySelector('meta[property="og:image"]');
+            [i1,i2].forEach(function(el){ if(el&&el.href) el.href=el.href.replace(/\?v=[^&"]*/,'?v='+v); });
+            if(og&&og.content) og.content=og.content.replace(/\?v=[^&"]*/,'?v='+v);
+          }catch(e){}
+        }
+        function applyV(v){
+          try{
+            var nt=document.createElement('script');
+            nt.src='./assets/yc-notify.js?v='+v;
+            document.head.appendChild(nt);
+            var sc=document.createElement('script');
+            sc.type='module';sc.crossOrigin='';sc.src='./assets/index-b34.js?v='+v;
+            document.head.appendChild(sc);
+            var lk=document.createElement('link');
+            lk.rel='stylesheet';lk.crossOrigin='';lk.href='./assets/index-C2M5URtc.css?v='+v;
+            document.head.appendChild(lk);
+            if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ fixIcons(v); }); }
+            else { fixIcons(v); }
+          }catch(e){}
+        }
+        var cached=localStorage.getItem(K);
+        if(cached) applyV(cached);
+        fetch("./assets/qbank-index.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(idx){
+          var v=idx&&idx.v?String(idx.v):'';
+          if(!v) return;
+          if(cached&&cached!==v){localStorage.setItem(K,v);location.replace(location.pathname+"?ycv="+v+"_"+Date.now());return;}
+          if(!cached){localStorage.setItem(K,v);applyV(v);}
+        }).catch(function(){ if(!cached){localStorage.setItem(K,FALLBACK);applyV(FALLBACK);} });
+      }catch(e){}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-title" content="亿成公考">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="application-name" content="亿成公考">
+    <title>亿成公考刷题应用</title>
+    <meta name="description" content="亿成公考刷题应用——常识、行测、申论全模块免费刷题，押题资料一键保存。">
+    <meta property="og:title" content="亿成公考 · 免费刷题应用">
+    <meta property="og:description" content="常识、行测、申论全模块免费刷题，押题资料一键保存。">
+    <meta property="og:image" content="https://ycteacher.github.io/yichenggongkao/assets/icon-yc-red-512.png?v=4">
+    <meta property="og:type" content="website">
+    <script>window.injectInfo = { env: "PROD" };</script><script id="app-manifest" type="application/json">
+{"navigationBar":{"visible":false,"title":"亿成公考刷题应用","backgroundColor":"#F7F4EF","foregroundColor":"#202020"},"localStorage":true}
+    </script>
+    
+    <link rel="preload" as="font" type="font/woff2" href="./assets/material-icons.woff2?v=1" crossorigin="anonymous">
+<link rel="icon" type="image/png" href="./assets/icon-yc-red-512.png?v=4">
+    <link rel="apple-touch-icon" href="./assets/icon-yc-red-512.png?v=4">
+    <link rel="manifest" href="./manifest.json?v=1">
+        <link href="./assets/material-icons.css?v=1" rel="stylesheet">
+    <script defer="" src="base.js"></script>
+    <script>window.YC_CS_BANK=window.YC_CS_BANK||[];</script>
+        <style>.tt-fig{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.md-tbl{border-collapse:collapse;margin:10px 0;width:100%;font-size:14px}.md-tbl th,.md-tbl td{border:1px solid #E5E1D8;padding:6px 10px;text-align:left;white-space:nowrap}.md-tbl th{background:#F7F5EF;font-weight:600;color:#4A463F}.tt-fig svg{max-width:100%;height:auto}.tt-opt svg{width:64px;height:64px;display:block;margin:0 auto}
+/* ===== Tab bar v1 ===== */
+.page-shell-bottom { padding-bottom: 78px !important; }
+.yc-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: flex; background: rgba(255,255,255,.97); border-top: 1px solid #E8E4DB; padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.yc-tabbar button { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px 2px; border: none; background: none; font-size: 11px; line-height: 1.2; color: #8A8378; cursor: pointer; white-space: nowrap; }
+.yc-tabbar button.on { color: #DC2626; font-weight: 600; }
+.yc-tabbar .material-icons { font-size: 22px; }
+/* 宽屏：底栏收窄居中悬浮，网页端更精致 */
+@media (min-width: 768px) {
+  .yc-tabbar { left: 50%; right: auto; transform: translateX(-50%); max-width: 680px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); padding-left: 16px; padding-right: 16px; }
+  .page-shell-bottom { padding-bottom: 86px !important; }
+}
+</style><!-- index-b34.js / index-C2M5URtc.css 版本参数由头部脚本从 qbank-index.json 的 v 字段动态注入 -->
+  <script>
+    window.artifactId = "ycgk-20261120";
+    window.artifactVersion = "27";
+    window.trace_id = "ycgk20261120";
+</script>
+<meta http-equiv="Content-Security-Policy" content="
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
+  frame-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
+  connect-src 'self' data: blob: https://textdb.online https://textdb.dev *.alipay.com *.alipayobjects.com *.amap.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com;
+  child-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
+  object-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
+  base-uri 'self' *.alipay.com *.alipayobjects.com *.amap.com;
+  form-action 'none';
+  upgrade-insecure-requests;
+">
+
+<style id="ui-polish">
+/* ===== UI Polish v1 ===== */
+.page-shell { -webkit-font-smoothing: antialiased; }
+
+/* 统一圆角与阴影：更轻、更整齐 */
+.page-shell .rounded-3xl { border-radius: 16px !important; }
+.page-shell .rounded-2xl { border-radius: 12px !important; }
+.page-shell [class*="shadow-"] { box-shadow: 0 1px 2px rgba(32,32,32,.04) !important; }
+
+/* 图标统一缩小 */
+.page-shell .h-10.w-10, .page-shell .h-11.w-11, .page-shell .h-12.w-12 {
+  width: 34px !important; height: 34px !important; border-radius: 10px !important; flex: none;
+}
+.page-shell .h-10 .material-icons, .page-shell .h-11 .material-icons, .page-shell .h-12 .material-icons { font-size: 17px !important; }
+.page-shell .grid .material-icons { font-size: 19px !important; }
+
+/* 三组入口卡改为「图标在左、文字在右」的紧凑行 */
+.page-shell .mt-3.grid > button.flex.flex-col[class*="border-[#E5E1D8]"] {
+  display: grid !important;
+  grid-template-columns: 34px 1fr;
+  column-gap: 12px;
+  align-items: center;
+  padding: 11px 14px !important;
+}
+.page-shell .mt-3.grid > button.flex.flex-col[class*="border-[#E5E1D8]"] > span:first-child { grid-row: 1 / span 2; grid-column: 1; }
+.page-shell .mt-3.grid > button.flex.flex-col[class*="border-[#E5E1D8]"] > p { margin: 0 !important; grid-column: 2; }
+.page-shell .mt-3.grid > button.flex.flex-col[class*="border-[#E5E1D8]"] > p:first-of-type { font-size: 14px !important; }
+.page-shell .mt-3.grid > button.flex.flex-col[class*="border-[#E5E1D8]"] > p:last-of-type { font-size: 12px !important; margin-top: 2px !important; }
+
+/* 复习建议默认折叠，点一下展开 */
+.page-shell [class*="F4F8F3"] {
+  position: relative; max-height: 54px; overflow: hidden; cursor: pointer;
+  transition: max-height .35s ease;
+}
+html.review-open .page-shell [class*="F4F8F3"] { max-height: 1600px; }
+.page-shell [class*="F4F8F3"]::after {
+  content: "展开完整建议 ▾";
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 16px 0 6px; text-align: center;
+  font-size: 11px; font-weight: 500; color: #15803D;
+  background: linear-gradient(rgba(244,248,243,0), #F4F8F3 60%);
+  pointer-events: none;
+}
+html.review-open .page-shell [class*="F4F8F3"]::after {
+  content: "收起建议 ▴"; background: none; position: static; display: block; padding: 8px 0 0;
+}
+
+/* 倒计时卡更挺括 */
+.page-shell .mt-5.rounded-3xl { padding: 18px 20px !important; }
+.page-shell .mt-5.rounded-3xl [class*="shadow-"] { box-shadow: 0 4px 14px rgba(21,128,61,.22) !important; }
+
+/* 统计卡更轻 */
+.page-shell .mt-4.grid.grid-cols-3 > .rounded-3xl { padding: 12px 8px !important; }
+.page-shell .mt-4.grid.grid-cols-3 .text-2xl { font-size: 20px !important; }
+
+/* 速算横幅 / 错题本 / 组卷卡收一收 */
+.page-shell .mt-4.flex.w-full, .page-shell .mt-3.grid > button[class*="bg-[#"] { padding-top: 13px !important; padding-bottom: 13px !important; }
+
+/* 备考档案卡内边距收紧 */
+.page-shell .mt-4.rounded-3xl.p-5 { padding: 16px !important; }
+</style><style id="yc-ui2">
+/* ===== UI 2.0 顶部栏与弹窗 ===== */
+:root { --yc-green:#15803D; --yc-ink:#202020; --yc-mut:#8A8378; --yc-line:#ECE8DF; }
+body.yc-ui { padding-top: 60px !important; }
+.yc-topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px max(14px, calc((100% - 768px) / 2)); background: rgba(250,248,242,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--yc-line);
+}
+@media (min-width: 820px) {
+  .page-shell { margin-left: auto !important; margin-right: auto !important; }
+}
+@media (min-width: 1024px) {
+  .page-shell { max-width: 1000px !important; }
+  .yc-topbar { padding-left: max(14px, calc((100% - 1000px) / 2)) !important; padding-right: max(14px, calc((100% - 1000px) / 2)) !important; }
+  .yc-grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+}
+.yc-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.yc-logo {
+  width: 36px; height: 36px; border-radius: 11px; flex: none;
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 17px;
+  box-shadow: 0 2px 8px rgba(220,38,38,.3);
+}
+.yc-brand-name { font-size: 16px; font-weight: 800; color: var(--yc-ink); letter-spacing: .5px; line-height: 1.1; }
+.yc-brand-sub { font-size: 10px; color: var(--yc-mut); margin-top: 1px; line-height: 1.2; }
+.yc-top-actions { display: flex; align-items: center; gap: 7px; flex: none; }
+.yc-chip {
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid var(--yc-line); background: #fff; border-radius: 999px;
+  padding: 6px 11px; font-size: 12px; font-weight: 600; color: var(--yc-ink);
+  cursor: pointer; white-space: nowrap;
+}
+.yc-chip:active { transform: scale(.96); }
+.yc-chip .yc-arrow { font-size: 9px; color: #B3AC9E; }
+.yc-chip.yc-chip-done { border-color: rgba(21,128,61,.35); color: var(--yc-green); }
+.yc-chip svg { width: 13px; height: 13px; }
+
+/* 遮罩与底部面板 */
+.yc-mask { position: fixed; inset: 0; background: rgba(20,20,20,.45); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.yc-mask.on { opacity: 1; pointer-events: auto; }
+.yc-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1001;
+  background: #fff; border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+  transform: translateY(105%); transition: transform .3s cubic-bezier(.32,.72,.35,1);
+  max-height: 82vh; overflow-y: auto; box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+}
+.yc-sheet.on { transform: translateY(0); }
+.yc-sheet h3 { font-size: 17px; font-weight: 800; color: var(--yc-ink); }
+.yc-sheet .yc-tip { font-size: 12px; color: var(--yc-mut); margin-top: 3px; }
+.yc-sec { margin-top: 16px; }
+.yc-sec-t { font-size: 12px; font-weight: 700; color: var(--yc-mut); letter-spacing: 1px; margin-bottom: 9px; }
+.yc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.yc-opt {
+  border: 1px solid var(--yc-line); background: #FAFAF7; border-radius: 10px;
+  padding: 8px 2px; font-size: 13px; font-weight: 600; color: var(--yc-ink);
+  text-align: center; cursor: pointer; transition: all .15s;
+}
+.yc-opt.on { border-color: var(--yc-green); background: rgba(21,128,61,.07); color: var(--yc-green); }
+.yc-types { display: flex; flex-wrap: wrap; gap: 8px; }
+.yc-types .yc-opt { padding: 8px 14px; border-radius: 999px; }
+.yc-save {
+  margin-top: 20px; width: 100%; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, #DC2626, #B91C1C); color: #fff;
+  font-size: 15px; font-weight: 700; padding: 13px; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(21,128,61,.3);
+}
+.yc-save:disabled { opacity: .45; box-shadow: none; }
+
+/* 建议弹窗 */
+.yc-modal {
+  position: fixed; z-index: 1002; left: 50%; top: 50%;
+  transform: translate(-50%, -46%) scale(.96); opacity: 0; pointer-events: none;
+  width: min(92vw, 420px); max-height: 78vh; overflow-y: auto;
+  background: #fff; border-radius: 20px; padding: 22px 18px 18px;
+  transition: all .25s cubic-bezier(.32,.72,.35,1); box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.yc-modal.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.yc-modal h3 { font-size: 18px; font-weight: 800; color: var(--yc-ink); }
+.yc-modal .yc-tagline { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; color: var(--yc-green); background: rgba(21,128,61,.08); border-radius: 999px; padding: 4px 10px; }
+.yc-adv-block { margin-top: 14px; }
+.yc-adv-block h4 { font-size: 12px; font-weight: 700; color: var(--yc-mut); letter-spacing: 1px; margin-bottom: 7px; }
+.yc-adv-block ul { list-style: none; }
+.yc-adv-block li {
+  position: relative; padding-left: 15px; font-size: 13px; line-height: 1.65; color: #3A3A34; margin-bottom: 7px;
+}
+.yc-adv-block li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--yc-green); }
+.yc-adv-note { margin-top: 12px; background: #F4F8F3; border-radius: 12px; padding: 11px 13px; font-size: 12px; line-height: 1.7; color: #2F5D3C; }
+.yc-close { margin-top: 16px; width: 100%; border: 1px solid var(--yc-line); background: #FAFAF7; border-radius: 12px; padding: 11px; font-size: 14px; font-weight: 600; color: var(--yc-ink); cursor: pointer; }
+
+/* 积分面板 */
+.yc-pts-hero { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; }
+.yc-pts-num { font-size: 40px; font-weight: 800; color: var(--yc-green); line-height: 1; }
+.yc-pts-unit { font-size: 13px; color: var(--yc-mut); }
+.yc-pts-today { font-size: 12px; color: var(--yc-mut); }
+.yc-rules { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yc-rule { background: #FAFAF7; border: 1px solid var(--yc-line); border-radius: 12px; padding: 10px 12px; }
+.yc-rule b { display: block; font-size: 13px; color: var(--yc-ink); }
+.yc-rule span { font-size: 11px; color: var(--yc-mut); }
+.yc-ledger { margin-top: 14px; }
+.yc-ledger-item { display: flex; justify-content: space-between; padding: 9px 2px; border-bottom: 1px dashed var(--yc-line); font-size: 12px; }
+.yc-ledger-item .yc-lr { color: var(--yc-green); font-weight: 700; }
+
+/* 我的方向横幅（选完后显示） */
+.yc-dir-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; cursor: pointer;
+  background: linear-gradient(135deg, rgba(21,128,61,.09), rgba(21,128,61,.04));
+  border: 1px solid rgba(21,128,61,.22);
+}
+.yc-dir-banner .yc-db-l { font-size: 13px; font-weight: 700; color: var(--yc-green); }
+.yc-dir-banner .yc-db-s { font-size: 11px; color: var(--yc-mut); margin-top: 2px; }
+.yc-dir-banner .yc-db-r { font-size: 12px; font-weight: 600; color: var(--yc-green); flex: none; }
+
+/* 内测版横幅（页面最上方，加宽加大横条） */
+.yc-beta-banner {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; box-sizing: border-box;
+  margin: 12px 0 0; padding: 15px 18px; border-radius: 14px;
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  box-shadow: 0 4px 16px rgba(220,38,38,.28);
+}
+.yc-beta-banner .yc-bb-tag {
+  flex: none; font-size: 14px; font-weight: 900; color: #DC2626;
+  background: #fff; border-radius: 8px; padding: 5px 11px; letter-spacing: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.yc-beta-banner .yc-bb-tx {
+  flex: 1; min-width: 0; font-size: 17px; font-weight: 800;
+  color: #fff; line-height: 1.45; letter-spacing: .3px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.12);
+}
+
+/* 视频讲解横幅（首页底部，底栏之上） */
+.yc-video-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 18px 0 4px; padding: 14px 16px; border-radius: 16px; cursor: pointer;
+  background: linear-gradient(135deg, #15803D, #166534);
+  box-shadow: 0 4px 16px rgba(21,128,61,.25);
+}
+.yc-video-banner:active { transform: scale(.99); }
+.yc-video-banner .yc-vb-l { font-size: 14px; font-weight: 800; color: #fff; }
+.yc-video-banner .yc-vb-s { font-size: 11px; color: rgba(255,255,255,.85); margin-top: 3px; line-height: 1.5; }
+.yc-video-banner .yc-vb-r { flex: none; font-size: 12px; font-weight: 700; color: #F0FDF4; background: rgba(255,255,255,.18); border-radius: 999px; padding: 6px 12px; }
+
+/* 听取意见横幅（页面最底部，底栏之上） */
+.yc-fb-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 18px 0 4px; padding: 14px 16px; border-radius: 16px; cursor: pointer;
+  background: linear-gradient(135deg, #B45309, #92400E);
+  box-shadow: 0 4px 16px rgba(180,83,9,.25);
+}
+.yc-fb-banner:active { transform: scale(.99); }
+.yc-fb-banner .yc-fb-l { font-size: 14px; font-weight: 800; color: #fff; }
+.yc-fb-banner .yc-fb-s { font-size: 11px; color: rgba(255,255,255,.85); margin-top: 3px; line-height: 1.5; }
+.yc-fb-banner .yc-fb-r { flex: none; font-size: 12px; font-weight: 700; color: #FFF7ED; background: rgba(255,255,255,.18); border-radius: 999px; padding: 6px 12px; }
+.yc-fb-banner .yc-gifts { display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap; }
+.yc-fb-banner .yc-gift { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); border-radius: 999px; padding: 4px 10px 4px 7px; }
+.yc-fb-banner .yc-gift svg { width: 19px; height: 19px; display: block; }
+.yc-fb-banner .yc-gift b { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
+
+/* 新图标 */
+.yc-svg { width: 20px; height: 20px; display: block; }
+.page-shell .mt-3.grid > button .yc-svg { width: 21px; height: 21px; }
+</style><style id="yc-fix">
+/* ===== 补缺失渐变类（修复紫卡/绿卡白字） ===== */
+.from-\[\#7C3AED\]{--tw-gradient-from: #7C3AED var(--tw-gradient-from-position);--tw-gradient-to: rgb(124 58 237 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.to-\[\#5B21B6\]{--tw-gradient-to: #5B21B6 var(--tw-gradient-to-position)}
+.from-\[\#16A34A\]{--tw-gradient-from: #16A34A var(--tw-gradient-from-position);--tw-gradient-to: rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.from-\[\#0E7490\]{--tw-gradient-from: #0E7490 var(--tw-gradient-from-position);--tw-gradient-to: rgb(14 116 144 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
+.to-\[\#155E75\]{--tw-gradient-to: #155E75 var(--tw-gradient-to-position)}
+
+/* ===== 资料领取专区卡片 ===== */
+#yc-materials-card{
+  display:flex; align-items:center; gap:12px;
+  margin:14px 0 4px; padding:14px 16px; border-radius:14px;
+  background:linear-gradient(90deg,#D97706,#B45309);
+  color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(180,83,9,.28);
+}
+#yc-materials-card:active{ transform:scale(.985); }
+#yc-materials-card .yc-mat-ic{ font-size:26px !important; flex:none; }
+#yc-materials-card .yc-mat-ic .yc-svg, #yc-install-card .yc-mat-ic .yc-svg{ width:26px; height:26px; }
+#yc-materials-card .yc-mat-tx{ flex:1; min-width:0; }
+#yc-materials-card .yc-mat-t{ font-size:15px; font-weight:800; letter-spacing:.5px; }
+#yc-materials-card .yc-mat-s{ font-size:11px; opacity:.92; margin-top:2px; }
+#yc-materials-card .yc-mat-go{ font-size:12px; font-weight:700; flex:none; background:rgba(255,255,255,.18); border-radius:999px; padding:5px 10px; }
+
+/* ===== 安装到桌面卡片（与资料卡同一套规范，蓝色区分） ===== */
+#yc-install-card{
+  display:flex; align-items:center; gap:12px;
+  margin:14px 0 0; padding:14px 16px; border-radius:14px;
+  background:linear-gradient(90deg,#2563EB,#1D4ED8);
+  color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,.28);
+}
+#yc-install-card:active{ transform:scale(.985); }
+#yc-install-card .yc-mat-ic{ font-size:26px !important; flex:none; }
+#yc-install-card .yc-mat-tx{ flex:1; min-width:0; }
+#yc-install-card .yc-mat-t{ font-size:15px; font-weight:800; letter-spacing:.5px; }
+#yc-install-card .yc-mat-s{ font-size:11px; opacity:.92; margin-top:2px; }
+#yc-install-card .yc-mat-go{ font-size:12px; font-weight:700; flex:none; background:rgba(255,255,255,.18); border-radius:999px; padding:5px 10px; }
+
+/* ===== 秒开加载页 ===== */
+#yc-skeleton{position:fixed;inset:0;z-index:2000;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s}
+#yc-skeleton.off{opacity:0;pointer-events:none}
+.yc-sk-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#DC2626,#B91C1C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:800;box-shadow:0 6px 20px rgba(220,38,38,.3)}
+.yc-sk-name{font-size:15px;font-weight:700;color:#202020;letter-spacing:1px}
+.yc-sk-sub{font-size:11px;color:#8A8378}
+.yc-sk-dots{display:flex;gap:6px;margin-top:4px}
+.yc-sk-dots i{width:7px;height:7px;border-radius:50%;background:#1B8A44;animation:ycsk 1.2s infinite}
+.yc-sk-dots i:nth-child(2){animation-delay:.2s}
+.yc-sk-dots i:nth-child(3){animation-delay:.4s}
+@keyframes ycsk{0%,100%{opacity:.25}50%{opacity:1}}
+</style><style>
+/* 窄屏顶栏防挤压：品牌行固定，功能按钮换行横向滚动 */
+@media (max-width:700px){
+  .yc-topbar{flex-wrap:wrap;row-gap:5px;padding-top:8px;padding-bottom:8px}
+  .yc-brand{flex:0 0 auto}
+  .yc-brand-sub{display:none}
+  .yc-brand-name{white-space:nowrap}
+  .yc-top-actions{flex:1 1 100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .yc-top-actions::-webkit-scrollbar{display:none}
+  body.yc-ui{padding-top:92px!important}
+}
+</style></head>
+  <body>
+    <div id="root"></div>
+    <div id="yc-skeleton">
+      <div class="yc-sk-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:18px"></div>
+      <div class="yc-sk-name">亿成公考 · 备考神器</div>
+      <div class="yc-sk-sub">题库加载中，马上就好</div>
+      <div class="yc-sk-dots"><i></i><i></i><i></i></div>
+    </div>
+    <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',function(){
+        navigator.serviceWorker.register('./sw.js').catch(function(){});
+      });
+    }
+    </script>
+    <script>
+    (function(){
+      function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
+      var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
+      setTimeout(function(){ clearInterval(t); hide(); },25000);
+    })();
+    </script>
+
+
+<script>
+document.addEventListener('click', function(e){
+  var t = e.target && e.target.closest ? e.target.closest('[class*="F4F8F3"]') : null;
+  if (t) document.documentElement.classList.toggle('review-open');
+});
+</script>
+
+<script>
+(function(){
+  if (window.__ycUI2) return; window.__ycUI2 = true;
+
+  var PROVINCES = ["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃","青海","宁夏","新疆"];
+  var TYPES = ["国考","省考","选调生","事业编","军队文职","三支一扶","央国企"];
+
+  var TYPE_ADVICE = {
+    "国考": ["行测＋申论，笔试一般在11月底；行测按副省级、地市级、行政执法类分三套卷，题量和难度略有差异。","五大模块里资料分析和判断推理性价比最高，建议每天资料20题、判断15题起步。","申论小题保分、大作文拉差距，每周至少完整写1篇。"],
+    "省考": ["多数省份参加多省联考，但江苏、山东、广东、北京、上海等自主命题，卷别和题量差异大，先确定本省卷别再刷题。","先做1-2套本省真题摸底，标出薄弱模块，再按模块专项突破。","关注本省人事考试网公告，招录计划和岗位限制每年都在变。"],
+    "选调生": ["以行测＋申论为主，部分省份加考案例分析或公基，整体难度略低于省考。","主要面向应届生，竞争比省考小，但要求党员、学生干部等条件，先核对自己是否符合。","复习节奏可参照省考，重点抓行测五大模块。"],
+    "事业编": ["以公基＋职测为主，部分岗位考综合应用能力；全国联考分A-E五类（综合管理、社科专技、自然科学专技、教师、医疗）。","广东等地事业编统考一般不分类别，侧重公基和行测，按本省公告确认考试科目。","公基靠积累，法律、政治、时政是大头，用碎片时间刷常识最划算。"],
+    "军队文职": ["公共科目（基本知识＋岗位能力）＋专业科目；岗位能力题型和行测接近。","公共知识里国防、军队常识是特色，占分不低，别只刷行测。","专业科目按报考岗位定，先查岗位表确认考试大纲。"],
+    "三支一扶": ["多数省份考公基＋行测或写作，难度低于省考，各省科目不同，以本省公告为准。","服务期满后有定向招录等政策红利，适合作为进入体制的跳板。","复习以公基和行测基础题为主，不必抠难题。"],
+    "央国企": ["行测＋综合知识＋专业课，各企业自主命题（如电网、烟草、银行、铁路），题型差异大。","行测是通用硬通货，先按省考标准练五大模块，再补企业特色题。","关注目标企业招聘官网，笔试面试节奏各不相同。"]
+  };
+
+  var PROVINCE_NOTES = {
+    "江苏": "江苏省考按岗位分A、B、C三类卷（A类综合管理、B类行政执法、C类乡镇机关），行测申论分类命题，先确定自己报的类别再刷题；事业单位统考单独组织，不与省考混用。",
+    "广东": "广东省考行测题量大、节奏快，乡镇卷单独命题；事业编统考一般不分类别，侧重公基和行测，按当年公告确认科目。",
+    "河南": "河南参加多省联考，报考人数多、行测题量大，务必用整卷模考练节奏，申论同样重点抓。",
+    "山东": "山东省考自主命题，题量稳定、竞争激烈，行测要练速度，申论重规范表达。",
+    "浙江": "浙江省考自主命题，行测难度偏高，资料分析和数量关系占比大，别放弃数量。",
+    "北京": "北京市考自主命题，行测＋申论，部分岗位加专业课，注意公告里的专业考试安排。",
+    "上海": "上海市考自主命题，行测＋申论，大部分职位需加考专业课，先定岗位再定复习范围。",
+    "四川": "四川参加多省联考，题量中等，竞争比高，行测正确率优先于速度。",
+    "湖北": "湖北参加多省联考，行测题量大，按联考节奏准备整卷模考。",
+    "湖南": "湖南参加多省联考，行测申论并重，乡镇卷单独命题。",
+    "陕西": "陕西参加多省联考，行测数学运算偏难，数量关系量力而行抓基础题。"
+  };
+
+  function ls(k, v){ try { if (v === undefined) { var s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } }
+  function getState(){ return ls("yc-ui-v1") || {}; }
+  function saveState(s){ ls("yc-ui-v1", s); }
+
+  /* ---------- 图标库 ---------- */
+  function svg(p, c){ return '<svg class="yc-svg" viewBox="0 0 24 24" fill="none" stroke="' + (c||"currentColor") + '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
+  /* 图标字体加载失败时会露出英文原名（如 category / library_books），这里按原名全部换成内嵌图标，彻底摆脱字体依赖 */
+  var LIG = {
+    "category": svg('<rect x="3.5" y="3.5" width="7" height="7" rx="1"/><circle cx="17" cy="7" r="3.5"/><path d="M7 14.5 10.5 21h-7z"/><rect x="14" y="15" width="6" height="6" rx="1"/>'),
+    "library_books": svg('<path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v17.5H7.5A2.5 2.5 0 0 0 5 22V4.5z"/><path d="M5 19.5A2.5 2.5 0 0 1 7.5 17H19M9.5 7h5"/>'),
+    "quiz": svg('<circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.3 2.4c-.8.3-1.3 1-1.3 1.8v.4"/><path d="M11.6 16.6h.01"/>'),
+    "trending_up": svg('<path d="M3 17l6-6 4 4 8-8"/><path d="M14.5 7H21v6.5"/>'),
+    "psychology": svg('<path d="M13 3a7 7 0 0 1 4 12.7V19h-3v2h-4v-3l-2.6-.1a1.4 1.4 0 0 1-1.3-1.4V14H4.5l2-3.6A7 7 0 0 1 13 3z"/><path d="M10.5 10.5a2 2 0 1 1 3 1.7c-.7.4-1 .9-1 1.6"/>'),
+    "calculate": svg('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/>'),
+    "account_balance": svg('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 11v7M10 11v7M14 11v7M18.5 11v7M3 21h18"/>'),
+    "percent": svg('<path d="M19 5 5 19"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>'),
+    "menu_book": svg('<path d="M12 6c-1.5-1.3-3.4-2-6-2v14c2.6 0 4.5.7 6 2 1.5-1.3 3.4-2 6-2V4c-2.6 0-4.5.7-6 2z"/><path d="M12 6v14"/>'),
+    "history": svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+    "swap_horiz": svg('<path d="M7 8h11M15 4.5 18.5 8 15 11.5M17 16H6M9 12.5 5.5 16 9 19.5"/>'),
+    "science": svg('<path d="M10 3v6L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M8.5 3h7M7.5 15h9"/>'),
+    "school": svg('<path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5z"/><path d="M6.5 11.5v4.2c0 1.2 2.5 2.6 5.5 2.6s5.5-1.4 5.5-2.6v-4.2"/>'),
+    "local_hospital": svg('<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8.5v7M8.5 12h7"/>'),
+    "hub": svg('<circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M6.6 6.6 10 10M17.4 6.6 14 10M6.6 17.4 10 14M17.4 17.4 14 14"/>'),
+    "construction": svg('<path d="M14.7 4.3a5 5 0 0 1 5.6-1l-3.4 3.4 1.4 1.4 3.4-3.4a5 5 0 0 1-6.6 6.2L8 18a2.1 2.1 0 0 1-3-3l7.1-7.1a5 5 0 0 1 2.6-3.6z"/>'),
+    "pie_chart": svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l6 6"/>'),
+    "payments": svg('<rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10h.01M18 14h.01"/>'),
+    "military_tech": svg('<circle cx="12" cy="9" r="5"/><path d="M9.5 13.5 8 21l4-2.2L16 21l-1.5-7.5"/>'),
+    "fact_check": svg('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 13l2 2 4-4"/>'),
+    "emoji_events": svg('<path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 5H5a3 3 0 0 0 3 4M16 5h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/>'),
+    "lightbulb": svg('<path d="M9.5 18h5M10 21h4"/><path d="M12 3a6 6 0 0 1 3.4 10.9c-.7.5-1.1 1.3-1.1 2.1v.5h-4.6v-.5c0-.8-.4-1.6-1.1-2.1A6 6 0 0 1 12 3z"/>'),
+    "edit_note": svg('<path d="M4 5h10M4 9h16M4 13h16M4 17h7"/><path d="M16.5 19.5 20 16l-2-2-3.5 3.5v2h2z"/>'),
+    "download": svg('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>'),
+    "install_mobile": svg('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M12 8v6M9.5 11.5 12 14l2.5-2.5"/>'),
+    "redeem": svg('<rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8s-1.2-4.5-4.2-4.5a2.2 2.2 0 0 0 0 4.5h4.2zM12 8s1.2-4.5 4.2-4.5a2.2 2.2 0 0 1 0 4.5H12z"/>')
+  };
+  var ICONS = {
+    "module-changshi": svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/>'),
+    "module-yanyu": svg('<path d="M21 12a8 8 0 0 1-8 8H4l1.6-3.2A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14.5h4"/>'),
+    "module-shuliang": svg('<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/>'),
+    "module-panduan": svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'),
+    "module-ziliao": svg('<path d="M4 20h16"/><rect x="6" y="11" width="3.4" height="6" rx="1"/><rect x="11" y="7" width="3.4" height="10" rx="1"/><rect x="16" y="4" width="3.4" height="13" rx="1"/>'),
+    "module-jundui": svg('<circle cx="12" cy="9" r="5.5"/><path d="M9.5 13.5 8 21l4-2.2L16 21l-1.5-7.5M12 6.8l.9 1.8 2 .3-1.4 1.4.3 2-1.8-1-1.8 1 .3-2-1.4-1.4 2-.3z"/>'),
+    "module-jiaoshi": svg('<path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5z"/><path d="M6.5 11.5v4.2c0 1.2 2.5 2.6 5.5 2.6s5.5-1.4 5.5-2.6v-4.2M21.5 9.5v5"/>'),
+    "module-yiliao": svg('<path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10z"/><path d="M9.3 12h5.4M12 9.3v5.4"/>'),
+    "guokao-entry": svg('<path d="M4 21V5.5L12 3l8 2.5V21"/><path d="M2.5 21h19M9.5 21v-4.5h5V21M9.5 9h.01M14.5 9h.01M9.5 12.5h.01M14.5 12.5h.01"/>'),
+    "zhifa-entry": svg('<path d="M12 3v3M7 6h10M6 6l-3.2 7a3.6 3.6 0 0 0 6.4 0L6 6zM18 6l-3.2 7a3.6 3.6 0 0 0 6.4 0L18 6z"/><path d="M12 6v13M8.5 21h7"/>'),
+    "mother-entry": svg('<path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v17.5H7.5A2.5 2.5 0 0 0 5 22V4.5z"/><path d="M5 19.5A2.5 2.5 0 0 1 7.5 17H19M9.5 7h5"/>'),
+    "countdown-entry": svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4.5l2.8 1.6M9 2.5h6"/>'),
+    "knowledge-entry": svg('<path d="M9 18.5h6M10 21h4"/><path d="M12 3a6 6 0 0 1 3.4 10.9c-.7.5-1.1 1.3-1.1 2.1v.5h-4.6v-.5c0-.8-.4-1.6-1.1-2.1A6 6 0 0 1 12 3z"/>'),
+    "plan-entry-grid": svg('<path d="M5 4h14a1.5 1.5 0 0 1 1.5 1.5V20a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 20V5.5A1.5 1.5 0 0 1 5 4z"/><path d="M8 3v3.5M16 3v3.5M3.5 10h17M8 14.5l2.6 2.6 5-5"/>'),
+    "speed-calc-entry": svg('<path d="M13 2 4.5 13.5h5L10 22l8.5-11.5h-5L13 2z"/>'),
+    "wrong-book-entry": svg('<path d="M4.5 3.5h15v17h-15z" rx="2"/><path d="M4.5 3.5h15v17h-15zM8 3.5v17M11 9l5 5M16 9l-5 5"/>'),
+    "start-paper-gk": svg('<path d="M6 2.5h9.5L20 7v14.5H6V2.5z"/><path d="M14.5 2.5V7H20M9 12h6M9 15.5h6"/>'),
+    "start-paper-gb": svg('<path d="M6 2.5h9.5L20 7v14.5H6V2.5z"/><path d="M14.5 2.5V7H20M9 12h6M9 15.5h4"/>')
+  };
+
+  function replaceIcons(){
+    document.querySelectorAll("[data-testid]").forEach(function(el){
+      var tid = el.getAttribute("data-testid");
+      var ic = ICONS[tid];
+      if (!ic) return;
+      el.querySelectorAll(".material-icons").forEach(function(mi){
+        if (mi.dataset.ycDone) return;
+        var wrap = document.createElement("span");
+        wrap.innerHTML = ic;
+        var s = wrap.firstChild;
+        s.dataset.ycDone = "1";
+        mi.replaceWith(s);
+      });
+    });
+    /* 全局兜底：凡是写着英文图标名的（字体没加载就会露出来），一律换成内嵌图标 */
+    document.querySelectorAll(".material-icons").forEach(function(mi){
+      if (mi.dataset.ycDone) return;
+      var name = (mi.textContent || "").trim();
+      var ic = LIG[name];
+      if (!ic) return;
+      var wrap = document.createElement("span");
+      wrap.innerHTML = ic;
+      var s = wrap.firstChild;
+      s.dataset.ycDone = "1";
+      mi.replaceWith(s);
+    });
+  }
+
+  /* ---------- 隐藏旧备考档案卡 ---------- */
+  function hideProfileCard(){
+    document.querySelectorAll(".page-shell > *").forEach(function(el){
+      if (el.textContent.indexOf("备考档案") > -1) {
+        el.classList.add("yc-hide-profile");
+        el.style.display = "none";
+      }
+    });
+  }
+  var style = document.createElement("style");
+  style.textContent = ".yc-hide-profile{display:none!important}";
+  document.head.appendChild(style);
+
+  /* ---------- 顶部栏 ---------- */
+  var state = getState();
+  var topbar = document.createElement("div");
+  topbar.className = "yc-topbar";
+  topbar.innerHTML =
+    '<div class="yc-brand"><div class="yc-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:11px"></div>' +
+    '<div><div class="yc-brand-name">亿成公考 · 备考神器</div>' +
+    '<div class="yc-brand-sub">亿成老师团队倾心打造 · 题库持续更新</div></div></div>' +
+    '<div class="yc-top-actions">' +
+    '<div class="yc-chip" id="ycChipPts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15.5s-4.8-3-4.8-6.4A2.7 2.7 0 0 1 12 7.4a2.7 2.7 0 0 1 4.8 1.7c0 3.4-4.8 6.4-4.8 6.4z"/></svg><span id="ycPtsShort">0</span></div>' +
+    '<div class="yc-chip" id="ycChipDir"><span id="ycChipDirText">选择方向</span><span class="yc-arrow">▼</span></div>' +
+    '</div>';
+  document.body.appendChild(topbar);
+  document.body.classList.add("yc-ui");
+
+  function refreshChips(){
+    var s = getState();
+    var t = document.getElementById("ycChipDirText");
+    var chip = document.getElementById("ycChipDir");
+    if (s.province && s.examType) {
+      t.textContent = s.province + " · " + s.examType;
+      chip.classList.add("yc-chip-done");
+    } else if (s.province) {
+      t.textContent = s.province;
+      chip.classList.add("yc-chip-done");
+    } else {
+      t.textContent = "选择方向";
+      chip.classList.remove("yc-chip-done");
+    }
+    renderDirBanner();
+  }
+
+  /* ---------- 遮罩 / 面板 / 弹窗 ---------- */
+  var mask = document.createElement("div"); mask.className = "yc-mask"; document.body.appendChild(mask);
+  var sheet = document.createElement("div"); sheet.className = "yc-sheet"; document.body.appendChild(sheet);
+  var modal = document.createElement("div"); modal.className = "yc-modal"; document.body.appendChild(modal);
+
+  function closeAll(){
+    mask.classList.remove("on"); sheet.classList.remove("on"); modal.classList.remove("on");
+  }
+  mask.addEventListener("click", closeAll);
+
+  var pick = {province: null, examType: null};
+  function openSheet(){
+    var s = getState();
+    pick = {province: s.province || null, examType: s.examType || null};
+    var pv = PROVINCES.map(function(p){
+      return '<div class="yc-opt' + (pick.province === p ? " on" : "") + '" data-pv="' + p + '">' + p + '</div>';
+    }).join("");
+    var tp = TYPES.map(function(t){
+      return '<div class="yc-opt' + (pick.examType === t ? " on" : "") + '" data-tp="' + t + '">' + t + '</div>';
+    }).join("");
+    sheet.innerHTML =
+      '<h3>选择你的备考方向</h3><div class="yc-tip">选好后为你生成针对性复习建议，可随时修改</div>' +
+      '<div class="yc-sec"><div class="yc-sec-t">目标省份</div><div class="yc-grid">' + pv + '</div></div>' +
+      '<div class="yc-sec"><div class="yc-sec-t">考试类型</div><div class="yc-types">' + tp + '</div></div>' +
+      '<button class="yc-save" id="ycSave" ' + ((pick.province && pick.examType) ? "" : "disabled") + '>保存并查看备考建议</button>';
+    sheet.querySelectorAll("[data-pv]").forEach(function(el){
+      el.addEventListener("click", function(){
+        pick.province = el.dataset.pv;
+        sheet.querySelectorAll("[data-pv]").forEach(function(e){ e.classList.remove("on"); });
+        el.classList.add("on"); syncSave();
+      });
+    });
+    sheet.querySelectorAll("[data-tp]").forEach(function(el){
+      el.addEventListener("click", function(){
+        pick.examType = el.dataset.tp;
+        sheet.querySelectorAll("[data-tp]").forEach(function(e){ e.classList.remove("on"); });
+        el.classList.add("on"); syncSave();
+      });
+    });
+    function syncSave(){
+      document.getElementById("ycSave").disabled = !(pick.province && pick.examType);
+    }
+    sheet.querySelector("#ycSave").addEventListener("click", function(){
+      saveState(pick); refreshChips(); closeAll();
+      setTimeout(openAdvice, 220);
+    });
+    mask.classList.add("on"); sheet.classList.add("on");
+  }
+
+  function openAdvice(){
+    var s = getState();
+    if (!s.province || !s.examType) { openSheet(); return; }
+    var adv = TYPE_ADVICE[s.examType] || [];
+    var note = PROVINCE_NOTES[s.province] || ("以" + s.province + "省最新招考公告为准，建议先做1-2套本省真题摸底，标出薄弱模块再专项突破。");
+    modal.innerHTML =
+      '<h3>你的备考建议</h3>' +
+      '<span class="yc-tagline">' + s.province + " · " + s.examType + '</span>' +
+      '<div class="yc-adv-block"><h4>' + s.examType + '怎么考</h4><ul>' + adv.map(function(a){ return "<li>" + a + "</li>"; }).join("") + '</ul></div>' +
+      '<div class="yc-adv-block"><h4>' + s.province + '特色</h4><div class="yc-adv-note">' + note + '</div></div>' +
+      '<button class="yc-close" id="ycAdvClose">知道了，开始刷题</button>';
+    document.getElementById("ycAdvClose").addEventListener("click", closeAll);
+    mask.classList.add("on"); modal.classList.add("on");
+  }
+
+  document.getElementById("ycChipDir").addEventListener("click", function(){
+    var s = getState();
+    if (s.province && s.examType) openAdvice(); else openSheet();
+  });
+
+  /* ---------- 我的方向横幅 ---------- */
+  function renderDirBanner(){
+    var s = getState();
+    var old = document.querySelector(".yc-dir-banner");
+    if (old) old.remove();
+    if (!s.province || !s.examType) return;
+    var shell = document.querySelector(".page-shell");
+    if (!shell) return;
+    var b = document.createElement("div");
+    b.className = "yc-dir-banner";
+    b.innerHTML = '<div><div class="yc-db-l">备考方向：' + s.province + " · " + s.examType + '</div>' +
+      '<div class="yc-db-s">已按你的方向生成复习建议</div></div>' +
+      '<div class="yc-db-r">查看 ›</div>';
+    b.addEventListener("click", openAdvice);
+    shell.insertBefore(b, shell.firstChild);
+  }
+
+  /* ---------- 积分中心 ---------- */
+  function getPoints(){ return ls("yicheng-gk-points-v1") || {balance: 0, ledger: []}; }
+  function addPoints(amount, reason, detail){
+    var p = getPoints();
+    p.balance = (p.balance || 0) + amount;
+    p.todayEarned = (p.todayEarned || 0) + amount;
+    p.todayDate = new Date().toISOString().slice(0, 10);
+    p.ledger = p.ledger || [];
+    p.ledger.unshift({id: "yc-" + Date.now(), time: new Date().toLocaleString("zh-CN", {hour12: false}).slice(0, 16), amount: amount, reason: reason, detail: detail});
+    p.ledger = p.ledger.slice(0, 30);
+    ls("yicheng-gk-points-v1", p);
+    refreshPtsShort();
+  }
+  function refreshPtsShort(){
+    document.getElementById("ycPtsShort").textContent = getPoints().balance || 0;
+  }
+  function dailyBonus(){
+    var p = getPoints();
+    var today = new Date().toISOString().slice(0, 10);
+    if (p.todayDate !== today) {
+      p.todayEarned = 0; p.todayDate = today;
+      ls("yicheng-gk-points-v1", p);
+      addPoints(2, "每日打卡", "每日首次打开应用");
+    }
+  }
+  function studyTotals(){
+    var s = ls("yicheng-gk-study-v1") || {};
+    var mp = s.moduleProgress || {};
+    var a = 0, c = 0;
+    Object.keys(mp).forEach(function(k){ a += mp[k].answered || 0; c += mp[k].correct || 0; });
+    return {a: a, c: c};
+  }
+  function watchAnswers(){
+    var last = studyTotals();
+    setInterval(function(){
+      var t = studyTotals();
+      var da = t.a - last.a, dc = t.c - last.c;
+      try{
+        if(da>0&&localStorage.getItem('ycgk.refDone')&&!localStorage.getItem('ycgk.refstudyDone')){
+          localStorage.setItem('ycgk.refstudyDone','1');
+          new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refstudy&r="+Date.now();
+        }
+      }catch(e){}
+      if (da > 0) addPoints(da, "完成刷题", "新答 " + da + " 题，每题 +1");
+      if (dc > 0) addPoints(dc, "答对加分", "答对 " + dc + " 题，每题 +1");
+      last = t;
+    }, 4000);
+  }
+  function openPoints(){
+    var p = getPoints();
+    var ledger = (p.ledger || []).slice(0, 8).map(function(l){
+      return '<div class="yc-ledger-item"><span>' + l.time + " · " + l.reason + '</span><span class="yc-lr">+' + l.amount + "</span></div>";
+    }).join("");
+    modal.innerHTML =
+      '<h3>积分中心</h3><span class="yc-tagline">坚持刷题，积分自然涨</span>' +
+      '<div class="yc-pts-hero"><span class="yc-pts-num">' + (p.balance || 0) + '</span><span class="yc-pts-unit">分</span>' +
+      '<span class="yc-pts-today">今日 +' + (p.todayEarned || 0) + "</span></div>" +
+      '<div class="yc-rules">' +
+      '<div class="yc-rule"><b>每日打卡 +2</b><span>每天打开应用自动到账</span></div>' +
+      '<div class="yc-rule"><b>刷题 +1 / 答对再 +1</b><span>做完题几秒内自动累计</span></div>' +
+      '<div class="yc-rule"><b>连续学习有加成</b><span>连续天数越多，打卡分越高</span></div>' +
+      '<div class="yc-rule"><b>兑换商城筹备中</b><span>积分先攒着，商城上线即可兑换</span></div>' +
+      "</div>" +
+      '<div class="yc-ledger"><div class="yc-sec-t">最近明细</div>' + (ledger || '<div class="yc-ledger-item"><span>暂无记录，去做两道题吧</span><span></span></div>') + "</div>" +
+      '<button class="yc-close" id="ycPtsClose">关闭</button>';
+    document.getElementById("ycPtsClose").addEventListener("click", closeAll);
+    mask.classList.add("on"); modal.classList.add("on");
+  }
+  document.getElementById("ycChipPts").addEventListener("click", openPoints);
+
+  /* ---------- 资料领取专区卡片 ---------- */
+  function addMaterialsCard(){
+    if (document.getElementById("yc-materials-card")) return;
+    var entry = document.querySelector('[data-testid="papers-entry"]');
+    if (!entry) return;
+    var card = document.createElement("div");
+    card.id = "yc-materials-card";
+    card.innerHTML =
+      '<span class="yc-mat-ic">' + LIG["redeem"] + '</span>' +
+      '<div class="yc-mat-tx"><div class="yc-mat-t">资料领取专区</div>' +
+      '<div class="yc-mat-s">预测卷 · 常识100考点 · 临阵磨枪手册 · 免费领取</div></div>' +
+      '<span class="yc-mat-go">领取 ›</span>';
+    card.addEventListener("click", function(){
+      try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.materials&r=" + Date.now(); }catch(e){}
+      window.location.href = "materials.html";
+    });
+    entry.parentNode.insertBefore(card, entry);
+
+    /* 安装指引卡片：手机/平板/电脑怎么装到桌面（已装过的用户不再显示） */
+    var instDone=false;
+    try{ instDone=localStorage.getItem('ycgk.installDone.v1')==='1'; }catch(e){}
+    if (!instDone && !document.getElementById("yc-install-card")) {
+      var ic = document.createElement("div");
+      ic.id = "yc-install-card";
+      ic.innerHTML =
+        '<span class="yc-mat-ic">' + LIG["install_mobile"] + '</span>' +
+        '<div class="yc-mat-tx"><div class="yc-mat-t">安装到桌面</div>' +
+        '<div class="yc-mat-s">手机 / 平板 / 电脑 · 一点即开，像 App 一样用</div></div>' +
+        '<span class="yc-mat-go">查看 ›</span>';
+      ic.addEventListener("click", function(){
+        window.location.href = "install.html";
+      });
+      entry.parentNode.insertBefore(ic, card);
+    }
+  }
+
+  /* ---------- 内测版横幅（首页顶部） ---------- */
+  function addBetaBanner(){
+    var shell = document.querySelector(".page-shell");
+    if (!shell || document.getElementById("yc-beta-banner")) return;
+    if (shell.textContent.indexOf("专项刷题") === -1) return;
+    var b = document.createElement("div");
+    b.id = "yc-beta-banner";
+    b.className = "yc-beta-banner";
+    b.innerHTML = '<span class="yc-bb-tag">内测版</span><span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>';
+    shell.insertBefore(b, shell.firstChild);
+  }
+
+  /* ---------- 听取意见横幅（首页底部） ---------- */
+  function addFbBanner(){
+    var shell = document.querySelector(".page-shell");
+    if (!shell || document.getElementById("yc-fb-banner")) return;
+    if (shell.textContent.indexOf("专项刷题") === -1) return;
+    var b = document.createElement("div");
+    b.id = "yc-fb-banner";
+    b.className = "yc-fb-banner";
+    var GIFT_SVGS = {
+      humid: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="7" width="8" height="13" rx="2"/><path d="M10 4h4"/><path d="M12 11.5c-1.1 1.4-1.7 2.3-1.7 3.1a1.7 1.7 0 1 0 3.4 0c0-.8-.6-1.7-1.7-3.1z"/></svg>',
+      pad: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3" width="15" height="18" rx="2.5"/><path d="M10 17.5h4"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7.5" y="2.5" width="9" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>',
+      book: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5C10.5 4.2 8.6 3.5 6 3.5v14c2.6 0 4.5.7 6 2 1.5-1.3 3.4-2 6-2v-14c-2.6 0-4.5.7-6 2z"/><path d="M12 5.5v14"/></svg>'
+    };
+    b.innerHTML = '<div style="min-width:0"><div class="yc-fb-l">听取意见 · 填问卷拿礼品</div><div class="yc-fb-s">1 分钟匿名问卷 · 积分可换真题卷、考公书籍、小家电、平板、手机</div>' +
+      '<div class="yc-gifts">' +
+      '<span class="yc-gift">' + GIFT_SVGS.humid + '<b>加湿器</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.pad + '<b>平板</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.phone + '<b>手机</b></span>' +
+      '<span class="yc-gift">' + GIFT_SVGS.book + '<b>考公书籍</b></span>' +
+      '</div></div><span class="yc-fb-r">去填写 ›</span>';
+    b.addEventListener("click", function(){
+      try{ new Image().src = "https://visitor-badge.laobi.icu/badge?page_id=ycgk.feedback&r=" + Date.now(); }catch(e){}
+      window.location.href = "feedback.html";
+    });
+    shell.appendChild(b);
+  }
+
+  /* ---------- 视频讲解横幅（首页底部） ---------- */
+  function addVideoBanner(){
+    var shell = document.querySelector(".page-shell");
+    if (!shell || document.getElementById("yc-video-banner")) return;
+    if (shell.textContent.indexOf("专项刷题") === -1) return;
+    var b = document.createElement("div");
+    b.id = "yc-video-banner";
+    b.className = "yc-video-banner";
+    b.innerHTML = '<div style="min-width:0"><div class="yc-vb-l">📺 视频讲解</div>' +
+      '<div class="yc-vb-s">亿成老师精讲视频 · 配套试卷可保存打印，边看边学</div></div>' +
+      '<span class="yc-vb-r">去看 ›</span>';
+    b.addEventListener("click", function(){
+      window.location.href = "videos.html?v=7";
+    });
+    var fb = document.getElementById("yc-fb-banner");
+    if (fb) shell.insertBefore(b, fb); else shell.appendChild(b);
+  }
+
+  /* ---------- 启动 ---------- */
+  function boot(){
+    replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers();
+    function tagGrids(){
+    document.querySelectorAll(".page-shell .grid.grid-cols-2").forEach(function(g){
+      if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
+    });
+  }
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
+    mo.observe(document.body, {childList: true, subtree: true});
+    addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+  /* 供邀请好友积分模块调用 */
+  window.getPoints = getPoints;
+  window.addPoints = addPoints;
+})();
+</script>
+<script>
+/* usage stats beacon v1 */
+(function(){
+  try{
+    var B='https://visitor-badge.laobi.icu/badge?page_id=';
+    function hit(id){ try{ new Image().src=B+id+'&r='+Date.now(); }catch(e){} }
+    hit('ycgk.open');
+    var d=new Date(),p=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    try{ if(!localStorage.getItem('ycgk.d'+p)){ localStorage.setItem('ycgk.d'+p,'1'); hit('ycgk.uv.'+p); } }catch(e){}
+    /* 设备类型与安装状态：每台设备只记一次 */
+    try{
+      if(!localStorage.getItem('ycgk.devdone')){
+        localStorage.setItem('ycgk.devdone','1');
+        var ua=navigator.userAgent||'';
+        var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+        var isMobi=isIOS||/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)||/Android|Mobile|Mobi/i.test(ua);
+        hit(isIOS?'ycgk.dev.ios':(isMobi?'ycgk.dev.android':'ycgk.dev.pc'));
+        var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+        if(standalone)hit('ycgk.installed');
+      }
+    }catch(e){}
+    /* 受邀同学回访：带过邀请链接的设备再次打开 */
+    try{
+      if(localStorage.getItem('ycgk.refDone')&&!sessionStorage.getItem('ycgk.refsess')){
+        sessionStorage.setItem('ycgk.refsess','1');
+        hit('ycgk.refreturn');
+      }
+    }catch(e){}
+    document.addEventListener('click',function(e){
+      try{
+        var el=e.target;
+        while(el&&el!==document.body&&el.tagName!=='BUTTON'){el=el.parentElement;}
+        if(!el||el===document.body)return;
+        var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+        if(/(顺序刷|随机刷|第\d+套$)/.test(t)) hit('ycgk.start');
+      }catch(e){}
+    },true);
+  }catch(e){}
+})();
+</script>
+<script>
+/* usage stats beacon v3: 在线心跳 / 24小时活跃 / 平板识别 / 刷题深度 */
+(function(){
+  try{
+    var B='https://visitor-badge.laobi.icu/badge?page_id=';
+    function hit(id){ try{ new Image().src=B+id+'&r='+Date.now(); }catch(e){} }
+    function pad(n){ return ('0'+n).slice(-2); }
+    /* 平板识别：每台设备只记一次（iPad 同时计入 iOS，平板为补充标签） */
+    try{
+      if(!localStorage.getItem('ycgk.devtab')){
+        localStorage.setItem('ycgk.devtab','1');
+        var ua=navigator.userAgent||'';
+        if(/iPad|Tablet|PlayBook|Silk|SM-T\d|SM-P\d|Tab\d|MatePad|Pad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)) hit('ycgk.dev.tablet');
+      }
+    }catch(e){}
+    /* 24小时活跃分布：每次打开记入所在小时 */
+    try{ hit('ycgk.hr.'+pad(new Date().getHours())); }catch(e){}
+    /* 在线心跳：打开时及每 60 秒各记一次所在分钟 */
+    try{
+      var lastHb='';
+      function hb(){ var d=new Date(),s=''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+pad(d.getHours())+pad(d.getMinutes()); if(s!==lastHb){ lastHb=s; hit('ycgk.hb.'+s); } }
+      hb(); setInterval(hb,60000);
+    }catch(e){}
+    /* 刷题深度：累计作答跨过 10/50/100/500/1000/5000 题各记一次（匿名） */
+    try{
+      var TH=[10,50,100,500,1000,5000];
+      function ansTotal(){
+        var t=0;
+        try{
+          var s=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}');
+          var mp=s.moduleProgress||{};
+          Object.keys(mp).forEach(function(k){ t+=(mp[k].answered||0); });
+        }catch(e){}
+        return t;
+      }
+      setInterval(function(){
+        try{
+          var a=ansTotal();
+          for(var i=0;i<TH.length;i++){
+            var n=TH[i];
+            if(a>=n&&!localStorage.getItem('ycgk.ans.t'+n)){ localStorage.setItem('ycgk.ans.t'+n,'1'); hit('ycgk.ans.t'+n); }
+          }
+        }catch(e){}
+      },8000);
+      /* 刷题段位：每跨过 100 题记一次 ycgk.lvl.<n>（匿名，供排行榜） */
+      var lastLvl=-1;
+      setInterval(function(){
+        try{
+          var a=ansTotal(), n=Math.min(49,Math.floor(a/100));
+          if(n>lastLvl){
+            for(var i=(lastLvl<0?0:lastLvl+1);i<=n;i++){
+              if(!localStorage.getItem('ycgk.lvl.'+i)){ localStorage.setItem('ycgk.lvl.'+i,'1'); hit('ycgk.lvl.'+i); }
+            }
+            lastLvl=n;
+          }
+        }catch(e){}
+      },8000);
+    }catch(e){}
+  }catch(e){}
+})();
+</script>
+<script>
+/* live stats v1: 设备指纹 / 型号 / 新增回访 / 在线心跳 / 安装 → textdb 聚合池
+   数据契约 key=ycgk-live-v1，供数据看板实时读取。纯前端，无后端依赖。 */
+(function(){
+  var KEY='ycgk-live-v1';
+  var GETS=['https://textdb.dev/api/data/','https://textdb.online/'];
+  var PUTS=[
+    function(k,v,cb){fetch('https://textdb.online/update/?key='+encodeURIComponent(k)+'&value='+encodeURIComponent(v)).then(function(){cb(true)},function(){cb(false)})},
+    function(k,v,cb){fetch('https://textdb.dev/api/data/'+k,{method:'POST',headers:{'Content-Type':'text/plain'},body:v}).then(function(r){cb(!!r.ok)},function(){cb(false)})}
+  ];
+  function pad(n){return ('0'+n).slice(-2)}
+  function dayKey(d){return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+  /* 匿名设备ID：统一以 ycgk.did.v1 为准；旧键 ycgk.did 只迁移一次并清除 */
+  function deviceId(){
+    var id='';try{id=localStorage.getItem('ycgk.did.v1')}catch(e){}
+    if(!id){
+      try{id=localStorage.getItem('ycgk.did')}catch(e){}
+      if(id){var ok=false;try{localStorage.setItem('ycgk.did.v1',id);ok=true}catch(e){}
+        if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}
+    }
+    if(id){return id}
+    id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    try{localStorage.setItem('ycgk.did.v1',id)}catch(e){}
+    return id;
+  }
+  function parseDevice(){
+    var ua=navigator.userAgent||'',os='pc',model='电脑';
+    if(/iPhone/i.test(ua)){os='ios';model='iPhone'}
+    else if(/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){os='ios';model='iPad'}
+    else if(/iPod/i.test(ua)){os='ios';model='iPod'}
+    else if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)){os='harmony';model='鸿蒙设备';var hm=ua.match(/(?:HarmonyOS|ArkWeb)[^;)]*\)?\s*([A-Za-z0-9 \-]{2,20})/i);if(hm&&hm[1])model='鸿蒙 '+hm[1].trim().slice(0,16)}
+    else if(/Android/i.test(ua)){
+      os='android';
+      var br=ua.match(/Build\/([^;)]+)/i);var md=ua.match(/Android[^;)]*;\s*([^;)]+)/i);
+      if(md&&md[1])model=md[1].trim().slice(0,20);else if(br)model='Android '+br[1].trim().slice(0,14);else model='安卓设备';
+      if(/Pad|Tablet|SM-T\d|MatePad/i.test(ua))model+='(平板)';
+    }
+    var installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+    return {os:os,model:model,install:!!installed};
+  }
+  function get(cb){
+    var i=0;
+    (function next(){
+      if(i>=GETS.length){cb(null);return}
+      fetch(GETS[i++]+KEY,{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+        if(!t||t.charAt(0)!=='{'){next();return}
+        try{cb(JSON.parse(t))}catch(e){next()}
+      }).catch(function(){next()});
+    })();
+  }
+  function put(val,cb){
+    var s=JSON.stringify(val);
+    /* textdb.dev 实测写入/读回均可靠；直接写它，避免主线路"假成功" */
+    PUTS[1](KEY,s,function(ok){cb(ok)});
+  }
+  function report(){
+    var did=deviceId(),dev=parseDevice(),now=Date.now(),today=dayKey(new Date());
+    get(function(pool){
+      var p=pool&&typeof pool==='object'?pool:{};
+      if(!p.online||typeof p.online!=='object')p.online={};
+      if(!p.devices||typeof p.devices!=='object')p.devices={};
+      if(!p.act||typeof p.act!=='object')p.act={};
+      /* 清理10分钟前的在线记录，控制体积 */
+      Object.keys(p.online).forEach(function(k){if(now-p.online[k]>600000){delete p.online[k];delete p.act[k]}});
+      p.online[did]=now;
+      /* 当前活动类型：quiz=正在刷题/做题页；空=其他页面（视频页由 videos.html 上报 vid） */
+      try{ p.act[did]=(document.querySelector('[data-testid="plan-exit"]')||document.querySelector('.yc-ob-mask.on'))?'quiz':''; }catch(e){ p.act[did]=''; }
+      /* 分钟级心跳计数：供看板画实时分钟趋势（保留最近3小时） */
+      if(!p.min||typeof p.min!=='object')p.min={};
+      var mk=today+pad(new Date().getHours())+pad(new Date().getMinutes());
+      p.min[mk]=(p.min[mk]||0)+1;
+      var mks=Object.keys(p.min).sort();
+      if(mks.length>180){for(var mi=0;mi<mks.length-180;mi++)delete p.min[mks[mi]];}
+      var rec=p.devices[did]||{};
+      if(!rec.first)rec.first=dayKey(new Date());
+      rec.last=today;rec.m=dev.model;rec.os=dev.os;rec.inst=!!(rec.inst||dev.install);
+      /* 访问频次 + 按天分时活跃：供看板生成真实访问趋势/24小时分布 */
+      rec.pv=(rec.pv||0)+1;
+      var dObj=new Date(),hr=pad(dObj.getHours());
+      if(!rec.hr||typeof rec.hr!=='object')rec.hr={};
+      if(!rec.hr[today]||typeof rec.hr[today]!=='object')rec.hr[today]={};
+      rec.hr[today][hr]=(rec.hr[today][hr]||0)+1;
+      /* 只保留最近14天的分时，控制体积 */
+      var hkeys=Object.keys(rec.hr).sort();
+      if(hkeys.length>14){for(var hi=0;hi<hkeys.length-14;hi++)delete rec.hr[hkeys[hi]];}
+      /* 活跃日矩阵（最近30天）：供留存/回访/DAU 计算 */
+      if(!rec.days||typeof rec.days!=='object')rec.days={};
+      rec.days[today]=1;
+      var dkeys=Object.keys(rec.days).sort();
+      if(dkeys.length>30){for(var di=0;di<dkeys.length-30;di++)delete rec.days[dkeys[di]];}
+      /* 会话：距上次心跳超过30分钟算新会话 */
+      if(!rec.lastTs||now-rec.lastTs>1800000)rec.sess=(rec.sess||0)+1;
+      rec.lastTs=now;
+      /* 来源渠道（只记首次）+ 页面加载耗时（只记首次） */
+      if(!rec.ref){try{var rf=document.referrer||'';if(rf)rec.ref=rf.replace(/^https?:\/\//,'').split(/[/?#]/)[0].slice(0,40)||'直接打开'}catch(e){}}
+      if(rec.perf===undefined){try{var t0=performance.timing,tn=performance.navigation?performance.navigation.type:0;if(t0&&t0.domContentLoadedEventStart>0)rec.perf=Math.min(9999,Math.round(t0.domContentLoadedEventStart-t0.navigationStart))}catch(e){rec.perf=0}}
+      p.devices[did]=rec;
+      /* 设备数上限保护：超过2000台只保留最近1500台 */
+      var ids=Object.keys(p.devices);
+      if(ids.length>2000){
+        ids.sort(function(a,b){return (p.devices[b].last||'')>(p.devices[a].last||'')?1:-1});
+        var keep={};for(var i=0;i<1500;i++)keep[ids[i]]=p.devices[ids[i]];
+        p.devices=keep;
+      }
+      p.ts=now;
+      put(p,function(){});
+    });
+  }
+  try{ report(); setInterval(report,120000); }catch(e){}
+})();
+</script>
+<script>
+/* 刷满10分钟弹问卷邀请：礼品=专业老师一对一问诊1小时。每人只弹一次。 */
+(function(){
+  var DONE='ycgk.fbinvite.done', ACC='ycgk.fbinvite.sec';
+  try{if(localStorage.getItem(DONE))return}catch(e){return}
+  var acc=0,last=Date.now(),timing=false;
+  try{acc=parseInt(localStorage.getItem(ACC)||'0',10)||0}catch(e){}
+  function tick(){
+    var now=Date.now();
+    if(!document.hidden&&timing){ acc+=Math.min(10,Math.round((now-last)/1000)); }
+    last=now;
+    try{localStorage.setItem(ACC,String(acc))}catch(e){}
+    if(acc>=600){ showInvite(); }
+  }
+  /* 用户点了刷题按钮后开始计时 */
+  document.addEventListener('click',function(e){
+    if(timing)return;
+    var el=e.target;while(el&&el!==document.body&&el.tagName!=='BUTTON')el=el.parentElement;
+    if(!el||el===document.body)return;
+    var t=(el.innerText||el.textContent||'').replace(/\s+/g,'');
+    if(/(顺序刷|随机刷|开始刷题|继续刷题|第\d+套$)/.test(t)){timing=true;last=Date.now();}
+  },true);
+  setInterval(tick,1000);
+  function showInvite(){
+    try{localStorage.setItem(DONE,'1')}catch(e){}
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.fbinvite&r="+Date.now()}catch(e){}
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:22px;opacity:0;transition:opacity .25s';
+    ov.innerHTML='<div style="background:#fff;border-radius:20px;width:100%;max-width:400px;padding:26px 22px 22px;box-shadow:0 16px 48px rgba(0,0,0,.28);position:relative;text-align:center">'+
+      '<button id="ycFbX" style="position:absolute;top:12px;right:16px;font-size:24px;color:#aaa;background:none;border:none;line-height:1">×</button>'+
+      '<div style="font-size:34px;line-height:1">🎁</div>'+
+      '<h3 style="font-size:20px;color:#15803D;margin:10px 0 8px;font-weight:800">刷题辛苦了，帮个小忙？</h3>'+
+      '<p style="font-size:14px;color:#555;line-height:1.75;margin:0 0 14px">你已经认真刷了 10 分钟啦 👏<br>花 1 分钟填个<b>小问卷</b>，告诉我们哪里还能做得更好。</p>'+
+      '<div style="background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:16px">'+
+        '<div style="font-size:13px;color:#92400E;margin-bottom:4px">填写即可参与抽取</div>'+
+        '<div style="font-size:16px;color:#B45309;font-weight:800;line-height:1.5">🎓 专业老师 1 对 1 问诊 1 小时</div>'+
+        '<div style="font-size:12px;color:#92400E;margin-top:4px">考前政策解读 · 报考指导 · 备考答疑</div>'+
+      '</div>'+
+      '<a href="./feedback.html" style="display:block;width:100%;background:#15803D;color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:800;text-decoration:none">去填问卷 · 抽问诊名额</a>'+
+      '<button id="ycFbNo" style="display:block;width:100%;background:none;border:none;color:#999;font-size:13px;margin-top:12px">下次再说</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    setTimeout(function(){ov.style.opacity='1'},10);
+    function close(){ov.style.opacity='0';setTimeout(function(){ov.remove()},250)}
+    ov.querySelector('#ycFbX').onclick=close;
+    ov.querySelector('#ycFbNo').onclick=close;
+    ov.addEventListener('click',function(e){if(e.target===ov)close()});
+  }
+})();
+</script>
+<script>
+/* cloud sync layer v1: 学习码多设备同步 */
+(function(){
+  var SYNC_FLAG="yicheng-gk-sync-v1", HINT_FLAG="yicheng-gk-sync-hint-v1";
+  var BASE="https://textdb.online", PRE="ycgkS1-", CHUNK_ENC=5000;
+  var KEYS=["yicheng-gk-fav-v1","yicheng-gk-last-v1","yicheng-gk-profile-v1","yicheng-gk-study-v1","yicheng-gk-speed-v1","yicheng-gk-points-v1"];
+  var CODE_CHARS="0123456789";
+  function rd(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+  function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function getSync(){return rd(SYNC_FLAG)||{}}
+  function setSync(o){wr(SYNC_FLAG,o)}
+  function myCode(){var s=getSync();return (s&&s.code)||""}
+  function genCode(){var r="";for(var i=0;i<6;i++)r+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return r}
+  function snapshot(){var o={};KEYS.forEach(function(k){o[k]=rd(k)});return o}
+  function snapStr(){try{return JSON.stringify(snapshot())}catch(e){return""}}
+  function num(a,b){return Math.max(a||0,b||0)}
+  function arrUnion(){
+    var s=[],seen={};
+    [].forEach.call(arguments,function(a){(a||[]).forEach(function(x){var k=typeof x==="string"?x:JSON.stringify(x);if(!seen[k]){seen[k]=1;s.push(x)}})});
+    return s;
+  }
+  function deepMax(a,b){
+    if(a===null||a===undefined)return b;
+    if(b===null||b===undefined)return a;
+    if(typeof a==="number"&&typeof b==="number")return Math.max(a,b);
+    if(Array.isArray(a)||Array.isArray(b))return arrUnion(a,b);
+    if(typeof a==="object"&&typeof b==="object"){
+      var o={},k;for(k in a)o[k]=a[k];for(k in b)o[k]=deepMax(o[k],b[k]);return o;
+    }
+    return b;
+  }
+  /* ---- cloud io ---- */
+  var EP_KEY="yicheng-gk-sync-ep-v1";
+  var ENDPOINTS=[
+    {name:"主线路",get:function(key,cb){fetch("https://textdb.online/"+key,{method:"GET"}).then(function(r){return r.text()}).then(function(t){cb(null,t)}).catch(function(e){cb(e)})},
+     put:function(key,val,cb){fetch("https://textdb.online/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val)).then(function(r){return r.json()}).then(function(j){cb(null,j)}).catch(function(e){cb(e)})}},
+    {name:"备用线路",get:function(key,cb){fetch("https://textdb.dev/api/data/"+key,{method:"GET"}).then(function(r){return r.text()}).then(function(t){cb(null,t)}).catch(function(e){cb(e)})},
+     put:function(key,val,cb){fetch("https://textdb.dev/api/data/"+key,{method:"POST",headers:{"Content-Type":"text/plain"},body:val}).then(function(r){if(r.ok){cb(null)}else{cb(new Error("HTTP "+r.status))}}).catch(function(e){cb(e)})}}
+  ];
+  function epPref(){var v=parseInt(localStorage.getItem(EP_KEY),10);return (isNaN(v)||v<0||v>=ENDPOINTS.length)?0:v}
+  function epPrefer(i){try{localStorage.setItem(EP_KEY,String(i))}catch(e){}}
+  function epOrder(){var p=epPref(),o=[];for(var i=0;i<ENDPOINTS.length;i++)o.push(ENDPOINTS[(p+i)%ENDPOINTS.length]);return o}
+  function cloudGet(key,cb){
+    var order=epOrder(),done=0,anyOK=false,err=null,got=false;
+    order.forEach(function(ep){
+      ep.get(key,function(e,t){
+        if(e){err=e}
+        else{anyOK=true;if(t&&!got){got=true;epPrefer(ENDPOINTS.indexOf(ep));cb(null,t)}}
+        done++;
+        if(done===order.length&&!got){cb(anyOK?null:(err||new Error("所有线路均连接失败")),null)}
+      });
+    });
+  }
+  function cloudPut(key,val,cb){
+    var order=epOrder(),done=0,okAny=false,err=null;
+    order.forEach(function(ep){
+      ep.put(key,val,function(e){
+        if(e){err=e}else{okAny=true;epPrefer(ENDPOINTS.indexOf(ep))}
+        done++;
+        if(done===order.length){cb(okAny?null:(err||new Error("所有线路写入失败")))}
+      });
+    });
+  }
+  function toB64(s){try{return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_")}catch(e){return s}}
+  function fromB64(s){try{var b=s.replace(/-/g,"+").replace(/_/g,"/");return decodeURIComponent(escape(atob(b)))}catch(e){return null}}
+  function chunkStr(s,size){
+    var out=[];
+    for(var i=0;i<s.length;i+=size)out.push(s.slice(i,i+size));
+    return out;
+  }
+  var pushing=false,pullBusy=false;
+  function push(cb){
+    var c=myCode();if(!c){cb&&cb("nocode");return}
+    if(pushing){cb&&cb("busy");return}
+    pushing=true;
+    var payload;try{payload=toB64(JSON.stringify({v:1,ts:Date.now(),d:snapshot()}))}catch(e){pushing=false;cb&&cb(e);return}
+    var parts=chunkStr(payload,CHUNK_ENC),meta={v:1,ts:Date.now(),n:parts.length};
+    var i=0,failed=null;
+    function fin(){pushing=false;if(failed){cb&&cb(failed)}else{var s=getSync();s.lastPush=Date.now();setSync(s);setChip("ok");cb&&cb(null)}}
+    function putMeta(){cloudPut(PRE+c,JSON.stringify(meta),function(e2){if(e2)failed=e2;fin()})}
+    function next(){
+      if(failed){pushing=false;cb&&cb(failed);return}
+      if(i>=parts.length){putMeta();return}
+      var idx=i++,tries=0;
+      function attempt(){
+        cloudPut(PRE+c+"-c"+idx,parts[idx],function(e){
+          if(e&&tries<2){tries++;attempt();return}
+          if(e)failed=e;
+          next();
+        });
+      }
+      attempt();
+    }
+    if(parts.length===0){fin();return}
+    next();
+  }
+  function pull(cb){
+    var c=myCode();if(!c){cb&&cb("nocode",null);return}
+    if(pullBusy){cb&&cb("busy",null);return}
+    pullBusy=true;
+    cloudGet(PRE+c,function(e,metaTxt){
+      if(e){pullBusy=false;cb&&cb(e,null);return}
+      var meta=null;try{meta=metaTxt?JSON.parse(metaTxt):null}catch(err){}
+      if(!meta||!meta.n){pullBusy=false;cb&&cb(null,null);return}
+      var parts=new Array(meta.n),got=0,failed=null;
+      if(meta.n===0){pullBusy=false;cb&&cb(null,null);return}
+      for(var i=0;i<meta.n;i++){
+        (function(i){
+          cloudGet(PRE+c+"-c"+i,function(e2,t2){
+            if(e2)failed=e2;else parts[i]=t2;
+            got++;
+            if(got===meta.n){
+              pullBusy=false;
+              if(failed){cb&&cb(failed,null);return}
+              var raw=fromB64(parts.join(""));
+              if(raw===null){cb&&cb("decode",null);return}
+              try{cb&&cb(null,JSON.parse(raw))}catch(e3){cb&&cb(e3,null)}
+            }
+          });
+        })(i);
+      }
+    });
+  }
+  /* ---- merge ---- */
+  function applyCloud(cloud){
+    var before=snapStr(),loc=snapshot(),d=(cloud&&cloud.d)||{};
+    var out={};
+    out["yicheng-gk-fav-v1"]=arrUnion(loc["yicheng-gk-fav-v1"],d["yicheng-gk-fav-v1"]);
+    var ls=loc["yicheng-gk-study-v1"]||{},cs=d["yicheng-gk-study-v1"]||{};
+    var study={totalAnswered:num(ls.totalAnswered,cs.totalAnswered),totalCorrect:num(ls.totalCorrect,cs.totalCorrect),streakDays:num(ls.streakDays,cs.streakDays),moduleProgress:deepMax(ls.moduleProgress||{},cs.moduleProgress||{}),wrongQuestions:arrUnion(ls.wrongQuestions,cs.wrongQuestions)};
+    var cd=cs.todayDate||"",ld=ls.todayDate||"";
+    if(cd&&(!ld||cd>=ld)){
+      study.todayDate=cd;
+      study.todayAnswered=ld===cd?num(ls.todayAnswered,cs.todayAnswered):(cs.todayAnswered||0);
+      study.todayCorrect=ld===cd?num(ls.todayCorrect,cs.todayCorrect):(cs.todayCorrect||0);
+    }else{
+      study.todayDate=ld;study.todayAnswered=ls.todayAnswered||0;study.todayCorrect=ls.todayCorrect||0;
+    }
+    var lsd=ls.lastStudyDate||"",csd=cs.lastStudyDate||"";
+    study.lastStudyDate=(cs.streakDays||0)>(ls.streakDays||0)?(csd||lsd):(lsd||csd);
+    out["yicheng-gk-study-v1"]=study;
+    var lp=loc["yicheng-gk-last-v1"],cp=d["yicheng-gk-last-v1"];
+    out["yicheng-gk-last-v1"]=(cp&&(!lp||(cloud.ts||0)>=(getSync().lastLocalTs||0)))?cp:(lp||cp);
+    var lpr=loc["yicheng-gk-profile-v1"],cpr=d["yicheng-gk-profile-v1"];
+    out["yicheng-gk-profile-v1"]=cpr||lpr;
+    var lsp=loc["yicheng-gk-speed-v1"]||{doneIds:[],attempted:0},csp=d["yicheng-gk-speed-v1"]||{doneIds:[],attempted:0};
+    out["yicheng-gk-speed-v1"]={doneIds:arrUnion(lsp.doneIds,csp.doneIds),attempted:num(lsp.attempted,csp.attempted)};
+    var lpt=loc["yicheng-gk-points-v1"]||{balance:0,ledger:[]},cpt=d["yicheng-gk-points-v1"]||{balance:0,ledger:[]};
+    out["yicheng-gk-points-v1"]={balance:num(lpt.balance,cpt.balance),ledger:arrUnion(lpt.ledger,cpt.ledger).slice(-500)};
+    KEYS.forEach(function(k){if(out[k]!==null&&out[k]!==undefined)wr(k,out[k])});
+    var s=getSync();s.appliedTs=cloud.ts||Date.now();s.lastLocalTs=Date.now();setSync(s);
+    return snapStr()!==before;
+  }
+  /* ---- ui ---- */
+  var chip=null,chipState="";
+  function setChip(st){
+    chipState=st;if(!chip)return;
+    if(!myCode()){chip.classList.add("yc-sync-off");chip.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2h1V8a5 5 0 0 1 5-5z"/></svg><span>登录同步</span>';return}
+    chip.classList.remove("yc-sync-off");
+    chip.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 19a4.5 4.5 0 1 1 .42-8.98 6 6 0 0 1 11.7 1.6A3.5 3.5 0 0 1 17.5 19z"/></svg><span>'+(st==="busy"?"同步中…":st==="err"?"重试同步":"已同步")+'</span>';
+  }
+  var ov=null,card=null;
+  function ensureUI(){
+    if(ov)return;
+    ov=document.createElement("div");ov.className="yc-sync-ov";
+    card=document.createElement("div");card.className="yc-sync-card";
+    ov.appendChild(card);document.body.appendChild(ov);
+    ov.addEventListener("click",function(e){if(e.target===ov)ov.classList.remove("on")});
+  }
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function openModal(){
+    ensureUI();
+    var c=myCode();
+    if(!c){
+      card.innerHTML='<h3>学习账号 · 多设备同步</h3>'+
+        '<div class="yc-sync-tip">生成一个专属学习码，手机、平板登录同一个码，刷题记录、错题本、积分自动同步。</div>'+
+        '<input class="yc-sync-in" id="ycSyncIn" placeholder="输入学习码" maxlength="12" autocomplete="off">'+
+        '<button class="yc-sync-btn main" id="ycSyncLogin">用学习码登录</button>'+
+        '<div class="yc-sync-div"><span>或</span></div>'+
+        '<button class="yc-sync-btn" id="ycSyncGen">生成我的学习码</button>'+
+        '<button class="yc-sync-btn" id="ycSyncPaste">用同步数据导入（不用网络）</button>'+
+        '<button class="yc-sync-btn" id="ycSyncTest">检测云端连接</button>'+
+        '<div class="yc-sync-err" id="ycSyncErr"></div>';
+      card.querySelector("#ycSyncGen").addEventListener("click",function(){
+        var btn=this;btn.disabled=true;btn.textContent="生成中…";
+        tryGen(0,function(code){
+          btn.disabled=false;
+          card.innerHTML='<h3>你的专属学习码</h3>'+
+            '<div class="yc-sync-code">'+code+'</div>'+
+            '<div class="yc-sync-tip"><b>这个码就是你的专属账号！</b>换手机、换平板全靠它，弄丢了就找不回刷题进度。请立刻截图保存！</div>'+
+            '<button class="yc-sync-btn main" id="ycSyncSave">我已保存，开启同步</button>';
+          card.querySelector("#ycSyncSave").addEventListener("click",function(){
+            setSync({code:code,appliedTs:0,lastLocalTs:Date.now()});
+            ov.classList.remove("on");setChip("busy");
+            push(function(e){setChip(e?"err":"ok")});
+          });
+        });
+      });
+      card.querySelector("#ycSyncTest").addEventListener("click",function(){
+        var btn=this;btn.disabled=true;btn.textContent="检测中…";
+        var err=card.querySelector("#ycSyncErr");
+        err.textContent="检测中，最多等 10 秒…";
+        var res={};
+        var left=2;
+        var timer=setTimeout(function(){if(left>0){left=0;err.textContent="✗ 两条线路都没连上（10 秒超时）。请换个浏览器（如 Safari）或换 WiFi/流量再试";btn.disabled=false;btn.textContent="重新检测"}},10000);
+        function fin(){left--;if(left===0){clearTimeout(timer);var a=res[0],b=res[1];
+          if(a&&b){err.textContent="✓ 两条线路都正常，网络没问题，请重新输入学习码登录"}
+          else if(a){err.textContent="✓ 主线路正常（备用不通）。可以正常登录同步"}
+          else if(b){err.textContent="✓ 备用线路正常（主线路不通）。已可自动切换，请重新输入学习码登录"}
+          else{err.textContent="✗ 两条线路都连不上。请换个浏览器（如 Safari）或换 WiFi/流量再试"}
+          btn.disabled=false;btn.textContent="重新检测"}}
+        fetch("https://textdb.online/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[0]=true;fin()})}).catch(function(e){res[0]=false;fin()});
+        fetch("https://textdb.dev/api/data/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[1]=true;fin()})}).catch(function(e){res[1]=false;fin()});
+      });
+      card.querySelector("#ycSyncPaste").addEventListener("click",function(){
+        card.innerHTML='<h3>粘贴同步数据</h3>'+
+          '<div class="yc-sync-tip">在存有刷题记录的设备上：点右上角「登录同步」→「复制同步数据」，把发过来的整段内容粘贴到下面。</div>'+
+          '<textarea class="yc-sync-in" id="ycSyncPayload" style="height:90px;font-size:12px;letter-spacing:0;text-transform:none" placeholder="粘贴 YCSYNC1 开头的内容"></textarea>'+
+          '<button class="yc-sync-btn main" id="ycSyncImport">导入并合并到本机</button>'+
+          '<button class="yc-sync-btn" id="ycSyncBack">返回</button>'+
+          '<div class="yc-sync-err" id="ycSyncErr"></div>';
+        card.querySelector("#ycSyncBack").addEventListener("click",function(){ov.classList.remove("on");openModal()});
+        card.querySelector("#ycSyncImport").addEventListener("click",function(){
+          var err=card.querySelector("#ycSyncErr");
+          var raw=(card.querySelector("#ycSyncPayload").value||"").trim();
+          if(raw.indexOf("YCSYNC1:")!==0){err.textContent="内容不对：请粘贴 YCSYNC1 开头的完整同步数据";return}
+          var json=fromB64(raw.slice(8));
+          if(!json){err.textContent="数据损坏：请重新复制一次";return}
+          var d=null;try{d=JSON.parse(json)}catch(e){}
+          if(!d||typeof d!=="object"){err.textContent="数据损坏：请重新复制一次";return}
+          var changed=applyCloud({ts:Date.now(),d:d});
+          ov.classList.remove("on");setChip("ok");
+          if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+          else{err.textContent="本机已是最新，无需导入"}
+        });
+      });
+      card.querySelector("#ycSyncLogin").addEventListener("click",function(){
+        var v=(card.querySelector("#ycSyncIn").value||"").replace(/\s/g,"").toUpperCase();
+        var err=card.querySelector("#ycSyncErr");
+        if(v.length<6){err.textContent="学习码至少 6 位";return}
+        err.textContent="登录中…";
+        setSync({code:v,appliedTs:0,lastLocalTs:Date.now()});
+        pull(function(e,cloud){
+          if(e){err.textContent="云端连接失败（v8）："+(e&&e.message||e)+"。可点「检测云端连接」查原因";setSync({});return}
+          var changed=cloud?applyCloud(cloud):false;
+          ov.classList.remove("on");setChip("ok");
+          if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+        });
+      });
+    }else{
+      var s=getSync();
+      var t=s.lastPush?new Date(s.lastPush).toLocaleString("zh-CN",{hour12:false}):"尚未同步";
+      card.innerHTML='<h3>学习账号</h3>'+
+        '<div class="yc-sync-code">'+esc(c)+'</div>'+
+        '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。</div>'+
+        '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
+        '<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>'+
+        '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
+      card.querySelector("#ycSyncNow").addEventListener("click",function(){
+        this.textContent="同步中…";this.disabled=true;
+        push(function(e){
+          if(e){openModal();return}
+          pull(function(e2,cloud){
+            if(!e2&&cloud){
+              var s=getSync();
+              if((cloud.ts||0)>(s.appliedTs||0)){
+                var changed=applyCloud(cloud);
+                if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload();return}
+              }
+            }
+            openModal();
+          });
+        });
+      });
+      card.querySelector("#ycSyncCopy").addEventListener("click",function(){
+        var btn=this;
+        var data={};KEYS.forEach(function(k){data[k]=rd(k)});
+        var payload="YCSYNC1:"+toB64(JSON.stringify(data));
+        function ok(){btn.textContent="已复制！用微信/QQ发给另一台设备，在那边选「用同步数据导入」";setTimeout(function(){btn.textContent="复制同步数据（发到另一台设备）"},4000)}
+        function fail(){btn.textContent="复制失败，请截图这段数据";if(window.prompt)window.prompt("全选复制下面内容：",payload)}
+        try{
+          if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(payload).then(ok,function(){fail()})}
+          else{var ta=document.createElement("textarea");ta.value=payload;document.body.appendChild(ta);ta.select();var c=document.execCommand("copy");ta.remove();c?ok():fail()}
+        }catch(e){fail()}
+      });
+      card.querySelector("#ycSyncOut").addEventListener("click",function(){
+        if(confirm("退出后本机数据保留，但不再同步到云端。确定退出？")){setSync({});ov.classList.remove("on");setChip("")}
+      });
+    }
+    ov.classList.add("on");
+  }
+  function tryGen(n,cb){
+    if(n>5){cb(genCode());return}
+    var code=genCode();
+    cloudGet(PRE+code,function(e,t){
+      if(e||t){tryGen(n+1,cb);return}
+      cb(code);
+    });
+  }
+  function addChip(){
+    var bar=document.querySelector(".yc-top-actions");
+    if(!bar||document.getElementById("ycChipAcc"))return false;
+    chip=document.createElement("div");chip.className="yc-chip";chip.id="ycChipAcc";
+    chip.addEventListener("click",openModal);
+    bar.insertBefore(chip,bar.firstChild);
+    setChip(chipState);return true;
+  }
+  var REMIND_GAP=3*24*3600*1000;
+  function tsFlag(k){try{var v=parseInt(localStorage.getItem(k),10);return isNaN(v)?0:v}catch(e){return 0}}
+  function showBar(html,cls,onClose){
+    var b=document.createElement("div");b.className="yc-sync-hint"+(cls?" "+cls:"");
+    b.innerHTML=html+'<i>知道了</i>';
+    b.querySelector("i").addEventListener("click",function(){b.remove();onClose&&onClose()});
+    document.body.appendChild(b);
+    setTimeout(function(){try{if(b.parentNode)onClose&&onClose();b.remove()}catch(e){}},20000);
+  }
+  function hint(){
+    setTimeout(function(){
+      try{if(document.querySelector(".yc-sync-hint"))return}catch(e){}
+      var c=myCode();
+      if(c){
+        var s=getSync();
+        if(Date.now()-(s.lastRemind||0)<REMIND_GAP)return;
+        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
+      }else{
+        if(Date.now()-tsFlag(HINT_FLAG)<REMIND_GAP)return;
+        showBar('<span>想让手机和平板的进度同步？点右上角「登录同步」领学习码</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
+      }
+    },4000);
+  }
+  /* ---- engine ---- */
+  var lastPushed=snapStr(),pushTimer=null;
+  function loop(){
+    if(myCode()&&!pushing&&!pullBusy){
+      var cur=snapStr();
+      if(cur!==lastPushed){
+        if(!pushTimer)pushTimer=setTimeout(function(){
+          pushTimer=null;
+          if(myCode()){setChip("busy");push(function(e){if(!e)lastPushed=snapStr();else setChip("err")})}
+        },4000);
+      }
+    }
+  }
+  function bootPull(){
+    if(!myCode())return;
+    var tries=0;
+    function attempt(){
+      setTimeout(function(){
+        pull(function(e,cloud){
+          if(e&&tries<3){tries++;attempt();return}
+          if(e||!cloud)return;
+          var s=getSync();
+          if((cloud.ts||0)>(s.appliedTs||0)){
+            var changed=applyCloud(cloud);
+            if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+          }
+        });
+      },tries?3000:2500);
+    }
+    attempt();
+  }
+  function boot(){
+    var tries=0;
+    var t=setInterval(function(){if(addChip()||++tries>20)clearInterval(t)},300);
+    hint();bootPull();
+    setInterval(loop,6000);
+    setInterval(function(){if(!document.hidden)pullNow()},90000);
+    document.addEventListener("visibilitychange",function(){
+      if(document.hidden&&myCode()&&snapStr()!==lastPushed){setChip("busy");push(function(e){if(!e)lastPushed=snapStr();setChip("")})}
+      if(!document.hidden)pullNow();
+    });
+  }
+  /* 其他设备有新进度时，温和提示刷新，不打断做题 */
+  function pullNow(){
+    if(!myCode()||pushing||pullBusy)return;
+    pull(function(e,cloud){
+      if(e||!cloud)return;
+      var s=getSync();
+      if((cloud.ts||0)>(s.appliedTs||0)){
+        var changed=applyCloud(cloud);
+        if(changed)showUpdateBar();
+      }
+    });
+  }
+  function showUpdateBar(){
+    if(document.getElementById("yc-sync-upd"))return;
+    var b=document.createElement("div");
+    b.className="yc-sync-hint";b.id="yc-sync-upd";
+    b.innerHTML='<span>其他设备有新的刷题进度</span><i>刷新查看</i>';
+    b.querySelector("i").addEventListener("click",function(){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()});
+    document.body.appendChild(b);
+    setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},30000);
+  }
+  var css=document.createElement("style");
+  css.textContent=".yc-sync-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.yc-sync-ov.on{display:flex}.yc-sync-card{background:#fff;border-radius:16px;padding:22px 20px;max-width:360px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.2)}.yc-sync-card h3{margin:0 0 10px;font-size:17px;color:#0f172a}.yc-sync-tip{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:14px}.yc-sync-in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 12px;font-size:16px;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}.yc-sync-btn{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:10px;padding:11px 0;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.yc-sync-btn.main{background:#4f46e5;border-color:#4f46e5;color:#fff}.yc-sync-btn.danger{color:#dc2626;border-color:#fecaca;background:#fef2f2}.yc-sync-btn:disabled{opacity:.6}.yc-sync-div{text-align:center;color:#94a3b8;font-size:12px;margin:10px 0 0}.yc-sync-code{font-size:30px;font-weight:800;letter-spacing:6px;text-align:center;color:#4f46e5;margin:14px 0 10px;font-family:monospace}.yc-sync-err{font-size:13px;color:#dc2626;min-height:18px;margin-top:8px;text-align:center}.yc-sync-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0f172a;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:99998;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}.yc-sync-hint i{font-style:normal;color:#93c5fd;font-weight:600;cursor:pointer;white-space:nowrap}.yc-sync-hint b{color:#fde68a;letter-spacing:1px}#ycChipAcc.yc-sync-off{color:#d97706;border-color:#fcd34d}@media (max-width:480px){#ycChipAcc span{display:none}#ycChipAcc{padding:6px 9px}}";
+  document.head.appendChild(css);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
+</script>
+<script>
+/* share & referral v1: 邀请好友得积分 */
+(function(){
+  var GET_URLS=["https://textdb.online/","https://textdb.dev/api/data/"];
+  function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function lsj(k){try{var v=ls(k);return v?JSON.parse(v):null}catch(e){return null}}
+  function lss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function myCode(){
+    var s=lsj("yicheng-gk-sync-v1");
+    if(s&&s.code)return s.code;
+    var c=ls("ycgk.shareCode");
+    if(!c){c="";for(var i=0;i<6;i++)c+=Math.floor(Math.random()*10);lss("ycgk.shareCode",c)}
+    return c;
+  }
+  function refKey(code){return "ycgkS1-ref-"+code}
+  function cloudGet(key,cb){
+    var done=0,got=false,err=null;
+    GET_URLS.forEach(function(u){
+      fetch(u+key,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+        if(t&&!got){got=true;cb(null,t)}
+        done++;if(done===GET_URLS.length&&!got)cb(err||new Error("网络不通"),null);
+      }).catch(function(e){err=e;done++;if(done===GET_URLS.length&&!got)cb(err,null)});
+    });
+  }
+  function cloudPut(key,val,cb){
+    var done=0,ok=false;
+    function fin(){done++;if(done===2)cb(ok?null:new Error("写入失败"))}
+    fetch("https://textdb.online/update/?key="+encodeURIComponent(key)+"&value="+encodeURIComponent(val)).then(function(){fin()},function(){fin()});
+    fetch("https://textdb.dev/api/data/"+key,{method:"POST",headers:{"Content-Type":"text/plain"},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+  }
+  function parseN(t){var n=parseInt(String(t||"").trim(),10);return isNaN(n)?0:n}
+  function bumpRef(code,cb){
+    cloudGet(refKey(code),function(e,t){
+      var n=parseN(t)+1;
+      cloudPut(refKey(code),String(n),function(e2){cb&&cb(e2,n)});
+    });
+  }
+  function getRefCount(code,cb){
+    cloudGet(refKey(code),function(e,t){cb(null,parseN(t))});
+  }
+  /* 新访客带邀请链接进来：同一设备只记一次 */
+  function handleRef(){
+    try{
+      var q=new URLSearchParams(location.search);
+      var ref=q.get("ref");
+      if(!ref)return;
+      ref=ref.replace(/[^0-9]/g,"").slice(0,12);
+      if(!ref||ref===myCode())return;
+      if(ls("ycgk.refDone"))return;
+      lss("ycgk.refDone","1");
+      bumpRef(ref,function(){});
+      /* 受邀访客计数已挪到 guide.html 第一触点；直接带 ref 打开本页的旧链接在此兜底 */
+      try{if(!ls("ycgk.refinDone")){lss("ycgk.refinDone","1");new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refin&r="+Date.now()}}catch(e){}
+      setTimeout(function(){
+        try{
+          var b=document.createElement("div");b.className="yc-sync-hint";
+          b.innerHTML='<span>欢迎来到亿成公考！同学邀请你来的，TA 会收到积分奖励</span><i>好的</i>';
+          b.querySelector("i").addEventListener("click",function(){b.remove()});
+          document.body.appendChild(b);
+          setTimeout(function(){try{if(b.parentNode)b.remove()}catch(e){}},15000);
+        }catch(e){}
+      },3000);
+    }catch(e){}
+  }
+  /* 邀请者自动到账：云端邀请数 - 已领取数 */
+  function creditReferrals(){
+    try{
+      getRefCount(myCode(),function(e,n){
+        if(e||!n)return;
+        var claimed=parseInt(ls("ycgk.refClaimed")||"0",10)||0;
+        var un=n-claimed;
+        if(un>0){
+          lss("ycgk.refClaimed",String(n));
+          if(window.addPoints)addPoints(un*10,"邀请好友","新同学通过你的链接加入 x"+un);
+        }
+      });
+    }catch(e){}
+  }
+  /* 首页邀请卡片 */
+  function addShareCard(){
+    if(document.getElementById("yc-share-card"))return;
+    var entry=document.getElementById("yc-materials-card");
+    if(!entry)return;
+    var card=document.createElement("div");
+    card.id="yc-share-card";
+    card.innerHTML='<span class="material-icons yc-share-ic">group_add</span>'+
+      '<div class="yc-mat-tx"><div class="yc-share-t">邀请好友 · 双方得积分</div>'+
+      '<div class="yc-share-s">每带 1 位新同学 +10 分 · 可换一对一申论批改、1对1问诊</div></div>'+
+      '<span class="yc-share-go">去邀请 ›</span>';
+    card.addEventListener("click",openShare);
+    entry.parentNode.insertBefore(card,entry);
+  }
+  /* 分享弹层（独立元素，不与同步弹层共用） */
+  var shOv=null;
+  function ensureOv(){
+    if(shOv)return;
+    shOv=document.createElement("div");shOv.className="yc-sync-ov";
+    var card=document.createElement("div");card.className="yc-sync-card";
+    shOv.appendChild(card);document.body.appendChild(shOv);
+    shOv.addEventListener("click",function(e){if(e.target===shOv)shOv.classList.remove("on")});
+  }
+  function shareLink(){return "https://ycteacher.github.io/yichenggongkao/guide.html?ref="+myCode()}
+  function copyText(txt,ok,fail){
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fail)}
+      else{var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();var c=document.execCommand("copy");ta.remove();c?ok():fail()}
+    }catch(e){fail()}
+  }
+  function openShare(){
+    ensureOv();
+    var card=shOv.firstChild;
+    card.innerHTML='<h3>邀请好友 · 得积分</h3>'+
+      '<div class="yc-sync-tip">把你的专属链接发给同学，TA 打开应用你就得 <b>10 分</b>，同一人只算一次。</div>'+
+      '<div class="yc-share-link" id="ycShareLink">'+shareLink()+'</div>'+
+      '<button class="yc-sync-btn main" id="ycShareCopy">复制邀请链接</button>'+
+      '<button class="yc-sync-btn" id="ycShareNative">分享给同学（微信 / QQ）</button>'+
+      '<div class="yc-share-stats" id="ycShareStats">邀请统计加载中…</div>'+
+      '<div class="yc-share-rules">'+
+        '<div class="yc-share-rt">积分可兑换 · 加微信 mshong 找亿成老师兑换</div>'+
+        '<div class="yc-share-rule"><b>一对一申论批改</b><span>100 分</span></div>'+
+        '<div class="yc-share-rule"><b>一对一综应批改</b><span>100 分</span></div>'+
+        '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>600 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
+      '</div>'+
+      '<button class="yc-sync-btn" id="ycShareRedeem">兑换详情 · 认识亿成老师 ›</button>'+
+      '<button class="yc-sync-btn" id="ycShareClose">关闭</button>';
+    card.querySelector("#ycShareCopy").addEventListener("click",function(){
+      var btn=this;
+      copyText(shareLink(),function(){btn.textContent="已复制！去微信 / QQ 粘贴发给同学";try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.sharecopy&r="+Date.now()}catch(e){}setTimeout(function(){btn.textContent="复制邀请链接"},3500)},function(){window.prompt("全选复制下面的链接：",shareLink())});
+    });
+    card.querySelector("#ycShareNative").addEventListener("click",function(){
+      var txt="我在用亿成老师的公考刷题应用，题库全免费，邀请你一起刷：";
+      if(navigator.share){navigator.share({title:"亿成公考",text:txt,url:shareLink()}).catch(function(){})}
+      else{copyText(txt+shareLink(),function(){alert("链接已复制，去微信 / QQ 粘贴发给同学吧")},function(){window.prompt("全选复制下面的链接：",shareLink())})}
+    });
+    card.querySelector("#ycShareRedeem").addEventListener("click",function(){window.location.href="teacher.html"});
+    card.querySelector("#ycShareClose").addEventListener("click",function(){shOv.classList.remove("on")});
+    getRefCount(myCode(),function(e,n){
+      var el=document.getElementById("ycShareStats");
+      if(!el)return;
+      var bal=(window.getPoints&&getPoints().balance)||0;
+      el.textContent=n>0?("已邀请 "+n+" 人 · 邀请积分 +"+(n*10)+" 分 · 当前积分 "+bal):"还没有同学通过你的链接来，快去分享吧";
+    });
+    creditReferrals();
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.share&r="+Date.now()}catch(e){}
+    shOv.classList.add("on");
+  }
+  /* 积分中心补一条邀请规则 */
+  function patchPointsModal(){
+    if(window.__ycShareRulePatched)return;
+    var rules=document.querySelectorAll(".yc-rule");
+    for(var i=0;i<rules.length;i++){
+      if(rules[i].textContent.indexOf("邀请好友")>-1){window.__ycShareRulePatched=true;return}
+      if(rules[i].textContent.indexOf("兑换商城筹备中")>-1){
+        var d=document.createElement("div");
+        d.className="yc-rule";
+        d.innerHTML='<b>邀请好友 +10 / 人</b><span>点首页「邀请好友」卡片，拿专属链接</span>';
+        rules[i].parentNode.insertBefore(d,rules[i]);
+        window.__ycShareRulePatched=true;return;
+      }
+    }
+  }
+  var css=document.createElement("style");
+  css.textContent="#yc-share-card{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#4F46E5,#4338CA);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,.28)}#yc-share-card:active{transform:scale(.985)}#yc-share-card .yc-share-ic{font-size:26px !important;flex:none}.yc-share-t{font-size:15px;font-weight:800;letter-spacing:.5px}.yc-share-s{font-size:11px;opacity:.92;margin-top:2px}.yc-share-go{font-size:12px;font-weight:700;flex:none;background:rgba(255,255,255,.18);border-radius:999px;padding:5px 10px}.yc-share-link{background:#f1f5f9;border:1.5px dashed #c7d2fe;border-radius:10px;padding:10px 12px;font-size:12px;word-break:break-all;color:#4338ca;margin-bottom:4px}.yc-share-stats{font-size:13px;color:#475569;margin-top:10px;text-align:center}.yc-share-rules{margin-top:12px;border-top:1px solid #eef2f7;padding-top:10px}.yc-share-rt{font-size:12px;color:#94a3b8;margin-bottom:8px}.yc-share-rule{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#0f172a;padding:4px 0}.yc-share-rule b{font-weight:700}.yc-share-rule span{color:#4f46e5;font-weight:700;font-size:12.5px;text-align:right}.yc-wl-st{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:13.5px;line-height:1.6;color:#0f172a;text-align:left}.yc-wl-st>b{flex:none;width:20px;height:20px;border-radius:50%;background:#4f46e5;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}.yc-wl-st span{flex:1}.yc-wl-st .kb{background:#eef2ff;color:#4338ca;border-radius:6px;padding:1px 6px;font-weight:800;white-space:nowrap}.yc-wl-wx{background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:#9a3412;margin-bottom:6px}";
+  document.head.appendChild(css);
+  /* 新同学首次打开：安装到桌面引导（按设备详细分类） */
+  function welcomeGuide(){
+    var seen=false;
+    try{seen=!!localStorage.getItem("ycgk.welcomeSeen")}catch(e){}
+    if(seen)return;
+    var ua=navigator.userAgent||"";
+    var isIPad=/iPad/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+    var isIPhone=/iPhone|iPod/i.test(ua);
+    var isIOS=isIPad||isIPhone;
+    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb|HUAWEI|HONOR/i.test(ua);
+    var isPad=/Pad|Tablet|SM-T\d|SM-P\d|MatePad|Tab\d/i.test(ua);
+    var isAndroid=/Android/i.test(ua);
+    var inWx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
+    var isPC=!isIOS&&!isHarmony&&!isAndroid;
+    /* 判断具体设备类别 */
+    var devLabel="设备",steps="";
+    if(isIPad){
+      devLabel="iPad 平板";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 iPad 自带的 <b class="kb">Safari</b> 浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点屏幕顶部右侧的「分享」按钮（方框+向上箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>向下滑，选「<b>添加到主屏幕</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点右上「添加」，桌面出现「亿成公考」图标，点开即用</span></div>';
+    }else if(isIPhone){
+      devLabel="iPhone 手机";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 iPhone 自带的 <b class="kb">Safari</b> 浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点屏幕<b>底部中间</b>的「分享」按钮（方框+向上箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>向下滑，选「<b>添加到主屏幕</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点右上「添加」，桌面出现图标，以后一点就开</span></div>';
+    }else if(isHarmony){
+      devLabel="鸿蒙设备"+(isPad?"（平板）":"（手机）");
+      steps='<div class="yc-wl-st"><b>1</b><span>用华为自带的 <b class="kb">浏览器</b> 打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点底部中间的「三道杠」或右上「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>选「<b>添加到桌面</b>」或「<b>添加书签</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>确认后，桌面出现图标；从桌面打开即可全屏刷题</span></div>';
+    }else if(isAndroid&&isPad){
+      devLabel="安卓平板";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点右上角的「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>选「<b>添加到主屏幕</b>」或「<b>安装应用</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点「安装」，桌面出现图标，横屏刷题更舒服</span></div>';
+    }else if(isAndroid){
+      devLabel="安卓手机";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点右上角的「⋮」菜单</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>选「<b>添加到主屏幕</b>」或「<b>安装应用</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点「安装」，桌面出现「亿成公考」图标</span></div>';
+    }else{
+      devLabel="电脑";
+      steps='<div class="yc-wl-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或 <b class="kb">Edge</b> 浏览器打开本页</span></div>'+
+            '<div class="yc-wl-st"><b>2</b><span>点地址栏<b>右侧</b>的「安装」图标（显示器+向下箭头）</span></div>'+
+            '<div class="yc-wl-st"><b>3</b><span>若没看到图标，点右上「⋮」→「<b>安装此站点为应用</b>」</span></div>'+
+            '<div class="yc-wl-st"><b>4</b><span>点「安装」，桌面/开始菜单出现图标，独立窗口刷题更清爽</span></div>';
+    }
+    var ov=document.createElement("div");ov.className="yc-sync-ov";
+    ov.innerHTML='<div class="yc-sync-card">'+
+      '<h3>欢迎来到亿成公考 👋</h3>'+
+      '<div class="yc-sync-tip">题库全免费，内测期间不收一分钱。<b>建议先把它装到桌面</b>，以后从图标一点就开，不用再找链接。检测到你用的是<b>'+devLabel+'</b>，按下面步骤操作：</div>'+
+      (inWx?'<div class="yc-wl-wx">⚠️ 你现在是在微信/QQ里打开的，会拦住安装。请先点右上角「···」→「<b>在浏览器中打开</b>」，再按下面步骤操作</div>':'')+
+      steps+
+      '<button class="yc-sync-btn main" id="ycWlOk">知道了，开始刷题</button>'+
+      '<button class="yc-sync-btn" id="ycWlLater" style="margin-top:8px">先不装，直接刷题</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlshow&r="+Date.now()}catch(e){}
+    function done(){try{localStorage.setItem("ycgk.welcomeSeen","1")}catch(e){}ov.classList.remove("on")}
+    ov.addEventListener("click",function(e){if(e.target===ov)done()});
+    ov.querySelector("#ycWlOk").addEventListener("click",function(){try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.wlok&r="+Date.now()}catch(e){}done()});
+    ov.querySelector("#ycWlLater").addEventListener("click",done);
+    setTimeout(function(){ov.classList.add("on")},600);
+  }
+  function boot(){
+    handleRef();
+    creditReferrals();
+    /* welcomeGuide() 已由 15-onboarding 全屏引导流程接管，此处不再调用，避免两个弹窗打架 */
+    var mo=new MutationObserver(function(){addShareCard();patchPointsModal()});
+    mo.observe(document.body,{childList:true,subtree:true});
+    addShareCard();patchPointsModal();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
+</script>
+<script>
+/* material-icons 兜底 v4 —— 源头已全 emoji(index-b34.js 编译产物已替换)
+   本脚本只做轻量兜底：万一有动态/漏网的英文连字图标，就地换成 emoji 字符。
+   不再使用 font-size:0 + ::after 隐藏方案（那会引入 data-emoji 依赖,动态节点漏抓会变圆点）。
+   emoji 文本是普通 Unicode,任何浏览器/WebView 都能渲染,零字体依赖。 */
+(function(){
+  var MAP={
+    apartment:'🏢',account_balance:'🏦',school:'🎓',military_tech:'🎖️',
+    group:'👥',group_add:'👥',groups:'👥',people:'👥',redeem:'🎁',
+    install_mobile:'📲',download:'📥',functions:'➗',gesture:'👆',
+    home:'🏠',history_edu:'📜',assignment:'📋',star:'⭐',star_border:'☆',
+    arrow_back:'⬅',arrow_forward:'➡',chevron_right:'›',chevron_left:'‹',expand_more:'⌄',expand_less:'⌃',
+    check:'✓',check_circle:'✅',check_circle_outline:'☑️',task_alt:'✅',
+    close:'✕',cancel:'✕',clear:'✕',search:'🔍',edit:'✏️',edit_note:'📝',
+    delete_sweep:'🗑️',lightbulb:'💡',tips_and_updates:'💡',bolt:'⚡',
+    auto_awesome:'✨',gavel:'⚖️',flag:'🚩',event:'📅',fact_check:'📋',
+    grid_on:'▦',account_tree:'🌳',speed:'⚡',target:'🎯',tracking:'🎯',
+    keyboard:'⌨️',warning:'⚠️',error:'❗',checklist:'📋',badge:'🏅',
+    comment:'💬',sync:'🔄',repeat:'🔁',undo:'↩️',upload:'⬆️',
+    cleaning_services:'🧹',hand:'✋',list:'📃',paper:'📄',folder:'📁',
+    description:'📄',menu_book:'📖',quiz:'❓',help:'❓',info:'ℹ️',
+    person:'👤',account_circle:'👤',work:'💼',business:'🏢',
+    date_range:'📅',calendar_month:'📅',schedule:'⏰',trending_up:'📈',
+    bar_chart:'📊',pie_chart:'🥧',dashboard:'📊',data_usage:'📊',
+    emoji_events:'🏆',military:'🎖️',local_hospital:'🏥',
+    phone_android:'📱',devices:'💻',laptop:'💻',computer:'💻',
+    lock:'🔒',security:'🔐',verified:'✅',star_rate:'⭐',
+    more_horiz:'⋯',more_vert:'⋮',add:'➕',remove:'➖',
+    play_arrow:'▶️',pause:'⏸️',refresh:'🔄',send:'📤',
+    analytics:'📊',insights:'💡',summarize:'📋',article:'📄'
+  };
+  var SEL='.material-icons,.material-icons-outlined,.material-icons-round,.material-icons-sharp,.material-icons-two-tone';
+  function fixOne(el){
+    if(!el||el.nodeType!==1||el.getAttribute('data-yc-emoji')) return;
+    var t=(el.textContent||'').trim();
+    if(!t) return;
+    if(MAP[t]){
+      try{ el.textContent=MAP[t]; }catch(e){}
+    }
+    el.setAttribute('data-yc-emoji','1');
+  }
+  function fixAll(){ try{ document.querySelectorAll(SEL).forEach(fixOne); }catch(e){} }
+  function boot(){
+    fixAll();
+    try{
+      var mo=new MutationObserver(function(list){
+        var need=false;
+        for(var i=0;i<list.length;i++){
+          var r=list[i];
+          if(r.type==='childList'&&r.addedNodes&&r.addedNodes.length){ need=true; break; }
+          if(r.type==='characterData'){ need=true; break; }
+        }
+        if(need) fixAll();
+      });
+      mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+    }catch(e){}
+    var n=0,iv=setInterval(function(){ fixAll(); if(++n>40)clearInterval(iv); },250);
+    setTimeout(fixAll,3000);
+  }
+  if(document.documentElement) boot();
+  else document.addEventListener('DOMContentLoaded',boot);
+})();
+</script>
+
+<script>
+/* 14-install-button: 常驻「安装/保存到本地」入口 —— Edge/Chrome 一键安装(PWA) + 图文兜底 */
+(function(){
+  var deferred=null, canPrompt=false, installed=false;
+  try{
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault(); deferred=e; canPrompt=true;
+      var b=document.getElementById('ycInstallTopBtn');
+      if(b){ b.disabled=false; b.textContent='⬇ 安装到桌面'; }
+    });
+    window.addEventListener('appinstalled', function(){
+      installed=true; deferred=null; canPrompt=false;
+      try{ localStorage.setItem('ycgk.installDone.v1','1'); }catch(e){}
+      var b=document.getElementById('ycInstallTopBtn');
+      if(b){ b.disabled=true; b.textContent='✓ 已安装'; }
+    });
+    if(window.matchMedia && matchMedia('(display-mode: standalone)').matches) installed=true;
+    /* 已确认装过桌面的用户：不再注入右上角安装入口 */
+    try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') installed=true; }catch(e){}
+  }catch(e){}
+
+  var CSS=''+
+  '.yc-install-btn{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:999px;padding:7px 11px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(220,38,38,.25);line-height:1.1;font-family:inherit}'+
+  '.yc-install-btn:active{transform:scale(.96)}'+
+  '.yc-install-btn:disabled{background:#9CA3AF;box-shadow:none;cursor:default}'+
+  '@media(max-width:560px){.yc-install-btn{font-size:11px;padding:6px 8px}}'+
+  '.yc-inst-mask{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.55);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}'+
+  '.yc-inst-mask.on{opacity:1;pointer-events:auto}'+
+  '.yc-inst-card{position:relative;width:100%;max-width:440px;max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:22px 20px 20px;box-shadow:0 18px 50px rgba(0,0,0,.25)}'+
+  '.yc-inst-card h3{margin:0 26px 4px 0;font-size:19px;font-weight:900;color:#202020}'+
+  '.yc-inst-sub{font-size:12.5px;color:#8A8378;margin-bottom:14px;line-height:1.6}'+
+  '.yc-inst-x{position:absolute;top:12px;right:14px;font-size:22px;color:#aaa;background:none;border:none;cursor:pointer;line-height:1}'+
+  '.yc-inst-hero{display:block;width:100%;background:linear-gradient(135deg,#15803D,#166534);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:900;margin-bottom:4px;cursor:pointer;box-shadow:0 4px 14px rgba(21,128,61,.28);font-family:inherit}'+
+  '.yc-inst-hero:disabled{background:#9CA3AF;box-shadow:none;cursor:default}'+
+  '.yc-inst-note{font-size:11.5px;color:#6b7280;text-align:center;margin:2px 0 14px;line-height:1.5}'+
+  '.yc-inst-sec{background:#F7F5F0;border-radius:12px;padding:12px 14px;margin-top:10px}'+
+  '.yc-inst-sec-t{font-size:13px;font-weight:800;color:#374151;margin-bottom:8px}'+
+  '.yc-inst-st{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.6;color:#202020;margin-top:7px;text-align:left}'+
+  '.yc-inst-st>b{flex:none;width:19px;height:19px;border-radius:50%;background:#15803D;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px}'+
+  '.yc-inst-st .kb{background:#e7f5ec;color:#15803D;border-radius:5px;padding:1px 5px;font-weight:800;white-space:nowrap}'+
+  '.yc-inst-guides{display:flex;gap:8px;margin-top:10px}'+
+  '.yc-inst-gbtn{flex:1;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-inst-gbtn:active{transform:scale(.97)}'+
+  '.yc-inst-gbtn2{flex:1;background:#fff;color:#B91C1C;border:1.5px solid #B91C1C;border-radius:10px;padding:12px 6px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-inst-gbtn2:active{transform:scale(.97)}'+
+  '.yc-inst-link{display:block;text-align:center;font-size:13px;font-weight:800;color:#15803D;text-decoration:none;border:1.5px solid #15803D;border-radius:10px;padding:10px;margin-top:14px}'+
+  '.yc-inst-foot{font-size:11px;color:#9CA3AF;text-align:center;margin-top:12px;line-height:1.6}';
+  var st=document.createElement('style'); st.textContent=CSS; document.head.appendChild(st);
+
+  function steps(){
+    var ua=navigator.userAgent||'';
+    var isIPad=/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    var isIPhone=/iPhone|iPod/i.test(ua);
+    var isIOS=isIPad||isIPhone;
+    var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb|HUAWEI|HONOR/i.test(ua);
+    var isPad=/Pad|Tablet|SM-T\d|SM-P\d|MatePad|Tab\d/i.test(ua);
+    var isAndroid=/Android/i.test(ua);
+    var inWx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
+    var isMac=/Macintosh|Mac OS X/i.test(ua)&&!(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    var head='',body='';
+    if(isIPad){
+      head='iPad 平板 · 添加到主屏幕';
+      body='<div class="yc-inst-st"><b>1</b><span>用自带 <b class="kb">Safari</b> 打开本页</span></div>'+
+           '<div class="yc-inst-st"><b>2</b><span>点顶部右侧「分享」（方框+向上箭头）</span></div>'+
+           '<div class="yc-inst-st"><b>3</b><span>下滑选「<b class="kb">添加到主屏幕</b>」→ 右上「添加」</span></div>';
+    }else if(isIPhone){
+      head='iPhone · 添加到主屏幕';
+      body='<div class="yc-inst-st"><b>1</b><span>用自带 <b class="kb">Safari</b> 打开本页</span></div>'+
+           '<div class="yc-inst-st"><b>2</b><span>点底部中间「分享」（方框+向上箭头）</span></div>'+
+           '<div class="yc-inst-st"><b>3</b><span>下滑选「<b class="kb">添加到主屏幕</b>」→ 右上「添加」</span></div>';
+    }else if(isHarmony){
+      head='鸿蒙设备 · 添加到桌面';
+      body='<div class="yc-inst-st"><b>1</b><span>用华为自带 <b class="kb">浏览器</b> 打开本页</span></div>'+
+           '<div class="yc-inst-st"><b>2</b><span>点底部「三道杠」或右上「⋮」</span></div>'+
+           '<div class="yc-inst-st"><b>3</b><span>选「<b class="kb">添加到桌面</b>」→ 确认</span></div>';
+    }else if(isAndroid){
+      head=(isPad?'安卓平板':'安卓手机')+' · 安装到桌面';
+      body='<div class="yc-inst-st"><b>1</b><span>用 <b class="kb">Chrome</b> 或自带浏览器打开本页</span></div>'+
+           '<div class="yc-inst-st"><b>2</b><span>点右上「⋮」菜单</span></div>'+
+           '<div class="yc-inst-st"><b>3</b><span>选「<b class="kb">安装应用</b>」或「添加到主屏幕」</span></div>';
+    }else if(isMac){
+      head='苹果电脑 · 安装到程序坞';
+      body='<div class="yc-inst-st"><b>1</b><span>用 <b class="kb">Chrome</b>/<b class="kb">Edge</b> 打开：点地址栏右侧「安装」图标，或右上「⋮」→「安装此站点为应用」</span></div>'+
+           '<div class="yc-inst-st"><b>2</b><span>用 <b class="kb">Safari</b> 打开：菜单「文件」→「添加到程序坞」</span></div>';
+    }else{
+      head='电脑 · 安装到本地（Windows）';
+      body='<div class="yc-inst-st"><b>1</b><span>推荐：点上方绿色「<b class="kb">一键安装到桌面</b>」按钮 → 弹窗里点「安装」</span></div>'+
+           '<div class="yc-inst-st"><b>2</b><span>或点地址栏<b>右侧</b>的「安装」图标（显示器+向下箭头）</span></div>'+
+           '<div class="yc-inst-st"><b>3</b><span>或点右上「⋮」→「<b class="kb">应用</b>」→「安装此站点为应用」</span></div>'+
+           '<div class="yc-inst-st"><b>4</b><span>装好后桌面/开始菜单出现图标，<b>断网也能刷题</b></span></div>';
+    }
+    var wx=inWx?'<div class="yc-inst-sec" style="background:#fff7ed"><div class="yc-inst-sec-t" style="color:#9a3412">⚠️ 微信/QQ 里装不了，先跳出去</div><div style="font-size:12.5px;color:#9a3412;line-height:1.6">点右上角「···」或「⋮」→「<b>在浏览器打开</b>」，用浏览器打开后点「一键安装到桌面」即可。</div><button id="ycInstCopy" style="margin-top:8px;width:100%;border:1.5px solid #fdba74;background:#fff;color:#9a3412;border-radius:9px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">📋 复制网址，去浏览器打开</button></div>':'';
+    return {head:head, body:body, wx:wx};
+  }
+
+  function openDialog(){
+    var s=steps();
+    var hero=(canPrompt&&deferred&&!installed)
+      ? '<button class="yc-inst-hero" id="ycInstGo">⬇ 一键安装到桌面（推荐）</button><div class="yc-inst-note">点它 → 系统弹窗点「安装」即可，最快</div>'
+      : (installed
+          ? '<button class="yc-inst-hero" disabled>✓ 已安装到本机</button><div class="yc-inst-note">从桌面图标打开即可，离线也能刷题</div>'
+          : '<button class="yc-inst-hero" disabled>当前浏览器不支持一键安装</button><div class="yc-inst-note">请用下方步骤，2 步搞定</div>');
+    var mask=document.getElementById('ycInstMask');
+    if(!mask){
+      mask=document.createElement('div'); mask.id='ycInstMask'; mask.className='yc-inst-mask';
+      mask.innerHTML='<div class="yc-inst-card" id="ycInstCard"></div>';
+      document.body.appendChild(mask);
+      mask.addEventListener('click',function(e){ if(e.target===mask) mask.classList.remove('on'); });
+    }
+    var card=document.getElementById('ycInstCard');
+    card.innerHTML='<button class="yc-inst-x" id="ycInstX">×</button>'+
+      '<h3>把亿成公考保存到本地</h3>'+
+      '<div class="yc-inst-sub">装到桌面后一点就开、不用再找链接，题库自动缓存，离线也能刷。</div>'+
+      hero+
+      '<div class="yc-inst-guides"><button class="yc-inst-gbtn" id="ycInstGV">📺 视频讲解</button><button class="yc-inst-gbtn2" id="ycInstGP">🖼 图文讲解</button></div>'+
+      '<div class="yc-inst-sec"><div class="yc-inst-sec-t">手动安装 · '+s.head+'</div>'+s.body+'</div>'+
+      s.wx+
+      '<a class="yc-inst-link" id="ycInstGuideLink" href="install.html">看完整图文 / 视频指引 ›</a>'+
+      '<div class="yc-inst-foot">只想存网页文件？电脑按 Ctrl+S（Mac 按 ⌘S）另存即可<br>安装完全免费 · 题库持续更新</div>';
+    card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
+    var cp=card.querySelector('#ycInstCopy');
+    if(cp) cp.addEventListener('click',function(){
+      var url=location.href.split('#')[0];
+      var done=function(){ cp.textContent='✓ 已复制，去浏览器粘贴打开'; };
+      var fallback=function(){ var ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy')}catch(e){} document.body.removeChild(ta); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,function(){ fallback(); done(); }); } else { fallback(); done(); }
+    });
+    var gl=card.querySelector('#ycInstGuideLink');
+    if(gl) gl.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href='install.html'; });
+    function goGuide(u){ return function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href=u; }; }
+    var gv=card.querySelector('#ycInstGV'), gp=card.querySelector('#ycInstGP');
+    if(gv) gv.addEventListener('click', goGuide('install-video.html'));
+    if(gp) gp.addEventListener('click', goGuide('install-guide.html'));
+    var go=card.querySelector('#ycInstGo');
+    if(go) go.addEventListener('click',function(){
+      if(deferred){
+        deferred.prompt();
+        deferred.userChoice.then(function(r){
+          if(r&&r.outcome==='accepted'){ try{new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.instclick&r='+Date.now()}catch(e){} }
+          deferred=null; canPrompt=false; mask.classList.remove('on');
+        });
+      }
+    });
+    mask.classList.add('on');
+    try{new Image().src='https://visitor-badge.laobi.icu/badge?page_id=ycgk.instopen&r='+Date.now()}catch(e){}
+  }
+
+  function inject(){
+    var actions=document.querySelector('.yc-top-actions');
+    if(!actions||document.getElementById('ycInstallTopBtn')) return false;
+    /* B2：做题页/套卷页/成绩页不放安装入口 */
+    try{ if(document.querySelector('[data-testid="plan-exit"]')||document.querySelector('.yc-ob-mask.on')) return false; }catch(e){}
+    /* 已确认装过桌面：完全不放安装按钮 */
+    try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') return true; }catch(e){}
+    var b=document.createElement('button');
+    b.id='ycInstallTopBtn'; b.className='yc-install-btn';
+    b.textContent=installed?'✓ 已安装':(canPrompt?'⬇ 安装到桌面':'⬇ 安装/保存');
+    b.disabled=installed;
+    b.addEventListener('click',openDialog);
+    actions.insertBefore(b, actions.firstChild);
+    return true;
+  }
+  var tries=0, timer=setInterval(function(){ if(inject()||++tries>40) clearInterval(timer); },120);
+  document.addEventListener('DOMContentLoaded',inject);
+})();
+</script>
+
+<script>
+/* 15-onboarding: 首启强制安装引导 → 学习计划表单 → 备考计划(底部tab+顶部常驻) → 模拟测试专区(10套卷+判分) */
+(function(){
+  'use strict';
+  var K_ONB='ycgk.onboard.v2', K_PLAN='ycgk.studyplan.v2', K_MOCK='ycgk.mock.v2';
+  /* ---- B0：统一弹窗注册表（频控档位见 yc-notify.js；yc-notify.js 版本参数随页面统一派生，动态加载后轮询注册）---- */
+  (function(){
+    var eb=function(){ try{ return YCNotify.inExamView(); }catch(e){ return false; } };
+    var tries=0;
+    function reg(){
+      if(!window.YCNotify){ if(++tries<60) setTimeout(reg,100); return; }
+      YCNotify.register('install',{freq:'days',days:3,priority:10,examBlock:eb});
+      YCNotify.register('installSoft',{freq:'days',days:3,priority:20,examBlock:eb});
+      YCNotify.register('planForm',{freq:'days',days:30,priority:30,examBlock:eb});
+      YCNotify.register('noticeBar',{freq:'once',priority:40});
+      YCNotify.register('updFloat',{freq:'days',days:1,priority:50});
+      YCNotify.register('mockSheet',{freq:'session',priority:60,examBlock:eb});
+      YCNotify.register('onboardChain',{freq:'once',priority:70,examBlock:eb});
+    }
+    reg();
+  })();
+  /* 已装到桌面的永久标记：装过就不再弹任何安装提醒（右上角按钮、首页卡片、首启引导） */
+  var K_INST='ycgk.installDone.v1';
+  function installDone(){ try{return localStorage.getItem(K_INST)==='1'}catch(e){return false} }
+  function markInstalled(){ try{localStorage.setItem(K_INST,'1')}catch(e){} }
+  /* ---- 弹窗频控 v1：用户选择用 localStorage 永久记住；sessionStorage 只做"本会话已弹过"计数 ---- */
+  var K_DISMISS='yc_install_dismissed_v1';   /* 叉掉/暂不安装 → 永久不再自动弹安装引导 */
+  var K_VISITS='yc_visit_count_v1';          /* 累计访问次数：前两次不自动弹，避免首访打断 */
+  var K_SESS_POP='yc_sess_popup_shown_v1';   /* 本会话已弹过引导（刷新不重复弹） */
+  var K_PLAN_LATER='yc_plan_later_v1';       /* 「暂不设置，先逛逛」时间戳 → 30 天内不再自动弹 */
+  /* 用户主动拒绝安装引导（叉掉/暂不安装）= 永久不再自动弹（done.install）；旧版"永久不再提醒"记录迁移为 done.install 继续生效 */
+  function installDismissed(){
+    try{ if(window.YCNotify){ if(localStorage.getItem(YCNotify.P+'done.install')==='1') return true; return YCNotify.recent('install',3*86400000); } }catch(e){}
+    try{return localStorage.getItem(K_DISMISS)==='1'}catch(e){return false}
+  }
+  function dismissInstall(){
+    try{ if(window.YCNotify){ YCNotify.dismiss('install', true); return; } }catch(e){}
+    try{localStorage.setItem(K_DISMISS,'1')}catch(e){}
+  }
+  function planLaterActive(){
+    try{ if(window.YCNotify) return YCNotify.recent('planForm',30*86400000); }catch(e){}
+    try{ var t=parseInt(localStorage.getItem(K_PLAN_LATER)||'0',10)||0; return !!t && Date.now()-t<30*86400000; }catch(e){return false}
+  }
+  function inAppBrowser(){ var ua=navigator.userAgent||''; return /MicroMessenger|QQ\/|MQQBrowser/i.test(ua); }
+  function hasAnyPlan(){
+    try{ if(getJSON(K_PLAN,null)) return true; }catch(e){}
+    try{ for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('ycgk.studyplan')===0) return true; } }catch(e){}
+    return false;
+  }
+  function showToast(msg){
+    try{
+      var t=document.createElement('div'); t.textContent=msg;
+      t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483647;background:#15803D;color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;box-shadow:0 6px 22px rgba(21,128,61,.35);font-family:inherit;white-space:nowrap;max-width:92vw';
+      document.body.appendChild(t);
+      setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; },2400);
+      setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2900);
+    }catch(e){}
+  }
+  function raw(k){ try{return localStorage.getItem(k)}catch(e){return null} }
+  function set(k,v){ try{localStorage.setItem(k,v)}catch(e){} }
+  function getJSON(k,fb){ try{var v=raw(k);return v?JSON.parse(v):fb}catch(e){return fb} }
+  function setJSON(k,v){ set(k,JSON.stringify(v)) }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') }
+  function $(id){ return document.getElementById(id) }
+
+  /* 修复"打开强制进备考计划"：清掉 React 读取的 #plan hash */
+  try{ if(/plan/i.test(location.hash)) history.replaceState(null,'',location.href.split('#')[0]); }catch(e){}
+  /* 停掉旧的一次性欢迎弹窗（由本流程接管） */
+  try{ set('ycgk.welcomeSeen','1'); }catch(e){}
+
+  var deferred=null, canInstall=false, installed=false;
+  try{
+    window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; canInstall=true; refreshInstallBtn(); });
+    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; markInstalled(); refreshInstallBtn(); showToast('✓ 已装到桌面，以后一点就开'); });
+    installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+    if(installed) markInstalled();
+  }catch(e){}
+
+  /* ---------- CSS ---------- */
+  var CSS=''+
+  '.yc-ob-mask{position:fixed;inset:0;z-index:2147483000;background:rgba(18,14,10,.62);display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:opacity .25s}'+
+  '.yc-ob-mask.on{opacity:1;pointer-events:auto}'+
+  '.yc-ob-card{position:relative;width:100%;max-width:460px;max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:24px 20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(14px);transition:transform .25s;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}'+
+  '.yc-ob-mask.on .yc-ob-card{transform:translateY(0)}'+
+  '.yc-ob-card.wide{max-width:680px}'+
+  '.yc-ob-x{position:absolute;top:7px;right:9px;width:44px;height:44px;border:none;background:#f2f0ec;border-radius:50%;font-size:20px;color:#8a8378;cursor:pointer;line-height:44px;text-align:center}'+
+  '.yc-ob-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;font-size:27px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 6px 18px rgba(220,38,38,.3)}'+
+  '.yc-ob-h{font-size:21px;font-weight:900;color:#202020;text-align:center;margin:0 0 6px;line-height:1.3}'+
+  '.yc-ob-sub{font-size:13px;color:#8a8378;text-align:center;margin:0 0 16px;line-height:1.6}'+
+  '.yc-ob-warn{background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.65;color:#9a3412;margin-bottom:14px;font-weight:600}'+
+  '.yc-ob-why{display:flex;gap:8px;margin-bottom:14px}'+
+  '.yc-ob-why div{flex:1;background:#F7F5F0;border-radius:12px;padding:11px 6px;text-align:center}'+
+  '.yc-ob-why .ic{font-size:23px;line-height:1.2}'+
+  '.yc-ob-why .tx{font-size:11.5px;color:#5b5560;margin-top:5px;font-weight:700}'+
+  '.yc-ob-steps{background:#fef2f2;border:1.5px solid #fecaca;border-radius:14px;padding:13px 14px;margin-bottom:12px}'+
+  '.yc-ob-steps-t{font-size:13.5px;font-weight:900;color:#991b1b;margin-bottom:9px}'+
+  '.yc-ob-st{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.6;color:#202020;margin-top:8px;text-align:left}'+
+  '.yc-ob-st b{flex:none;width:21px;height:21px;border-radius:50%;background:#DC2626;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}'+
+  '.yc-ob-st .kb{background:#fee2e2;color:#b91c1c;border-radius:5px;padding:1px 5px;font-weight:800;white-space:nowrap}'+
+  '.yc-ob-wx{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.6;color:#92400e;margin-bottom:12px}'+
+  '.yc-ob-primary{display:block;width:100%;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;border-radius:13px;padding:15px;font-size:16px;font-weight:900;margin-top:6px;cursor:pointer;box-shadow:0 5px 16px rgba(220,38,38,.3);font-family:inherit}'+
+  '.yc-ob-primary:active{transform:scale(.985)}'+
+  '.yc-ob-ghost{display:block;width:100%;background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:12px;padding:12px;font-size:14px;font-weight:800;margin-top:9px;cursor:pointer;font-family:inherit}'+
+  '.yc-ob-foot{font-size:11.5px;color:#9ca3af;text-align:center;margin-top:12px;line-height:1.7}'+
+  '.yc-ob-foot a{color:#6b7280;text-decoration:underline;cursor:pointer}'+
+  '.yc-ob-label{display:block;font-size:13px;font-weight:800;color:#374151;margin:14px 0 6px;text-align:left}'+
+  '.yc-ob-input,.yc-ob-select{width:100%;box-sizing:border-box;border:1.5px solid #e5e1d8;border-radius:11px;padding:12px 13px;font-size:15px;color:#202020;background:#fff;font-family:inherit;outline:none}'+
+  '.yc-ob-input[type=date]{-webkit-appearance:none;appearance:none;min-height:48px;text-align:left}'+
+  '.yc-ob-input:focus,.yc-ob-select:focus{border-color:#DC2626}'+
+  '.yc-ob-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}'+
+  '.yc-ob-chip{padding:9px 13px;border-radius:999px;border:1.5px solid #e5e1d8;background:#fff;font-size:13.5px;color:#5b5560;font-weight:700;cursor:pointer;user-select:none}'+
+  '.yc-ob-chip.on{background:#DC2626;color:#fff;border-color:#DC2626}'+
+  '.yc-ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}'+
+  '.yc-ob-grid .yc-ob-label{margin-top:10px}'+
+  /* 计划 */
+  '.yc-ob-profile{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 14px}'+
+  '.yc-ob-tag{background:#fef2f2;color:#b91c1c;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800}'+
+  '.yc-ob-hero{background:linear-gradient(135deg,#991b1b,#DC2626);color:#fff;border-radius:14px;padding:15px;text-align:center;margin-bottom:14px}'+
+  '.yc-ob-hero .d{font-size:34px;font-weight:900;line-height:1.1}'+
+  '.yc-ob-hero .l{font-size:12.5px;opacity:.92;margin-top:4px}'+
+  '.yc-ob-stage{background:#F7F5F0;border-radius:13px;padding:13px 14px;margin-bottom:10px;text-align:left}'+
+  '.yc-ob-stage-h{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:900;color:#202020;margin-bottom:7px}'+
+  '.yc-ob-stage-h span{font-size:11.5px;color:#b91c1c;background:#fee2e2;border-radius:999px;padding:2px 9px}'+
+  '.yc-ob-task{font-size:12.8px;color:#5b5560;line-height:1.7;padding-left:16px;position:relative}'+
+  '.yc-ob-task:before{content:"·";position:absolute;left:4px;color:#DC2626;font-weight:900}'+
+  '.yc-ob-task.go{color:#b91c1c;font-weight:800;cursor:pointer;text-decoration:underline}'+
+  /* 模考列表 */
+  '.yc-ob-filter{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}'+
+  '.yc-ob-filter button{flex:none;border:1.5px solid #e5e1d8;background:#fff;color:#5b5560;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap}'+
+  '.yc-ob-filter button.on{background:#DC2626;color:#fff;border-color:#DC2626}'+
+  '.yc-ob-papers{display:grid;grid-template-columns:1fr 1fr;gap:10px}'+
+  '.yc-ob-paper{border:1.5px solid #eee9df;border-radius:13px;padding:13px;background:#fff;text-align:left;cursor:pointer;transition:transform .12s,box-shadow .12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}'+
+  '.yc-ob-paper:active{transform:scale(.98)}'+
+  '.yc-ob-paper .bd{display:inline-block;background:#fef2f2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:900;margin-bottom:7px}'+
+  '.yc-ob-paper .nm{font-size:14px;font-weight:900;color:#202020;line-height:1.4;min-height:38px}'+
+  '.yc-ob-paper .mt{font-size:11.5px;color:#9ca3af;margin-top:8px}'+
+  '.yc-ob-paper .go{font-size:12px;color:#b91c1c;font-weight:900;margin-top:6px}'+
+  /* 答题 */
+  '.yc-ob-prog{display:flex;justify-content:space-between;font-size:12.5px;color:#8a8378;margin-bottom:10px;font-weight:700}'+
+  '.yc-ob-bar{height:6px;background:#f0ede7;border-radius:99px;overflow:hidden;margin-bottom:16px}'+
+  '.yc-ob-bar i{display:block;height:100%;background:linear-gradient(90deg,#DC2626,#B91C1C);border-radius:99px;transition:width .2s}'+
+  '.yc-ob-q{font-size:16px;font-weight:700;color:#202020;line-height:1.7;margin-bottom:16px;text-align:left}'+
+  '.yc-ob-qimg{display:block;max-width:100%;max-height:320px;margin:0 auto 16px;border-radius:10px}'+
+  '.yc-ob-opt{display:flex;gap:11px;align-items:center;border:1.5px solid #e8e4dc;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;text-align:left;font-size:14.5px;color:#374151;line-height:1.5;transition:all .12s}'+
+  '.yc-ob-opt .k{flex:none;width:26px;height:26px;border-radius:50%;background:#f4f1ec;color:#6b7280;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}'+
+  '.yc-ob-opt.sel{border-color:#DC2626;background:#fef2f2}'+
+  '.yc-ob-opt.sel .k{background:#DC2626;color:#fff}'+
+  '.yc-ob-opt.right{border-color:#15803D;background:#f0fdf4}'+
+  '.yc-ob-opt.right .k{background:#15803D;color:#fff}'+
+  '.yc-ob-opt.wrong{border-color:#DC2626;background:#fef2f2}'+
+  '.yc-ob-opt.wrong .k{background:#DC2626;color:#fff}'+
+  '.yc-ob-nav{display:flex;gap:10px;margin-top:14px}'+
+  '.yc-ob-nav button{flex:1;border-radius:11px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}'+
+  '.yc-ob-nav .prev{background:#f4f1ec;color:#5b5560;border:none}'+
+  '.yc-ob-nav .next{background:#DC2626;color:#fff;border:none}'+
+  /* 结果 */
+  '.yc-ob-score{text-align:center;margin:6px 0 16px}'+
+  '.yc-ob-score .n{font-size:52px;font-weight:900;color:#DC2626;line-height:1}'+
+  '.yc-ob-score .t{font-size:13px;color:#8a8378;margin-top:5px}'+
+  '.yc-ob-level{display:inline-block;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:900;margin-top:8px}'+
+  '.yc-ob-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f2efe9;font-size:13.5px;color:#374151}'+
+  '.yc-ob-row b{color:#202020}'+
+  '.yc-ob-row .r{color:#b91c1c;font-weight:800}'+
+  '.yc-ob-row .g{color:#15803D;font-weight:800}'+
+  /* 通用 */
+  '.yc-plan-btn{display:inline-flex;align-items:center;gap:3px;background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;line-height:1.1;font-family:inherit}'+
+  '.yc-plan-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}'+
+  '.yc-plan-tab .mi{font-size:22px;line-height:1}'+
+  '.yc-plan-tab .lb{font-size:11px;font-weight:700;white-space:nowrap}'+
+  '@media(max-width:400px){.yc-ob-card{padding:20px 16px}.yc-ob-why .tx{font-size:10.5px}}';
+  var st=document.createElement('style'); st.id='ycObCss'; st.textContent=CSS; document.head.appendChild(st);
+
+  /* ---------- 全屏层 ---------- */
+  var ov=null, ovTimer=null;
+  function openCard(id, html, opts){
+    opts=opts||{};
+    closeCard(true);
+    ov=document.createElement('div'); ov.id=id; ov.className='yc-ob-mask';
+    ov.innerHTML='<div class="yc-ob-card'+(opts.wide?' wide':'')+'">'+html+'</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){ if(ov) ov.classList.add('on'); });
+    /* 动画结束后清掉 transform：iOS 平板上带 transform 的容器会让原生日历/触摸命中失效 */
+    setTimeout(function(){ if(ov){ var c=ov.firstChild; if(c&&c.style) c.style.transform='none'; } },320);
+    if(opts.closable!==false){
+      ov.addEventListener('click',function(e){ if(e.target===ov) closeCard(); });
+      var card=ov.firstChild;
+      var x=document.createElement('button'); x.className='yc-ob-x'; x.textContent='×';
+      x.setAttribute('aria-label','关闭');
+      x.addEventListener('click',closeCard); card.insertBefore(x,card.firstChild);
+    }
+    /* B1 硬指标：滚动锁 / Esc 关闭 / 安卓返回键 / 焦点锁 */
+    try{
+      ov._ycPrevOverflow=document.body.style.overflow;
+      document.body.style.overflow='hidden';
+      try{ history.pushState({ycPop:true},''); ov._ycPushed=true; }catch(e){}
+      ov._ycOnKey=function(e){
+        try{
+          if(e.key==='Escape'){ closeCard(); return; }
+          if(e.key==='Tab'&&ov){
+            var f=ov.querySelectorAll('button,input,select,a[href],[tabindex]:not([tabindex="-1"])');
+            if(!f.length) return;
+            var first=f[0],last=f[f.length-1];
+            if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+            else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+            else if(!ov.contains(document.activeElement)){e.preventDefault();first.focus();}
+          }
+        }catch(e2){}
+      };
+      document.addEventListener('keydown',ov._ycOnKey,true);
+      ov._ycOnPop=function(){ closeCard(); };
+      window.addEventListener('popstate',ov._ycOnPop);
+    }catch(e){}
+    return ov;
+  }
+  function closeCard(now){
+    if(ovTimer){clearTimeout(ovTimer);ovTimer=null}
+    if(!ov) return;
+    var o=ov; ov=null;
+    try{
+      document.removeEventListener('keydown',o._ycOnKey,true);
+      window.removeEventListener('popstate',o._ycOnPop);
+      document.body.style.overflow=o._ycPrevOverflow||'';
+      if(o._ycPushed&&history.state&&history.state.ycPop){ try{history.back();}catch(e){} }
+    }catch(e){}
+    o.classList.remove('on');
+    if(now){ if(o.parentNode)o.parentNode.removeChild(o); }
+    else ovTimer=setTimeout(function(){ if(o.parentNode)o.parentNode.removeChild(o); },260);
+  }
+  function badge(id){ try{ new Image().src='https://visitor-badge.laobi.icu/badge?page_id='+id+'&r='+Date.now(); }catch(e){} }
+
+  /* ---------- 屏幕1：安装引导（强制、丰富） ---------- */
+  function device(){
+    var ua=navigator.userAgent||'',os='pc',model='电脑';
+    if(/iPhone/i.test(ua)){os='ios';model='iPhone'}
+    else if(/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){os='ios';model='iPad'}
+    else if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)){os='harmony';model='鸿蒙设备'}
+    else if(/Android/i.test(ua)){os='android';var md=ua.match(/Android[^;)]*;\s*([^;)]+)/i);model=md&&md[1]?md[1].trim().slice(0,20):'安卓设备';if(/Pad|Tablet|SM-T\d|MatePad/i.test(ua))model+='(平板)'}
+    var wx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
+    var iosOther=/iPhone|iPod/.test(ua)&&/CriOS|FxiOS|EdgiOS|Opt\/|YaBrowser/i.test(ua);
+    var osName=os==='ios'?'苹果':os==='android'?'安卓':os==='harmony'?'鸿蒙':'电脑';
+    var steps;
+    if(os==='ios'){
+      steps=[['点浏览器底部的「分享」按钮（方框加箭头）'],['选「添加到主屏幕」，再点右上角「添加」']];
+    }else if(os==='android'){
+      steps=[['点浏览器右上角「⋮」菜单'],['选「添加到主屏幕」或「安装应用」']];
+    }else if(os==='harmony'){
+      steps=[['点浏览器底部「⋮」或菜单按钮'],['选「添加到桌面」']];
+    }else{
+      steps=[['点地址栏右侧的「安装」图标（或菜单里的「安装应用」）']];
+    }
+    var label=(model.indexOf(osName)>-1)?model:model+' · '+osName;
+    return {label:label,steps:steps,wx:wx,iosOther:iosOther};
+  }
+  function screenInstall(){
+    badge('ycgk.v2.installshow');
+    var d=device();
+    var stepsHtml='';
+    for(var i=0;i<d.steps.length;i++){
+      stepsHtml+='<div class="yc-ob-st"><b>'+(i+1)+'</b><span>'+d.steps[i][0]+'</span></div>';
+    }
+    var hero=installed
+      ? '<button class="yc-ob-primary" disabled style="background:#9ca3af;box-shadow:none">✓ 已安装到本机</button><button class="yc-ob-ghost" id="obInstalled">继续制定学习计划 →</button>'
+      : (canInstall&&deferred
+          ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button><button class="yc-ob-ghost" id="obInstalled">✅ 我已手动装好，下一步 →</button>'
+          : '<button class="yc-ob-primary" id="obInstalled">✅ 我已装好，下一步 →</button>');
+    var html='<div class="yc-ob-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:14px"></div>'+
+      '<div class="yc-ob-h">先把亿成公考装到桌面</div>'+
+      '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
+      '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+
+      '<div class="yc-ob-why"><div><div class="ic">⚡</div><div class="tx">一点就开</div></div><div><div class="ic">📴</div><div class="tx">离线能刷</div></div><div><div class="ic">🎯</div><div class="tx">不再找链接</div></div></div>'+
+      (d.iosOther?'<div class="yc-ob-wx">iPhone 上只有 <b>Safari</b> 能安装到桌面。点「📋 复制网址」→ 打开 <b>Safari</b> 粘贴访问 → 再按步骤安装。</div>':'')+
+      (d.wx?'<div class="yc-ob-wx">你在微信/QQ里打开会被拦住安装。先点右上角「···」或「⋮」→「<b>在浏览器打开</b>」，用浏览器打开后点「一键安装」即可。</div>':'')+
+      '<div class="yc-ob-steps"><div class="yc-ob-steps-t">📲 '+esc(d.label)+' · 安装步骤</div>'+stepsHtml+'</div>'+
+      hero+
+      '<button class="yc-ob-ghost" id="obCopy">📋 复制网址（存备忘录备用）</button>'+
+      '<button class="yc-ob-ghost" id="obNo" style="border-color:#e5e7eb;color:#6b7280">暂不安装（不再自动提醒）</button>'+
+      '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再装，先去做学习计划 →</a></div>';
+    openCard('ycObInstall',html,{closable:true});
+    var ovI=$('ycObInstall');
+    if(ovI){ var xbI=ovI.querySelector('.yc-ob-x'); if(xbI) xbI.addEventListener('click',function(){ dismissInstall(); set(K_ONB,'2'); }); }
+    var one=$('obOneTap');
+    if(one) one.addEventListener('click',function(){
+      if(!deferred) return;
+      var goForm=function(){ set(K_ONB,'1'); screenForm(); };
+      try{
+        deferred.prompt();
+        deferred.userChoice.then(function(r){
+          if(r&&r.outcome==='accepted'){ badge('ycgk.v2.installok'); }
+          deferred=null; canInstall=false;
+          goForm();
+        }).catch(function(){ deferred=null; canInstall=false; goForm(); });
+      }catch(e){
+        /* 部分鸿蒙浏览器一键安装不可用：不再卡住，直接进学习计划 */
+        deferred=null; canInstall=false;
+        goForm();
+      }
+    });
+    var ok=$('obInstalled');
+    if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); markInstalled(); set(K_ONB,'1'); screenForm(); });
+    $('obCopy').addEventListener('click',function(){ copyText(location.href.split('#')[0],'网址已复制，粘贴到备忘录即可'); });
+    $('obNo').addEventListener('click',function(){ dismissInstall(); set(K_ONB,'2'); closeCard(); });
+    $('obLater').addEventListener('click',function(){ set(K_ONB,'1'); closeCard(); screenForm(); });
+  }
+
+  /* ---------- 屏幕2：学习计划表单 ---------- */
+  var PROVINCES=['北京','天津','河北','山西','内蒙古','辽宁','吉林','黑龙江','上海','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','广西','海南','重庆','四川','贵州','云南','陕西','甘肃','青海','宁夏','新疆'];
+  var EXAMS=['国考','省考/省联考','事业编','军队文职','三支一扶','央国企','选调生','银行校招'];
+  var FRESH=['完全没开始','零基础','有一点基础','系统备考中','考前冲刺'];
+  var WEAK=['常识判断','言语理解','判断推理','数量关系','资料分析','申论','综合应用'];
+  function screenForm(pre){
+    /* 已有学习计划的用户：不再强制填表，直接看现有计划（"重新定制"入口传 pre 不受影响） */
+    if(!pre && hasAnyPlan()){ screenPlan(true); return; }
+    badge('ycgk.v2.formshow');
+    var d=new Date(); d.setDate(d.getDate()+75); var defDate=d.toISOString().slice(0,10);
+    var examOpts='',provOpts='';
+    for(var i=0;i<EXAMS.length;i++) examOpts+='<option value="'+EXAMS[i]+'">'+EXAMS[i]+'</option>';
+    for(var j=0;j<PROVINCES.length;j++) provOpts+='<option value="'+PROVINCES[j]+'">'+PROVINCES[j]+'</option>';
+    provOpts+='<option value="台湾省"'+(pre&&pre.prov==='台湾省'?' selected':'')+'>台湾省（待上架）</option>';
+    var freshChips='',weakChips='';
+    for(var a=0;a<FRESH.length;a++) freshChips+='<span class="yc-ob-chip'+(a===0?' on':'')+'" data-fresh="'+FRESH[a]+'">'+FRESH[a]+'</span>';
+    for(var b=0;b<WEAK.length;b++) weakChips+='<span class="yc-ob-chip" data-weak="'+WEAK[b]+'">'+WEAK[b]+'</span>';
+    var html='<div class="yc-ob-h">制定你的专属备考计划</div>'+
+      '<div class="yc-ob-sub">填好这几点，按你的考试时间和薄弱项排一份「每天刷什么」的计划</div>'+
+      '<label class="yc-ob-label">怎么称呼你</label><input class="yc-ob-input" id="fName" placeholder="如：张三" value="'+(pre&&pre.name?esc(pre.name):'')+'">'+
+      '<div class="yc-ob-grid"><div><label class="yc-ob-label">考试类别</label><select class="yc-ob-select" id="fExam">'+examOpts+'</select></div>'+
+      '<div><label class="yc-ob-label">考试日期</label><input class="yc-ob-input" type="date" id="fDate" value="'+defDate+'"></div></div>'+
+      '<label class="yc-ob-label">所在省份</label><select class="yc-ob-select" id="fProv">'+provOpts+'</select>'+
+      '<label class="yc-ob-label">目前备考状态</label><div class="yc-ob-chips" id="fFresh">'+freshChips+'</div>'+
+      '<label class="yc-ob-label">薄弱板块（可多选，重点补）</label><div class="yc-ob-chips" id="fWeak">'+weakChips+'</div>'+
+      '<div class="yc-ob-grid"><div><label class="yc-ob-label">每天能刷</label><select class="yc-ob-select" id="fDaily"><option value="10">10 题</option><option value="20" selected>20 题</option><option value="30">30 题</option><option value="50">50 题</option></select></div>'+
+      '<div><label class="yc-ob-label">每日投入</label><select class="yc-ob-select" id="fMins"><option value="20">20 分钟</option><option value="40" selected>40 分钟</option><option value="60">1 小时</option><option value="120">2 小时+</option></select></div></div>'+
+      '<button class="yc-ob-primary" id="fGen">✨ 生成我的备考计划</button>'+
+      '<button class="yc-ob-ghost" id="fLater" style="border-color:#e5e7eb;color:#6b7280">暂不设置，先逛逛（30天内不再提醒）</button>'+
+      '<div class="yc-ob-foot">生成后可随时在底部「计划」入口重新定制</div>';
+    openCard('ycObForm',html,{closable:true});
+    var ovF=$('ycObForm');
+    if(ovF){ var xbF=ovF.querySelector('.yc-ob-x'); if(xbF) xbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} try{ if(window.YCNotify) YCNotify.dismiss('planForm'); }catch(e){} set(K_ONB,'2'); }); }
+    bindChips('fFresh','data-fresh',true);
+    bindChips('fWeak','data-weak',false);
+    $('fGen').addEventListener('click',function(){
+      var fresh=oneChip('fFresh')||'完全没开始';
+      var weak=chipsVal('fWeak');
+      var plan={
+        name:($('fName').value||'同学').trim(),
+        exam:$('fExam').value,
+        date:$('fDate').value||defDate,
+        prov:$('fProv').value,
+        fresh:fresh,
+        weak:weak,
+        daily:parseInt($('fDaily').value,10)||20,
+        mins:parseInt($('fMins').value,10)||40,
+        created:Date.now()
+      };
+      setJSON(K_PLAN,plan); set(K_ONB,'2');
+      badge('ycgk.v2.plangen');
+      showToast('✓ 学习计划已生成，可在底部「计划」随时调整');
+      screenPlan();
+    });
+    var lbF=$('fLater'); if(lbF) lbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} try{ if(window.YCNotify) YCNotify.dismiss('planForm'); }catch(e){} set(K_ONB,'2'); closeCard(); });
+  }
+  function bindChips(id,attr,single){
+    var box=$(id); if(!box) return;
+    box.addEventListener('click',function(e){
+      var c=e.target.closest?e.target.closest('[data-fresh],[data-weak]'):null;
+      if(!c||c.parentNode!==box) return;
+      if(single){ var all=box.querySelectorAll('.yc-ob-chip'); for(var i=0;i<all.length;i++)all[i].classList.remove('on'); c.classList.add('on'); }
+      else c.classList.toggle('on');
+    });
+  }
+  function oneChip(id){ var c=$(id).querySelector('.yc-ob-chip.on'); return c?(c.getAttribute('data-fresh')||c.getAttribute('data-weak')):''; }
+  function chipsVal(id){ var all=$(id).querySelectorAll('.yc-ob-chip.on'),r=[]; for(var i=0;i<all.length;i++)r.push(all[i].getAttribute('data-weak')||all[i].getAttribute('data-fresh')); return r; }
+
+  /* ---------- 屏幕3：备考计划 ---------- */
+  function daysTo(dateStr){
+    try{ var d=new Date(dateStr+'T00:00:00'); var now=new Date(); now.setHours(0,0,0,0); return Math.max(0,Math.round((d-now)/86400000)); }catch(e){ return 60; }
+  }
+  function weakModules(plan){
+    var map={'常识判断':'changshi','言语理解':'yanyu','判断推理':'panduan','数量关系':'shuliang','资料分析':'ziliao','申论':'shenlun','综合应用':'zy'};
+    var r=[]; for(var i=0;i<(plan.weak||[]).length;i++){ var m=map[plan.weak[i]]; if(m)r.push(m); } return r;
+  }
+  function buildStages(plan){
+    var days=daysTo(plan.date), wm=weakModules(plan), fresh=plan.fresh;
+    var stages=[];
+    if(fresh==='零基础'||fresh==='完全没开始'||fresh==='有一点基础'){
+      stages.push({name:'第 0 步 · 水平摸底',days:1,mock:true,tasks:['先做一套模拟测试，摸清当前真实水平','★★ 这一步最重要，做完计划会自动为你校准']});
+    }
+    var b=Math.max(3,Math.round(days*0.3)), a=Math.max(3,Math.round(days*0.3)), q=Math.max(2,Math.round(days*0.25)), s=Math.max(1,days-b-a-q);
+    var focus=(wm.length?wm.slice(0,3).join(' / '):'常识、言语、判断');
+    stages.push({name:'第一阶段 · 基础夯实',days:b,tasks:['主攻 '+focus+'，每天 '+plan.daily+' 题','错题当天整理，弄清每个选项',''+plan.mins+' 分钟专注训练']});
+    stages.push({name:'第二阶段 · 专项突破',days:a,tasks:['薄弱模块加练：'+focus,'限时训练，正确率目标 70%+','每周复盘一次错题本']});
+    stages.push({name:'第三阶段 · 真题强化',days:q,tasks:['按考试类别刷真题卷（见模拟测试专区）','每 2 天做一套，做完必复盘','把高频错题回炉重做']});
+    stages.push({name:'第四阶段 · 全真模考冲刺',days:s,tasks:['严格计时做整套卷，还原考场','稳住优势项，主抓提分最快的模块','考前一两天只看错题和笔记']});
+    return stages;
+  }
+  function screenPlan(closable){
+    var plan=getJSON(K_PLAN,null);
+    if(!plan){ screenForm(); return; }
+    var days=daysTo(plan.date), stages=buildStages(plan);
+    var tags='<span class="yc-ob-tag">👤 '+esc(plan.name)+'</span><span class="yc-ob-tag">🎯 '+esc(plan.exam)+'</span><span class="yc-ob-tag">📍 '+esc(plan.prov)+'</span><span class="yc-ob-tag">📊 '+esc(plan.fresh)+'</span>'+
+      (plan.weak&&plan.weak.length?'<span class="yc-ob-tag">📌 弱项 '+esc(plan.weak.join('·'))+'</span>':'');
+    var stHtml='';
+    for(var i=0;i<stages.length;i++){
+      var s=stages[i],tasks='';
+      for(var t=0;t<s.tasks.length;t++){
+        var cls=(s.mock||/模拟测试|真题卷|整套卷/.test(s.tasks[t]))?'yc-ob-task go':'yc-ob-task';
+        var attr=(s.mock||/模拟测试/.test(s.tasks[t]))?' data-gomock="1"':(/真题卷|整套卷/.test(s.tasks[t])?' data-gomock="1"':'');
+        tasks+='<div class="'+cls+'"'+attr+'>'+esc(s.tasks[t])+(attr?' ›':'')+'</div>';
+      }
+      stHtml+='<div class="yc-ob-stage"><div class="yc-ob-stage-h"><span style="background:none;color:#202020;padding:0">'+esc(s.name)+'</span><span>约 '+s.days+' 天</span></div>'+tasks+'</div>';
+    }
+    var html='<div class="yc-ob-h">📋 '+esc(plan.name)+'的备考计划</div>'+
+      '<div class="yc-ob-profile">'+tags+'</div>'+
+      '<div class="yc-ob-hero"><div class="d">'+days+'</div><div class="l">天后开考 · 每天 '+plan.daily+' 题 / '+plan.mins+' 分钟</div></div>'+
+      stHtml+
+      '<button class="yc-ob-primary" id="pMock">📝 去做模拟测试（定位水平）</button>'+
+      '<div class="yc-ob-nav"><button class="prev" id="pEdit">重新定制</button><button class="next" id="pStart">开始今天的任务</button></div>'+
+      '<div class="yc-ob-foot">计划按你的考试日期自动推进 · 数据只存在本机</div>';
+    openCard('ycObPlan',html,{closable:closable!==false,wide:true});
+    var ovEl=$('ycObPlan');
+    ovEl.addEventListener('click',function(e){
+      var c=e.target.closest?e.target.closest('[data-gomock]'):null;
+      if(c){ closeCard(true); screenMock(); }
+    });
+    $('pMock').addEventListener('click',function(){ closeCard(true); screenMock(); });
+    $('pEdit').addEventListener('click',function(){ screenForm(plan); });
+    $('pStart').addEventListener('click',function(){
+      var wm=weakModules(plan);
+      var mods=wm.length?wm:['changshi','yanyu','panduan','shuliang','ziliao'];
+      ensureBank(function(){
+        var qs=pickByModules(mods,Math.min(plan.daily,30),77);
+        if(!qs.length){ alert('题库还在加载，请稍等几秒再试'); return; }
+        runQuiz(qs,'今日任务 · '+plan.daily+' 题',function(res){ closeCard(true); screenResult(res,null); });
+      });
+    });
+  }
+
+  /* ---------- 屏幕4：模拟测试专区 ---------- */
+  var PAPERS=[
+    {id:'gk-a',exam:'国考',name:'国考 · 行政执法卷（A类）',cls:'A类',total:20,seed:11,mix:{changshi:4,yanyu:4,panduan:4,shuliang:4,ziliao:4}},
+    {id:'gk-b',exam:'国考',name:'国考 · 综合管理卷（B类）',cls:'B类',total:20,seed:12,mix:{yanyu:5,panduan:5,ziliao:5,changshi:5}},
+    {id:'sk-a',exam:'省考',name:'省考 · 县级综合卷（A类）',cls:'A类',total:20,seed:21,mix:{changshi:4,yanyu:5,panduan:5,shuliang:3,ziliao:3}},
+    {id:'sk-b',exam:'省考',name:'省考 · 乡镇基层卷（B类）',cls:'B类',total:20,seed:22,mix:{changshi:5,yanyu:4,panduan:4,shuliang:4,ziliao:3}},
+    {id:'sy-a',exam:'事业编',name:'事业编 · 综合管理（A类）',cls:'A类',total:20,seed:31,mix:{changshi:4,yanyu:4,panduan:4,shuliang:4,ziliao:4}},
+    {id:'sy-b',exam:'事业编',name:'事业编 · 社科专技（B类）',cls:'B类',total:20,seed:32,mix:{yanyu:6,panduan:6,changshi:4,ziliao:4}},
+    {id:'sy-c',exam:'事业编',name:'事业编 · 自科专技（C类）',cls:'C类',total:20,seed:33,mix:{shuliang:6,ziliao:6,panduan:4,changshi:4}},
+    {id:'sy-d',exam:'事业编',name:'事业编 · 中小学教师（D类）',cls:'D类',total:20,seed:34,mix:{yanyu:5,panduan:5,changshi:5,ziliao:5}},
+    {id:'sy-e',exam:'事业编',name:'事业编 · 医疗卫生（E类）',cls:'E类',total:20,seed:35,mix:{changshi:6,yanyu:4,panduan:4,ziliao:6}},
+    {id:'jh',exam:'军队文职/三支一扶/央国企',name:'军队文职 · 三支一扶 · 央国企 综合卷',cls:'综合',total:20,seed:41,mix:{changshi:5,jundui:4,yanyu:4,panduan:4,ziliao:3}}
+  ];
+  var EXAM_FILTER=['全部','国考','省考','事业编','综合类'];
+  function screenMock(filter){
+    filter=filter||'全部';
+    badge('ycgk.v2.mockshow');
+    var fHtml=''; for(var i=0;i<EXAM_FILTER.length;i++) fHtml+='<button class="'+(EXAM_FILTER[i]===filter?'on':'')+'" data-f="'+EXAM_FILTER[i]+'">'+EXAM_FILTER[i]+'</button>';
+    var plan=getJSON(K_PLAN,null);
+    var firstTip=(plan&&(plan.fresh==='零基础'||plan.fresh==='完全没开始'))
+      ? '<div class="yc-ob-warn">🎯 你是<b>零基础/刚起步</b>，建议先做第 1 套卷摸底，看清强弱再按计划训练。</div>' : '';
+    var list='';
+    for(var p=0;p<PAPERS.length;p++){
+      var paper=PAPERS[p], show=(filter==='全部'||paper.exam===filter||(filter==='综合类'&&/军队|三支|央国企/.test(paper.exam)));
+      if(!show) continue;
+      var best=bestScore(paper.id);
+      list+='<div class="yc-ob-paper" data-p="'+paper.id+'"><span class="bd">'+esc(paper.cls)+' · '+esc(paper.exam)+'</span>'+
+        '<div class="nm">'+esc(paper.name)+'</div>'+
+        '<div class="mt">'+paper.total+' 题 · 建议 '+Math.round(paper.total*1.2)+' 分钟'+(best!==null?' · 最佳 '+best+' 分':'')+'</div>'+
+        '<div class="go">开始测试 ›</div></div>';
+    }
+    var html='<div class="yc-ob-h">📝 模拟测试专区</div>'+
+      '<div class="yc-ob-sub">10 套难度适中卷，做完立即判分、定位当前水平</div>'+firstTip+
+      '<div class="yc-ob-filter" id="mFilter">'+fHtml+'</div>'+
+      '<div class="yc-ob-papers" id="mList">'+list+'</div>'+
+      '<div class="yc-ob-foot">题目由命题组精选组合 · 成绩只存在本机</div>';
+    openCard('ycObMock',html,{closable:true,wide:true});
+    var ovEl=$('ycObMock');
+    ovEl.addEventListener('click',function(e){
+      var f=e.target.closest?e.target.closest('[data-f]'):null;
+      if(f){ screenMock(f.getAttribute('data-f')); return; }
+      var p=e.target.closest?e.target.closest('[data-p]'):null;
+      if(p){ startPaper(p.getAttribute('data-p')); return; }
+    });
+  }
+  function bestScore(pid){
+    var recs=getJSON(K_MOCK,[]),best=null;
+    for(var i=0;i<recs.length;i++) if(recs[i].pid===pid && (best===null||recs[i].score>best)) best=recs[i].score;
+    return best;
+  }
+
+  /* ---------- 题库读取与组卷 ---------- */
+  function allQuestions(){
+    var arr=[];
+    try{
+      var dr=window.__ycDr||[];
+      for(var i=0;i<dr.length;i++) arr.push(dr[i]);
+      var cs=window.YC_CS_BANK||[]; for(var i2=0;i2<cs.length;i2++) arr.push(cs[i2]);
+      var more=window.YC_MORE_QBANKS||[];
+      for(var j=0;j<more.length;j++){ var sub=more[j]||[]; for(var k=0;k<sub.length;k++) arr.push(sub[k]); }
+    }catch(e){}
+    var seen={},out=[];
+    for(var m=0;m<arr.length;m++){
+      var q=arr[m];
+      if(q&&q.id&&!seen[q.id]&&typeof q.prompt==='string'&&q.prompt&&q.options&&q.options.length===4&&typeof q.answer==='number'&&q.answer>=0&&q.answer<=3){
+        seen[q.id]=1; out.push(q);
+      }
+    }
+    return out;
+  }
+  function seededShuffle(a,seed){
+    var arr=a.slice(),s=seed||1;
+    function rnd(){ s=(s*9301+49297)%233280; return s/233280; }
+    for(var i=arr.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1)); var t=arr[i];arr[i]=arr[j];arr[j]=t; }
+    return arr;
+  }
+  function byModule(){
+    var qs=allQuestions(),g={};
+    for(var i=0;i<qs.length;i++){ var m=qs[i].module||'other'; (g[m]=g[m]||[]).push(qs[i]); }
+    return g;
+  }
+  function pickByModules(mods,n,seed){
+    var g=byModule(),picked=[],seen={};
+    var per=Math.max(1,Math.ceil(n/mods.length));
+    for(var a=0;a<mods.length;a++){
+      var pool=seededShuffle(g[mods[a]]||[],seed+a*13);
+      var take=Math.min(per,pool.length);
+      for(var b=0;b<take && picked.length<n;b++){ if(!seen[pool[b].id]){ seen[pool[b].id]=1; picked.push(pool[b]); } }
+    }
+    if(picked.length<n){
+      var rest=seededShuffle(allQuestions(),seed+999);
+      for(var r=0;r<rest.length && picked.length<n;r++){ if(!seen[rest[r].id]){ seen[rest[r].id]=1; picked.push(rest[r]); } }
+    }
+    return seededShuffle(picked,seed+7);
+  }
+  function ensureBank(cb){
+    var MODS=['changshi','yanyu','panduan','shuliang','ziliao','jundui'];
+    if(window.__ycLoadModules&&window.__ycBanksReady){ window.__ycLoadModules(MODS,cb); return; }
+    if(window.__ycLoadModules){
+      var tries=0;
+      var t=setInterval(function(){
+        tries++;
+        if(window.__ycBanksReady){ clearInterval(t); window.__ycLoadModules(MODS,cb); }
+        else if(tries>25){ clearInterval(t); cb(); }
+      },300);
+      return;
+    }
+    cb();
+  }
+  function startPaper(pid){
+    var paper=null; for(var i=0;i<PAPERS.length;i++) if(PAPERS[i].id===pid) paper=PAPERS[i];
+    if(!paper) return;
+    ensureBank(function(){
+      var g=byModule(),picked=[],seen={};
+      for(var mod in paper.mix){
+        var pool=seededShuffle(g[mod]||[],paper.seed+mod.length*17);
+        var take=Math.min(paper.mix[mod],pool.length);
+        for(var k=0;k<take;k++){ if(!seen[pool[k].id]){ seen[pool[k].id]=1; picked.push(pool[k]); } }
+      }
+      if(picked.length<paper.total){
+        var rest=seededShuffle(allQuestions(),paper.seed+888);
+        for(var r=0;r<rest.length && picked.length<paper.total;r++){ if(!seen[rest[r].id]){ seen[rest[r].id]=1; picked.push(rest[r]); } }
+      }
+      picked=seededShuffle(picked,paper.seed+3).slice(0,paper.total);
+      if(!picked.length){ alert('题库还在加载，请稍等几秒再试'); return; }
+      runQuiz(picked,paper.name,function(res){ saveResult(paper,res); screenResult(res,paper); });
+    });
+  }
+  function saveResult(paper,res){
+    var recs=getJSON(K_MOCK,[]);
+    recs.push({pid:paper.id,name:paper.name,score:res.score,correct:res.correct,total:res.total,rate:res.rate,mods:res.mods,ts:Date.now()});
+    if(recs.length>60) recs=recs.slice(-60);
+    setJSON(K_MOCK,recs); badge('ycgk.v2.mocksave');
+  }
+  function qImage(q){
+    var u=q.img||q.image||(q.config&&(q.config.img||q.config.url))||'';
+    if(!u) return '';
+    if(!/^https?:/i.test(u)){ u=u.replace(/^\.\//,''); u='https://ycteacher.github.io/yichenggongkao/'+(u.charAt(0)==='/'?u.slice(1):u); }
+    return '<img class="yc-ob-qimg" src="'+esc(u)+'" alt="题目图片" onerror="this.style.display=\'none\'">';
+  }
+
+  /* ---------- 屏幕5：答题 ---------- */
+  var MODN={changshi:'常识',yanyu:'言语',panduan:'判断',shuliang:'数量',ziliao:'资料',tuitui:'图推',jundui:'军队',liuda:'六大'};
+  function runQuiz(qs,title,onFinish){
+    var idx=0,answers=new Array(qs.length);
+    function render(){
+      var q=qs[idx],opts='',letters=['A','B','C','D'];
+      for(var i=0;i<q.options.length;i++){
+        opts+='<div class="yc-ob-opt'+(answers[idx]===i?' sel':'')+'" data-o="'+i+'"><span class="k">'+letters[i]+'</span><span>'+esc(q.options[i])+'</span></div>';
+      }
+      var pct=Math.round((idx)/qs.length*100);
+      var html='<div class="yc-ob-h" style="font-size:17px">'+esc(title)+'</div>'+
+        '<div class="yc-ob-prog"><span>第 '+(idx+1)+' / '+qs.length+' 题</span><span>'+esc(MODN[q.module]||'综合')+'</span></div>'+
+        '<div class="yc-ob-bar"><i style="width:'+pct+'%"></i></div>'+
+        '<div class="yc-ob-q">'+esc(q.prompt)+'</div>'+qImage(q)+
+        opts+
+        '<div class="yc-ob-nav"><button class="prev" id="qPrev"'+(idx===0?' disabled':'')+'>‹ 上一题</button>'+
+        '<button class="next" id="qNext">'+(idx===qs.length-1?'交卷看分 ›':'下一题 ›')+'</button></div>'+
+        '<div class="yc-ob-foot">选好选项会自动记录 · 可返回修改</div>';
+      openCard('ycObQuiz',html,{closable:true,wide:true});
+      var ovEl=$('ycObQuiz');
+      ovEl.addEventListener('click',function(e){
+        var o=e.target.closest?e.target.closest('[data-o]'):null;
+        if(o){ answers[idx]=parseInt(o.getAttribute('data-o'),10); var all=ovEl.querySelectorAll('.yc-ob-opt'); for(var k=0;k<all.length;k++)all[k].classList.remove('sel'); o.classList.add('sel'); }
+      });
+      $('qPrev').addEventListener('click',function(){ if(idx>0){idx--;render();} });
+      $('qNext').addEventListener('click',function(){
+        if(answers[idx]===undefined){ alert('请先选一个答案'); return; }
+        if(idx<qs.length-1){ idx++; render(); }
+        else finish();
+      });
+    }
+    function finish(){
+      var correct=0,mods={};
+      for(var i=0;i<qs.length;i++){
+        var m=qs[i].module||'other'; mods[m]=mods[m]||{c:0,t:0}; mods[m].t++;
+        if(answers[i]===qs[i].answer){ correct++; mods[m].c++; }
+      }
+      var rate=Math.round(correct/qs.length*100);
+      onFinish({correct:correct,total:qs.length,rate:rate,score:rate,mods:mods,qs:qs,answers:answers,title:title});
+    }
+    render();
+  }
+
+  /* ---------- 屏幕6：判分结果 ---------- */
+  function screenResult(res,paper){
+    badge('ycgk.v2.resultshow');
+    var level,advice;
+    if(res.rate>=85){ level='优秀 · 基础扎实'; advice='保持节奏，主攻真题和限时训练即可。'; }
+    else if(res.rate>=70){ level='良好 · 稳中有优'; advice='把错题涉及的模块再过一遍，正确率能再上一个台阶。'; }
+    else if(res.rate>=50){ level='中等 · 有提升空间'; advice='按计划重点补薄弱模块，先抓提分最快的部分。'; }
+    else { level='起步 · 需要系统补'; advice='别急，按备考计划从基础夯实开始，每天坚持就会见效。'; }
+    var rows='';
+    for(var m in res.mods){
+      var v=res.mods[m],r=Math.round(v.c/v.t*100);
+      rows+='<div class="yc-ob-row"><span>'+esc(MODN[m]||'综合')+'</span><span><b>'+v.c+'/'+v.t+'</b> · <span class="'+(r>=70?'g':'r')+'">'+r+'%</span></span></div>';
+    }
+    var html='<div class="yc-ob-h">判分结果</div><div class="yc-ob-sub">'+esc(res.title)+'</div>'+
+      '<div class="yc-ob-score"><div class="n">'+res.score+'</div><div class="t">分 · 答对 '+res.correct+'/'+res.total+' 题</div><div class="yc-ob-level">'+level+'</div></div>'+
+      '<div style="background:#F7F5F0;border-radius:12px;padding:11px 14px;font-size:13px;color:#5b5560;line-height:1.7;margin-bottom:12px">💡 '+advice+'</div>'+
+      '<div style="font-size:13px;font-weight:900;color:#374151;margin-bottom:4px">各模块正确率</div>'+rows+
+      '<div class="yc-ob-nav"><button class="prev" id="rReview">看错题</button><button class="next" id="rPlan">按结果优化计划</button></div>'+
+      '<button class="yc-ob-ghost" id="rAgain">再做一套 / 返回专区</button>';
+    openCard('ycObResult',html,{closable:true,wide:true});
+    $('rReview').addEventListener('click',function(){ reviewWrong(res); });
+    $('rPlan').addEventListener('click',function(){
+      var plan=getJSON(K_PLAN,null);
+      if(plan){
+        var weak=[]; for(var m in res.mods){ var r=res.mods[m].c/res.mods[m].t; if(r<0.7 && MODN[m]){ var nm=moduleToWeak(m); if(nm&&weak.indexOf(nm)<0)weak.push(nm); } }
+        if(weak.length) plan.weak=weak;
+        plan.fresh='有一点基础'; setJSON(K_PLAN,plan);
+      }
+      closeCard(true); screenPlan();
+    });
+    $('rAgain').addEventListener('click',function(){ closeCard(true); screenMock(); });
+  }
+  function moduleToWeak(m){ var inv={'changshi':'常识判断','yanyu':'言语理解','panduan':'判断推理','shuliang':'数量关系','ziliao':'资料分析','shenlun':'申论','zy':'综合应用'}; return inv[m]||''; }
+  function reviewWrong(res){
+    var html='<div class="yc-ob-h">错题回顾</div><div class="yc-ob-sub">'+esc(res.title)+' · 共 '+(res.total-res.correct)+' 题</div>';
+    var letters=['A','B','C','D'],n=0;
+    for(var i=0;i<res.qs.length;i++){
+      var q=res.qs[i]; if(res.answers[i]===q.answer) continue; n++;
+      html+='<div style="border-bottom:1px solid #f0ede7;padding:12px 0;text-align:left">'+
+        '<div style="font-size:13.5px;font-weight:700;color:#202020;line-height:1.6">'+n+'. '+esc(q.prompt)+'</div>'+
+        qImage(q)+
+        '<div style="font-size:12.5px;color:#15803D;margin-top:6px;font-weight:800">✓ 正确答案：'+letters[q.answer]+'. '+esc(q.options[q.answer])+'</div>'+
+        (res.answers[i]!==undefined?'<div style="font-size:12.5px;color:#b91c1c;margin-top:3px">✗ 你选的：'+letters[res.answers[i]]+'. '+esc(q.options[res.answers[i]])+'</div>':'')+
+        (q.explanation?'<div style="font-size:12px;color:#8a8378;margin-top:7px;line-height:1.6">解析：'+esc(q.explanation)+'</div>':'')+
+        '</div>';
+    }
+    if(!n) html+='<div class="yc-ob-sub" style="margin-top:20px">🎉 全对，没有错题！</div>';
+    html+='<button class="yc-ob-primary" id="rvBack">返回结果</button>';
+    openCard('ycObReview',html,{closable:true,wide:true});
+    $('rvBack').addEventListener('click',function(){ screenResult(res,null); });
+  }
+
+  /* ---------- 复制文本 ---------- */
+  function copyText(text,msg){
+    function done(){ toast(msg||'已复制'); }
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done,function(){fallback();}); }
+      else fallback();
+    }catch(e){ fallback(); }
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，请长按网址手动复制'); }
+      document.body.removeChild(ta);
+    }
+  }
+  function toast(msg){
+    var t=document.createElement('div');
+    t.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(20,16,12,.9);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;z-index:2147483647;box-shadow:0 4px 14px rgba(0,0,0,.3)';
+    t.textContent=msg; document.body.appendChild(t);
+    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2200);
+  }
+  function refreshInstallBtn(){ /* 预留：顶部安装按钮状态由 14 号维护 */ }
+
+  /* ---------- B4：今日计划 X/Y ---------- */
+  function planDaily(){
+    try{ var p=JSON.parse(localStorage.getItem(K_PLAN)||'null'); return p&&p.daily?p.daily:0; }catch(e){ return 0; }
+  }
+  function todayDone(){
+    try{
+      var d=new Date();
+      function pk(x){ return ''+x.getFullYear()+('0'+(x.getMonth()+1)).slice(-2)+('0'+x.getDate()).slice(-2); }
+      var k=pk(d), n=0;
+      var st=null; try{ st=JSON.parse(localStorage.getItem('ycgk-stat')||'null'); }catch(e){ st=null; }
+      if(st&&st.quiz&&st.quiz.d&&st.quiz.d[k]) n+=(st.quiz.d[k].n||0);
+      var buf=null; try{ buf=JSON.parse(localStorage.getItem('ycgk.tl.buf')||'null'); }catch(e){ buf=null; }
+      if(buf&&buf.quiz&&buf.quiz.d&&buf.quiz.d[k]) n+=(buf.quiz.d[k].n||0);
+      return n;
+    }catch(e){ return 0; }
+  }
+  function planBtnLabel(){
+    var daily=planDaily();
+    if(!daily) return '📋 计划';
+    var done=Math.min(todayDone(),daily);
+    return '📋 今日计划 '+done+'/'+daily;
+  }
+
+  /* ---------- B0：设置入口 —— 弹窗提醒总开关 ---------- */
+  function openPopSettings(){
+    try{
+      if(!(window.YCNotify&&YCNotify.openModal)) return;
+      var on=YCNotify.masterOn();
+      var rec=YCNotify.openModal({wide:false,closable:true,html:
+        '<div class="yc-ob-h" style="margin-bottom:4px">设置</div>'+
+        '<div class="yc-ob-sub" style="text-align:left">控制是否自动弹出安装引导、学习计划等提醒</div>'+
+        '<label style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F7F5F0;border-radius:12px;padding:14px;margin:12px 0;font-weight:800;color:#202020;font-size:14px">'+
+        '<span>🔔 弹窗提醒</span><input type="checkbox" id="ycPopMaster" '+(on?'checked':'')+' style="width:22px;height:22px;accent-color:#DC2626">'+
+        '</label>'+
+        '<div style="font-size:12px;color:#8a8378;line-height:1.6">关闭后，安装引导、学习计划等自动弹窗不再出现；公告条与手动入口不受影响。</div>'+
+        '<button class="yc-ob-primary" id="ycPopSetOk">好的</button>'
+      });
+      var cb=document.getElementById('ycPopMaster');
+      if(cb) cb.addEventListener('change',function(){ try{ YCNotify.setMaster(cb.checked); }catch(e){} });
+      var okb=document.getElementById('ycPopSetOk');
+      if(okb) okb.addEventListener('click',function(){ rec.close(); });
+    }catch(e){}
+  }
+
+  /* ---------- 常驻入口：顶部按钮 + 底部 tab ---------- */
+  function injectEntries(){
+    var actions=document.querySelector('.yc-top-actions');
+    if(actions && !$('ycPopSetBtn')){
+      var sb=document.createElement('button'); sb.id='ycPopSetBtn'; sb.className='yc-plan-btn';
+      sb.textContent='⚙️'; sb.title='设置'; sb.setAttribute('aria-label','设置');
+      sb.addEventListener('click',openPopSettings);
+      actions.insertBefore(sb,actions.firstChild);
+    }
+    if(actions && !$('ycPlanTopBtn')){
+      var b=document.createElement('button'); b.id='ycPlanTopBtn'; b.className='yc-plan-btn';
+      b.textContent=planBtnLabel();
+      b.addEventListener('click',function(){ screenPlan(true); });
+      actions.insertBefore(b,actions.firstChild);
+    }
+    var tabbar=document.querySelector('.yc-tabbar');
+    if(tabbar && !$('ycPlanTabBtn')){
+      var btn=document.createElement('button'); btn.id='ycPlanTabBtn'; btn.className='yc-plan-tab';
+      btn.innerHTML='<span class="mi">📋</span><span class="lb">'+(planDaily()?planBtnLabel().replace('📋 ',''):'计划')+'</span>';
+      btn.addEventListener('click',function(){ screenPlan(true); });
+      tabbar.appendChild(btn);
+    }
+    var mockBtn=null;
+    if(tabbar && !$('ycMockTabBtn')){
+      var mb=document.createElement('button'); mb.id='ycMockTabBtn'; mb.className='yc-plan-tab';
+      mb.innerHTML='<span class="mi">📝</span><span class="lb">模考</span>';
+      mb.addEventListener('click',function(){ screenMock('全部'); });
+      tabbar.appendChild(mb);
+    }
+  }
+  var tries=0,ij=setInterval(function(){ injectEntries(); if((document.querySelector('.yc-tabbar')&&document.querySelector('.yc-top-actions'))||++tries>40) clearInterval(ij); },150);
+  document.addEventListener('DOMContentLoaded',injectEntries);
+
+  /* ---------- 低频安装轻提醒：未装桌面且距上次提醒≥3天，弹非阻断浮条（已装永不提醒） ---------- */
+  var K_REM='ycgk.installRemind.v1';
+  function softInstallRemind(){
+    try{
+      if(installDone()) return;
+      if(installDismissed()) return;
+      if(window.YCNotify){
+        if(!YCNotify.canShow('installSoft')) return;
+        YCNotify.markShown('installSoft'); /* 3 天冷却 */
+      }else{
+        var last=0; try{ last=parseInt(raw(K_REM)||'0',10)||0; }catch(e){}
+        if(Date.now()-last < 3*86400000) return;
+        try{ set(K_REM,String(Date.now())); }catch(e){}
+      }
+    }catch(e){ return; }
+    setTimeout(function(){
+      if(document.getElementById('ycSoftInst')) return;
+      var bar=document.createElement('div'); bar.id='ycSoftInst';
+      bar.style.cssText='position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483001;background:#1F2937;color:#fff;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:700;box-shadow:0 6px 22px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;font-family:inherit;white-space:nowrap;max-width:92vw';
+      var tx=document.createElement('span'); tx.textContent='📱 还没装到桌面？装好一点就开，离线也能刷';
+      var go=document.createElement('button'); go.textContent='去安装';
+      go.style.cssText='background:#DC2626;color:#fff;border:none;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit';
+      go.addEventListener('click',function(){ if(bar.parentNode)bar.parentNode.removeChild(bar); window.location.href='install.html'; });
+      var x=document.createElement('button'); x.textContent='×';
+      x.style.cssText='background:none;border:none;color:#9ca3af;font-size:17px;cursor:pointer;padding:0 2px;font-family:inherit';
+      x.addEventListener('click',function(){ if(window.YCNotify){ try{ YCNotify.dismiss('installSoft'); }catch(e){} } else { dismissInstall(); } if(bar.parentNode)bar.parentNode.removeChild(bar); });
+      bar.appendChild(tx); bar.appendChild(go); bar.appendChild(x);
+      document.body.appendChild(bar);
+      setTimeout(function(){ if(bar.parentNode) bar.parentNode.removeChild(bar); },9000);
+    },5000);
+  }
+
+  /* ---------- 启动：首启引导流程 ---------- */
+  function start(){
+    try{
+      /* B2 总开关：设置里关闭后，不自动弹任何引导/提醒 */
+      if(window.YCNotify&&!YCNotify.masterOn()) return;
+      var step=raw(K_ONB)||'0';
+      if(step==='2'){ softInstallRemind(); return; } // 已完成引导，正常用
+      /* 已填过学习计划的用户（含旧版本键）：视为已完成引导，绝不再弹表单或安装引导 */
+      if(hasAnyPlan()){ set(K_ONB,'2'); softInstallRemind(); return; }
+      /* 30天内点过「暂不设置，先逛逛」：跳过整个引导链，计划入口常驻菜单 */
+      if(planLaterActive()){ set(K_ONB,'2'); softInstallRemind(); return; }
+      if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
+      /* 微信/QQ 内置浏览器装不了 PWA：不自动弹安装引导，常驻入口里给「在浏览器打开」指引 */
+      if(inAppBrowser()){ return; }
+      /* B4：学习计划表单自动弹出仅限学习时段（7:00–23:00），每天最多 1 次 */
+      var nowD=new Date(), h=nowD.getHours();
+      var dkey=(window.YCNotify?YCNotify.P:'ycgk.pop.')+'d.planForm';
+      var shownToday=false; try{ shownToday=(localStorage.getItem(dkey)===nowD.toDateString()); }catch(e){}
+      if(step==='1'&&(h<7||h>=23||shownToday)){ softInstallRemind(); return; }
+      /* 频控：3 天冷却（非永久）；累计访问不满 3 次（已访问 2 次以上才允许）不弹；每次会话最多 1 次 */
+      var visits=0; try{ visits=parseInt(raw(K_VISITS)||'0',10)||0; }catch(e){}
+      visits++; set(K_VISITS,String(visits));
+      var sessPopped=false; try{ sessPopped=!!sessionStorage.getItem(K_SESS_POP); }catch(e){}
+      if(installDismissed()||sessPopped||visits<3){ softInstallRemind(); return; }
+      try{ sessionStorage.setItem(K_SESS_POP,'1'); }catch(e){}
+      try{ localStorage.setItem(dkey,nowD.toDateString()); }catch(e){}
+      if(window.YCNotify) YCNotify.markShown('install'); /* 记 3 天冷却 */
+      /* B1：自动弹窗延迟 ≥2s，做题/模考页面不弹 */
+      setTimeout(function(){
+        try{
+          if(window.YCNotify&&YCNotify.inExamView()) return;
+          if(step==='0') screenInstall();
+          else if(step==='1') screenForm();
+        }catch(e){}
+      },2000);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+
+<script>
+/* 亿成公考 · 内测公告（实时时间 + 问卷引导） */
+(function(){
+  if(document.getElementById('yc-notice')) return;
+  var css=document.createElement('style');
+  css.textContent=
+    '#yc-notice{position:fixed;top:0;left:0;right:0;z-index:2147483000;'+
+      'background:linear-gradient(90deg,#B91C1C,#EA580C);color:#fff;'+
+      'font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;'+
+      'box-shadow:0 2px 10px rgba(0,0,0,.22);}'+
+    '.yc-notice-inner{max-width:960px;margin:0 auto;display:flex;align-items:flex-start;gap:8px;'+
+      'padding:7px 40px 7px 12px;font-size:12.5px;line-height:1.55;position:relative;}'+
+    '.yc-notice-tag{flex:none;background:rgba(255,255,255,.22);border-radius:4px;'+
+      'padding:1px 7px;font-weight:700;white-space:nowrap;}'+
+    '.yc-notice-text{flex:1;}'+
+    '.yc-notice-clock{display:block;color:#FDE68A;font-weight:800;font-size:13.5px;margin-bottom:2px;}'+
+    '.yc-notice-text a{color:#FDE68A;font-weight:700;text-decoration:underline;}'+
+    '.yc-notice-close{position:absolute;top:5px;right:8px;background:none;border:none;'+
+      'color:#fff;font-size:19px;line-height:1;cursor:pointer;opacity:.9;padding:2px 6px;}'+
+    '.yc-notice-upd{flex:none;align-self:center;background:#FDE68A;color:#7F1D1D;border:none;'+
+      'border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;cursor:pointer;'+
+      'box-shadow:0 2px 8px rgba(0,0,0,.2);white-space:nowrap;font-family:inherit;}'+
+    '.yc-notice-upd:active{transform:scale(.95)}'+
+    '.yc-notice-upd:disabled{opacity:.6}'+
+    '#yc-upd-float{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);'+
+      'z-index:2147483001;background:#1F2937;color:#FDE68A;border:1.5px solid #FDE68A;border-radius:999px;'+
+      'padding:10px 18px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);'+
+      'font-family:system-ui,-apple-system,"PingFang SC",sans-serif;display:none;white-space:nowrap;}'+
+    '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}'+
+    /* 公告条固定后，顶栏与正文整体下移，滚动时顶部完全不动 */
+    '.yc-topbar{top:var(--yc-notice-h,0px)!important}'+
+    'body.yc-ui{padding-top:calc(60px + var(--yc-notice-h,0px))!important}'+
+    '@media (max-width:700px){body.yc-ui{padding-top:calc(92px + var(--yc-notice-h,0px))!important}}';
+  document.head.appendChild(css);
+  var box=document.createElement('div');
+  box.id='yc-notice';
+  box.innerHTML=
+    '<div class="yc-notice-inner">'+
+      '<span class="yc-notice-tag">公告</span>'+
+      '<span class="yc-notice-text">'+
+        '<span class="yc-notice-clock" id="yc-notice-clock"></span>'+
+        '亿成公考刷题神器正在内测、不断升级，可能遇到题目或功能的小问题，欢迎包涵与反馈。'+
+        '欢迎提交<a href="./feedback.html">最下方的调查问卷</a>，说说你的使用感受；'+
+        '问卷积分可兑换考公书籍、家电、平板、手机等实物，也可换一对一视频答疑。'+
+      '</span>'+
+      '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
+      '<button class="yc-notice-close" aria-label="关闭">×</button>'+
+    '</div>';
+  function pad(n){return n<10?'0'+n:''+n;}
+  function tick(){
+    var d=new Date();
+    var el=document.getElementById('yc-notice-clock');
+    if(el) el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+  tick(); setInterval(tick,1000);
+
+  function doUpdate(btn){
+    /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */
+    if(btn){ btn.disabled=true; btn.textContent='更新中…'; }
+    /* B6：新版本处于 waiting 时，用户点击浮条/一键更新才正式激活并刷新 */
+    try{
+      if(navigator.serviceWorker){
+        navigator.serviceWorker.getRegistration().then(function(reg){
+          if(reg&&reg.waiting){ try{ reg.waiting.postMessage({type:'yc-skip-waiting'}); }catch(e){} }
+        });
+      }
+    }catch(e){}
+    var go=function(){
+      try{ sessionStorage.setItem('ycUpdOk', String(Date.now())); }catch(e){}
+      /* 强制从网络重新拉取最新 index.html，绕过浏览器缓存，确保更新真实生效 */
+      if(window.fetch){
+        fetch(location.pathname, {cache:'reload'}).then(function(){ location.replace(location.pathname+'?upd='+Date.now()); }).catch(function(){ location.replace(location.pathname+'?upd='+Date.now()); });
+      } else {
+        location.replace(location.pathname+'?upd='+Date.now());
+      }
+    };
+    /* 把当前页面用到的所有脚本、样式也强制走一次网络，刷新浏览器缓存，
+       这样即使文件名没变（版本戳没升），更新后也立刻是最新内容 */
+    var refreshAssets=function(){
+      if(!window.fetch) return Promise.resolve();
+      var seen={}, urls=[], els=document.querySelectorAll('script[src],link[href]');
+      for(var i=0;i<els.length;i++){
+        var u=els[i].src||els[i].href;
+        if(!u) continue;
+        try{ u=new URL(u, location.href).href; }catch(e){ continue; }
+        if(!/^https?:/.test(u)) continue;
+        if(u.indexOf(location.origin)!==0) continue; /* 只刷本站资源 */
+        if(seen[u]) continue; seen[u]=1; urls.push(u);
+      }
+      return Promise.all(urls.map(function(u){
+        return fetch(u, {cache:'reload'}).catch(function(){});
+      }));
+    };
+    var swClear=function(){
+      return new Promise(function(resolve){
+        if(!navigator.serviceWorker || !navigator.serviceWorker.controller){ resolve(); return; }
+        try{
+          var ch=new MessageChannel(), done=false;
+          ch.port1.onmessage=function(){ if(!done){done=true;resolve();} };
+          setTimeout(function(){ if(!done){done=true;resolve();} },1500);
+          navigator.serviceWorker.controller.postMessage({type:'yc-clear-cache'},[ch.port2]);
+        }catch(e){ resolve(); }
+      });
+    };
+    swClear().then(function(){ return refreshAssets(); }).then(go).catch(go);
+  }
+
+  function bindUpd(){
+    var b=document.getElementById('yc-notice-upd');
+    if(b && !b.dataset.bound){ b.dataset.bound='1'; b.addEventListener('click',function(){ doUpdate(b); }); }
+  }
+  bindUpd();
+
+  /* 更新完成提示：一键更新跳转回来后，明确告诉用户"已经是最新版" */
+  (function(){
+    var ok=null;
+    try{ ok=sessionStorage.getItem('ycUpdOk'); if(ok) sessionStorage.removeItem('ycUpdOk'); }catch(e){}
+    if(!ok) return;
+    try{ if(localStorage.getItem('ycgk.pop.done.updToast')==='1') return; localStorage.setItem('ycgk.pop.done.updToast','1'); }catch(e){}
+    var t=document.createElement('div');
+    t.id='yc-upd-toast';
+    t.textContent='✓ 已更新到最新版本';
+    t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483647;'+
+      'background:#15803D;color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;'+
+      'box-shadow:0 6px 22px rgba(21,128,61,.35);font-family:inherit;white-space:nowrap;';
+    var mount2=function(){
+      if(!document.body){ setTimeout(mount2,120); return; }
+      document.body.appendChild(t);
+      setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; },2600);
+      setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },3100);
+    };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount2); else mount2();
+  })();
+
+  function showFloat(){
+    if(document.getElementById('yc-upd-float')) return;
+    try{ if(window.YCNotify&&!YCNotify.canShow('updFloat')) return; }catch(e){}
+    try{ var h=parseInt(localStorage.getItem('ycgk.updfloat.hide')||'0',10)||0; if(h&&Date.now()-h<86400000) return; }catch(e){}
+    var f=document.createElement('button');
+    f.id='yc-upd-float';
+    f.textContent='🆕 有新版本 · 点这里一键更新';
+    f.addEventListener('click',function(){ doUpdate(f); });
+    var x=document.createElement('span');
+    x.textContent='×'; x.title='暂不提醒（24小时）';
+    x.style.cssText='margin-left:6px;color:#e5e7eb;font-size:17px;cursor:pointer;padding:2px 8px;';
+    x.addEventListener('click',function(ev){ ev.stopPropagation(); try{ localStorage.setItem('ycgk.updfloat.hide',String(Date.now())); }catch(e){} try{ if(window.YCNotify) YCNotify.dismiss('updFloat'); }catch(e){} if(f.parentNode)f.parentNode.removeChild(f); });
+    f.appendChild(x);
+    document.body.appendChild(f);
+  }
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg) return;
+      if(reg.waiting || reg.installing) showFloat();
+      reg.addEventListener('updatefound',function(){ setTimeout(showFloat, 500); });
+    });
+  }
+  function mount(){
+    if(!document.body) return;
+    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'||(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ document.documentElement.style.setProperty('--yc-notice-h','0px'); return; } }catch(e){}
+    document.body.insertBefore(box,document.body.firstChild);
+    var btn=box.querySelector('.yc-notice-close');
+    if(btn) btn.addEventListener('click',function(){
+      try{ localStorage.setItem('ycgk.notice.dismissed.v1','1'); }catch(e){}
+      try{ if(window.YCNotify) YCNotify.dismiss('noticeBar'); }catch(e){}
+      box.style.display='none';
+      document.documentElement.style.setProperty('--yc-notice-h','0px');
+    });
+    var measure=function(){
+      if(box.style.display==='none') return;
+      document.documentElement.style.setProperty('--yc-notice-h',(box.offsetHeight||0)+'px');
+    };
+    measure();
+    window.addEventListener('resize',measure);
+    setTimeout(measure,600);
+    setTimeout(measure,2000);
+    if(window.ResizeObserver){
+      var ro=new ResizeObserver(function(){ measure(); });
+      ro.observe(box);
+    }
+  }
+  if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
+})();
+</script>
+<script>
+/* telemetry v1: 学生端埋点升级 —— PWA安装 / UA画像 / 心跳与会话 / 刷题行为聚合 / 稳定性
+   数据契约（供数据看板读取）：
+   - ycgk-stat 聚合池：{ts, inst:{t,d:{YYYYMMDD:n},os:{name:n}},
+       err:{d:{date:{n,top:{msg:n}}}}, perf:{d:{date:[ms]}},
+       quiz:{d:{date:{n,c,dur,stk,mods:{k:{n,c}},subs:{},diffs:{}}}},
+       sess:{d:{date:n},dur:{date:sec}}}
+   - ycgk-hb-0..7 心跳分片：{d:{did:lastTs}, s:{did:sessionStart}}（>3小时记录清理）
+   - 实时池(ycgk-live-v1)设备记录新增可选字段：brand/net/sc/src/srcs/osv
+   规范：读-合并-写，失败重试2次退避；单键≤100KB超出滚动裁剪；与 11-part 实时池上报分键不冲突。 */
+(function(){
+  if(window.__ycTl)return;window.__ycTl=1;
+  var LS='ycgk-stat',BUFK='ycgk.tl.buf',ANSK='ycgk.tl.ans',ACTK='ycgk.tl.lastAct';
+  var GETS=['https://textdb.dev/api/data/','https://textdb.online/'];
+  function pad(n){return ('0'+n).slice(-2)}
+  function dayKey(d){d=d||new Date();return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+  function did(){var id='';try{id=localStorage.getItem('ycgk.did.v1')}catch(e){}
+    if(!id){try{id=localStorage.getItem('ycgk.did')}catch(e){}if(id){var ok=false;try{localStorage.setItem('ycgk.did.v1',id);ok=true}catch(e){}if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}}
+    return id||'anon'}
+  function shard(){var s=did(),h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%8}
+  function get(k,cb){var i=0;(function next(){if(i>=GETS.length){cb(null);return}
+    fetch(GETS[i++]+k,{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+      if(!t||t.charAt(0)!=='{'){next();return}
+      try{cb(JSON.parse(t))}catch(e){next()}}).catch(function(){next()})})()}
+  function put(k,v,cb){
+    var s=JSON.stringify(v),n=0;
+    function dev(){fetch('https://textdb.dev/api/data/'+k,{method:'POST',headers:{'Content-Type':'text/plain'},body:s}).then(function(r){if(r.ok){cb(true)}else{retry()}},retry)}
+    function retry(){n++;if(n<=2){setTimeout(dev,n===1?2000:8000)}else if(n===3){setTimeout(function(){fetch('https://textdb.online/update/?key='+encodeURIComponent(k)+'&value='+encodeURIComponent(s)).then(function(){cb(true)},function(){cb(false)})},15000)}else{cb(false)}}
+    dev();
+  }
+  /* ---- 本地缓冲（页面关闭前落盘，下次启动续传） ---- */
+  var B={inst:null,err:null,perf:[],quiz:null,sess:null};
+  try{var saved=JSON.parse(localStorage.getItem(BUFK)||'null');if(saved&&typeof saved==='object'){B.inst=saved.inst||null;B.err=saved.err||null;B.perf=saved.perf||[];B.quiz=saved.quiz||null;B.sess=saved.sess||null}}catch(e){}
+  function saveBuf(){try{localStorage.setItem(BUFK,JSON.stringify(B))}catch(e){}}
+  function takeBuf(part){
+    var snap;
+    if(part==='quiz'){snap={quiz:B.quiz};B.quiz=null}
+    else{snap={inst:B.inst,err:B.err,perf:B.perf,sess:B.sess};B.inst=null;B.err=null;B.perf=[];B.sess=null}
+    saveBuf();return snap;
+  }
+  function backBuf(snap){
+    if(snap.inst){B.inst=snap.inst}
+    if(snap.err){B.err=snap.err}
+    if(snap.perf&&snap.perf.length){B.perf=(B.perf||[]).concat(snap.perf)}
+    if(snap.sess){B.sess=snap.sess}
+    if(snap.quiz){B.quiz=snap.quiz}
+    saveBuf();
+  }
+  /* ---- 合并进聚合池 ---- */
+  function mergeKV(t,src){if(!src)return;Object.keys(src).forEach(function(k){var o=src[k]||{};var x=t[k]||(t[k]={n:0,c:0});x.n+=o.n||0;x.c+=o.c||0})}
+  function pruneStat(p){
+    function trim(o,keep){var ks=Object.keys(o).sort();if(ks.length>keep){for(var i=0;i<ks.length-keep;i++)delete o[ks[i]]}}
+    trim(p.err.d,14);trim(p.perf.d,14);trim(p.quiz.d,30);trim(p.sess.d,30);trim(p.sess.dur,30);
+    function size(){try{return JSON.stringify(p).length}catch(e){return 0}}
+    var steps=[
+      function(){Object.keys(p.perf.d).forEach(function(d){var a=p.perf.d[d];if(a.length>50)p.perf.d[d]=a.slice(-50)})},
+      function(){trim(p.err.d,7);trim(p.perf.d,7);trim(p.quiz.d,7);trim(p.sess.d,7);trim(p.sess.dur,7)},
+      function(){p.perf={d:{}}},
+      function(){trim(p.quiz.d,3);trim(p.sess.d,3);trim(p.sess.dur,3)}
+    ];
+    for(var i=0;i<steps.length&&size()>100000;i++)steps[i]();
+  }
+  function mergeStat(pool,snap){
+    var p=pool&&typeof pool==='object'?pool:{};
+    var today=dayKey();
+    if(!p.inst||typeof p.inst!=='object')p.inst={t:0,d:{},os:{}};
+    if(!p.err||typeof p.err!=='object')p.err={d:{}};
+    if(!p.perf||typeof p.perf!=='object')p.perf={d:{}};
+    if(!p.quiz||typeof p.quiz!=='object')p.quiz={d:{}};
+    if(!p.sess||typeof p.sess!=='object')p.sess={d:{},dur:{}};
+    if(snap.inst&&snap.inst.n){
+      p.inst.t=(p.inst.t||0)+snap.inst.n;
+      p.inst.d[today]=(p.inst.d[today]||0)+snap.inst.n;
+      Object.keys(snap.inst.os).forEach(function(k){p.inst.os[k]=(p.inst.os[k]||0)+snap.inst.os[k]});
+    }
+    if(snap.err&&snap.err.n){
+      var e=p.err.d[today]||(p.err.d[today]={n:0,top:{}});
+      e.n+=snap.err.n;
+      Object.keys(snap.err.top).forEach(function(m){e.top[m]=(e.top[m]||0)+snap.err.top[m]});
+      var tks=Object.keys(e.top);
+      if(tks.length>10){tks.sort(function(a,b){return e.top[b]-e.top[a]});var keep={};for(var i=0;i<10;i++)keep[tks[i]]=e.top[tks[i]];e.top=keep}
+    }
+    if(snap.perf&&snap.perf.length){
+      var arr=p.perf.d[today]||(p.perf.d[today]=[]);
+      snap.perf.forEach(function(v){arr.push(v)});
+      if(arr.length>200)p.perf.d[today]=arr.slice(-200);
+    }
+    if(snap.sess){
+      Object.keys(snap.sess.d||{}).forEach(function(d){p.sess.d[d]=(p.sess.d[d]||0)+snap.sess.d[d]});
+      Object.keys(snap.sess.dur||{}).forEach(function(d){p.sess.dur[d]=(p.sess.dur[d]||0)+snap.sess.dur[d]});
+    }
+    if(snap.quiz){
+      Object.keys(snap.quiz.d||{}).forEach(function(d){
+        var q=snap.quiz.d[d],t=p.quiz.d[d]||(p.quiz.d[d]={n:0,c:0,dur:0,stk:0,mods:{},subs:{},diffs:{}});
+        t.n+=q.n||0;t.c+=q.c||0;t.dur+=q.dur||0;t.stk=Math.max(t.stk||0,q.stk||0);
+        mergeKV(t.mods,q.mods);mergeKV(t.subs,q.subs);mergeKV(t.diffs,q.diffs);
+      });
+    }
+    p.ts=Date.now();
+    pruneStat(p);
+    return p;
+  }
+  /* ---- 上报（串行化，base=安装/错误/耗时/会话，quiz=刷题聚合） ---- */
+  var busy=false,pendQ=false;
+  function doFlush(part){
+    if(part==='quiz'){if(busy){pendQ=true;return}if(!B.quiz)return}
+    else{if(busy)return;if(!B.inst&&!B.err&&!(B.perf&&B.perf.length)&&!B.sess)return}
+    busy=true;
+    var snap=takeBuf(part);
+    get(LS,function(pool){
+      var merged=mergeStat(pool,snap);
+      put(LS,merged,function(ok){
+        if(ok){busy=false;if(pendQ){pendQ=false;doFlush('quiz')}}
+        else{backBuf(snap);busy=false}
+      });
+    });
+  }
+  setInterval(function(){doFlush('base')},600000);
+  setInterval(function(){doFlush('quiz')},3600000);
+  /* ---- 会话识别与时长 ---- */
+  try{
+    var last=+localStorage.getItem(ACTK)||0;
+    if(Date.now()-last>1800000){if(!B.sess)B.sess={d:{},dur:{}};var dk0=dayKey();B.sess.d[dk0]=(B.sess.d[dk0]||0)+1}
+    localStorage.setItem(ACTK,String(Date.now()));
+  }catch(e){}
+  var visSince=document.hidden?0:Date.now();
+  function addDur(a,b){var ms=Math.min(b-a,7200000);if(ms>5000){if(!B.sess)B.sess={d:{},dur:{}};var k=dayKey();B.sess.dur[k]=(B.sess.dur[k]||0)+Math.round(ms/1000)}}
+  /* ---- 心跳（≤60秒，仅前台；分片键 ycgk-hb-0..7） ---- */
+  var HB='ycgk-hb-'+shard(),sessStart=Date.now();
+  function beat(){
+    get(HB,function(pool){
+      var p=pool&&typeof pool==='object'?pool:{};
+      if(!p.d||typeof p.d!=='object')p.d={};
+      if(!p.s||typeof p.s!=='object')p.s={};
+      var now=Date.now();
+      Object.keys(p.d).forEach(function(k){if(now-p.d[k]>10800000){delete p.d[k];delete p.s[k]}});
+      p.d[did()]=now;
+      if(!p.s[did()])p.s[did()]=sessStart;
+      p.ts=now;
+      put(HB,p,function(){});
+    });
+  }
+  beat();
+  setInterval(function(){if(!document.hidden){beat();try{localStorage.setItem(ACTK,String(Date.now()))}catch(e){}}},60000);
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){if(visSince){addDur(visSince,Date.now());visSince=0}beat();saveBuf();doFlush('base');doFlush('quiz')}
+    else{visSince=Date.now();beat()}
+  });
+  window.addEventListener('pagehide',function(){
+    if(visSince){addDur(visSince,Date.now());visSince=0}
+    saveBuf();doFlush('base');doFlush('quiz');
+  });
+  /* ---- 刷题行为：本地聚合（模块维度），8秒轮询差分 ---- */
+  function readStudy(){try{var s=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}');return s.moduleProgress||{}}catch(e){return{}}}
+  var lastAns=null,lastDelta=0;
+  try{lastAns=JSON.parse(localStorage.getItem(ANSK)||'null')}catch(e){}
+  function pollQuiz(){
+    var mp=readStudy(),cur={},dn=0;
+    Object.keys(mp).forEach(function(k){var o=mp[k]||{};cur[k]={n:o.answered||0,c:o.correct||0}});
+    if(lastAns){
+      var now=Date.now(),dk=dayKey();
+      Object.keys(cur).forEach(function(k){
+        var l=lastAns[k]||{n:0,c:0},d1=cur[k].n-l.n,d2=cur[k].c-l.c;
+        if(d1>0){
+          dn+=d1;
+          if(!B.quiz)B.quiz={d:{}};
+          var q=B.quiz.d[dk]||(B.quiz.d[dk]={n:0,c:0,dur:0,stk:0,mods:{},subs:{},diffs:{}});
+          var c2=Math.max(0,Math.min(d2,d1));
+          q.n+=d1;q.c+=c2;
+          var m=q.mods[k]||(q.mods[k]={n:0,c:0});m.n+=d1;m.c+=c2;
+          if(lastDelta&&now-lastDelta<600000)q.dur+=Math.min(now-lastDelta,120000);
+        }
+      });
+      if(dn>0){
+        lastDelta=now;
+        try{var sd=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}').streakDays;if(sd){B.quiz.d[dk].stk=Math.max(B.quiz.d[dk].stk||0,sd)}}catch(e){}
+        if((B.quiz.d[dk].n||0)>=50)doFlush('quiz');
+      }
+    }
+    lastAns=cur;
+    try{localStorage.setItem(ANSK,JSON.stringify(cur))}catch(e){}
+  }
+  pollQuiz();setInterval(pollQuiz,8000);
+  /* ---- 稳定性：JS错误 / Promise未捕获拒绝（消息截断120字符） ---- */
+  function addErr(msg){
+    msg=String(msg||'未知错误').slice(0,120);
+    if(!B.err)B.err={n:0,top:{}};
+    B.err.n++;B.err.top[msg]=(B.err.top[msg]||0)+1;
+    var ks=Object.keys(B.err.top);
+    if(ks.length>20){ks.sort(function(a,b){return B.err.top[b]-B.err.top[a]});var keep={};for(var i=0;i<20;i++)keep[ks[i]]=B.err.top[ks[i]];B.err.top=keep}
+  }
+  window.addEventListener('error',function(e){try{addErr(e&&e.message||'script error')}catch(x){}});
+  window.addEventListener('unhandledrejection',function(e){try{var r=e&&e.reason;addErr(typeof r==='string'?r:(r&&r.message)||'promise rejection')}catch(x){}});
+  /* ---- 加载耗时：loadEventEnd - navigationStart（每次会话一条） ---- */
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      try{
+        var ms=0,nt=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+        if(nt&&nt.loadEventEnd)ms=Math.round(nt.loadEventEnd-nt.startTime);
+        else if(performance.timing&&performance.timing.loadEventEnd)ms=Math.round(performance.timing.loadEventEnd-performance.timing.navigationStart);
+        if(ms>0&&ms<600000){B.perf.push(ms);saveBuf()}
+      }catch(e){}
+    },50);
+  });
+  /* ---- PWA 安装上报（含OS；每设备每天最多记一次） ---- */
+  function osName(){var ua=navigator.userAgent||'';
+    if(/iPhone|iPad|iPod/i.test(ua))return 'ios';
+    if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua))return 'harmony';
+    if(/Android/i.test(ua))return 'android';
+    return 'pc'}
+  function recordInstall(){
+    try{var dk=dayKey();if(localStorage.getItem('ycgk.tl.inst')===dk)return;localStorage.setItem('ycgk.tl.inst',dk)}catch(e){}
+    if(!B.inst)B.inst={n:0,os:{}};
+    B.inst.n++;B.inst.os[osName()]=(B.inst.os[osName()]||0)+1;
+    saveBuf();doFlush('base');
+  }
+  window.addEventListener('appinstalled',function(){try{recordInstall()}catch(e){}});
+  window.addEventListener('beforeinstallprompt',function(e){
+    try{if(e&&e.userChoice)e.userChoice.then(function(c){if(c&&c.outcome==='accepted')recordInstall()})}catch(err){}
+  });
+  /* ---- UA画像：品牌/网络/分辨率/来源 → 实时池设备记录（每次会话写一次，随机延迟避让 11-part） ---- */
+  function brandOf(){var ua=navigator.userAgent||'';
+    if(/iPhone|iPad|iPod|Macintosh/i.test(ua))return '苹果';
+    if(/HONOR/i.test(ua))return '荣耀';
+    if(/HUAWEI|HMSCore|HarmonyOS/i.test(ua))return '华为';
+    if(/Redmi|Xiaomi|MIUI|MIX|MI \d/i.test(ua))return '小米';
+    if(/OPPO|PADM|PCTM/i.test(ua))return 'OPPO';
+    if(/vivo|V\d{4}A/i.test(ua))return 'vivo';
+    return '其他'}
+  function netType(){try{return (navigator.connection&&navigator.connection.effectiveType)||''}catch(e){return ''}}
+  function screenStr(){try{return screen.width+'x'+screen.height+'@'+(window.devicePixelRatio||1)}catch(e){return ''}}
+  function srcOf(){
+    try{
+      if((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true)return 'PWA';
+      var q=new URLSearchParams(location.search);
+      if(q.get('ref'))return '分享链接';
+      return '直接打开';
+    }catch(e){return '直接打开'}
+  }
+  function writeProfile(){
+    get('ycgk-live-v1',function(pool){
+      var p=pool&&typeof pool==='object'?pool:{};
+      if(!p.devices||typeof p.devices!=='object')p.devices={};
+      var rec=p.devices[did()]||{};
+      rec.brand=brandOf();
+      var osvM=(navigator.userAgent||'').match(/Android (\d+(?:\.\d+)?)/)||(navigator.userAgent||'').match(/OS (\d+(?:_\d+)?)/);
+      if(osvM)rec.osv=osvM[1].replace('_','.');
+      var nt=netType();if(nt)rec.net=nt;
+      var sc=screenStr();if(sc)rec.sc=sc;
+      rec.src=srcOf();
+      rec.srcs=rec.srcs||{};rec.srcs[rec.src]=(rec.srcs[rec.src]||0)+1;
+      p.devices[did()]=rec;p.ts=Date.now();
+      put('ycgk-live-v1',p,function(){});
+    });
+  }
+  setTimeout(writeProfile,5000+Math.floor(Math.random()*8000));
+  /* 启动时若有上次未上报完的缓冲，尽快补报 */
+  if(B.inst||B.err||(B.perf&&B.perf.length)||B.sess)setTimeout(function(){doFlush('base')},20000);
+})();
+</script>
+
+
+
+</body></html>

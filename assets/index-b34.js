@@ -423,16 +423,16 @@ try{(window.YC_MORE_QBANKS||[]).forEach(function(arr){for(var i=0;i<arr.length;i
 try{(window.YC_ESSAY_BANKS||[]).forEach(function(arr){(window.YC_ESSAY_QS=window.YC_ESSAY_QS||[]).push.apply(window.YC_ESSAY_QS,arr)});if(window.YC_ESSAY_BANKS)window.YC_ESSAY_BANKS.length=0}catch(e){}
 }
 function finish(){mergeAll();try{window.__ycBanksReady=true;window.__ycDr=Dr;window.__ycNc=nc;window.dispatchEvent(new Event("yc-banks-ready"))}catch(e){}}
-function load(list,cb){var d=0;list.forEach(function(f){if(__filesLoaded[f]){d++;if(d>=list.length&&cb)cb();return;}__filesLoaded[f]=1;var sc=document.createElement("script");sc.src="./assets/"+f+".js?v="+(window.__ycBankIndex&&window.__ycBankIndex.v||"tt69");sc.onload=sc.onerror=function(){loadedN++;prog();d++;if(d>=list.length&&cb)cb()};document.head.appendChild(sc)})}
+function load(list,cb){var d=0;list.forEach(function(f){if(__filesLoaded[f]){d++;if(d>=list.length&&cb)cb();return;}__filesLoaded[f]=1;var sc=document.createElement("script");sc.src="./assets/"+f+".js?v="+(window.__ycBankIndex&&window.__ycBankIndex.v||"tt70");sc.onload=sc.onerror=function(){loadedN++;prog();d++;if(d>=list.length&&cb)cb()};document.head.appendChild(sc)})}
 function idx(){return window.__ycBankIndex||{modules:{},files:{}}}
 function filesForMods(mods){var out=[],seen={};mods.forEach(function(m){var mi=idx().modules[m];if(mi)(mi.files||[]).forEach(function(f){if(!seen[f]){seen[f]=1;out.push(f)}})});return out}
 function filesForIds(ids){var im=window.__ycBankIdmap||{},out=[],seen={};ids.forEach(function(id){var f=im[id];if(f&&!seen[f]){seen[f]=1;out.push(f)}});return out}
 window.__ycLoadFiles=function(files,cb){if(!files.length){if(cb)cb();return}load(files,function(){finish();if(cb)cb()})};
 window.__ycLoadModules=function(mods,cb){window.__ycLoadFiles(filesForMods(mods),function(){try{mods.forEach(function(m){window.__ycModLoaded=window.__ycModLoaded||{};window.__ycModLoaded[m]=true})}catch(e){}if(cb)cb()})};
-window.__ycLoadIds=function(ids,cb){if(!ids||!ids.length){if(cb)cb();return}var run=function(){window.__ycLoadFiles(filesForIds(ids),cb)};if(window.__ycBankIdmap){run();return}if(!window.__ycIdmapP){window.__ycIdmapP=fetch("./assets/qbank-idmap.json?v="+(window.__ycBankIndex&&window.__ycBankIndex.v||"tt69")).then(function(r){return r.json()}).then(function(j){window.__ycBankIdmap=j||{}}).catch(function(){window.__ycBankIdmap=window.__ycBankIdmap||{}})}window.__ycIdmapP.then(run)};
+window.__ycLoadIds=function(ids,cb){if(!ids||!ids.length){if(cb)cb();return}var run=function(){window.__ycLoadFiles(filesForIds(ids),cb)};if(window.__ycBankIdmap){run();return}if(!window.__ycIdmapP){window.__ycIdmapP=fetch("./assets/qbank-idmap.json?v="+(window.__ycBankIndex&&window.__ycBankIndex.v||"tt70")).then(function(r){return r.json()}).then(function(j){window.__ycBankIdmap=j||{}}).catch(function(){window.__ycBankIdmap=window.__ycBankIdmap||{}})}window.__ycIdmapP.then(run)};
 window.__ycOpenModule=function(mod,cb){window.__ycLoadModules([mod],cb)};
 /* 启动：只拉轻量索引，不拉题库分片；索引失败 1.5s 后重试一次 */
-(function(){var done=false;var boot=function(j){if(done)return;done=true;window.__ycBankIndex=j||{modules:{},files:{}};TOTAL=Object.keys(window.__ycBankIndex.files||{}).length;finish();prog()};var go=function(){return fetch("./assets/qbank-index.json?v=tt69",{cache:"no-store"}).then(function(r){return r.json()}).then(boot)};go().catch(function(){setTimeout(function(){go().catch(function(){boot(null)})},1500)})})();
+(function(){var done=false;var boot=function(j){if(done)return;done=true;window.__ycBankIndex=j||{modules:{},files:{}};TOTAL=Object.keys(window.__ycBankIndex.files||{}).length;finish();prog()};var go=function(){return fetch("./assets/qbank-index.json?v=tt70",{cache:"no-store"}).then(function(r){return r.json()}).then(boot)};go().catch(function(){setTimeout(function(){go().catch(function(){boot(null)})},1500)})})();
 })();
 
 /* ===== YC 个人数据看板 + 备考方向 + 倒计时 v1 (b34) ===== */

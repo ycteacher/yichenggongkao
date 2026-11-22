@@ -1,0 +1,32 @@
+载入 2000 题（门槛：墨迹差异率≥0.15）
+  [glitch] 7 blank cells, retry 1
+  [glitch] 7 blank cells, retry 2
+  [glitch] 7 blank cells, retry 3
+  [retry] batch@0 failed (RuntimeError), relaunching browser
+  [glitch] 7 blank cells, retry 1
+  [glitch] 7 blank cells, retry 2
+  [glitch] 7 blank cells, retry 3
+  [retry] batch@0 failed (RuntimeError), relaunching browser
+  [glitch] 7 blank cells, retry 1
+  [glitch] 7 blank cells, retry 2
+  [glitch] 7 blank cells, retry 3
+  [retry] batch@0 failed (RuntimeError), relaunching browser
+  [glitch] 7 blank cells, retry 1
+  [glitch] 7 blank cells, retry 2
+  [glitch] 7 blank cells, retry 3
+  [retry] batch@0 failed (RuntimeError), relaunching browser
+  [glitch] 7 blank cells, retry 1
+  [glitch] 7 blank cells, retry 2
+  [glitch] 7 blank cells, retry 3
+Traceback (most recent call last):
+  File "/root/workspace/.tmp/repo_clone/tools/tt2000/pixel_check.py", line 167, in <module>
+    main()
+  File "/root/workspace/.tmp/repo_clone/tools/tt2000/pixel_check.py", line 138, in main
+    f80 = run(questions, 80, '80px全量')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/.tmp/repo_clone/tools/tt2000/pixel_check.py", line 116, in run
+    fails = check_batch(page, sub_qs, size)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/.tmp/repo_clone/tools/tt2000/pixel_check.py", line 90, in check_batch
+    raise RuntimeError(f'{len(blanks)} blank cells persist (render glitch): first={blanks[:5]}')
+RuntimeError: 7 blank cells persist (render glitch): first=[100, 114, 168, 229, 232]

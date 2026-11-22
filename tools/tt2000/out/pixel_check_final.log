@@ -1,0 +1,204 @@
+载入 2000 题（门槛：墨迹差异率≥0.15）
+  [80px全量] 187/2000 不合格+1
+  [80px全量] 374/2000 不合格+2
+  [retry] screenshot failed (Page.screenshot: Target crashed 
+Browser logs:
+
+<launching> /usr/local/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AutoExpandDetailsElement,AvoidUnnecessaryBeforeUnloadCheckSync,CertificateTransparencyComponentUpdater,DestroyProfileOnBrowserClose,DialMediaRouteProvider,ExtensionManifestV2Disabled,GlobalMediaControls,HttpsUpgrades,ImprovedCookieControls,LazyFrameLoading,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --user-data-dir=/tmp/playwright_chromiumdev_profile-aCcetR --remote-debugging-pipe --no-startup-window
+<launched> pid=123541
+[pid=123541][err] [123541:123559:1123/010119.619008:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123559:1123/010119.619172:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123556:1123/010119.629323:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123556:1123/010119.630160:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123556:1123/010119.630274:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123556:1123/010119.630335:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123556:1123/010119.630558:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123556:1123/010119.681604:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123556:1123/010119.702984:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123541:1123/010119.708075:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123541][err] [123541:123541:1123/010119.712496:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123541][err] [123541:123541:1123/010119.713798:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123541][err] [123541:123556:1123/010119.714003:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123541][err] [123541:123541:1123/010119.715964:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123541][err] [123541:123591:1123/010119.725187:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123591:1123/010119.725644:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123591:1123/010119.730939:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123591:1123/010119.731818:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123541:123591:1123/010119.734417:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123541][err] [123577:123606:1123/010120.262645:ERROR:net/socket/ssl_client_socket_impl.cc:914] handshake failed; returned -1, SSL error code 1, net_error -202
+[pid=123541][err] [1123/010121.219909:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+[pid=123541][err] [1123/010121.220199:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+), retrying
+  [retry] batch@374 failed (TargetClosedError), relaunching browser
+  [retry] screenshot failed (Page.screenshot: Target crashed 
+Browser logs:
+
+<launching> /usr/local/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AutoExpandDetailsElement,AvoidUnnecessaryBeforeUnloadCheckSync,CertificateTransparencyComponentUpdater,DestroyProfileOnBrowserClose,DialMediaRouteProvider,ExtensionManifestV2Disabled,GlobalMediaControls,HttpsUpgrades,ImprovedCookieControls,LazyFrameLoading,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --user-data-dir=/tmp/playwright_chromiumdev_profile-szwm6R --remote-debugging-pipe --no-startup-window
+<launched> pid=123630
+[pid=123630][err] [123630:123646:1123/010121.494718:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123649:1123/010121.496920:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123649:1123/010121.497195:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123646:1123/010121.501671:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123646:1123/010121.501740:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123646:1123/010121.501750:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123646:1123/010121.501753:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123646:1123/010121.550087:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123646:1123/010121.571744:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123630:1123/010121.577297:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123630][err] [123630:123630:1123/010121.581474:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123630][err] [123630:123630:1123/010121.584370:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123630][err] [123630:123646:1123/010121.584714:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123630][err] [123630:123630:1123/010121.591945:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123630][err] [123630:123687:1123/010121.610365:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123687:1123/010121.610881:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123687:1123/010121.611327:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123687:1123/010121.619153:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123630:123687:1123/010121.619281:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123630][err] [123669:123694:1123/010121.938614:ERROR:net/socket/ssl_client_socket_impl.cc:914] handshake failed; returned -1, SSL error code 1, net_error -202
+[pid=123630][err] [1123/010124.931245:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+[pid=123630][err] [1123/010124.931568:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+), retrying
+  [retry] batch@374 failed (TargetClosedError), relaunching browser
+  [80px全量] 561/2000 不合格+13
+  [80px全量] 748/2000 不合格+16
+  [retry] screenshot failed (Page.screenshot: Target crashed 
+Browser logs:
+
+<launching> /usr/local/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AutoExpandDetailsElement,AvoidUnnecessaryBeforeUnloadCheckSync,CertificateTransparencyComponentUpdater,DestroyProfileOnBrowserClose,DialMediaRouteProvider,ExtensionManifestV2Disabled,GlobalMediaControls,HttpsUpgrades,ImprovedCookieControls,LazyFrameLoading,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --user-data-dir=/tmp/playwright_chromiumdev_profile-bP2FPC --remote-debugging-pipe --no-startup-window
+<launched> pid=123920
+[pid=123920][err] [123920:123935:1123/010129.613295:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123938:1123/010129.615123:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123938:1123/010129.615314:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123935:1123/010129.617595:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123935:1123/010129.617610:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123935:1123/010129.617958:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123935:1123/010129.617969:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123935:1123/010129.671489:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123935:1123/010129.697538:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123920:1123/010129.716790:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123920][err] [123920:123920:1123/010129.719888:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123920][err] [123920:123920:1123/010129.723915:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123920][err] [123920:123935:1123/010129.724193:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=123920][err] [123920:123981:1123/010129.726665:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123981:1123/010129.726706:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123981:1123/010129.726741:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123981:1123/010129.726766:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123981:1123/010129.726790:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=123920][err] [123920:123920:1123/010129.727652:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=123920][err] [123956:123976:1123/010129.979623:ERROR:net/socket/ssl_client_socket_impl.cc:914] handshake failed; returned -1, SSL error code 1, net_error -202
+[pid=123920][err] [1123/010130.959536:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+[pid=123920][err] [1123/010130.959782:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+), retrying
+  [retry] batch@748 failed (TargetClosedError), relaunching browser
+  [80px全量] 935/2000 不合格+28
+  [retry] screenshot failed (Page.screenshot: Target crashed 
+Browser logs:
+
+<launching> /usr/local/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AutoExpandDetailsElement,AvoidUnnecessaryBeforeUnloadCheckSync,CertificateTransparencyComponentUpdater,DestroyProfileOnBrowserClose,DialMediaRouteProvider,ExtensionManifestV2Disabled,GlobalMediaControls,HttpsUpgrades,ImprovedCookieControls,LazyFrameLoading,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --user-data-dir=/tmp/playwright_chromiumdev_profile-D2LAPz --remote-debugging-pipe --no-startup-window
+<launched> pid=124095
+[pid=124095][err] [124095:124110:1123/010133.144307:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124113:1123/010133.146721:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124113:1123/010133.146775:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124110:1123/010133.150393:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124110:1123/010133.150422:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124110:1123/010133.150431:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124110:1123/010133.150435:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124110:1123/010133.205208:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124110:1123/010133.229885:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124095:1123/010133.233273:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124095][err] [124095:124095:1123/010133.242941:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124095][err] [124095:124095:1123/010133.243956:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124095][err] [124095:124110:1123/010133.244268:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124095][err] [124095:124095:1123/010133.247415:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124095][err] [124095:124149:1123/010133.267975:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124149:1123/010133.269287:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124149:1123/010133.270019:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124149:1123/010133.270062:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124095:124149:1123/010133.275632:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124095][err] [124130:124159:1123/010133.589390:ERROR:net/socket/ssl_client_socket_impl.cc:914] handshake failed; returned -1, SSL error code 1, net_error -202
+[pid=124095][err] [1123/010134.480030:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+[pid=124095][err] [1123/010134.480613:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+), retrying
+  [retry] batch@935 failed (TargetClosedError), relaunching browser
+  [retry] screenshot failed (Page.screenshot: Target crashed 
+Browser logs:
+
+<launching> /usr/local/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AutoExpandDetailsElement,AvoidUnnecessaryBeforeUnloadCheckSync,CertificateTransparencyComponentUpdater,DestroyProfileOnBrowserClose,DialMediaRouteProvider,ExtensionManifestV2Disabled,GlobalMediaControls,HttpsUpgrades,ImprovedCookieControls,LazyFrameLoading,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --user-data-dir=/tmp/playwright_chromiumdev_profile-gp94YS --remote-debugging-pipe --no-startup-window
+<launched> pid=124184
+[pid=124184][err] [124184:124198:1123/010134.763800:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124202:1123/010134.765113:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124202:1123/010134.765352:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124198:1123/010134.769933:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124198:1123/010134.770101:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124198:1123/010134.770270:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124198:1123/010134.770477:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124198:1123/010134.820952:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124198:1123/010134.847774:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124184:1123/010134.851777:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124184][err] [124184:124184:1123/010134.854989:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124184][err] [124184:124184:1123/010134.859352:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124184][err] [124184:124198:1123/010134.859705:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=124184][err] [124184:124184:1123/010134.861457:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=124184][err] [124184:124245:1123/010134.875680:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124245:1123/010134.875789:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124245:1123/010134.875928:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124245:1123/010134.876002:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124184:124245:1123/010134.876048:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=124184][err] [124220:124241:1123/010135.114936:ERROR:net/socket/ssl_client_socket_impl.cc:914] handshake failed; returned -1, SSL error code 1, net_error -202
+[pid=124184][err] [1123/010136.436594:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+[pid=124184][err] [1123/010136.436719:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+), retrying
+  [retry] batch@935 failed (TargetClosedError), relaunching browser
+  [80px全量] 1122/2000 不合格+44
+  [80px全量] 1309/2000 不合格+45
+  [80px全量] 1496/2000 不合格+83
+  [80px全量] 1683/2000 不合格+40
+  [80px全量] 1870/2000 不合格+15
+  [80px全量] 2000/2000 不合格+18
+80px 全量: 不合格 305/12000 对
+   {'qi': 183, 'pair': '0-1', 'ink': 0.13, 'full': 0.004, 'gi': 183}
+   {'qi': 163, 'pair': '0-3', 'ink': 0.104, 'full': 0.05, 'gi': 350}
+   {'qi': 178, 'pair': '0-2', 'ink': 0.137, 'full': 0.038, 'gi': 365}
+   {'qi': 21, 'pair': '1-2', 'ink': 0.142, 'full': 0.014, 'gi': 395}
+   {'qi': 30, 'pair': '0-1', 'ink': 0.085, 'full': 0.003, 'gi': 404}
+   {'qi': 74, 'pair': '0-1', 'ink': 0.119, 'full': 0.014, 'gi': 448}
+   {'qi': 96, 'pair': '0-3', 'ink': 0.0, 'full': 0.0, 'gi': 470}
+   {'qi': 111, 'pair': '1-2', 'ink': 0.0, 'full': 0.0, 'gi': 485}
+   {'qi': 136, 'pair': '2-3', 'ink': 0.0, 'full': 0.0, 'gi': 510}
+   {'qi': 137, 'pair': '0-1', 'ink': 0.096, 'full': 0.003, 'gi': 511}
+   {'qi': 142, 'pair': '2-3', 'ink': 0.137, 'full': 0.016, 'gi': 516}
+   {'qi': 177, 'pair': '2-3', 'ink': 0.054, 'full': 0.002, 'gi': 551}
+   {'qi': 181, 'pair': '1-2', 'ink': 0.0, 'full': 0.0, 'gi': 555}
+   {'qi': 181, 'pair': '1-3', 'ink': 0.141, 'full': 0.005, 'gi': 555}
+   {'qi': 181, 'pair': '2-3', 'ink': 0.141, 'full': 0.005, 'gi': 555}
+  [140px抽验] 105/120 不合格+2
+  [140px抽验] 120/120 不合格+0
+  [200px抽验] 75/120 不合格+2
+  [200px抽验] 120/120 不合格+1
+140/200px 抽验(120题×2): 不合格 5
+   {'qi': 2, 'pair': '2-3', 'ink': 0.0, 'full': 0.0, 'gi': 2, 'size': 140}
+   {'qi': 21, 'pair': '0-3', 'ink': 0.0, 'full': 0.003, 'gi': 21, 'size': 140}
+   {'qi': 2, 'pair': '2-3', 'ink': 0.0, 'full': 0.0, 'gi': 2, 'size': 200}
+   {'qi': 21, 'pair': '0-3', 'ink': 0.0, 'full': 0.0, 'gi': 21, 'size': 200}
+   {'qi': 5, 'pair': '1-3', 'ink': 0.135, 'full': 0.012, 'gi': 80, 'size': 200}
+存在不合格项，需修复

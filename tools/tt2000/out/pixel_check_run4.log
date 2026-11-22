@@ -1,0 +1,110 @@
+载入 2000 题（门槛：墨迹差异率≥0.15）
+  [glitch] 7 blank cells, retry 1
+  [glitch] 7 blank cells, retry 2
+  [glitch] 7 blank cells, retry 3
+  [blank] 7 cells persist as blank, marking as fails
+  [80px全量] 75/2000 不合格+7
+  [glitch] 11 blank cells, retry 1
+  [glitch] 11 blank cells, retry 2
+  [glitch] 11 blank cells, retry 3
+  [blank] 11 cells persist as blank, marking as fails
+  [80px全量] 150/2000 不合格+11
+  [80px全量] 225/2000 不合格+0
+  [80px全量] 300/2000 不合格+0
+  [80px全量] 375/2000 不合格+1
+  [80px全量] 450/2000 不合格+1
+  [80px全量] 525/2000 不合格+3
+  [80px全量] 600/2000 不合格+4
+  [80px全量] 675/2000 不合格+11
+  [80px全量] 750/2000 不合格+1
+  [80px全量] 825/2000 不合格+0
+  [80px全量] 900/2000 不合格+0
+  [80px全量] 975/2000 不合格+0
+  [80px全量] 1050/2000 不合格+0
+  [80px全量] 1125/2000 不合格+0
+  [glitch] 36 blank cells, retry 1
+  [glitch] 36 blank cells, retry 2
+  [glitch] 36 blank cells, retry 3
+  [blank] 36 cells persist as blank, marking as fails
+  [80px全量] 1200/2000 不合格+36
+  [glitch] 17 blank cells, retry 1
+  [glitch] 17 blank cells, retry 2
+  [glitch] 17 blank cells, retry 3
+  [blank] 17 cells persist as blank, marking as fails
+  [80px全量] 1275/2000 不合格+18
+  [80px全量] 1350/2000 不合格+3
+  [80px全量] 1425/2000 不合格+8
+  [80px全量] 1500/2000 不合格+9
+  [80px全量] 1575/2000 不合格+1
+  [80px全量] 1650/2000 不合格+0
+  [80px全量] 1725/2000 不合格+5
+  [80px全量] 1800/2000 不合格+6
+  [80px全量] 1875/2000 不合格+6
+  [80px全量] 1950/2000 不合格+0
+  [80px全量] 2000/2000 不合格+0
+80px 全量: 不合格 131/12000 对
+   {'qi': 25, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 25}
+   {'qi': 28, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 28}
+   {'qi': 42, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 42}
+   {'qi': 57, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 57}
+   {'qi': 58, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 58}
+   {'qi': 66, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 66}
+   {'qi': 70, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 70}
+   {'qi': 12, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 87}
+   {'qi': 13, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 88}
+   {'qi': 27, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 102}
+   {'qi': 28, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 103}
+   {'qi': 30, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 105}
+   {'qi': 36, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 111}
+   {'qi': 45, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 120}
+   {'qi': 46, 'pair': 'blank', 'ink': 0.0, 'full': 0.0, 'gi': 121}
+  [140px抽验] 42/120 不合格+3
+  [retry] screenshot failed (Page.screenshot: Target crashed 
+Browser logs:
+
+<launching> /usr/local/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AutoExpandDetailsElement,AvoidUnnecessaryBeforeUnloadCheckSync,CertificateTransparencyComponentUpdater,DestroyProfileOnBrowserClose,DialMediaRouteProvider,ExtensionManifestV2Disabled,GlobalMediaControls,HttpsUpgrades,ImprovedCookieControls,LazyFrameLoading,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --user-data-dir=/tmp/playwright_chromiumdev_profile-ahyTkO --remote-debugging-pipe --no-startup-window
+<launched> pid=132779
+[pid=132779][err] [132779:132794:1123/011505.249206:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132794:1123/011505.249785:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132794:1123/011505.249900:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132794:1123/011505.249984:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132794:1123/011505.250108:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132798:1123/011505.261825:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132798:1123/011505.262745:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132794:1123/011505.322428:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132794:1123/011505.363819:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132779:1123/011505.375078:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=132779][err] [132779:132779:1123/011505.380493:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=132779][err] [132779:132779:1123/011505.385125:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=132779][err] [132779:132794:1123/011505.385220:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=132779][err] [132779:132779:1123/011505.387889:ERROR:dbus/object_proxy.cc:590] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=132779][err] [132779:132824:1123/011505.409667:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132824:1123/011505.409837:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132824:1123/011505.410166:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132824:1123/011505.411762:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132779:132824:1123/011505.411914:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=132779][err] [132818:132843:1123/011505.918756:ERROR:net/socket/ssl_client_socket_impl.cc:914] handshake failed; returned -1, SSL error code 1, net_error -202
+[pid=132779][err] [1123/011509.243092:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)
+[pid=132779][err] [1123/011509.243386:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+), retrying
+  [retry] batch@42 failed (TargetClosedError), relaunching browser
+  [140px抽验] 84/120 不合格+1
+  [140px抽验] 120/120 不合格+0
+  [200px抽验] 30/120 不合格+3
+  [200px抽验] 60/120 不合格+0
+  [200px抽验] 90/120 不合格+1
+  [200px抽验] 120/120 不合格+0
+140/200px 抽验(120题×2): 不合格 8
+   {'qi': 2, 'pair': '2-3', 'ink': 0.0, 'full': 0.0, 'gi': 2, 'size': 140}
+   {'qi': 17, 'pair': '0-3', 'ink': 0.0, 'full': 0.0, 'gi': 17, 'size': 140}
+   {'qi': 21, 'pair': '0-3', 'ink': 0.0, 'full': 0.003, 'gi': 21, 'size': 140}
+   {'qi': 31, 'pair': '0-2', 'ink': 0.134, 'full': 0.025, 'gi': 73, 'size': 140}
+   {'qi': 2, 'pair': '2-3', 'ink': 0.0, 'full': 0.0, 'gi': 2, 'size': 200}
+   {'qi': 17, 'pair': '0-3', 'ink': 0.0, 'full': 0.001, 'gi': 17, 'size': 200}
+   {'qi': 21, 'pair': '0-3', 'ink': 0.0, 'full': 0.0, 'gi': 21, 'size': 200}
+   {'qi': 13, 'pair': '0-2', 'ink': 0.134, 'full': 0.012, 'gi': 73, 'size': 200}
+存在不合格项，需修复
