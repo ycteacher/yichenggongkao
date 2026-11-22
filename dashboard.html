@@ -316,7 +316,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
       <div class="card"><h3>分享与裂变 <span class="hint">静态快照 · T+1</span></h3><div class="desc">邀请链路各环节</div><div id="share"><div class="skel"></div></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
-      <div class="card w2"><h3>每日明细 <span class="hint"><button class="abtn" id="csvBtn" style="padding:3px 10px;font-size:11px">导出 CSV</button></span></h3><div class="desc">访问、活跃、视频、问卷按日汇总</div><div class="tscroll"><table id="daily"></table></div></div>
+      <div class="card w2"><h3>每日明细 <span class="hint"><button class="abtn" id="dailyToggle" style="padding:3px 10px;font-size:11px">展开全部</button> <button class="abtn" id="csvBtn" style="padding:3px 10px;font-size:11px">导出 CSV</button></span></h3><div class="desc">访问、活跃、视频、问卷按日汇总 · 默认显示最近 7 天</div><div class="tscroll"><table id="daily"></table></div></div>
     </div>
   </div>
 
@@ -1054,6 +1054,19 @@ function renderDaily(L){
     return '<tr><td><b>'+r.d.slice(4,6)+'/'+r.d.slice(6,8)+'</b></td><td>'+(r.pv||'—')+'</td><td>'+(r.dau||'—')+'</td><td>'+(r.start===''?'—':r.start)+'</td><td>'+(r.vid||'—')+'</td><td>'+(r.vidUv||'—')+'</td><td>'+(r.fb||'—')+'</td></tr>';
   }).join('');
   el('daily').innerHTML=h;
+  applyDailyFold();
+  /* 每日明细折叠：默认只显示最近 7 天 */
+  var dailyOpen=false;
+  function applyDailyFold(){
+    var t=el('daily');if(!t)return;
+    var trs=t.querySelectorAll('tr');
+    for(var i=1;i<trs.length;i++){trs[i].style.display=(!dailyOpen&&i>7)?'none':''}
+    var total=trs.length-1;
+    var btn=el('dailyToggle');
+    if(btn){btn.textContent=dailyOpen?'收起':'展开全部 '+total+' 天';btn.style.display=total>7?'':'none'}
+  }
+  var toggleBtn=el('dailyToggle');
+  if(toggleBtn&&!toggleBtn._bound){toggleBtn._bound=true;toggleBtn.onclick=function(){dailyOpen=!dailyOpen;applyDailyFold()}}
   el('csvBtn').onclick=function(){
     var head='日期,PV,活跃设备,开始刷题,视频播放,视频人数,问卷\n';
     var body=rows.map(function(r){return [r.d,r.pv,r.dau,r.start,r.vid,r.vidUv,r.fb].join(',')}).join('\n');
