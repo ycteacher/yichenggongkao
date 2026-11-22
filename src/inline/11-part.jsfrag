@@ -10,13 +10,17 @@
   ];
   function pad(n){return ('0'+n).slice(-2)}
   function dayKey(d){return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
-  /* 匿名设备ID：本地生成并长期保存；型号/系统识别 */
+  /* 匿名设备ID：统一以 ycgk.did.v1 为准；旧键 ycgk.did 只迁移一次并清除 */
   function deviceId(){
-    var id='';try{id=localStorage.getItem('ycgk.did')}catch(e){}
+    var id='';try{id=localStorage.getItem('ycgk.did.v1')}catch(e){}
     if(!id){
-      id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-      try{localStorage.setItem('ycgk.did',id)}catch(e){}
+      try{id=localStorage.getItem('ycgk.did')}catch(e){}
+      if(id){var ok=false;try{localStorage.setItem('ycgk.did.v1',id);ok=true}catch(e){}
+        if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}
     }
+    if(id){return id}
+    id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    try{localStorage.setItem('ycgk.did.v1',id)}catch(e){}
     return id;
   }
   function parseDevice(){

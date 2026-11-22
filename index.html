@@ -8,7 +8,7 @@
       /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
       try{
         var K="yc-page-ver";
-        var FALLBACK="tt63"; /* 兜底：仅首次访问且索引请求失败时使用 */
+        var FALLBACK="tt64"; /* 兜底：仅首次访问且索引请求失败时使用 */
         function fixIcons(v){
           try{
             var i1=document.querySelector('link[rel="icon"]'),i2=document.querySelector('link[rel="apple-touch-icon"]'),og=document.querySelector('meta[property="og:image"]');
@@ -953,13 +953,17 @@ document.addEventListener('click', function(e){
   ];
   function pad(n){return ('0'+n).slice(-2)}
   function dayKey(d){return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
-  /* 匿名设备ID：本地生成并长期保存；型号/系统识别 */
+  /* 匿名设备ID：统一以 ycgk.did.v1 为准；旧键 ycgk.did 只迁移一次并清除 */
   function deviceId(){
-    var id='';try{id=localStorage.getItem('ycgk.did')}catch(e){}
+    var id='';try{id=localStorage.getItem('ycgk.did.v1')}catch(e){}
     if(!id){
-      id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-      try{localStorage.setItem('ycgk.did',id)}catch(e){}
+      try{id=localStorage.getItem('ycgk.did')}catch(e){}
+      if(id){var ok=false;try{localStorage.setItem('ycgk.did.v1',id);ok=true}catch(e){}
+        if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}
     }
+    if(id){return id}
+    id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    try{localStorage.setItem('ycgk.did.v1',id)}catch(e){}
     return id;
   }
   function parseDevice(){
@@ -3015,7 +3019,9 @@ document.addEventListener('click', function(e){
   var GETS=['https://textdb.dev/api/data/','https://textdb.online/'];
   function pad(n){return ('0'+n).slice(-2)}
   function dayKey(d){d=d||new Date();return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
-  function did(){var id='';try{id=localStorage.getItem('ycgk.did')}catch(e){}return id||'anon'}
+  function did(){var id='';try{id=localStorage.getItem('ycgk.did.v1')}catch(e){}
+    if(!id){try{id=localStorage.getItem('ycgk.did')}catch(e){}if(id){var ok=false;try{localStorage.setItem('ycgk.did.v1',id);ok=true}catch(e){}if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}}
+    return id||'anon'}
   function shard(){var s=did(),h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%8}
   function get(k,cb){var i=0;(function next(){if(i>=GETS.length){cb(null);return}
     fetch(GETS[i++]+k,{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){

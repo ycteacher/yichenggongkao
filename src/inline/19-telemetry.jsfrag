@@ -14,7 +14,9 @@
   var GETS=['https://textdb.dev/api/data/','https://textdb.online/'];
   function pad(n){return ('0'+n).slice(-2)}
   function dayKey(d){d=d||new Date();return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
-  function did(){var id='';try{id=localStorage.getItem('ycgk.did')}catch(e){}return id||'anon'}
+  function did(){var id='';try{id=localStorage.getItem('ycgk.did.v1')}catch(e){}
+    if(!id){try{id=localStorage.getItem('ycgk.did')}catch(e){}if(id){var ok=false;try{localStorage.setItem('ycgk.did.v1',id);ok=true}catch(e){}if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}}
+    return id||'anon'}
   function shard(){var s=did(),h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%8}
   function get(k,cb){var i=0;(function next(){if(i>=GETS.length){cb(null);return}
     fetch(GETS[i++]+k,{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){

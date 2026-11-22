@@ -1217,6 +1217,7 @@ el('reconBtn').addEventListener('click',function(){el('specMask').classList.add(
 (function(){
   try{
     var did=localStorage.getItem('ycgk.did.v1');
+    if(!did){did=localStorage.getItem('ycgk.did');if(did){var ok=false;try{localStorage.setItem('ycgk.did.v1',did);ok=true}catch(e){}if(ok){try{localStorage.removeItem('ycgk.did')}catch(e){}}}}
     if(!did){did='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);try{localStorage.setItem('ycgk.did.v1',did)}catch(e){}}
     fetchPool('ycgk-live-v1').then(function(p){
       if(!p||typeof p!=='object')return;

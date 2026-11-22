@@ -219,15 +219,19 @@ var vtrack = (function(){
   var pending = {}, dayPend = {}, dayUids = {}, flushT = null;
   var ucntPend = {}, pagePend = null;
 
-  /* 匿名设备编号：与刷题应用同规则，用于"播放人数"去重 */
+  /* 匿名设备编号：全站统一以 ycgk.did.v1 为准，旧键 ycgk.did 只迁移一次并清除 */
   function deviceId(){
-    try{
-      var d = localStorage.getItem('ycgk.did.v1');
-      if(d) return d;
-      d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-      localStorage.setItem('ycgk.did.v1', d);
-      return d;
-    }catch(e){ return 'danon'; }
+    var d = '';
+    try{ d = localStorage.getItem('ycgk.did.v1'); }catch(e){}
+    if(!d){
+      try{ d = localStorage.getItem('ycgk.did'); }catch(e){}
+      if(d){ var ok=false; try{ localStorage.setItem('ycgk.did.v1', d); ok=true; }catch(e){}
+        if(ok){ try{ localStorage.removeItem('ycgk.did'); }catch(e){} } }
+    }
+    if(d) return d;
+    d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+    try{ localStorage.setItem('ycgk.did.v1', d); }catch(e){}
+    return d;
   }
   var DID = deviceId();
 
@@ -340,13 +344,17 @@ var vtrack = (function(){
     var LKEY = 'ycgk-live-v1';
     var LGETS = ['https://textdb.dev/api/data/', 'https://textdb.online/'];
     function lid(){
-      try{
-        var d = localStorage.getItem('ycgk.did');
-        if (d) return d;
-        d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-        localStorage.setItem('ycgk.did', d);
-        return d;
-      }catch(e){ return 'danon'; }
+      var d = '';
+      try{ d = localStorage.getItem('ycgk.did.v1'); }catch(e){}
+      if(!d){
+        try{ d = localStorage.getItem('ycgk.did'); }catch(e){}
+        if(d){ var ok=false; try{ localStorage.setItem('ycgk.did.v1', d); ok=true; }catch(e){}
+          if(ok){ try{ localStorage.removeItem('ycgk.did'); }catch(e){} } }
+      }
+      if(d) return d;
+      d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+      try{ localStorage.setItem('ycgk.did.v1', d); }catch(e){}
+      return d;
     }
     var LDID = lid();
     function lget(cb){
