@@ -217,6 +217,7 @@ var vtrack = (function(){
   function today(){ var d = new Date(); return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); }
 
   var pending = {}, dayPend = {}, dayUids = {}, flushT = null;
+  var ucntPend = {}, pagePend = null;
 
   /* 匿名设备编号：与刷题应用同规则，用于"播放人数"去重 */
   function deviceId(){
@@ -250,7 +251,7 @@ var vtrack = (function(){
     if (kind === 'exit' && extra != null) { pending[k].exit[extra] = (pending[k].exit[extra]||0)+1; flushSoon(); return; }
     if (kind === 'exit3' && extra != null) { if (!pending[k].exit3) pending[k].exit3 = {}; pending[k].exit3[extra] = (pending[k].exit3[extra]||0)+1; flushSoon(); return; }
     pending[k][kind] = (pending[k][kind] || 0) + n;
-    if (kind === 'play') { pending[k]._uid = DID; dayUids[d] = dayUids[d] || {}; dayUids[d][DID] = 1; }
+    if (kind === 'play') { pending[k]._uid = DID; dayUids[d] = dayUids[d] || {}; dayUids[d][DID] = 1; ucntPend[DID] = (ucntPend[DID]||0)+1; }
     var d = today();
     if (!dayPend[d]) dayPend[d] = { play:0, done:0, sec:0 };
     if (kind === 'sec') dayPend[d].sec += n;
@@ -301,20 +302,85 @@ var vtrack = (function(){
           if (!p.days[d].uids || typeof p.days[d].uids !== 'object') p.days[d].uids = {};
           Object.keys(dayUids[d]).forEach(function(u){ p.days[d].uids[u] = 1; });
         }
+        /* 视频板块进入：页面级打开次数与进入设备（随30天滚动清理） */
+        if (pagePend) {
+          p.days[d].popen = (p.days[d].popen||0) + (pagePend.open||0);
+          if (!p.days[d].puids || typeof p.days[d].puids !== 'object') p.days[d].puids = {};
+          Object.keys(pagePend.uids||{}).forEach(function(u){ p.days[d].puids[u] = 1; });
+        }
       });
+      /* 每设备累计播放次数：供"同一用户观看次数排行榜"（上限500台，超出淘汰计数最小的） */
+      if (Object.keys(ucntPend).length) {
+        if (!p.ucnt || typeof p.ucnt !== 'object') p.ucnt = {};
+        Object.keys(ucntPend).forEach(function(u){ p.ucnt[u] = (p.ucnt[u]||0) + ucntPend[u]; });
+        var uk = Object.keys(p.ucnt);
+        if (uk.length > 500) {
+          uk.sort(function(a,b){ return p.ucnt[a]-p.ucnt[b]; });
+          for (var ui = 0; ui < uk.length - 500; ui++) delete p.ucnt[uk[ui]];
+        }
+      }
       var dk = Object.keys(p.days).sort();
       if (dk.length > 30) { for (var i = 0; i < dk.length - 30; i++) delete p.days[dk[i]]; }
       p.ts = Date.now();
       put(p, function(ok){
-        if (ok) { pending = {}; dayPend = {}; dayUids = {}; }
+        if (ok) { pending = {}; dayPend = {}; dayUids = {}; ucntPend = {}; pagePend = null; }
         else flushSoon(); /* 写失败：本地计数保留，稍后重试 */
       });
     });
   }
 
+  /* 页面进入计数：进入视频板块即计 1 次打开（本次会话只记一次） */
+  try { pagePend = { open: 1, uids: {} }; pagePend.uids[DID] = 1; flushSoon(); } catch(e) {}
   setInterval(flush, 30000);
   document.addEventListener('visibilitychange', function(){ if (document.hidden) flush(); });
   window.addEventListener('beforeunload', flush);
+
+  /* ============ 实时在线心跳：视频页活动 → 实时池（与刷题端同一实时池，看板区分"正在看视频"） ============ */
+  (function(){
+    var LKEY = 'ycgk-live-v1';
+    var LGETS = ['https://textdb.dev/api/data/', 'https://textdb.online/'];
+    function lid(){
+      try{
+        var d = localStorage.getItem('ycgk.did');
+        if (d) return d;
+        d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+        localStorage.setItem('ycgk.did', d);
+        return d;
+      }catch(e){ return 'danon'; }
+    }
+    var LDID = lid();
+    function lget(cb){
+      var i = 0;
+      (function next(){
+        if (i >= LGETS.length) { cb(null); return; }
+        fetch(LGETS[i++] + LKEY, { cache: 'no-store' }).then(function(r){ return r.text(); }).then(function(t){
+          if (!t || t.charAt(0) !== '{') { next(); return; }
+          try { cb(JSON.parse(t)); } catch(e) { next(); }
+        }).catch(function(){ next(); });
+      })();
+    }
+    function lput(p){
+      try { fetch('https://textdb.dev/api/data/' + LKEY, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(p) }).catch(function(){}); } catch(e) {}
+    }
+    function beat(){
+      var now = Date.now();
+      lget(function(pool){
+        try{
+          var p = pool && typeof pool === 'object' ? pool : {};
+          if (!p.online || typeof p.online !== 'object') p.online = {};
+          if (!p.act || typeof p.act !== 'object') p.act = {};
+          Object.keys(p.online).forEach(function(k){ if (now - p.online[k] > 600000) { delete p.online[k]; delete p.act[k]; } });
+          p.online[LDID] = now;
+          p.act[LDID] = 'vid';
+          p.ts = now;
+          lput(p);
+        }catch(e){}
+      });
+    }
+    beat();
+    setInterval(function(){ if (!document.hidden) beat(); }, 60000);
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) beat(); });
+  })();
 
   /* 播放器埋点：开始播放（每次打开播放页只计一次）、观看时长（每5秒）、完整看完（最后一段播完） */
   function bindPlayer(player, getPart, nParts){
