@@ -1937,6 +1937,8 @@ document.addEventListener('click', function(e){
   function inject(){
     var actions=document.querySelector('.yc-top-actions');
     if(!actions||document.getElementById('ycInstallTopBtn')) return false;
+    /* B2：做题页/套卷页/成绩页不放安装入口 */
+    try{ if(document.querySelector('[data-testid="plan-exit"]')||document.querySelector('.yc-ob-mask.on')) return false; }catch(e){}
     /* 已确认装过桌面：完全不放安装按钮 */
     try{ if(localStorage.getItem('ycgk.installDone.v1')==='1') return true; }catch(e){}
     var b=document.createElement('button');
@@ -1952,11 +1954,23 @@ document.addEventListener('click', function(e){
 })();
 </script>
 
+<script src="./assets/yc-notify.js?v=v20"></script>
 <script>
 /* 15-onboarding: 首启强制安装引导 → 学习计划表单 → 备考计划(底部tab+顶部常驻) → 模拟测试专区(10套卷+判分) */
 (function(){
   'use strict';
   var K_ONB='ycgk.onboard.v2', K_PLAN='ycgk.studyplan.v2', K_MOCK='ycgk.mock.v2';
+  /* ---- B0：统一弹窗注册表（频控档位见 yc-notify.js）---- */
+  if(window.YCNotify){
+    var eb=function(){ try{ return YCNotify.inExamView(); }catch(e){ return false; } };
+    YCNotify.register('install',{freq:'days',days:3,priority:10,examBlock:eb});
+    YCNotify.register('installSoft',{freq:'days',days:3,priority:20,examBlock:eb});
+    YCNotify.register('planForm',{freq:'days',days:30,priority:30,examBlock:eb});
+    YCNotify.register('noticeBar',{freq:'once',priority:40});
+    YCNotify.register('updFloat',{freq:'days',days:1,priority:50});
+    YCNotify.register('mockSheet',{freq:'session',priority:60,examBlock:eb});
+    YCNotify.register('onboardChain',{freq:'once',priority:70,examBlock:eb});
+  }
   /* 已装到桌面的永久标记：装过就不再弹任何安装提醒（右上角按钮、首页卡片、首启引导） */
   var K_INST='ycgk.installDone.v1';
   function installDone(){ try{return localStorage.getItem(K_INST)==='1'}catch(e){return false} }
@@ -1966,9 +1980,19 @@ document.addEventListener('click', function(e){
   var K_VISITS='yc_visit_count_v1';          /* 累计访问次数：前两次不自动弹，避免首访打断 */
   var K_SESS_POP='yc_sess_popup_shown_v1';   /* 本会话已弹过引导（刷新不重复弹） */
   var K_PLAN_LATER='yc_plan_later_v1';       /* 「暂不设置，先逛逛」时间戳 → 30 天内不再自动弹 */
-  function installDismissed(){ try{return localStorage.getItem(K_DISMISS)==='1'}catch(e){return false} }
-  function dismissInstall(){ try{localStorage.setItem(K_DISMISS,'1')}catch(e){} }
-  function planLaterActive(){ try{ var t=parseInt(localStorage.getItem(K_PLAN_LATER)||'0',10)||0; return !!t && Date.now()-t<30*86400000; }catch(e){return false} }
+  /* B2：新版关闭 = 3 天冷却（非永久）；旧版"永久不再提醒"记录迁移为 done.install 继续生效 */
+  function installDismissed(){
+    try{ if(window.YCNotify){ if(localStorage.getItem(YCNotify.P+'done.install')==='1') return true; return YCNotify.recent('install',3*86400000); } }catch(e){}
+    try{return localStorage.getItem(K_DISMISS)==='1'}catch(e){return false}
+  }
+  function dismissInstall(){
+    try{ if(window.YCNotify){ YCNotify.dismiss('install'); return; } }catch(e){}
+    try{localStorage.setItem(K_DISMISS,'1')}catch(e){}
+  }
+  function planLaterActive(){
+    try{ if(window.YCNotify) return YCNotify.recent('planForm',30*86400000); }catch(e){}
+    try{ var t=parseInt(localStorage.getItem(K_PLAN_LATER)||'0',10)||0; return !!t && Date.now()-t<30*86400000; }catch(e){return false}
+  }
   function inAppBrowser(){ var ua=navigator.userAgent||''; return /MicroMessenger|QQ\/|MQQBrowser/i.test(ua); }
   function hasAnyPlan(){
     try{ if(getJSON(K_PLAN,null)) return true; }catch(e){}
@@ -2113,14 +2137,44 @@ document.addEventListener('click', function(e){
       ov.addEventListener('click',function(e){ if(e.target===ov) closeCard(); });
       var card=ov.firstChild;
       var x=document.createElement('button'); x.className='yc-ob-x'; x.textContent='×';
+      x.setAttribute('aria-label','关闭');
       x.addEventListener('click',closeCard); card.insertBefore(x,card.firstChild);
     }
+    /* B1 硬指标：滚动锁 / Esc 关闭 / 安卓返回键 / 焦点锁 */
+    try{
+      ov._ycPrevOverflow=document.body.style.overflow;
+      document.body.style.overflow='hidden';
+      try{ history.pushState({ycPop:true},''); ov._ycPushed=true; }catch(e){}
+      ov._ycOnKey=function(e){
+        try{
+          if(e.key==='Escape'){ closeCard(); return; }
+          if(e.key==='Tab'&&ov){
+            var f=ov.querySelectorAll('button,input,select,a[href],[tabindex]:not([tabindex="-1"])');
+            if(!f.length) return;
+            var first=f[0],last=f[f.length-1];
+            if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+            else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+            else if(!ov.contains(document.activeElement)){e.preventDefault();first.focus();}
+          }
+        }catch(e2){}
+      };
+      document.addEventListener('keydown',ov._ycOnKey,true);
+      ov._ycOnPop=function(){ closeCard(); };
+      window.addEventListener('popstate',ov._ycOnPop);
+    }catch(e){}
     return ov;
   }
   function closeCard(now){
     if(ovTimer){clearTimeout(ovTimer);ovTimer=null}
     if(!ov) return;
-    var o=ov; ov=null; o.classList.remove('on');
+    var o=ov; ov=null;
+    try{
+      document.removeEventListener('keydown',o._ycOnKey,true);
+      window.removeEventListener('popstate',o._ycOnPop);
+      document.body.style.overflow=o._ycPrevOverflow||'';
+      if(o._ycPushed&&history.state&&history.state.ycPop){ try{history.back();}catch(e){} }
+    }catch(e){}
+    o.classList.remove('on');
     if(now){ if(o.parentNode)o.parentNode.removeChild(o); }
     else ovTimer=setTimeout(function(){ if(o.parentNode)o.parentNode.removeChild(o); },260);
   }
@@ -2134,6 +2188,7 @@ document.addEventListener('click', function(e){
     else if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)){os='harmony';model='鸿蒙设备'}
     else if(/Android/i.test(ua)){os='android';var md=ua.match(/Android[^;)]*;\s*([^;)]+)/i);model=md&&md[1]?md[1].trim().slice(0,20):'安卓设备';if(/Pad|Tablet|SM-T\d|MatePad/i.test(ua))model+='(平板)'}
     var wx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
+    var iosOther=/iPhone|iPod/.test(ua)&&/CriOS|FxiOS|EdgiOS|Opt\/|YaBrowser/i.test(ua);
     var osName=os==='ios'?'苹果':os==='android'?'安卓':os==='harmony'?'鸿蒙':'电脑';
     var steps;
     if(os==='ios'){
@@ -2146,7 +2201,7 @@ document.addEventListener('click', function(e){
       steps=[['点地址栏右侧的「安装」图标（或菜单里的「安装应用」）']];
     }
     var label=(model.indexOf(osName)>-1)?model:model+' · '+osName;
-    return {label:label,steps:steps,wx:wx};
+    return {label:label,steps:steps,wx:wx,iosOther:iosOther};
   }
   function screenInstall(){
     badge('ycgk.v2.installshow');
@@ -2165,11 +2220,12 @@ document.addEventListener('click', function(e){
       '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
       '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+
       '<div class="yc-ob-why"><div><div class="ic">⚡</div><div class="tx">一点就开</div></div><div><div class="ic">📴</div><div class="tx">离线能刷</div></div><div><div class="ic">🎯</div><div class="tx">不再找链接</div></div></div>'+
+      (d.iosOther?'<div class="yc-ob-wx">iPhone 上只有 <b>Safari</b> 能安装到桌面。点「📋 复制网址」→ 打开 <b>Safari</b> 粘贴访问 → 再按步骤安装。</div>':'')+
       (d.wx?'<div class="yc-ob-wx">你在微信/QQ里打开会被拦住安装。先点右上角「···」或「⋮」→「<b>在浏览器打开</b>」，用浏览器打开后点「一键安装」即可。</div>':'')+
       '<div class="yc-ob-steps"><div class="yc-ob-steps-t">📲 '+esc(d.label)+' · 安装步骤</div>'+stepsHtml+'</div>'+
       hero+
       '<button class="yc-ob-ghost" id="obCopy">📋 复制网址（存备忘录备用）</button>'+
-      '<button class="yc-ob-ghost" id="obNo" style="border-color:#e5e7eb;color:#6b7280">暂不安装，不再提醒</button>'+
+      '<button class="yc-ob-ghost" id="obNo" style="border-color:#e5e7eb;color:#6b7280">暂不安装（3天内不再提醒）</button>'+
       '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再装，先去做学习计划 →</a></div>';
     openCard('ycObInstall',html,{closable:true});
     var ovI=$('ycObInstall');
@@ -2230,7 +2286,7 @@ document.addEventListener('click', function(e){
       '<div class="yc-ob-foot">生成后可随时在底部「计划」入口重新定制</div>';
     openCard('ycObForm',html,{closable:true});
     var ovF=$('ycObForm');
-    if(ovF){ var xbF=ovF.querySelector('.yc-ob-x'); if(xbF) xbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} set(K_ONB,'2'); }); }
+    if(ovF){ var xbF=ovF.querySelector('.yc-ob-x'); if(xbF) xbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} try{ if(window.YCNotify) YCNotify.dismiss('planForm'); }catch(e){} set(K_ONB,'2'); }); }
     bindChips('fFresh','data-fresh',true);
     bindChips('fWeak','data-weak',false);
     $('fGen').addEventListener('click',function(){
@@ -2252,7 +2308,7 @@ document.addEventListener('click', function(e){
       showToast('✓ 学习计划已生成，可在底部「计划」随时调整');
       screenPlan();
     });
-    var lbF=$('fLater'); if(lbF) lbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} set(K_ONB,'2'); closeCard(); });
+    var lbF=$('fLater'); if(lbF) lbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} try{ if(window.YCNotify) YCNotify.dismiss('planForm'); }catch(e){} set(K_ONB,'2'); closeCard(); });
   }
   function bindChips(id,attr,single){
     var box=$(id); if(!box) return;
@@ -2587,19 +2643,69 @@ document.addEventListener('click', function(e){
   }
   function refreshInstallBtn(){ /* 预留：顶部安装按钮状态由 14 号维护 */ }
 
+  /* ---------- B4：今日计划 X/Y ---------- */
+  function planDaily(){
+    try{ var p=JSON.parse(localStorage.getItem(K_PLAN)||'null'); return p&&p.daily?p.daily:0; }catch(e){ return 0; }
+  }
+  function todayDone(){
+    try{
+      var d=new Date();
+      function pk(x){ return ''+x.getFullYear()+('0'+(x.getMonth()+1)).slice(-2)+('0'+x.getDate()).slice(-2); }
+      var k=pk(d), n=0;
+      var st=null; try{ st=JSON.parse(localStorage.getItem('ycgk-stat')||'null'); }catch(e){ st=null; }
+      if(st&&st.quiz&&st.quiz.d&&st.quiz.d[k]) n+=(st.quiz.d[k].n||0);
+      var buf=null; try{ buf=JSON.parse(localStorage.getItem('ycgk.tl.buf')||'null'); }catch(e){ buf=null; }
+      if(buf&&buf.quiz&&buf.quiz.d&&buf.quiz.d[k]) n+=(buf.quiz.d[k].n||0);
+      return n;
+    }catch(e){ return 0; }
+  }
+  function planBtnLabel(){
+    var daily=planDaily();
+    if(!daily) return '📋 计划';
+    var done=Math.min(todayDone(),daily);
+    return '📋 今日计划 '+done+'/'+daily;
+  }
+
+  /* ---------- B0：设置入口 —— 弹窗提醒总开关 ---------- */
+  function openPopSettings(){
+    try{
+      if(!(window.YCNotify&&YCNotify.openModal)) return;
+      var on=YCNotify.masterOn();
+      var rec=YCNotify.openModal({wide:false,closable:true,html:
+        '<div class="yc-ob-h" style="margin-bottom:4px">设置</div>'+
+        '<div class="yc-ob-sub" style="text-align:left">控制是否自动弹出安装引导、学习计划等提醒</div>'+
+        '<label style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F7F5F0;border-radius:12px;padding:14px;margin:12px 0;font-weight:800;color:#202020;font-size:14px">'+
+        '<span>🔔 弹窗提醒</span><input type="checkbox" id="ycPopMaster" '+(on?'checked':'')+' style="width:22px;height:22px;accent-color:#DC2626">'+
+        '</label>'+
+        '<div style="font-size:12px;color:#8a8378;line-height:1.6">关闭后，安装引导、学习计划等自动弹窗不再出现；公告条与手动入口不受影响。</div>'+
+        '<button class="yc-ob-primary" id="ycPopSetOk">好的</button>'
+      });
+      var cb=document.getElementById('ycPopMaster');
+      if(cb) cb.addEventListener('change',function(){ try{ YCNotify.setMaster(cb.checked); }catch(e){} });
+      var okb=document.getElementById('ycPopSetOk');
+      if(okb) okb.addEventListener('click',function(){ rec.close(); });
+    }catch(e){}
+  }
+
   /* ---------- 常驻入口：顶部按钮 + 底部 tab ---------- */
   function injectEntries(){
     var actions=document.querySelector('.yc-top-actions');
+    if(actions && !$('ycPopSetBtn')){
+      var sb=document.createElement('button'); sb.id='ycPopSetBtn'; sb.className='yc-plan-btn';
+      sb.textContent='⚙️'; sb.title='设置'; sb.setAttribute('aria-label','设置');
+      sb.addEventListener('click',openPopSettings);
+      actions.insertBefore(sb,actions.firstChild);
+    }
     if(actions && !$('ycPlanTopBtn')){
       var b=document.createElement('button'); b.id='ycPlanTopBtn'; b.className='yc-plan-btn';
-      b.textContent='📋 计划';
+      b.textContent=planBtnLabel();
       b.addEventListener('click',function(){ screenPlan(true); });
       actions.insertBefore(b,actions.firstChild);
     }
     var tabbar=document.querySelector('.yc-tabbar');
     if(tabbar && !$('ycPlanTabBtn')){
       var btn=document.createElement('button'); btn.id='ycPlanTabBtn'; btn.className='yc-plan-tab';
-      btn.innerHTML='<span class="mi">📋</span><span class="lb">计划</span>';
+      btn.innerHTML='<span class="mi">📋</span><span class="lb">'+(planDaily()?planBtnLabel().replace('📋 ',''):'计划')+'</span>';
       btn.addEventListener('click',function(){ screenPlan(true); });
       tabbar.appendChild(btn);
     }
@@ -2617,11 +2723,18 @@ document.addEventListener('click', function(e){
   /* ---------- 低频安装轻提醒：未装桌面且距上次提醒≥3天，弹非阻断浮条（已装永不提醒） ---------- */
   var K_REM='ycgk.installRemind.v1';
   function softInstallRemind(){
-    if(installDone()) return;
-    if(installDismissed()) return;
-    var last=0; try{ last=parseInt(raw(K_REM)||'0',10)||0; }catch(e){}
-    if(Date.now()-last < 3*86400000) return;
-    try{ set(K_REM,String(Date.now())); }catch(e){}
+    try{
+      if(installDone()) return;
+      if(installDismissed()) return;
+      if(window.YCNotify){
+        if(!YCNotify.canShow('installSoft')) return;
+        YCNotify.markShown('installSoft'); /* 3 天冷却 */
+      }else{
+        var last=0; try{ last=parseInt(raw(K_REM)||'0',10)||0; }catch(e){}
+        if(Date.now()-last < 3*86400000) return;
+        try{ set(K_REM,String(Date.now())); }catch(e){}
+      }
+    }catch(e){ return; }
     setTimeout(function(){
       if(document.getElementById('ycSoftInst')) return;
       var bar=document.createElement('div'); bar.id='ycSoftInst';
@@ -2632,7 +2745,7 @@ document.addEventListener('click', function(e){
       go.addEventListener('click',function(){ if(bar.parentNode)bar.parentNode.removeChild(bar); window.location.href='install.html'; });
       var x=document.createElement('button'); x.textContent='×';
       x.style.cssText='background:none;border:none;color:#9ca3af;font-size:17px;cursor:pointer;padding:0 2px;font-family:inherit';
-      x.addEventListener('click',function(){ dismissInstall(); if(bar.parentNode)bar.parentNode.removeChild(bar); });
+      x.addEventListener('click',function(){ if(window.YCNotify){ try{ YCNotify.dismiss('installSoft'); }catch(e){} } else { dismissInstall(); } if(bar.parentNode)bar.parentNode.removeChild(bar); });
       bar.appendChild(tx); bar.appendChild(go); bar.appendChild(x);
       document.body.appendChild(bar);
       setTimeout(function(){ if(bar.parentNode) bar.parentNode.removeChild(bar); },9000);
@@ -2641,25 +2754,40 @@ document.addEventListener('click', function(e){
 
   /* ---------- 启动：首启引导流程 ---------- */
   function start(){
-    var step=raw(K_ONB)||'0';
-    if(step==='2'){ softInstallRemind(); return; } // 已完成引导，正常用
-    /* 已填过学习计划的用户（含旧版本键）：视为已完成引导，绝不再弹表单或安装引导 */
-    if(hasAnyPlan()){ set(K_ONB,'2'); softInstallRemind(); return; }
-    /* 30天内点过「暂不设置，先逛逛」：跳过整个引导链，计划入口常驻菜单 */
-    if(planLaterActive()){ set(K_ONB,'2'); softInstallRemind(); return; }
-    if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
-    /* 微信/QQ 内置浏览器装不了 PWA：不自动弹安装引导，常驻入口里给「在浏览器打开」指引 */
-    if(inAppBrowser()){ return; }
-    /* 频控：叉掉过永久不弹；累计访问不满 3 次（已访问 2 次以上才允许）不弹；每次会话最多 1 次 */
-    var visits=0; try{ visits=parseInt(raw(K_VISITS)||'0',10)||0; }catch(e){}
-    visits++; set(K_VISITS,String(visits));
-    var sessPopped=false; try{ sessPopped=!!sessionStorage.getItem(K_SESS_POP); }catch(e){}
-    if(installDismissed()||sessPopped||visits<3){ softInstallRemind(); return; }
-    try{ sessionStorage.setItem(K_SESS_POP,'1'); }catch(e){}
-    setTimeout(function(){
-      if(step==='0') screenInstall();
-      else if(step==='1') screenForm();
-    },400);
+    try{
+      /* B2 总开关：设置里关闭后，不自动弹任何引导/提醒 */
+      if(window.YCNotify&&!YCNotify.masterOn()) return;
+      var step=raw(K_ONB)||'0';
+      if(step==='2'){ softInstallRemind(); return; } // 已完成引导，正常用
+      /* 已填过学习计划的用户（含旧版本键）：视为已完成引导，绝不再弹表单或安装引导 */
+      if(hasAnyPlan()){ set(K_ONB,'2'); softInstallRemind(); return; }
+      /* 30天内点过「暂不设置，先逛逛」：跳过整个引导链，计划入口常驻菜单 */
+      if(planLaterActive()){ set(K_ONB,'2'); softInstallRemind(); return; }
+      if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
+      /* 微信/QQ 内置浏览器装不了 PWA：不自动弹安装引导，常驻入口里给「在浏览器打开」指引 */
+      if(inAppBrowser()){ return; }
+      /* B4：学习计划表单自动弹出仅限学习时段（7:00–23:00），每天最多 1 次 */
+      var nowD=new Date(), h=nowD.getHours();
+      var dkey=(window.YCNotify?YCNotify.P:'ycgk.pop.')+'d.planForm';
+      var shownToday=false; try{ shownToday=(localStorage.getItem(dkey)===nowD.toDateString()); }catch(e){}
+      if(step==='1'&&(h<7||h>=23||shownToday)){ softInstallRemind(); return; }
+      /* 频控：3 天冷却（非永久）；累计访问不满 3 次（已访问 2 次以上才允许）不弹；每次会话最多 1 次 */
+      var visits=0; try{ visits=parseInt(raw(K_VISITS)||'0',10)||0; }catch(e){}
+      visits++; set(K_VISITS,String(visits));
+      var sessPopped=false; try{ sessPopped=!!sessionStorage.getItem(K_SESS_POP); }catch(e){}
+      if(installDismissed()||sessPopped||visits<3){ softInstallRemind(); return; }
+      try{ sessionStorage.setItem(K_SESS_POP,'1'); }catch(e){}
+      try{ localStorage.setItem(dkey,nowD.toDateString()); }catch(e){}
+      if(window.YCNotify) YCNotify.markShown('install'); /* 记 3 天冷却 */
+      /* B1：自动弹窗延迟 ≥2s，做题/模考页面不弹 */
+      setTimeout(function(){
+        try{
+          if(window.YCNotify&&YCNotify.inExamView()) return;
+          if(step==='0') screenInstall();
+          else if(step==='1') screenForm();
+        }catch(e){}
+      },2000);
+    }catch(e){}
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
@@ -2724,6 +2852,14 @@ document.addEventListener('click', function(e){
   function doUpdate(btn){
     /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */
     if(btn){ btn.disabled=true; btn.textContent='更新中…'; }
+    /* B6：新版本处于 waiting 时，用户点击浮条/一键更新才正式激活并刷新 */
+    try{
+      if(navigator.serviceWorker){
+        navigator.serviceWorker.getRegistration().then(function(reg){
+          if(reg&&reg.waiting){ try{ reg.waiting.postMessage({type:'yc-skip-waiting'}); }catch(e){} }
+        });
+      }
+    }catch(e){}
     var go=function(){
       try{ sessionStorage.setItem('ycUpdOk', String(Date.now())); }catch(e){}
       /* 强制从网络重新拉取最新 index.html，绕过浏览器缓存，确保更新真实生效 */
@@ -2775,6 +2911,7 @@ document.addEventListener('click', function(e){
     var ok=null;
     try{ ok=sessionStorage.getItem('ycUpdOk'); if(ok) sessionStorage.removeItem('ycUpdOk'); }catch(e){}
     if(!ok) return;
+    try{ if(localStorage.getItem('ycgk.pop.done.updToast')==='1') return; localStorage.setItem('ycgk.pop.done.updToast','1'); }catch(e){}
     var t=document.createElement('div');
     t.id='yc-upd-toast';
     t.textContent='✓ 已更新到最新版本';
@@ -2792,6 +2929,7 @@ document.addEventListener('click', function(e){
 
   function showFloat(){
     if(document.getElementById('yc-upd-float')) return;
+    try{ if(window.YCNotify&&!YCNotify.canShow('updFloat')) return; }catch(e){}
     try{ var h=parseInt(localStorage.getItem('ycgk.updfloat.hide')||'0',10)||0; if(h&&Date.now()-h<86400000) return; }catch(e){}
     var f=document.createElement('button');
     f.id='yc-upd-float';
@@ -2800,7 +2938,7 @@ document.addEventListener('click', function(e){
     var x=document.createElement('span');
     x.textContent='×'; x.title='暂不提醒（24小时）';
     x.style.cssText='margin-left:6px;color:#e5e7eb;font-size:17px;cursor:pointer;padding:2px 8px;';
-    x.addEventListener('click',function(ev){ ev.stopPropagation(); try{ localStorage.setItem('ycgk.updfloat.hide',String(Date.now())); }catch(e){} if(f.parentNode)f.parentNode.removeChild(f); });
+    x.addEventListener('click',function(ev){ ev.stopPropagation(); try{ localStorage.setItem('ycgk.updfloat.hide',String(Date.now())); }catch(e){} try{ if(window.YCNotify) YCNotify.dismiss('updFloat'); }catch(e){} if(f.parentNode)f.parentNode.removeChild(f); });
     f.appendChild(x);
     document.body.appendChild(f);
   }
@@ -2813,11 +2951,12 @@ document.addEventListener('click', function(e){
   }
   function mount(){
     if(!document.body) return;
-    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'){ document.documentElement.style.setProperty('--yc-notice-h','0px'); return; } }catch(e){}
+    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'||(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ document.documentElement.style.setProperty('--yc-notice-h','0px'); return; } }catch(e){}
     document.body.insertBefore(box,document.body.firstChild);
     var btn=box.querySelector('.yc-notice-close');
     if(btn) btn.addEventListener('click',function(){
       try{ localStorage.setItem('ycgk.notice.dismissed.v1','1'); }catch(e){}
+      try{ if(window.YCNotify) YCNotify.dismiss('noticeBar'); }catch(e){}
       box.style.display='none';
       document.documentElement.style.setProperty('--yc-notice-h','0px');
     });
