@@ -98,6 +98,12 @@
       mi = i; triedFb = false;
       mp.src = mediaParts[i];
       mp.load();
+      /* 视频 ready 后自动播放（静音起播，失败忽略） */
+      var go = function(){
+        mp.removeEventListener("canplay", go);
+        try { mp.muted = true; var p = mp.play(); if (p && p.catch) p.catch(function(){}); } catch(e){}
+      };
+      mp.addEventListener("canplay", go);
     }
     mp.addEventListener("ended", function(){ if (mi < mediaParts.length - 1) loadMini(mi + 1); });
     mp.addEventListener("error", function(){
