@@ -5,23 +5,37 @@
     <meta http-equiv="Expires" content="0">
     <script>
     (function(){
-      var V="ttfix117";
+      /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
       try{
         var K="yc-page-ver";
-        var prev=localStorage.getItem(K);
-        if(prev&&prev!==V){localStorage.setItem(K,V);var p=location.pathname;location.replace(p+"?ycv="+V+"_"+Date.now());return;}
-        if(!prev){localStorage.setItem(K,V);}
-        if(location.search.indexOf("ycv=")===-1){
-          var LK="yc-ver-chk-at",now=Date.now(),last=0;
-          try{last=+localStorage.getItem(LK)||0}catch(e){}
-          if(now-last>6*3600*1000){
-            try{localStorage.setItem(LK,String(now))}catch(e){}
-            fetch("./index.html?ycchk="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
-              var m=t.match(/index-b34\.js\?v=([a-z0-9]+)/);
-              if(m&&m[1]!==V){localStorage.setItem(K,m[1]);location.replace(location.pathname+"?ycv="+m[1]+"_"+Date.now());}
-            }).catch(function(){});
-          }
+        var FALLBACK="tt62"; /* 兜底：仅首次访问且索引请求失败时使用 */
+        function fixIcons(v){
+          try{
+            var i1=document.querySelector('link[rel="icon"]'),i2=document.querySelector('link[rel="apple-touch-icon"]'),og=document.querySelector('meta[property="og:image"]');
+            [i1,i2].forEach(function(el){ if(el&&el.href) el.href=el.href.replace(/\?v=[^&"]*/,'?v='+v); });
+            if(og&&og.content) og.content=og.content.replace(/\?v=[^&"]*/,'?v='+v);
+          }catch(e){}
         }
+        function applyV(v){
+          try{
+            var sc=document.createElement('script');
+            sc.type='module';sc.crossOrigin='';sc.src='./assets/index-b34.js?v='+v;
+            document.head.appendChild(sc);
+            var lk=document.createElement('link');
+            lk.rel='stylesheet';lk.crossOrigin='';lk.href='./assets/index-C2M5URtc.css?v='+v;
+            document.head.appendChild(lk);
+            if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ fixIcons(v); }); }
+            else { fixIcons(v); }
+          }catch(e){}
+        }
+        var cached=localStorage.getItem(K);
+        if(cached) applyV(cached);
+        fetch("./assets/qbank-index.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(idx){
+          var v=idx&&idx.v?String(idx.v):'';
+          if(!v) return;
+          if(cached&&cached!==v){localStorage.setItem(K,v);location.replace(location.pathname+"?ycv="+v+"_"+Date.now());return;}
+          if(!cached){localStorage.setItem(K,v);applyV(v);}
+        }).catch(function(){ if(!cached){localStorage.setItem(K,FALLBACK);applyV(FALLBACK);} });
       }catch(e){}
     })();
     </script>
@@ -59,8 +73,7 @@
   .yc-tabbar { left: 50%; right: auto; transform: translateX(-50%); max-width: 680px; bottom: 12px; border: 1px solid #E8E4DB; border-radius: 999px; box-shadow: 0 4px 16px rgba(32,32,32,.10); padding-left: 16px; padding-right: 16px; }
   .page-shell-bottom { padding-bottom: 86px !important; }
 }
-</style><script type="module" crossorigin="" src="./assets/index-b34.js?v=ttfix117"></script>
-        <link rel="stylesheet" crossorigin="" href="./assets/index-C2M5URtc.css?v=ttfix117">
+</style><!-- index-b34.js / index-C2M5URtc.css 版本参数由头部脚本从 qbank-index.json 的 v 字段动态注入 -->
   <script>
     window.artifactId = "ycgk-20261120";
     window.artifactVersion = "27";
@@ -1980,13 +1993,13 @@ document.addEventListener('click', function(e){
   var K_VISITS='yc_visit_count_v1';          /* 累计访问次数：前两次不自动弹，避免首访打断 */
   var K_SESS_POP='yc_sess_popup_shown_v1';   /* 本会话已弹过引导（刷新不重复弹） */
   var K_PLAN_LATER='yc_plan_later_v1';       /* 「暂不设置，先逛逛」时间戳 → 30 天内不再自动弹 */
-  /* B2：新版关闭 = 3 天冷却（非永久）；旧版"永久不再提醒"记录迁移为 done.install 继续生效 */
+  /* 用户主动拒绝安装引导（叉掉/暂不安装）= 永久不再自动弹（done.install）；旧版"永久不再提醒"记录迁移为 done.install 继续生效 */
   function installDismissed(){
     try{ if(window.YCNotify){ if(localStorage.getItem(YCNotify.P+'done.install')==='1') return true; return YCNotify.recent('install',3*86400000); } }catch(e){}
     try{return localStorage.getItem(K_DISMISS)==='1'}catch(e){return false}
   }
   function dismissInstall(){
-    try{ if(window.YCNotify){ YCNotify.dismiss('install'); return; } }catch(e){}
+    try{ if(window.YCNotify){ YCNotify.dismiss('install', true); return; } }catch(e){}
     try{localStorage.setItem(K_DISMISS,'1')}catch(e){}
   }
   function planLaterActive(){
