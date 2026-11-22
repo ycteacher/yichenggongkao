@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v19';
+var CACHE = 'yc-static-v20';
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件与题库索引：有网时后台更新（stale-while-revalidate），命中缓存秒回 */
 var SWR_PAT = /(index-b34\.js|qbank-index\.json|qbank-idmap\.json)$/;
@@ -14,6 +14,10 @@ function dlog(m){ dbg.log.push((dbg.fetches) + ' ' + m); if (dbg.log.length > 12
 self.addEventListener('message', function (e) {
   if (e.data === 'debug' && e.source) {
     e.source.postMessage(JSON.stringify(dbg));
+  }
+  /* B6：新版本 waiting 中，用户点击更新浮条后才正式激活（不自动抢前台） */
+  if (e.data && e.data.type === 'yc-skip-waiting') {
+    self.skipWaiting();
   }
   /* 一键更新时通知清空静态缓存，保证下次拿到最新资源 */
   if (e.data && e.data.type === 'yc-clear-cache') {
@@ -26,7 +30,7 @@ self.addEventListener('message', function (e) {
 });
 
 self.addEventListener('install', function () {
-  self.skipWaiting();
+  /* B6：不自动 skipWaiting —— 新版本先进入 waiting，由页面底部更新浮条引导用户点击后生效 */
 });
 
 self.addEventListener('activate', function (e) {
