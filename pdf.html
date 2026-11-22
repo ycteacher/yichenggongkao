@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src 'self'; img-src 'self' data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; img-src 'self' data: blob:; media-src 'self' https: blob:; connect-src 'self' https://yicheng-video.oss-cn-beijing.aliyuncs.com;">
 <title>配套试卷 · 亿成公考</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#FAF8F3; color:#202020; min-height:100vh; display:flex; flex-direction:column; }
+  /* 关键：整页禁止左右滑动，只允许上下滚，杜绝 PDF 左右乱晃 */
+  html, body { overflow-x:hidden; max-width:100%; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#FAF8F3; color:#202020; min-height:100vh; }
   .topbar {
-    position:sticky; top:0; z-index:10; background:#FAF8F3; border-bottom:1px solid #EDE9E0;
+    position:sticky; top:0; z-index:20; background:#FAF8F3; border-bottom:1px solid #EDE9E0;
     padding:12px 16px; display:flex; align-items:center; gap:12px;
     padding-top:calc(12px + env(safe-area-inset-top));
   }
@@ -21,8 +23,27 @@
   .topbar .tt { flex:1; min-width:0; }
   .topbar .tt h1 { font-size:17px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .topbar .tt p { font-size:12px; color:#8A8378; margin-top:2px; }
-  .viewer { flex:1; width:100%; border:0; background:#fff; }
-  .tips { max-width:760px; margin:0 auto; width:100%; padding:16px 16px 40px; }
+  /* 顶部小视频：从视频页点进来时显示，边看题边看视频 */
+  .mini-wrap { position:sticky; top:61px; z-index:15; background:#000; }
+  .mini-wrap video { display:block; width:100%; aspect-ratio:16/9; background:#000; border:0; }
+  .actions { max-width:760px; margin:0 auto; width:100%; padding:14px 16px 0; }
+  .dl-btn {
+    display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    padding:14px 16px; border-radius:14px; border:0; cursor:pointer;
+    background:#15803D; color:#fff; font-size:15px; font-weight:700;
+  }
+  .dl-btn:active { transform:scale(.99); }
+  .dl-btn:disabled { opacity:.6; }
+  .dl-status { font-size:12px; color:#6B6558; line-height:1.8; margin-top:8px; }
+  .dl-status b { color:#202020; }
+  .pages { max-width:760px; margin:0 auto; width:100%; padding:12px 12px 8px; }
+  .pages .ph {
+    width:100%; background:#EFECE4; border-radius:8px; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:center; color:#9A9387; font-size:13px;
+  }
+  .pages canvas { display:block; width:100%; margin-bottom:10px; border-radius:8px; box-shadow:0 1px 6px rgba(32,32,32,.10); background:#fff; }
+  .pginfo { text-align:center; font-size:12px; color:#9A9387; padding:2px 16px 10px; }
+  .tips { max-width:760px; margin:0 auto; width:100%; padding:8px 16px 40px; }
   .tips .card { background:#fff; border-radius:16px; padding:14px 16px; box-shadow:0 2px 10px rgba(32,32,32,.05); margin-bottom:12px; }
   .tips h3 { font-size:14px; font-weight:800; color:#15803D; margin-bottom:8px; }
   .tips li { font-size:13px; color:#6B6558; line-height:1.8; margin-left:18px; }
@@ -31,34 +52,143 @@
 </head>
 <body>
   <div class="topbar">
-    <a class="back" href="videos.html?v=2" aria-label="返回视频">←</a>
+    <a class="back" href="videos.html?v=7" aria-label="返回视频">←</a>
     <div class="tt">
       <h1 id="pageTitle">配套试卷</h1>
-      <p>保存 · 打印 · 对着视频做题</p>
+      <p>预览 · 一键保存 · 上下滑动看题</p>
     </div>
   </div>
-  <iframe class="viewer" id="viewer" title="试卷预览"></iframe>
+  <div id="miniWrap" style="display:none">
+    <div class="mini-wrap">
+      <video id="miniPlayer" controls playsinline webkit-playsinline preload="metadata" controlslist="nodownload" disablepictureinpicture oncontextmenu="return false"></video>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="dl-btn" id="dlBtn">⬇️ 一键保存 / 下载讲义</button>
+    <p class="dl-status" id="dlStatus">点上面按钮，文件直接存进手机；存到哪了会在这里告诉你。</p>
+  </div>
+  <div class="pages" id="pages"><div class="ph" style="height:200px">讲义加载中…</div></div>
+  <div class="pginfo" id="pginfo"></div>
   <div class="tips">
     <div class="card">
-      <h3>📄 怎么保存到手机</h3>
-      <li>iPhone：点屏幕右上角<strong>「分享」图标</strong>（方框加箭头）→ 选<strong>「存储到文件」</strong>或「打印」。</li>
-      <li>安卓 / 电脑：页面里一般有<strong>下载按钮</strong>，或右键 →「另存为 / 打印」。</li>
-    </div>
-    <div class="card">
       <h3>💡 边看视频边用卷子，推荐三种方式</h3>
-      <li><strong>最推荐：打印出来</strong>。保存后去打印店打一份，纸上做题，手机放视频，效率最高。</li>
-      <li><strong>两件套</strong>：电脑或平板放视频，手机看卷子；没有第二台设备就用手机分屏（iPhone 从底部上滑进分屏）。</li>
+      <li><strong>最推荐：打印出来</strong>。先点「一键保存」存下文件，去打印店打一份，纸上做题，手机放视频，效率最高。</li>
+      <li><strong>两件套</strong>：电脑或平板放视频，手机看卷子；没有第二台设备就用手机分屏。</li>
       <li><strong>先做后听</strong>：先把卷子整份做一遍，再开视频听讲解，错的地方重点听——比边做边听记得牢。</li>
     </div>
   </div>
+<script src="assets/pdf.min.js"></script>
 <script>
 (function(){
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
   var q = new URLSearchParams(location.search);
   var file = q.get("file") || "";
   var name = q.get("name") || "配套试卷";
-  if (!/^files\//.test(file)) { file = ""; }
-  document.getElementById("pageTitle").textContent = name + " · 试卷";
-  if (file) document.getElementById("viewer").src = file;
+  if (!/^files\//.test(file)) file = "";
+  document.getElementById("pageTitle").textContent = name + " · 讲义";
+
+  /* ---- 顶部小视频：从视频页点进来时带上 media/fb 参数 ---- */
+  var mediaParts = (q.get("media") || "").split("|").filter(Boolean);
+  var fbParts = (q.get("fb") || "").split("|").filter(Boolean);
+  if (mediaParts.length) {
+    document.getElementById("miniWrap").style.display = "block";
+    var mp = document.getElementById("miniPlayer");
+    var mi = 0, triedFb = false;
+    function loadMini(i){
+      mi = i; triedFb = false;
+      mp.src = mediaParts[i];
+      mp.load();
+    }
+    mp.addEventListener("ended", function(){ if (mi < mediaParts.length - 1) loadMini(mi + 1); });
+    mp.addEventListener("error", function(){
+      if (!triedFb && fbParts[mi]) { triedFb = true; mp.src = fbParts[mi]; mp.load(); }
+    });
+    loadMini(0);
+  }
+
+  /* ---- 一键保存 / 下载：真下载，下完告诉用户文件去哪了 ---- */
+  var dlBtn = document.getElementById("dlBtn"), dlStatus = document.getElementById("dlStatus");
+  var fname = decodeURIComponent((file.split("/").pop() || "讲义.pdf"));
+  dlBtn.addEventListener("click", function(){
+    if (!file) { dlStatus.textContent = "没有找到讲义文件"; return; }
+    dlBtn.disabled = true;
+    dlStatus.textContent = "正在准备文件，请稍等…";
+    fetch(file).then(function(r){
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.blob();
+    }).then(function(b){
+      var url = URL.createObjectURL(b);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      dlBtn.disabled = false;
+      dlStatus.innerHTML = "✅ 已开始下载「" + esc(fname) + "」，去这里找：<br>" +
+        "· 苹果手机：Safari 可能问「是否下载」，点下载后，在<b>「文件」App → 浏览 → 下载项</b>里<br>" +
+        "· 安卓手机：看<b>通知栏</b>的下载完成提示，文件在「文件管理」的 <b>Download</b> 文件夹<br>" +
+        "· 电脑：在浏览器右上角<b>下载列表</b>里";
+      setTimeout(function(){ try { URL.revokeObjectURL(url); } catch(e){} }, 60000);
+    }).catch(function(){
+      dlBtn.disabled = false;
+      dlStatus.innerHTML = "一键下载没成功，已帮你用新页面打开：长按页面选「保存 / 下载」，或点浏览器菜单里的「下载」即可。";
+      try { window.open(file, "_blank"); } catch(e){ location.href = file; }
+    });
+  });
+
+  /* ---- PDF 渲染：按屏宽逐页画出来，只能上下滑，不会左右晃 ---- */
+  var cont = document.getElementById("pages");
+  var info = document.getElementById("pginfo");
+  if (!file) {
+    cont.innerHTML = '<div class="ph" style="height:160px">没有找到讲义文件</div>';
+    return;
+  }
+  if (!window.pdfjsLib) {
+    cont.innerHTML = '<div class="ph" style="height:160px">预览组件加载失败，点上面「一键保存」直接下载</div>';
+    return;
+  }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "assets/pdf.worker.min.js";
+  pdfjsLib.getDocument(file).promise.then(function(pdf){
+    info.textContent = "共 " + pdf.numPages + " 页 · 上下滑动查看，不用左右挪";
+    cont.innerHTML = "";
+    var w = cont.clientWidth || 360;
+    var io = null;
+    if (window.IntersectionObserver) {
+      io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if (en.isIntersecting) { renderPage(pdf, en.target, w); io.unobserve(en.target); }
+        });
+      }, { rootMargin: "300px 0px" });
+    }
+    for (var i = 1; i <= pdf.numPages; i++) {
+      var ph = document.createElement("div");
+      ph.className = "ph";
+      ph.style.height = Math.round(w * 1.414) + "px";
+      ph.textContent = "第 " + i + " 页加载中…";
+      ph.setAttribute("data-pg", i);
+      cont.appendChild(ph);
+      if (io) io.observe(ph); else renderPage(pdf, ph, w);
+    }
+  }).catch(function(){
+    cont.innerHTML = '<div class="ph" style="height:160px">预览加载失败，点上面「一键保存」直接下载</div>';
+  });
+
+  function renderPage(pdf, ph, w){
+    var n = parseInt(ph.getAttribute("data-pg"), 10);
+    pdf.getPage(n).then(function(page){
+      var vp = page.getViewport({ scale: 1 });
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var vp2 = page.getViewport({ scale: (w / vp.width) * dpr });
+      var canvas = document.createElement("canvas");
+      canvas.width = Math.floor(vp2.width);
+      canvas.height = Math.floor(vp2.height);
+      canvas.style.width = "100%";
+      canvas.setAttribute("data-pg", n);
+      page.render({ canvasContext: canvas.getContext("2d"), viewport: vp2 });
+      ph.parentNode.replaceChild(canvas, ph);
+    }).catch(function(){ ph.textContent = "第 " + n + " 页加载失败"; });
+  }
 })();
 </script>
 </body>
