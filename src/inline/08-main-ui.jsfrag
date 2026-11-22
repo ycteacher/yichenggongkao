@@ -402,7 +402,7 @@
       '<div class="yc-vb-s">亿成老师精讲视频 · 配套试卷可保存打印，边看边学</div></div>' +
       '<span class="yc-vb-r">去看 ›</span>';
     b.addEventListener("click", function(){
-      window.location.href = "videos.html?v=6";
+      window.location.href = "videos.html?v=7";
     });
     var fb = document.getElementById("yc-fb-banner");
     if (fb) shell.insertBefore(b, fb); else shell.appendChild(b);
