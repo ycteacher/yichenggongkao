@@ -1654,7 +1654,7 @@ document.addEventListener('click', function(e){
     var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb|HUAWEI|HONOR/i.test(ua);
     var isPad=/Pad|Tablet|SM-T\d|SM-P\d|MatePad|Tab\d/i.test(ua);
     var isAndroid=/Android/i.test(ua);
-    var inWx=/MicroMessenger/i.test(ua);
+    var inWx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
     var isPC=!isIOS&&!isHarmony&&!isAndroid;
     /* 判断具体设备类别 */
     var devLabel="设备",steps="";
@@ -1699,7 +1699,7 @@ document.addEventListener('click', function(e){
     ov.innerHTML='<div class="yc-sync-card">'+
       '<h3>欢迎来到亿成公考 👋</h3>'+
       '<div class="yc-sync-tip">题库全免费，内测期间不收一分钱。<b>建议先把它装到桌面</b>，以后从图标一点就开，不用再找链接。检测到你用的是<b>'+devLabel+'</b>，按下面步骤操作：</div>'+
-      (inWx?'<div class="yc-wl-wx">⚠️ 你现在是在微信里打开的，微信会拦住安装。请先点右上角「···」→「<b>在浏览器中打开</b>」，再按下面步骤操作</div>':'')+
+      (inWx?'<div class="yc-wl-wx">⚠️ 你现在是在微信/QQ里打开的，会拦住安装。请先点右上角「···」→「<b>在浏览器中打开</b>」，再按下面步骤操作</div>':'')+
       steps+
       '<button class="yc-sync-btn main" id="ycWlOk">知道了，开始刷题</button>'+
       '<button class="yc-sync-btn" id="ycWlLater" style="margin-top:8px">先不装，直接刷题</button>'+
@@ -1844,7 +1844,7 @@ document.addEventListener('click', function(e){
     var isHarmony=/HarmonyOS|OpenHarmony|ArkWeb|HUAWEI|HONOR/i.test(ua);
     var isPad=/Pad|Tablet|SM-T\d|SM-P\d|MatePad|Tab\d/i.test(ua);
     var isAndroid=/Android/i.test(ua);
-    var inWx=/MicroMessenger/i.test(ua);
+    var inWx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
     var isMac=/Macintosh|Mac OS X/i.test(ua)&&!(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
     var head='',body='';
     if(isIPad){
@@ -1878,7 +1878,7 @@ document.addEventListener('click', function(e){
            '<div class="yc-inst-st"><b>3</b><span>或点右上「⋮」→「<b class="kb">应用</b>」→「安装此站点为应用」</span></div>'+
            '<div class="yc-inst-st"><b>4</b><span>装好后桌面/开始菜单出现图标，<b>断网也能刷题</b></span></div>';
     }
-    var wx=inWx?'<div class="yc-inst-sec" style="background:#fff7ed"><div class="yc-inst-sec-t" style="color:#9a3412">⚠️ 你在微信里，会被拦住</div><div style="font-size:12.5px;color:#9a3412;line-height:1.6">先点右上角「···」→「在浏览器中打开」，再按上面步骤操作。</div></div>':'';
+    var wx=inWx?'<div class="yc-inst-sec" style="background:#fff7ed"><div class="yc-inst-sec-t" style="color:#9a3412">⚠️ 微信/QQ 里装不了，先跳出去</div><div style="font-size:12.5px;color:#9a3412;line-height:1.6">点右上角「···」或「⋮」→「<b>在浏览器打开</b>」，用浏览器打开后点「一键安装到桌面」即可。</div><button id="ycInstCopy" style="margin-top:8px;width:100%;border:1.5px solid #fdba74;background:#fff;color:#9a3412;border-radius:9px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">📋 复制网址，去浏览器打开</button></div>':'';
     return {head:head, body:body, wx:wx};
   }
 
@@ -1907,6 +1907,13 @@ document.addEventListener('click', function(e){
       '<a class="yc-inst-link" id="ycInstGuideLink" href="install.html">看完整图文 / 视频指引 ›</a>'+
       '<div class="yc-inst-foot">只想存网页文件？电脑按 Ctrl+S（Mac 按 ⌘S）另存即可<br>安装完全免费 · 题库持续更新</div>';
     card.querySelector('#ycInstX').addEventListener('click',function(){mask.classList.remove('on')});
+    var cp=card.querySelector('#ycInstCopy');
+    if(cp) cp.addEventListener('click',function(){
+      var url=location.href.split('#')[0];
+      var done=function(){ cp.textContent='✓ 已复制，去浏览器粘贴打开'; };
+      var fallback=function(){ var ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy')}catch(e){} document.body.removeChild(ta); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,function(){ fallback(); done(); }); } else { fallback(); done(); }
+    });
     var gl=card.querySelector('#ycInstGuideLink');
     if(gl) gl.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href='install.html'; });
     function goGuide(u){ return function(ev){ ev.preventDefault(); ev.stopPropagation(); mask.classList.remove('on'); window.location.href=u; }; }
@@ -1954,6 +1961,29 @@ document.addEventListener('click', function(e){
   var K_INST='ycgk.installDone.v1';
   function installDone(){ try{return localStorage.getItem(K_INST)==='1'}catch(e){return false} }
   function markInstalled(){ try{localStorage.setItem(K_INST,'1')}catch(e){} }
+  /* ---- 弹窗频控 v1：用户选择用 localStorage 永久记住；sessionStorage 只做"本会话已弹过"计数 ---- */
+  var K_DISMISS='yc_install_dismissed_v1';   /* 叉掉/暂不安装 → 永久不再自动弹安装引导 */
+  var K_VISITS='yc_visit_count_v1';          /* 累计访问次数：前两次不自动弹，避免首访打断 */
+  var K_SESS_POP='yc_sess_popup_shown_v1';   /* 本会话已弹过引导（刷新不重复弹） */
+  var K_PLAN_LATER='yc_plan_later_v1';       /* 「暂不设置，先逛逛」时间戳 → 30 天内不再自动弹 */
+  function installDismissed(){ try{return localStorage.getItem(K_DISMISS)==='1'}catch(e){return false} }
+  function dismissInstall(){ try{localStorage.setItem(K_DISMISS,'1')}catch(e){} }
+  function planLaterActive(){ try{ var t=parseInt(localStorage.getItem(K_PLAN_LATER)||'0',10)||0; return !!t && Date.now()-t<30*86400000; }catch(e){return false} }
+  function inAppBrowser(){ var ua=navigator.userAgent||''; return /MicroMessenger|QQ\/|MQQBrowser/i.test(ua); }
+  function hasAnyPlan(){
+    try{ if(getJSON(K_PLAN,null)) return true; }catch(e){}
+    try{ for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('ycgk.studyplan')===0) return true; } }catch(e){}
+    return false;
+  }
+  function showToast(msg){
+    try{
+      var t=document.createElement('div'); t.textContent=msg;
+      t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483647;background:#15803D;color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;box-shadow:0 6px 22px rgba(21,128,61,.35);font-family:inherit;white-space:nowrap;max-width:92vw';
+      document.body.appendChild(t);
+      setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; },2400);
+      setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2900);
+    }catch(e){}
+  }
   function raw(k){ try{return localStorage.getItem(k)}catch(e){return null} }
   function set(k,v){ try{localStorage.setItem(k,v)}catch(e){} }
   function getJSON(k,fb){ try{var v=raw(k);return v?JSON.parse(v):fb}catch(e){return fb} }
@@ -1969,7 +1999,7 @@ document.addEventListener('click', function(e){
   var deferred=null, canInstall=false, installed=false;
   try{
     window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; canInstall=true; refreshInstallBtn(); });
-    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; markInstalled(); refreshInstallBtn(); });
+    window.addEventListener('appinstalled',function(){ installed=true; deferred=null; canInstall=false; markInstalled(); refreshInstallBtn(); showToast('✓ 已装到桌面，以后一点就开'); });
     installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
     if(installed) markInstalled();
   }catch(e){}
@@ -1981,7 +2011,7 @@ document.addEventListener('click', function(e){
   '.yc-ob-card{position:relative;width:100%;max-width:460px;max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:24px 20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(14px);transition:transform .25s;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}'+
   '.yc-ob-mask.on .yc-ob-card{transform:translateY(0)}'+
   '.yc-ob-card.wide{max-width:680px}'+
-  '.yc-ob-x{position:absolute;top:14px;right:16px;width:30px;height:30px;border:none;background:#f2f0ec;border-radius:50%;font-size:18px;color:#8a8378;cursor:pointer;line-height:30px;text-align:center}'+
+  '.yc-ob-x{position:absolute;top:7px;right:9px;width:44px;height:44px;border:none;background:#f2f0ec;border-radius:50%;font-size:20px;color:#8a8378;cursor:pointer;line-height:44px;text-align:center}'+
   '.yc-ob-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;font-size:27px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 6px 18px rgba(220,38,38,.3)}'+
   '.yc-ob-h{font-size:21px;font-weight:900;color:#202020;text-align:center;margin:0 0 6px;line-height:1.3}'+
   '.yc-ob-sub{font-size:13px;color:#8a8378;text-align:center;margin:0 0 16px;line-height:1.6}'+
@@ -2103,7 +2133,7 @@ document.addEventListener('click', function(e){
     else if(/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){os='ios';model='iPad'}
     else if(/HarmonyOS|OpenHarmony|ArkWeb/i.test(ua)){os='harmony';model='鸿蒙设备'}
     else if(/Android/i.test(ua)){os='android';var md=ua.match(/Android[^;)]*;\s*([^;)]+)/i);model=md&&md[1]?md[1].trim().slice(0,20):'安卓设备';if(/Pad|Tablet|SM-T\d|MatePad/i.test(ua))model+='(平板)'}
-    var wx=/MicroMessenger/i.test(ua);
+    var wx=/MicroMessenger|QQ\/|MQQBrowser/i.test(ua);
     var osName=os==='ios'?'苹果':os==='android'?'安卓':os==='harmony'?'鸿蒙':'电脑';
     var steps;
     if(os==='ios'){
@@ -2135,12 +2165,15 @@ document.addEventListener('click', function(e){
       '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
       '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+
       '<div class="yc-ob-why"><div><div class="ic">⚡</div><div class="tx">一点就开</div></div><div><div class="ic">📴</div><div class="tx">离线能刷</div></div><div><div class="ic">🎯</div><div class="tx">不再找链接</div></div></div>'+
-      (d.wx?'<div class="yc-ob-wx">你在微信里打开会被拦住安装。先点右上角「···」→「<b>在浏览器中打开</b>」，再按下面步骤操作。</div>':'')+
+      (d.wx?'<div class="yc-ob-wx">你在微信/QQ里打开会被拦住安装。先点右上角「···」或「⋮」→「<b>在浏览器打开</b>」，用浏览器打开后点「一键安装」即可。</div>':'')+
       '<div class="yc-ob-steps"><div class="yc-ob-steps-t">📲 '+esc(d.label)+' · 安装步骤</div>'+stepsHtml+'</div>'+
       hero+
       '<button class="yc-ob-ghost" id="obCopy">📋 复制网址（存备忘录备用）</button>'+
+      '<button class="yc-ob-ghost" id="obNo" style="border-color:#e5e7eb;color:#6b7280">暂不安装，不再提醒</button>'+
       '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再装，先去做学习计划 →</a></div>';
-    openCard('ycObInstall',html,{closable:false});
+    openCard('ycObInstall',html,{closable:true});
+    var ovI=$('ycObInstall');
+    if(ovI){ var xbI=ovI.querySelector('.yc-ob-x'); if(xbI) xbI.addEventListener('click',function(){ dismissInstall(); set(K_ONB,'2'); }); }
     var one=$('obOneTap');
     if(one) one.addEventListener('click',function(){
       if(!deferred) return;
@@ -2161,6 +2194,7 @@ document.addEventListener('click', function(e){
     var ok=$('obInstalled');
     if(ok) ok.addEventListener('click',function(){ badge('ycgk.v2.installed'); markInstalled(); set(K_ONB,'1'); screenForm(); });
     $('obCopy').addEventListener('click',function(){ copyText(location.href.split('#')[0],'网址已复制，粘贴到备忘录即可'); });
+    $('obNo').addEventListener('click',function(){ dismissInstall(); set(K_ONB,'2'); closeCard(); });
     $('obLater').addEventListener('click',function(){ set(K_ONB,'1'); closeCard(); screenForm(); });
   }
 
@@ -2171,7 +2205,7 @@ document.addEventListener('click', function(e){
   var WEAK=['常识判断','言语理解','判断推理','数量关系','资料分析','申论','综合应用'];
   function screenForm(pre){
     /* 已有学习计划的用户：不再强制填表，直接看现有计划（"重新定制"入口传 pre 不受影响） */
-    if(!pre && getJSON(K_PLAN,null)){ screenPlan(true); return; }
+    if(!pre && hasAnyPlan()){ screenPlan(true); return; }
     badge('ycgk.v2.formshow');
     var d=new Date(); d.setDate(d.getDate()+75); var defDate=d.toISOString().slice(0,10);
     var examOpts='',provOpts='';
@@ -2192,8 +2226,11 @@ document.addEventListener('click', function(e){
       '<div class="yc-ob-grid"><div><label class="yc-ob-label">每天能刷</label><select class="yc-ob-select" id="fDaily"><option value="10">10 题</option><option value="20" selected>20 题</option><option value="30">30 题</option><option value="50">50 题</option></select></div>'+
       '<div><label class="yc-ob-label">每日投入</label><select class="yc-ob-select" id="fMins"><option value="20">20 分钟</option><option value="40" selected>40 分钟</option><option value="60">1 小时</option><option value="120">2 小时+</option></select></div></div>'+
       '<button class="yc-ob-primary" id="fGen">✨ 生成我的备考计划</button>'+
+      '<button class="yc-ob-ghost" id="fLater" style="border-color:#e5e7eb;color:#6b7280">暂不设置，先逛逛（30天内不再提醒）</button>'+
       '<div class="yc-ob-foot">生成后可随时在底部「计划」入口重新定制</div>';
-    openCard('ycObForm',html,{closable:false});
+    openCard('ycObForm',html,{closable:true});
+    var ovF=$('ycObForm');
+    if(ovF){ var xbF=ovF.querySelector('.yc-ob-x'); if(xbF) xbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} set(K_ONB,'2'); }); }
     bindChips('fFresh','data-fresh',true);
     bindChips('fWeak','data-weak',false);
     $('fGen').addEventListener('click',function(){
@@ -2212,6 +2249,7 @@ document.addEventListener('click', function(e){
       };
       setJSON(K_PLAN,plan); set(K_ONB,'2');
       badge('ycgk.v2.plangen');
+      showToast('✓ 学习计划已生成，可在底部「计划」随时调整');
       screenPlan();
     });
   }
@@ -2450,7 +2488,7 @@ document.addEventListener('click', function(e){
         '<div class="yc-ob-nav"><button class="prev" id="qPrev"'+(idx===0?' disabled':'')+'>‹ 上一题</button>'+
         '<button class="next" id="qNext">'+(idx===qs.length-1?'交卷看分 ›':'下一题 ›')+'</button></div>'+
         '<div class="yc-ob-foot">选好选项会自动记录 · 可返回修改</div>';
-      openCard('ycObQuiz',html,{closable:false,wide:true});
+      openCard('ycObQuiz',html,{closable:true,wide:true});
       var ovEl=$('ycObQuiz');
       ovEl.addEventListener('click',function(e){
         var o=e.target.closest?e.target.closest('[data-o]'):null;
@@ -2579,6 +2617,7 @@ document.addEventListener('click', function(e){
   var K_REM='ycgk.installRemind.v1';
   function softInstallRemind(){
     if(installDone()) return;
+    if(installDismissed()) return;
     var last=0; try{ last=parseInt(raw(K_REM)||'0',10)||0; }catch(e){}
     if(Date.now()-last < 3*86400000) return;
     try{ set(K_REM,String(Date.now())); }catch(e){}
@@ -2592,7 +2631,7 @@ document.addEventListener('click', function(e){
       go.addEventListener('click',function(){ if(bar.parentNode)bar.parentNode.removeChild(bar); window.location.href='install.html'; });
       var x=document.createElement('button'); x.textContent='×';
       x.style.cssText='background:none;border:none;color:#9ca3af;font-size:17px;cursor:pointer;padding:0 2px;font-family:inherit';
-      x.addEventListener('click',function(){ if(bar.parentNode)bar.parentNode.removeChild(bar); });
+      x.addEventListener('click',function(){ dismissInstall(); if(bar.parentNode)bar.parentNode.removeChild(bar); });
       bar.appendChild(tx); bar.appendChild(go); bar.appendChild(x);
       document.body.appendChild(bar);
       setTimeout(function(){ if(bar.parentNode) bar.parentNode.removeChild(bar); },9000);
@@ -2603,9 +2642,19 @@ document.addEventListener('click', function(e){
   function start(){
     var step=raw(K_ONB)||'0';
     if(step==='2'){ softInstallRemind(); return; } // 已完成引导，正常用
-    /* 已填过学习计划的用户：视为已完成引导，绝不再弹表单或安装引导 */
-    if(getJSON(K_PLAN,null)){ set(K_ONB,'2'); softInstallRemind(); return; }
+    /* 已填过学习计划的用户（含旧版本键）：视为已完成引导，绝不再弹表单或安装引导 */
+    if(hasAnyPlan()){ set(K_ONB,'2'); softInstallRemind(); return; }
+    /* 30天内点过「暂不设置，先逛逛」：跳过整个引导链，计划入口常驻菜单 */
+    if(planLaterActive()){ set(K_ONB,'2'); softInstallRemind(); return; }
     if(step==='0'&&installDone()){ step='1'; set(K_ONB,'1'); } // 已装过桌面：跳过安装引导
+    /* 微信/QQ 内置浏览器装不了 PWA：不自动弹安装引导，常驻入口里给「在浏览器打开」指引 */
+    if(inAppBrowser()){ return; }
+    /* 频控：叉掉过永久不弹；累计访问不满 3 次（已访问 2 次以上才允许）不弹；每次会话最多 1 次 */
+    var visits=0; try{ visits=parseInt(raw(K_VISITS)||'0',10)||0; }catch(e){}
+    visits++; set(K_VISITS,String(visits));
+    var sessPopped=false; try{ sessPopped=!!sessionStorage.getItem(K_SESS_POP); }catch(e){}
+    if(installDismissed()||sessPopped||visits<3){ softInstallRemind(); return; }
+    try{ sessionStorage.setItem(K_SESS_POP,'1'); }catch(e){}
     setTimeout(function(){
       if(step==='0') screenInstall();
       else if(step==='1') screenForm();
@@ -2742,10 +2791,16 @@ document.addEventListener('click', function(e){
 
   function showFloat(){
     if(document.getElementById('yc-upd-float')) return;
+    try{ var h=parseInt(localStorage.getItem('ycgk.updfloat.hide')||'0',10)||0; if(h&&Date.now()-h<86400000) return; }catch(e){}
     var f=document.createElement('button');
     f.id='yc-upd-float';
     f.textContent='🆕 有新版本 · 点这里一键更新';
     f.addEventListener('click',function(){ doUpdate(f); });
+    var x=document.createElement('span');
+    x.textContent='×'; x.title='暂不提醒（24小时）';
+    x.style.cssText='margin-left:6px;color:#e5e7eb;font-size:17px;cursor:pointer;padding:2px 8px;';
+    x.addEventListener('click',function(ev){ ev.stopPropagation(); try{ localStorage.setItem('ycgk.updfloat.hide',String(Date.now())); }catch(e){} if(f.parentNode)f.parentNode.removeChild(f); });
+    f.appendChild(x);
     document.body.appendChild(f);
   }
   if(navigator.serviceWorker){
@@ -2757,9 +2812,11 @@ document.addEventListener('click', function(e){
   }
   function mount(){
     if(!document.body) return;
+    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'){ document.documentElement.style.setProperty('--yc-notice-h','0px'); return; } }catch(e){}
     document.body.insertBefore(box,document.body.firstChild);
     var btn=box.querySelector('.yc-notice-close');
     if(btn) btn.addEventListener('click',function(){
+      try{ localStorage.setItem('ycgk.notice.dismissed.v1','1'); }catch(e){}
       box.style.display='none';
       document.documentElement.style.setProperty('--yc-notice-h','0px');
     });
