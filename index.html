@@ -2252,6 +2252,7 @@ document.addEventListener('click', function(e){
       showToast('✓ 学习计划已生成，可在底部「计划」随时调整');
       screenPlan();
     });
+    var lbF=$('fLater'); if(lbF) lbF.addEventListener('click',function(){ try{localStorage.setItem(K_PLAN_LATER,String(Date.now()))}catch(e){} set(K_ONB,'2'); closeCard(); });
   }
   function bindChips(id,attr,single){
     var box=$(id); if(!box) return;
