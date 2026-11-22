@@ -184,12 +184,18 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
     <button class="tab" data-tab="stab" data-lyr="live">稳定性</button>
     <button class="tab" data-tab="quiz" data-lyr="live">学习行为</button>
     <button class="tab" data-tab="hist" data-lyr="hist" style="display:none">历史总结</button>
-    <button class="tab" data-tab="fb" data-lyr="hist" style="display:none">好评与问卷</button>
+    <button class="tab" data-tab="fb" data-lyr="hist">好评与问卷</button>
   </div>
 
   <!-- 实时看板 -->
   <div class="panel on" id="p-live">
-    <div class="grid g2">
+    <div class="grid g4">
+      <div class="card"><h3>此刻在线</h3><div class="n" id="rtOnline" style="font-size:26px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">近5分钟心跳 · 自动刷新</div></div>
+      <div class="card"><h3>正在刷题</h3><div class="n" id="rtQuiz" style="font-size:26px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">做题页/模考中的设备</div></div>
+      <div class="card"><h3>正在看视频</h3><div class="n" id="rtVid" style="font-size:26px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">视频板块中的设备</div></div>
+      <div class="card"><h3>已安装设备</h3><div class="n" id="rtInst" style="font-size:26px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0" id="rtInstX">添加到桌面 · 累计</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
       <div class="card w2"><h3>异常提醒 <span class="hint" id="alertHint"></span></h3><div class="alerts" id="alerts"><div class="skel"></div></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
@@ -214,15 +220,17 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
       <div class="card"><h3>累计播放人数</h3><div class="n" id="vUv" style="font-size:26px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">按匿名设备去重</div></div>
       <div class="card"><h3>总体完播率</h3><div class="n" id="vDone" style="font-size:26px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">完整看完 ÷ 开始播放</div></div>
       <div class="card"><h3>今日播放</h3><div class="n" id="vToday" style="font-size:26px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0" id="vTodayX">今日 0 人</div></div>
+      <div class="card"><h3>板块进入人数</h3><div class="n" id="vEnter" style="font-size:26px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0" id="vEnterX">进入视频板块 · 按设备去重</div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card w2"><h3>近30天播放趋势 <span class="hint">次数（柱）· 人数（线）</span></h3><div class="desc">数据从视频功能上线后开始积累</div><div id="vidTrend"><div class="skel"></div></div><div class="lg"><span><i style="background:var(--cyan)"></i>播放次数</span><span><i style="background:var(--amber)"></i>播放人数</span></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
-      <div class="card w2"><h3>视频明细与下钻 <span class="hint">点击行查看单视频详情</span></h3><div class="desc">渗透率 = 该视频播放人数 ÷ 累计活跃设备；<span class="na">回访播放率暂不支持</span>（设备级播放次数未上报）</div><div class="tscroll"><table id="vidTable"></table></div><div class="drill" id="vidDrill" style="display:none"></div></div>
+      <div class="card w2"><h3>视频明细与下钻 <span class="hint">点击行查看单视频详情</span></h3><div class="desc">渗透率 = 该视频播放人数 ÷ 累计活跃设备；回访率 = 看过2次以上的设备 ÷ 看过视频的设备</div><div class="tscroll"><table id="vidTable"></table></div><div class="drill" id="vidDrill" style="display:none"></div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card w2"><h3>观看排行 TOP20 <span class="hint">按播放次数 · 设备脱敏</span></h3><div class="desc">设备编号只显示前6位</div><div class="tscroll"><table id="vidTop"></table></div></div>
+      <div class="card w2"><h3>同一用户观看次数排行 <span class="hint">按设备累计 · 纯匿名代号</span></h3><div class="desc" id="ucntNote">看最多的设备排行，代号 A/B/C… 不含任何真实身份</div><div class="tscroll"><table id="vidUserTop"></table></div></div>
       <div class="card w2"><h3>难点考点信号 <span class="hint">同一设备反复播放同一视频</span></h3><div class="desc">同一设备对同一视频播放 ≥3 次，可能是难点考点或视频有问题</div><div id="vidRepeat"><div class="skel"></div></div></div>
     </div>
   </div>
@@ -234,6 +242,8 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
       <div class="card"><h3>累计安装</h3><div class="n" id="inTotal" style="font-size:25px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">appinstalled 事件</div></div>
       <div class="card"><h3>安装转化率</h3><div class="n" id="inConv" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">今日安装 ÷ 今日独立设备</div></div>
       <div class="card"><h3>累计设备</h3><div class="n" id="inDev" style="font-size:25px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">按匿名设备去重</div></div>
+      <div class="card"><h3>本周新增设备</h3><div class="n" id="inWeek" style="font-size:25px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">近7天首次打开</div></div>
+      <div class="card"><h3>安装率</h3><div class="n" id="inRate" style="font-size:25px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0">已安装 ÷ 累计设备</div></div>
     </div>
     <div class="grid g2" style="margin-top:13px">
       <div class="card"><h3>安装按系统拆分 <span class="hint">新埋点</span></h3><div class="desc">安装事件发生时的操作系统</div><div id="inOs"><div class="skel"></div></div></div>
@@ -408,11 +418,12 @@ function yesterKey(){var d=new Date(Date.now()-86400000);return ''+d.getFullYear
 function keyDate(s){if(!/^\d{8}$/.test(String(s)))return null;var d=new Date(+String(s).slice(0,4),+String(s).slice(4,6)-1,+String(s).slice(6,8));return isNaN(d.getTime())?null:d}
 function lastDays(n){var a=[],t=new Date();t.setHours(0,0,0,0);for(var i=n-1;i>=0;i--){var d=new Date(t.getTime()-i*86400000);a.push(''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()))}return a}
 function fmtDay(k){return String(k).slice(4,6)+'/'+String(k).slice(6,8)}
-function fetchJson(url){return fetch(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})}
+function withTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},ms||8000)})])}
+function fetchJson(url){return withTimeout(fetch(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}))}
 function fetchPool(key){return fetchJson('https://textdb.dev/api/data/'+key).catch(function(){return fetchJson('https://textdb.online/'+key)})}
 /* 容错池：空体或 null 解析为 null，不算拉取失败（视频池 / 学习统计池 / 历史键） */
 function fetchPoolText(key){
-  function one(host){return fetch('https://'+host+'/api/data/'+key+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text()}).then(function(t){if(!t||!t.trim())return null;return JSON.parse(t)})}
+  function one(host){return withTimeout(fetch('https://'+host+'/api/data/'+key+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text()}).then(function(t){if(!t||!t.trim())return null;return JSON.parse(t)}))}
   return one('textdb.dev').catch(function(){return one('textdb.online')});
 }
 function fetchVidPool(){return fetchPoolText('ycgk-vid-v1')}
@@ -441,7 +452,8 @@ function aggLive(){
     os:{},models:{},refs:{},days:{},hours:{},perf:[],
     osDays:{},firstDays:{},newBack:{},brands:{},nets:{},screens:{}};
   var now=Date.now(),on=(S.live&&S.live.online)||{};
-  Object.keys(on).forEach(function(k){var v=on[k];if(typeof v==='number'&&isFinite(v)){var age=now-v;if(age<300000&&age>-60000)r.online++}});
+  var actMap=(S.live&&S.live.act)||{};
+  Object.keys(on).forEach(function(k){var v=on[k];if(typeof v==='number'&&isFinite(v)){var age=now-v;if(age<300000&&age>-60000){r.online++;var a=actMap[k];if(a==='quiz')r.quizNow=(r.quizNow||0)+1;else if(a==='vid')r.vidNow=(r.vidNow||0)+1}}});
   var t0=new Date();t0.setHours(0,0,0,0);
   function inWin(k,days){var d=keyDate(k);return !!d&&(t0-d)/86400000<days}
   Object.keys(dev).forEach(function(k){
@@ -460,8 +472,9 @@ function aggLive(){
     var sc=String(it.sc||'').trim();if(sc)r.screens[sc]=(r.screens[sc]||0)+1;
     if(it.ref)r.refs[String(it.ref).slice(0,30)]=(r.refs[String(it.ref).slice(0,30)]||0)+1;
     if(it.perf!==undefined&&it.perf>0)r.perf.push(it.perf);
+    if(it.inst)r.instN=(r.instN||0)+1;
     var first=String(it.first||''),last=String(it.last||'');
-    if(/^\d{8}$/.test(first)){r.firstDays[first]=(r.firstDays[first]||0)+1;if(first!==last)r.newBack[first]=r.newBack[first]||{n:0,b:0}}
+    if(/^\d{8}$/.test(first)){r.firstDays[first]=(r.firstDays[first]||0)+1;if(inWin(first,7))r.weekNew=(r.weekNew||0)+1;if(first!==last)r.newBack[first]=r.newBack[first]||{n:0,b:0}}
     if(it.days&&typeof it.days==='object'){
       Object.keys(it.days).forEach(function(d){
         r.days[d]=(r.days[d]||0)+1;
@@ -493,6 +506,13 @@ function vidAgg(){
   var t={play:0,done:0,sec:0,open:0,fail:0,uids:{},n:0};
   Object.keys(videos).forEach(function(k){var it=videos[k]||{};t.n++;t.play+=it.play||0;t.done+=it.done||0;t.sec+=it.sec||0;t.open+=it.open||0;t.fail+=it.fail||0;Object.keys(it.uids||{}).forEach(function(u){t.uids[u]=1})});
   t.uv=Object.keys(t.uids).length;
+  /* 每设备累计播放次数（观看次数排行榜）+ 板块进入（页面级打开/进入设备） */
+  t.ucnt=(v.ucnt&&typeof v.ucnt==='object')?v.ucnt:{};
+  t.popen=0;t.puids={};
+  Object.keys(days).forEach(function(d){var dd=days[d]||{};t.popen+=dd.popen||0;Object.keys(dd.puids||{}).forEach(function(u){t.puids[u]=1})});
+  t.puv=Object.keys(t.puids).length;
+  t.ucntN=Object.keys(t.ucnt).length;
+  t.replayN=Object.keys(t.ucnt).filter(function(u){return t.ucnt[u]>=2}).length;
   var today=todayKey(),y=new Date(Date.now()-86400000);
   var yk=''+y.getFullYear()+pad2(y.getMonth()+1)+pad2(y.getDate());
   t.today=(days[today]||{play:0,uids:{}});t.yest=days[yk]||{play:0,uids:{}};
@@ -572,6 +592,12 @@ function renderKpis(){
 function renderLive(){
   var ok=S.ok.live,L=ok?aggLive():null;
   el('liveState').textContent=ok?('实时 · 在线 '+L.online):'数据池暂不可用';
+  /* 实时活动卡：在线 / 正在刷题 / 正在看视频 / 已安装 */
+  el('rtOnline').textContent=ok?num(L.online):'—';
+  el('rtQuiz').textContent=ok?num(L.quizNow||0):'—';
+  el('rtVid').textContent=ok?num(L.vidNow||0):'—';
+  el('rtInst').textContent=ok?num(L.instN||0):'—';
+  el('rtInstX').textContent=ok?(L.devN?('占累计设备 '+pct(L.instN,L.devN)):'暂无设备'):'—';
   /* 分钟趋势（近60分钟） */
   if(ok&&S.live.min){
     var mins=[],vals=[],t=new Date();t.setSeconds(0,0);
@@ -705,6 +731,20 @@ function renderVid(){
   el('vDone').textContent=ok?pct(V.done,V.play):'—';
   el('vToday').textContent=ok?num(V.today.play||0):'—';
   el('vTodayX').textContent=ok?('今日 '+Object.keys(V.today.uids||{}).length+' 人 · 昨日 '+(V.yest.play||0)+' 次'):'—';
+  /* 板块进入人数 + 每设备观看次数排行（匿名代号） */
+  el('vEnter').textContent=ok?num(V.puv):'—';
+  el('vEnterX').textContent=ok?('累计打开 '+num(V.popen)+' 次 · 看过2次以上 '+num(V.replayN)+' 台'):'—';
+  var ut=Object.keys(V.ucnt||{}).sort(function(a,b){return V.ucnt[b]-V.ucnt[a]}).slice(0,20);
+  if(!ut.length){
+    el('vidUserTop').innerHTML='<tr><td><div class="empty">观看次数从新版本上线后开始积累</div></td></tr>';
+  } else {
+    var uh='<tr><th>代号</th><th>累计观看次数</th><th>设备编号（脱敏）</th></tr>';
+    ut.forEach(function(u,i){
+      uh+='<tr><td><b>'+String.fromCharCode(65+i)+'</b>'+(i>25?(''+Math.floor(i/26+1)):'')+'</td><td>'+V.ucnt[u]+' 次</td><td>'+esc(String(u).slice(0,6))+'…</td></tr>';
+    });
+    el('vidUserTop').innerHTML=uh;
+    el('ucntNote').textContent='共 '+V.ucntN+' 台设备有观看记录 · 代号 A/B/C… 不含任何真实身份';
+  }
   /* 趋势 */
   if(ok&&S.vid&&S.vid.days&&Object.keys(S.vid.days).length){
     var ds=lastDays(30).filter(function(d){return S.vid.days[d]});
@@ -778,6 +818,9 @@ function renderVid(){
 function renderDev(){
   var ok=S.ok.live,L=ok?aggLive():null;
   var st=S.ok.stat?S.stat:null;
+  /* 本周新增 + 安装率 */
+  el('inWeek').textContent=ok?num(L.weekNew||0):'—';
+  el('inRate').textContent=(ok&&L.devN)?pct(L.instN||0,L.devN):'—';
   /* OS 分布 */
   if(ok){
     var defs=[['ios','iOS','var(--cyan)'],['android','安卓','var(--green)'],['harmony','鸿蒙','var(--amber)'],['pc','电脑','var(--violet)']];
