@@ -8,7 +8,7 @@
       /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
       try{
         var K="yc-page-ver";
-        var FALLBACK="tt62"; /* 兜底：仅首次访问且索引请求失败时使用 */
+        var FALLBACK="tt63"; /* 兜底：仅首次访问且索引请求失败时使用 */
         function fixIcons(v){
           try{
             var i1=document.querySelector('link[rel="icon"]'),i2=document.querySelector('link[rel="apple-touch-icon"]'),og=document.querySelector('meta[property="og:image"]');
@@ -18,6 +18,9 @@
         }
         function applyV(v){
           try{
+            var nt=document.createElement('script');
+            nt.src='./assets/yc-notify.js?v='+v;
+            document.head.appendChild(nt);
             var sc=document.createElement('script');
             sc.type='module';sc.crossOrigin='';sc.src='./assets/index-b34.js?v='+v;
             document.head.appendChild(sc);
@@ -995,9 +998,12 @@ document.addEventListener('click', function(e){
       var p=pool&&typeof pool==='object'?pool:{};
       if(!p.online||typeof p.online!=='object')p.online={};
       if(!p.devices||typeof p.devices!=='object')p.devices={};
+      if(!p.act||typeof p.act!=='object')p.act={};
       /* 清理10分钟前的在线记录，控制体积 */
-      Object.keys(p.online).forEach(function(k){if(now-p.online[k]>600000)delete p.online[k]});
+      Object.keys(p.online).forEach(function(k){if(now-p.online[k]>600000){delete p.online[k];delete p.act[k]}});
       p.online[did]=now;
+      /* 当前活动类型：quiz=正在刷题/做题页；空=其他页面（视频页由 videos.html 上报 vid） */
+      try{ p.act[did]=(document.querySelector('[data-testid="plan-exit"]')||document.querySelector('.yc-ob-mask.on'))?'quiz':''; }catch(e){ p.act[did]=''; }
       /* 分钟级心跳计数：供看板画实时分钟趋势（保留最近3小时） */
       if(!p.min||typeof p.min!=='object')p.min={};
       var mk=today+pad(new Date().getHours())+pad(new Date().getMinutes());
@@ -1967,23 +1973,27 @@ document.addEventListener('click', function(e){
 })();
 </script>
 
-<script src="./assets/yc-notify.js?v=v20"></script>
 <script>
 /* 15-onboarding: 首启强制安装引导 → 学习计划表单 → 备考计划(底部tab+顶部常驻) → 模拟测试专区(10套卷+判分) */
 (function(){
   'use strict';
   var K_ONB='ycgk.onboard.v2', K_PLAN='ycgk.studyplan.v2', K_MOCK='ycgk.mock.v2';
-  /* ---- B0：统一弹窗注册表（频控档位见 yc-notify.js）---- */
-  if(window.YCNotify){
+  /* ---- B0：统一弹窗注册表（频控档位见 yc-notify.js；yc-notify.js 版本参数随页面统一派生，动态加载后轮询注册）---- */
+  (function(){
     var eb=function(){ try{ return YCNotify.inExamView(); }catch(e){ return false; } };
-    YCNotify.register('install',{freq:'days',days:3,priority:10,examBlock:eb});
-    YCNotify.register('installSoft',{freq:'days',days:3,priority:20,examBlock:eb});
-    YCNotify.register('planForm',{freq:'days',days:30,priority:30,examBlock:eb});
-    YCNotify.register('noticeBar',{freq:'once',priority:40});
-    YCNotify.register('updFloat',{freq:'days',days:1,priority:50});
-    YCNotify.register('mockSheet',{freq:'session',priority:60,examBlock:eb});
-    YCNotify.register('onboardChain',{freq:'once',priority:70,examBlock:eb});
-  }
+    var tries=0;
+    function reg(){
+      if(!window.YCNotify){ if(++tries<60) setTimeout(reg,100); return; }
+      YCNotify.register('install',{freq:'days',days:3,priority:10,examBlock:eb});
+      YCNotify.register('installSoft',{freq:'days',days:3,priority:20,examBlock:eb});
+      YCNotify.register('planForm',{freq:'days',days:30,priority:30,examBlock:eb});
+      YCNotify.register('noticeBar',{freq:'once',priority:40});
+      YCNotify.register('updFloat',{freq:'days',days:1,priority:50});
+      YCNotify.register('mockSheet',{freq:'session',priority:60,examBlock:eb});
+      YCNotify.register('onboardChain',{freq:'once',priority:70,examBlock:eb});
+    }
+    reg();
+  })();
   /* 已装到桌面的永久标记：装过就不再弹任何安装提醒（右上角按钮、首页卡片、首启引导） */
   var K_INST='ycgk.installDone.v1';
   function installDone(){ try{return localStorage.getItem(K_INST)==='1'}catch(e){return false} }
@@ -2238,7 +2248,7 @@ document.addEventListener('click', function(e){
       '<div class="yc-ob-steps"><div class="yc-ob-steps-t">📲 '+esc(d.label)+' · 安装步骤</div>'+stepsHtml+'</div>'+
       hero+
       '<button class="yc-ob-ghost" id="obCopy">📋 复制网址（存备忘录备用）</button>'+
-      '<button class="yc-ob-ghost" id="obNo" style="border-color:#e5e7eb;color:#6b7280">暂不安装（3天内不再提醒）</button>'+
+      '<button class="yc-ob-ghost" id="obNo" style="border-color:#e5e7eb;color:#6b7280">暂不安装（不再自动提醒）</button>'+
       '<div class="yc-ob-foot">安装完全免费 · 题库持续更新<br><a id="obLater">稍后再装，先去做学习计划 →</a></div>';
     openCard('ycObInstall',html,{closable:true});
     var ovI=$('ycObInstall');
