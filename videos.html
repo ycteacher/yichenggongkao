@@ -178,6 +178,14 @@ var VIDEOS = [
     pdfs: [
       { name: "配套听课讲义", file: "files/" + encodeURIComponent("言语理解100题·配套听课讲义.pdf") }
     ] },
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/shuliang300-1.mp4",
+          "https://yicheng-video.oss-cn-beijing.aliyuncs.com/shuliang300-2.mp4",
+          "https://yicheng-video.oss-cn-beijing.aliyuncs.com/shuliang300-3.mp4"],
+    srcs: ["media/shuliang300-1.mp4", "media/shuliang300-2.mp4", "media/shuliang300-3.mp4"],
+    cat: "数量关系", title: "数量关系300题合集完整版", desc: "数量关系 300 题完整讲解，八大题型一次讲透，约 3 小时伴学，配套讲义可对照练习。", pic: "",
+    links: [
+      { name: "配套讲义", url: "https://workbuddy.link/p/bJneQTCCrX4GnZ8e9D9Mfd" }
+    ] },
 ];
 
 var state = { view: "home", cat: null, idx: -1 };
@@ -529,6 +537,13 @@ function renderPlay(){
       (vMedia ? '&media=' + encodeURIComponent(vMedia) : '') +
       (vFb ? '&fb=' + encodeURIComponent(vFb) : '') + '">' +
       '<span>📄 配套试卷 · ' + esc(p.name || "试卷" + (j + 1)) + '</span><span class="arr">›</span></a>';
+  }
+  var extLinks = v.links || [];
+  for (var j2 = 0; j2 < extLinks.length; j2++) {
+    var L = extLinks[j2];
+    if (!L || !L.url) continue;
+    pdfHtml += '<a class="pdf-btn" href="' + esc(L.url) + '" target="_blank" rel="noopener">' +
+      '<span>📄 ' + esc(L.name || "配套讲义") + '</span><span class="arr">›</span></a>';
   }
   if (pdfHtml) pdfHtml += '<p class="pdf-note">点开可预览，页内有「一键保存」按钮，文件存到哪了会告诉你</p>';
   else pdfHtml = '<p class="no-pdf">本视频无配套试卷，直接看就行</p>';
