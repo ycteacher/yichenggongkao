@@ -34,5 +34,7 @@
       "purpose": "maskable"
     }
   ],
-  "id": "yichenggongkao"
+  "id": "yichenggongkao",
+  "lang": "zh-CN",
+  "prefer_related_applications": false
 }
