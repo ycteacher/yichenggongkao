@@ -65,7 +65,7 @@
     try {
       if (!masterOn()) return false;
       var d = registry[name];
-      if (!d) return true;
+      if (!d) return false;
       if (d.enabled && !d.enabled()) return false;
       if (ls(doneKey(name)) === '1') return false;
       var t = int0(ls(tsKey(name)));
@@ -94,9 +94,11 @@
       stat('show', name);
     } catch (e) {}
   }
-  /* 用户主动关闭：once 类记永久 done；days 类记时间戳（N 天冷却，非永久） */
-  function dismiss(name) {
+  /* 用户主动关闭：done=true 一律永久 done（用户主动拒绝=永久）；
+     否则 once 类记永久 done、days 类记时间戳（N 天冷却，非永久） */
+  function dismiss(name, done) {
     try {
+      if (done === true) { lsSet(doneKey(name), '1'); stat('dismiss', name); return; }
       var d = registry[name] || {};
       if (d.freq === 'days') lsSet(tsKey(name), String(now()));
       else lsSet(doneKey(name), '1');
