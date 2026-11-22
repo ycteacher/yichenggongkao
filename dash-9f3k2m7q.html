@@ -314,7 +314,7 @@ td b{color:var(--txt)}
 
   <div class="sec-h"><span class="bar"></span><h2>每日明细与反馈</h2><span class="note">按日增量 · 真实问卷</span></div>
   <div class="grid g2">
-    <div class="card"><h3>每日明细</h3><div class="desc">设备为当日去重，其余为当日增量</div><div style="overflow-x:auto"><table id="daily"></table></div></div>
+    <div class="card"><h3>每日明细 <span class="hint"><button class="refresher" id="dailyToggle" type="button" style="padding:3px 10px;font-size:11px">展开全部</button></span></h3><div class="desc">设备为当日去重，其余为当日增量 · 默认显示最近 7 天</div><div style="overflow-x:auto"><table id="daily"></table></div></div>
     <div class="card">
       <h3>用户反馈 <span class="hint">问卷云端实时</span></h3>
       <div class="desc" id="fbCnt">—</div>
@@ -497,7 +497,22 @@ function renderDaily(d){
     return '<tr><td><b>'+x.date.slice(5)+'</b></td><td>'+(x.uv==null?'—':x.uv)+'</td><td>'+(x.open==null?'—':x.open)+'</td><td>'+(x.materials==null?'—':x.materials)+'</td><td>'+(x.start==null?'—':x.start)+'</td></tr>';
   }).join('');
   el('daily').innerHTML=h+body;
+  applyDailyFold();
 }
+/* 每日明细折叠：默认只显示最近 7 天 */
+var dailyOpen=false;
+function applyDailyFold(){
+  var t=el('daily');if(!t)return;
+  var trs=t.querySelectorAll('tr');
+  for(var i=1;i<trs.length;i++){trs[i].style.display=(!dailyOpen&&i>7)?'none':''}
+  var total=trs.length-1;
+  var btn=el('dailyToggle');
+  if(btn){btn.textContent=dailyOpen?'收起':'展开全部 '+total+' 天';btn.style.display=total>7?'':'none'}
+}
+(function(){
+  var btn=el('dailyToggle');
+  if(btn)btn.addEventListener('click',function(){dailyOpen=!dailyOpen;applyDailyFold()});
+})();
 
 /* 问卷 */
 function renderFb(fb){
