@@ -691,6 +691,24 @@ function renderPlay(){
     var curRate = 1;
     var triedFb = false;
 
+    /* 断点续播：按视频 key（分类+标题）记录进度，重进自动接着看 */
+    var vposKey = (v.cat || '') + '|' + (v.title || '');
+    function vposAll(){ try { return JSON.parse(localStorage.getItem('ycgk.vpos.v1') || '{}') || {}; } catch(e){ return {}; } }
+    function vposSave(t, d, p){ try { var all = vposAll(); all[vposKey] = { t: t, d: d, p: p }; localStorage.setItem('ycgk.vpos.v1', JSON.stringify(all)); } catch(e){} }
+    function vposClear(){ try { var all = vposAll(); delete all[vposKey]; localStorage.setItem('ycgk.vpos.v1', JSON.stringify(all)); } catch(e){} }
+    var resumeT = 0, resumeP = 0;
+    (function(){
+      var rec = vposAll()[vposKey];
+      if (rec && typeof rec.t === 'number' && rec.d && rec.t > 0 && rec.t < rec.d - 5) { resumeT = rec.t; resumeP = rec.p || 0; }
+    })();
+    function toast(msg){
+      var t = document.createElement('div');
+      t.className = 'load-ov';
+      t.innerHTML = '<div style="text-align:center"><div class="load-txt">' + msg + '</div></div>';
+      box.appendChild(t);
+      setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 2200);
+    }
+
     var box = player.parentNode;
     var ov = document.createElement("div");
     ov.className = "load-ov";
@@ -721,9 +739,27 @@ function renderPlay(){
     }
 
     player.addEventListener("playing", hideLoad);
+    player.addEventListener("playing", function(){
+      /* 进入播放后恢复上次进度（仅首次进入时生效一次） */
+      if (resumeT > 0 && player.duration && resumeT < player.duration - 5) {
+        try { player.currentTime = resumeT; } catch(e){}
+        toast('⏩ 已从上次进度继续');
+      }
+      resumeT = 0;
+    });
+    /* 播放中每 5 秒存一次进度（不影响 vtrack 埋点） */
+    var lastPos = 0;
+    player.addEventListener("timeupdate", function(){
+      var now = Date.now();
+      if (now - lastPos < 5000) return;
+      lastPos = now;
+      var d = player.duration;
+      if (d && player.currentTime > 0) vposSave(player.currentTime, d, partIdx);
+    });
 
     player.addEventListener("ended", function(){
       if (partIdx < parts.length - 1) loadPart(partIdx + 1, true);
+      else vposClear();
     });
 
     player.addEventListener("error", function(){
@@ -739,7 +775,7 @@ function renderPlay(){
       }
     });
 
-    loadPart(0);
+    if (resumeP > 0 && resumeP < parts.length) loadPart(resumeP); else loadPart(0);
     vtrack.bindPlayer(player, function(){ return partIdx; }, parts.length);
 
     /* 全屏 + 横屏锁定 */

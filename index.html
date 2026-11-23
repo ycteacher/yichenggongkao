@@ -2287,6 +2287,27 @@ document.addEventListener('click', function(e){
     if(installed) markInstalled();
   }catch(e){}
 
+  /* 老机兜底：页面加载 3 秒后仍没触发 beforeinstallprompt、也不在已安装容器内，
+     说明这台设备不支持一键安装——点安装按钮时改弹图文引导，不再静默无响应 */
+  var noPrompt=false;
+  setTimeout(function(){
+    try{
+      var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+      if(!deferred&&!canInstall&&!installed&&!standalone) noPrompt=true;
+    }catch(e){}
+  },3000);
+  function showManualGuide(){
+    var d=device();
+    var st=''; for(var i=0;i<d.steps.length;i++) st+='<div class="yc-ob-st"><b>'+(i+1)+'</b><span>'+d.steps[i][0]+'</span></div>';
+    var wx=d.wx?'<div style="background:#fff7ed;border-radius:12px;padding:11px 14px;margin-top:10px;font-size:12.5px;color:#9a3412;line-height:1.6">⚠️ 微信/QQ 里装不了：点右上角「···」或「⋮」→「在浏览器打开」，再用浏览器按上面步骤装。</div>':'';
+    openCard('ycObManual','<div class="yc-ob-h">手动添加到桌面</div>'+
+      '<div class="yc-ob-sub">当前浏览器不支持一键安装，按下面步骤手动装（'+esc(d.label)+'）</div>'+
+      st+wx+
+      '<button class="yc-ob-primary" id="obManualOk">知道了</button>');
+    var okb=$('obManualOk');
+    if(okb) okb.addEventListener('click',function(){ closeCard(); });
+  }
+
   /* ---------- CSS ---------- */
   var CSS=''+
   '.yc-ob-mask{position:fixed;inset:0;z-index:2147483000;background:rgba(18,14,10,.62);display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:opacity .25s}'+
@@ -2423,7 +2444,7 @@ document.addEventListener('click', function(e){
     }catch(e){}
     return ov;
   }
-  function closeCard(now){
+  function closeCard(now,keepHistory){
     if(ovTimer){clearTimeout(ovTimer);ovTimer=null}
     if(!ov) return;
     var o=ov; ov=null;
@@ -2431,7 +2452,12 @@ document.addEventListener('click', function(e){
       document.removeEventListener('keydown',o._ycOnKey,true);
       window.removeEventListener('popstate',o._ycOnPop);
       document.body.style.overflow=o._ycPrevOverflow||'';
-      if(o._ycPushed&&history.state&&history.state.ycPop){ try{history.back();}catch(e){} }
+      if(o._ycPushed&&history.state&&history.state.ycPop){
+        /* keepHistory=true：紧接着要打开新弹层，不能 history.back()——
+           back 是异步的，会晚于新弹层的 pushState 生效，把新卡片顶掉 */
+        if(keepHistory){ try{history.replaceState(null,'',location.href);}catch(e){} }
+        else{ try{history.back();}catch(e){} }
+      }
     }catch(e){}
     o.classList.remove('on');
     if(now){ if(o.parentNode)o.parentNode.removeChild(o); }
@@ -2491,7 +2517,7 @@ document.addEventListener('click', function(e){
     if(ovI){ var xbI=ovI.querySelector('.yc-ob-x'); if(xbI) xbI.addEventListener('click',function(){ dismissInstall(); set(K_ONB,'2'); }); }
     var one=$('obOneTap');
     if(one) one.addEventListener('click',function(){
-      if(!deferred) return;
+      if(!deferred){ if(noPrompt) showManualGuide(); return; }
       var goForm=function(){ set(K_ONB,'1'); screenForm(); };
       try{
         deferred.prompt();
@@ -2630,9 +2656,9 @@ document.addEventListener('click', function(e){
     var ovEl=$('ycObPlan');
     ovEl.addEventListener('click',function(e){
       var c=e.target.closest?e.target.closest('[data-gomock]'):null;
-      if(c){ closeCard(true); screenMock(); }
+      if(c){ closeCard(true,true); screenMock(); }
     });
-    $('pMock').addEventListener('click',function(){ closeCard(true); screenMock(); });
+    $('pMock').addEventListener('click',function(){ closeCard(true,true); screenMock(); });
     $('pEdit').addEventListener('click',function(){ screenForm(plan); });
     $('pStart').addEventListener('click',function(){
       var wm=weakModules(plan);
@@ -2640,7 +2666,7 @@ document.addEventListener('click', function(e){
       ensureBank(function(){
         var qs=pickByModules(mods,Math.min(plan.daily,30),77);
         if(!qs.length){ alert('题库还在加载，请稍等几秒再试'); return; }
-        runQuiz(qs,'今日任务 · '+plan.daily+' 题',function(res){ closeCard(true); screenResult(res,null); });
+        runQuiz(qs,'今日任务 · '+plan.daily+' 题',function(res){ closeCard(true,true); screenResult(res,null); });
       });
     });
   }
@@ -2857,9 +2883,9 @@ document.addEventListener('click', function(e){
         if(weak.length) plan.weak=weak;
         plan.fresh='有一点基础'; setJSON(K_PLAN,plan);
       }
-      closeCard(true); screenPlan();
+      closeCard(true,true); screenPlan();
     });
-    $('rAgain').addEventListener('click',function(){ closeCard(true); screenMock(); });
+    $('rAgain').addEventListener('click',function(){ closeCard(true,true); screenMock(); });
   }
   function moduleToWeak(m){ var inv={'changshi':'常识判断','yanyu':'言语理解','panduan':'判断推理','shuliang':'数量关系','ziliao':'资料分析','shenlun':'申论','zy':'综合应用'}; return inv[m]||''; }
   function reviewWrong(res){
