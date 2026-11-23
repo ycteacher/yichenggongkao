@@ -183,7 +183,7 @@
       : (canInstall&&deferred
           ? '<button class="yc-ob-primary" id="obOneTap">⬇ 一键安装到桌面（推荐）</button><button class="yc-ob-ghost" id="obInstalled">✅ 我已手动装好，下一步 →</button>'
           : '<button class="yc-ob-primary" id="obInstalled">✅ 我已装好，下一步 →</button>');
-    var html='<div class="yc-ob-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:14px"></div>'+
+    var html='<div class="yc-ob-logo"><img src="./assets/ycicon-192-a.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:14px"></div>'+
       '<div class="yc-ob-h">先把亿成公考装到桌面</div>'+
       '<div class="yc-ob-sub">识别到你的设备：<b style="color:#b91c1c">'+esc(d.label)+'</b></div>'+
       '<div class="yc-ob-warn">⚠️ <b>不装到桌面，下次可能就找不到我了！</b><br>这是网页应用，关掉链接很难再找回。装到桌面后一点图标就开，断网也能刷题。</div>'+

@@ -131,7 +131,7 @@
   var topbar = document.createElement("div");
   topbar.className = "yc-topbar";
   topbar.innerHTML =
-    '<div class="yc-brand"><div class="yc-logo"><img src="./assets/icon-yc-red-192.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:11px"></div>' +
+    '<div class="yc-brand"><div class="yc-logo"><img src="./assets/ycicon-192-a.png?v=4" alt="亿成公考" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:11px"></div>' +
     '<div><div class="yc-brand-name">亿成公考 · 备考神器</div>' +
     '<div class="yc-brand-sub">亿成老师团队倾心打造 · 题库持续更新</div></div></div>' +
     '<div class="yc-top-actions">' +
