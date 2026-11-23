@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="application-name" content="亿成公考">
 <title>内测意见问卷 · 亿成公考</title>
-    <meta name="description" content="亿成公考——免费刷题、押题资料、备考数据看板。">
+    <meta name="description" content="亿成公考——免费刷题、备考资料、备考数据看板。">
     <meta property="og:title" content="亿成公考 · 免费刷题应用">
-    <meta property="og:description" content="常识、行测、申论全模块免费刷题，押题资料一键保存。">
+    <meta property="og:description" content="常识、行测、申论全模块免费刷题，备考资料一键保存。">
     <meta property="og:image" content="https://ycteacher.github.io/yichenggongkao/assets/ycicon-512-a.png">
     <meta property="og:type" content="website">
 
@@ -21,13 +21,16 @@
   .hero h1 { font-size:22px; font-weight:800; letter-spacing:.5px; }
   .hero p { font-size:12px; opacity:.92; margin-top:6px; line-height:1.6; }
   .card { background:#fff; border-radius:16px; padding:18px 16px; margin-top:14px; box-shadow:0 2px 12px rgba(32,32,32,.06); }
-  .q-t { font-size:14px; font-weight:700; color:#202020; }
+  .q-t { font-size:14px; font-weight:700; color:#202020; line-height:1.6; }
   .q-t .req { color:#DC2626; }
+  .q-hint { font-size:12px; color:#8A8378; margin-top:4px; line-height:1.6; font-weight:400; }
   .opts { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
   .opt { font-size:13px; padding:8px 14px; border-radius:999px; border:1.5px solid #E5E1D8; background:#FBF9F4; color:#4A463F; cursor:pointer; transition:all .15s; }
   .opt.on { border-color:#DC2626; background:#FDEBEB; color:#B91C1C; font-weight:700; }
-  textarea { width:100%; min-height:88px; margin-top:10px; border:1.5px solid #E5E1D8; border-radius:12px; background:#FBF9F4; padding:10px 12px; font-size:13px; font-family:inherit; color:#202020; resize:vertical; }
+  textarea { width:100%; min-height:96px; margin-top:10px; border:1.5px solid #E5E1D8; border-radius:12px; background:#FBF9F4; padding:10px 12px; font-size:13px; font-family:inherit; color:#202020; resize:vertical; }
   textarea:focus { outline:none; border-color:#DC2626; }
+  .ex { font-size:11.5px; color:#8A8378; background:#FBF9F4; border-radius:8px; padding:8px 10px; margin-top:8px; line-height:1.7; }
+  .ex b { color:#B45309; }
   .submit { display:block; width:100%; margin-top:18px; border:none; border-radius:14px; background:linear-gradient(135deg,#DC2626,#B91C1C); color:#fff; font-size:16px; font-weight:800; padding:15px; cursor:pointer; box-shadow:0 4px 16px rgba(220,38,38,.3); }
   .submit:disabled { opacity:.55; }
   .submit:active { transform:scale(.99); }
@@ -48,6 +51,7 @@
   .hidden { display:none; }
   .sec-t { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:#8A8378; letter-spacing:1px; margin:24px 0 10px; }
   .sec-t::before { content:""; width:4px; height:14px; border-radius:2px; background:#DC2626; }
+  .sec-note { font-size:12px; color:#8A8378; margin:-4px 0 10px; line-height:1.7; }
 </style>
 </head>
 <body>
@@ -59,10 +63,12 @@
   </div>
 
   <div id="formBox">
+    <div class="sec-t">一 · 快速打分（点选即可）</div>
+
     <div class="card">
       <div class="q-t">1. 总体使用感受 <span class="req">*</span></div>
       <div class="opts" data-q="a1">
-        <span class="opt">非常好</span><span class="opt">还不错</span><span class="opt">一般</span><span class="opt">不太好</span>
+        <span class="opt">非常好</span><span class="opt">还不错</span><span class="opt">一般</span><span class="opt">不太好</span><span class="opt">很糟糕</span>
       </div>
     </div>
     <div class="card">
@@ -98,19 +104,19 @@
     <div class="card">
       <div class="q-t">7. 你在备考哪类考试 <span class="req">*</span></div>
       <div class="opts" data-q="a7">
-        <span class="opt">国考</span><span class="opt">省考</span><span class="opt">事业编</span><span class="opt">军队文职</span><span class="opt">教师编</span><span class="opt">医疗编</span><span class="opt">三支一扶</span>
+        <span class="opt">国考</span><span class="opt">省考</span><span class="opt">事业编</span><span class="opt">军队文职</span><span class="opt">教师编</span><span class="opt">医疗编</span><span class="opt">三支一扶</span><span class="opt">银行/国企</span><span class="opt">选调生</span><span class="opt">其他</span>
       </div>
     </div>
     <div class="card">
       <div class="q-t">8. 最常用的功能是哪个 <span class="req">*</span></div>
       <div class="opts" data-q="a8">
-        <span class="opt">专项刷题</span><span class="opt">整套卷子</span><span class="opt">错题本</span><span class="opt">速算特训</span><span class="opt">领资料</span>
+        <span class="opt">专项刷题</span><span class="opt">整套卷子</span><span class="opt">错题本</span><span class="opt">速算特训</span><span class="opt">领资料</span><span class="opt">申论批改</span><span class="opt">视频课程</span><span class="opt">考试通告</span>
       </div>
     </div>
     <div class="card">
       <div class="q-t">9. 最希望优先补充哪类题 <span class="req">*</span></div>
       <div class="opts" data-q="a9">
-        <span class="opt">图形推理</span><span class="opt">资料分析</span><span class="opt">言语理解</span><span class="opt">判断推理</span><span class="opt">数量关系</span><span class="opt">常识</span>
+        <span class="opt">图形推理</span><span class="opt">资料分析</span><span class="opt">言语理解</span><span class="opt">判断推理</span><span class="opt">数量关系</span><span class="opt">常识</span><span class="opt">申论</span><span class="opt">综应</span><span class="opt">面试</span>
       </div>
     </div>
     <div class="card">
@@ -119,10 +125,45 @@
         <span class="opt">肯定会</span><span class="opt">可能会</span><span class="opt">不好说</span>
       </div>
     </div>
+
+    <div class="sec-t">二 · 遇到的问题（选了尽量写两句，我们改得更快）</div>
+    <p class="sec-note">这部分全部选填，不影响积分；写得越具体，修复越快。</p>
+
     <div class="card">
-      <div class="q-t">11. 其他意见或建议（选填，写在「其他」里）</div>
-      <textarea id="otherTx" placeholder="想加什么功能、哪里不顺手、还想刷什么题，都可以写"></textarea>
+      <div class="q-t">11. 你遇到了哪些问题？<span class="q-hint">可多选，点一下选中、再点取消</span></div>
+      <div class="opts" data-q="a11" data-multi="1">
+        <span class="opt">打不开 / 白屏</span><span class="opt">加载慢或卡顿</span><span class="opt">按钮点不动</span><span class="opt">题目或答案显示错误</span><span class="opt">解析看不懂</span><span class="opt">视频播放不了</span><span class="opt">资料提取失败</span><span class="opt">积分 / 兑换问题</span><span class="opt">安装到桌面失败</span><span class="opt">其他</span>
+      </div>
     </div>
+
+    <div class="card">
+      <div class="q-t">12. 具体说说这个问题</div>
+      <p class="q-hint">照着「在哪个页面 → 做了什么 → 出现了什么」写就行，一句话也很有用：</p>
+      <textarea id="bugTx" placeholder="在哪个页面 → 做了什么 → 出现了什么"></textarea>
+      <div class="ex"><b>例子：</b>刷图形推理第 5 题，点「提交」后卡住不动，退出重进还是那样；<br><b>例子：</b>资料领取点「保存」没反应，手机是小米浏览器。</div>
+    </div>
+
+    <div class="card">
+      <div class="q-t">13. 哪个板块让你最想吐槽？<span class="q-hint">可多选</span></div>
+      <div class="opts" data-q="a13" data-multi="1">
+        <span class="opt">专项刷题</span><span class="opt">整套卷子</span><span class="opt">错题本</span><span class="opt">速算特训</span><span class="opt">申论批改</span><span class="opt">视频</span><span class="opt">资料领取</span><span class="opt">考试通告</span><span class="opt">积分商城</span>
+      </div>
+      <textarea id="moanTx" placeholder="它哪里让你难受了？比如：题目太挤、字太小、翻页麻烦……"></textarea>
+    </div>
+
+    <div class="sec-t">三 · 你的想法（想到什么写什么）</div>
+
+    <div class="card">
+      <div class="q-t">14. 最想要的新功能或新内容</div>
+      <textarea id="wishTx" placeholder="想要什么直接写，比如：申论范文合集、政治理论专项、夜间模式、题目收藏夹……"></textarea>
+      <div class="ex"><b>提示：</b>写「我想要××，用来看 / 用来刷」这种，我们照着做。</div>
+    </div>
+
+    <div class="card">
+      <div class="q-t">15. 其他意见或想对亿成说的话（选填）</div>
+      <textarea id="otherTx" placeholder="夸的、骂的、建议的，都欢迎"></textarea>
+    </div>
+
     <button class="submit" id="submitBtn">提交问卷 · 领 200 积分</button>
     <p class="tip">问卷匿名提交，不收集任何个人信息；每人积分奖励仅一次，问卷可以多次提交（以最新一次为准）。</p>
   </div>
@@ -174,15 +215,22 @@
     document.getElementById("ptsNum").textContent=p.balance||0;
   }
 
-  // 选项点选
+  /* 选项点选：普通题单选，data-multi="1" 的题可多选 */
   var answers={};
   document.querySelectorAll(".opts").forEach(function(box){
     box.addEventListener("click", function(e){
       var el=e.target;
       if(!el.classList.contains("opt")) return;
-      box.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("on"); });
-      el.classList.add("on");
-      answers[box.dataset.q]=el.textContent;
+      if(box.dataset.multi==="1"){
+        el.classList.toggle("on");
+        var picked=[];
+        box.querySelectorAll(".opt.on").forEach(function(o){ picked.push(o.textContent); });
+        answers[box.dataset.q]=picked.join("、");
+      }else{
+        box.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("on"); });
+        el.classList.add("on");
+        answers[box.dataset.q]=el.textContent;
+      }
     });
   });
 
@@ -211,7 +259,11 @@
     btn.disabled=true; btn.textContent="提交中…";
     var __ua=navigator.userAgent||"";
     var __dev=/iPad|Tablet/i.test(__ua)?"平板":(/iPhone|iPod/i.test(__ua)?"苹果":(/Android|Mobile/i.test(__ua)?"安卓":"电脑"));
-    var payload={ ts:Date.now(), dev:__dev, a1:answers.a1, a2:answers.a2, a3:answers.a3, a4:answers.a4, a5:answers.a5, a6:answers.a6, a7:answers.a7, a8:answers.a8, a9:answers.a9, a10:answers.a10, other:(document.getElementById("otherTx").value||"").slice(0,500) };
+    var payload={ ts:Date.now(), dev:__dev, a1:answers.a1, a2:answers.a2, a3:answers.a3, a4:answers.a4, a5:answers.a5, a6:answers.a6, a7:answers.a7, a8:answers.a8, a9:answers.a9, a10:answers.a10,
+      a11:answers.a11||"", bug:(document.getElementById("bugTx").value||"").slice(0,800),
+      a13:answers.a13||"", moan:(document.getElementById("moanTx").value||"").slice(0,800),
+      wish:(document.getElementById("wishTx").value||"").slice(0,800),
+      other:(document.getElementById("otherTx").value||"").slice(0,500) };
     loadCloud().then(function(cloud){
       cloud.list=cloud.list||[];
       cloud.list.push(payload);
