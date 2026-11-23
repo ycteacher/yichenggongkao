@@ -133,9 +133,13 @@
   }
   function mount(){
     if(!document.body) return;
-    document.body.insertBefore(box,document.body.firstChild);
+    /* 关闭公告只隐藏 72 小时（v2 键存时间戳），与 index.html 口径一致 */
+    var dismissed=false;
+    try{ var dTs=parseInt(localStorage.getItem('ycgk.notice.dismissed.v2')||'0',10)||0; if(dTs&&Date.now()-dTs<72*3600*1000){ dismissed=true; } }catch(e){}
+    if(!dismissed) document.body.insertBefore(box,document.body.firstChild);
     var btn=box.querySelector('.yc-notice-close');
     if(btn) btn.addEventListener('click',function(){
+      try{ localStorage.setItem('ycgk.notice.dismissed.v2',String(Date.now())); }catch(e){}
       box.style.display='none';
       measure();
     });

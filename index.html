@@ -3133,11 +3133,14 @@ document.addEventListener('click', function(e){
   function mount(){
     if(!document.body) return;
     var dismissed=false;
-    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'||(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ dismissed=true; } }catch(e){}
+    /* 关闭公告只隐藏 72 小时（v2 键存时间戳）；旧 v1 键为永久关闭，此处不再读取，
+       让之前点过 × 的用户重新看到公告条与一键更新按钮 */
+    try{ var dTs=parseInt(localStorage.getItem('ycgk.notice.dismissed.v2')||'0',10)||0; if(dTs&&Date.now()-dTs<72*3600*1000){ dismissed=true; } }catch(e){}
+    if(!dismissed&&(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ dismissed=true; }
     if(!dismissed) document.body.insertBefore(box,document.body.firstChild);
     var btn=box.querySelector('.yc-notice-close');
     if(btn) btn.addEventListener('click',function(){
-      try{ localStorage.setItem('ycgk.notice.dismissed.v1','1'); }catch(e){}
+      try{ localStorage.setItem('ycgk.notice.dismissed.v2',String(Date.now())); }catch(e){}
       try{ if(window.YCNotify) YCNotify.dismiss('noticeBar'); }catch(e){}
       box.style.display='none';
       measure();
