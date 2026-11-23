@@ -146,9 +146,9 @@
     window.trace_id = "ycgk20261120";
 </script>
 <meta http-equiv="Content-Security-Policy" content="
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *.alipay.com *.alipayobjects.com *.amap.com *.myqcloud.com;
   frame-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
-  connect-src 'self' data: blob: https://textdb.online https://textdb.dev *.alipay.com *.alipayobjects.com *.amap.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com;
+  connect-src 'self' data: blob: https://textdb.online https://textdb.dev *.alipay.com *.alipayobjects.com *.amap.com *.antgroup-inc.cn *.antgroup.com wss://*.antgroup.com *.myqcloud.com;
   child-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
   object-src 'self' data: blob: *.alipay.com *.alipayobjects.com *.amap.com;
   base-uri 'self' *.alipay.com *.alipayobjects.com *.amap.com;
@@ -2992,8 +2992,11 @@ document.addEventListener('click', function(e){
     '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}'+
     /* 公告条固定后，顶栏与正文整体下移，滚动时顶部完全不动。
        正文留白改为实测头部总高（公告条+顶栏），不再用 60/92px 估算，消除移动端大片空白 */
-    '.yc-topbar{top:var(--yc-notice-h,0px)!important}'+
-    'body.yc-ui{padding-top:var(--yc-head-h,60px)!important}';
+    /* 修复点：非独立模式下补回安全区间距（与修改点④口径一致），公告条/顶栏/正文整体随安全区下移，
+       消除刘海屏 webview 内公告条压住刷题页头部与题干首行的问题；浏览器与 PWA standalone 下 --yc-sat=0，行为不变 */
+    '#yc-notice{top:var(--yc-sat,0px)}'+
+    '.yc-topbar{top:calc(var(--yc-notice-h,0px) + var(--yc-sat,0px))!important}'+
+    'body.yc-ui{padding-top:calc(var(--yc-head-h,60px) + var(--yc-sat,0px))!important}';
   document.head.appendChild(css);
   var box=document.createElement('div');
   box.id='yc-notice';
