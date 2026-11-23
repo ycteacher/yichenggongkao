@@ -1,1 +1,389 @@
-{"v":"tt70","total":49704,"mergedTotal":49694,"modules":{"changshi":{"count":10426,"files":["cs-bank-1","cs-bank-2","cs-bank-3","cs-bank-4","cs-bank-5","cs-bank-6","cs-bank-7","cs-bank-8","qk-changshi-01"]},"panduan":{"count":11585,"files":["qk-panduan-01","qk-panduan-02","qk-panduan-03","qk-panduan-04","qk-panduan-05","qk-panduan-06","qk-panduan-07","qk-panduan-08","qk-panduan-09","qk-panduan-10"]},"shuliang":{"count":8109,"files":["qk-shuliang-01","qk-shuliang-02","qk-shuliang-03","qk-shuliang-04","qk-shuliang-05","qk-shuliang-06","qk-shuliang-07","qk-shuliang-08","qk-shuliang-09"]},"tuitui":{"count":6579,"files":["qk-tuitui-82","qk-tuitui-83","qk-tuitui-84","qk-tuitui-85","qk-tuitui-86","qk-tuitui-87","qk-tuitui-88","qk-tuitui-89","qk-tuitui-90","qk-tuitui-91"]},"yanyu":{"count":8099,"files":["qk-yanyu-01","qk-yanyu-02","qk-yanyu-03","qk-yanyu-04","qk-yanyu-05","qk-yanyu-06","qk-yanyu-07","qk-yanyu-08"]},"yiliao":{"count":55,"files":["qk-yiliao-01"]},"zhengzhi":{"count":300,"files":["qk-zhengzhi-01"]},"ziliao":{"count":4541,"files":["qk-ziliao-01","qk-ziliao-02","qk-ziliao-03","qk-ziliao-04"]},"shenlun":{"count":6,"files":["shenlun-bank-1"]},"zongying":{"count":4,"files":["zongying-bank-1"]}},"files":{"cs-bank-1":{"module":"changshi","count":2665,"bytes":1048954},"cs-bank-2":{"module":"changshi","count":1531,"bytes":724340},"cs-bank-3":{"module":"changshi","count":1153,"bytes":431064},"cs-bank-4":{"module":"changshi","count":1397,"bytes":443534},"cs-bank-5":{"module":"changshi","count":1797,"bytes":605098},"cs-bank-6":{"module":"changshi","count":417,"bytes":141029},"cs-bank-7":{"module":"changshi","count":0,"bytes":0},"cs-bank-8":{"module":"changshi","count":0,"bytes":0},"qk-changshi-01":{"module":"changshi","count":1466,"bytes":572900},"qk-panduan-01":{"module":"panduan","count":1611,"bytes":967826},"qk-panduan-02":{"module":"panduan","count":1277,"bytes":1000964},"qk-panduan-03":{"module":"panduan","count":896,"bytes":1106404},"qk-panduan-04":{"module":"panduan","count":900,"bytes":1105302},"qk-panduan-05":{"module":"panduan","count":824,"bytes":1126570},"qk-panduan-06":{"module":"panduan","count":1528,"bytes":932881},"qk-panduan-07":{"module":"panduan","count":1565,"bytes":919297},"qk-panduan-08":{"module":"panduan","count":1051,"bytes":1042149},"qk-panduan-09":{"module":"panduan","count":1071,"bytes":1037813},"qk-panduan-10":{"module":"panduan","count":862,"bytes":841008},"qk-shuliang-01":{"module":"shuliang","count":1927,"bytes":748219},"qk-shuliang-02":{"module":"shuliang","count":1663,"bytes":727274},"qk-shuliang-03":{"module":"shuliang","count":1513,"bytes":747257},"qk-shuliang-04":{"module":"shuliang","count":1479,"bytes":746889},"qk-shuliang-05":{"module":"shuliang","count":108,"bytes":54014},"qk-shuliang-06":{"module":"shuliang","count":333,"bytes":143541},"qk-shuliang-07":{"module":"shuliang","count":333,"bytes":140564},"qk-shuliang-08":{"module":"shuliang","count":453,"bytes":179780},"qk-shuliang-09":{"module":"shuliang","count":300,"bytes":154096},"qk-tuitui-82":{"module":"tuitui","count":357,"bytes":1803931},"qk-tuitui-83":{"module":"tuitui","count":400,"bytes":1444707},"qk-tuitui-84":{"module":"tuitui","count":400,"bytes":2113066},"qk-tuitui-85":{"module":"tuitui","count":400,"bytes":2071963},"qk-tuitui-86":{"module":"tuitui","count":400,"bytes":1382597},"qk-yanyu-01":{"module":"yanyu","count":1432,"bytes":969679},"qk-yanyu-02":{"module":"yanyu","count":1642,"bytes":905715},"qk-yanyu-03":{"module":"yanyu","count":1558,"bytes":936931},"qk-yanyu-04":{"module":"yanyu","count":1123,"bytes":1020860},"qk-yanyu-05":{"module":"yanyu","count":1364,"bytes":945583},"qk-yanyu-06":{"module":"yanyu","count":334,"bytes":122889},"qk-yanyu-07":{"module":"yanyu","count":294,"bytes":159393},"qk-yanyu-08":{"module":"yanyu","count":352,"bytes":197712},"qk-yiliao-01":{"module":"yiliao","count":55,"bytes":21570},"qk-zhengzhi-01":{"module":"zhengzhi","count":300,"bytes":147017},"qk-ziliao-01":{"module":"ziliao","count":1446,"bytes":772734},"qk-ziliao-02":{"module":"ziliao","count":1200,"bytes":745608},"qk-ziliao-03":{"module":"ziliao","count":1106,"bytes":710378},"qk-ziliao-04":{"module":"ziliao","count":789,"bytes":494705},"shenlun-bank-1":{"module":"shenlun","count":6,"bytes":19334},"zongying-bank-1":{"module":"zongying","count":4,"bytes":12911},"qk-tuitui-87":{"module":"tuitui","count":622,"bytes":3650717},"qk-tuitui-88":{"module":"tuitui","count":1000,"bytes":3536983},"qk-tuitui-89":{"module":"tuitui","count":1000,"bytes":3209121},"qk-tuitui-90":{"module":"tuitui","count":1000,"bytes":5568450},"qk-tuitui-91":{"module":"tuitui","count":1000,"bytes":6605597}}}
+{
+ "v": "tt71",
+ "total": 49804,
+ "mergedTotal": 49794,
+ "modules": {
+  "changshi": {
+   "count": 10426,
+   "files": [
+    "cs-bank-1",
+    "cs-bank-2",
+    "cs-bank-3",
+    "cs-bank-4",
+    "cs-bank-5",
+    "cs-bank-6",
+    "cs-bank-7",
+    "cs-bank-8",
+    "qk-changshi-01"
+   ]
+  },
+  "panduan": {
+   "count": 11585,
+   "files": [
+    "qk-panduan-01",
+    "qk-panduan-02",
+    "qk-panduan-03",
+    "qk-panduan-04",
+    "qk-panduan-05",
+    "qk-panduan-06",
+    "qk-panduan-07",
+    "qk-panduan-08",
+    "qk-panduan-09",
+    "qk-panduan-10"
+   ]
+  },
+  "shuliang": {
+   "count": 8109,
+   "files": [
+    "qk-shuliang-01",
+    "qk-shuliang-02",
+    "qk-shuliang-03",
+    "qk-shuliang-04",
+    "qk-shuliang-05",
+    "qk-shuliang-06",
+    "qk-shuliang-07",
+    "qk-shuliang-08",
+    "qk-shuliang-09"
+   ]
+  },
+  "tuitui": {
+   "count": 6679,
+   "files": [
+    "qk-tuitui-82",
+    "qk-tuitui-83",
+    "qk-tuitui-84",
+    "qk-tuitui-85",
+    "qk-tuitui-86",
+    "qk-tuitui-87",
+    "qk-tuitui-88",
+    "qk-tuitui-89",
+    "qk-tuitui-90",
+    "qk-tuitui-91",
+    "qk-tuitui-92"
+   ]
+  },
+  "yanyu": {
+   "count": 8099,
+   "files": [
+    "qk-yanyu-01",
+    "qk-yanyu-02",
+    "qk-yanyu-03",
+    "qk-yanyu-04",
+    "qk-yanyu-05",
+    "qk-yanyu-06",
+    "qk-yanyu-07",
+    "qk-yanyu-08"
+   ]
+  },
+  "yiliao": {
+   "count": 55,
+   "files": [
+    "qk-yiliao-01"
+   ]
+  },
+  "zhengzhi": {
+   "count": 300,
+   "files": [
+    "qk-zhengzhi-01"
+   ]
+  },
+  "ziliao": {
+   "count": 4541,
+   "files": [
+    "qk-ziliao-01",
+    "qk-ziliao-02",
+    "qk-ziliao-03",
+    "qk-ziliao-04"
+   ]
+  },
+  "shenlun": {
+   "count": 6,
+   "files": [
+    "shenlun-bank-1"
+   ]
+  },
+  "zongying": {
+   "count": 4,
+   "files": [
+    "zongying-bank-1"
+   ]
+  }
+ },
+ "files": {
+  "cs-bank-1": {
+   "module": "changshi",
+   "count": 2665,
+   "bytes": 1048954
+  },
+  "cs-bank-2": {
+   "module": "changshi",
+   "count": 1531,
+   "bytes": 724340
+  },
+  "cs-bank-3": {
+   "module": "changshi",
+   "count": 1153,
+   "bytes": 431064
+  },
+  "cs-bank-4": {
+   "module": "changshi",
+   "count": 1397,
+   "bytes": 443534
+  },
+  "cs-bank-5": {
+   "module": "changshi",
+   "count": 1797,
+   "bytes": 605098
+  },
+  "cs-bank-6": {
+   "module": "changshi",
+   "count": 417,
+   "bytes": 141029
+  },
+  "cs-bank-7": {
+   "module": "changshi",
+   "count": 0,
+   "bytes": 0
+  },
+  "cs-bank-8": {
+   "module": "changshi",
+   "count": 0,
+   "bytes": 0
+  },
+  "qk-changshi-01": {
+   "module": "changshi",
+   "count": 1466,
+   "bytes": 572900
+  },
+  "qk-panduan-01": {
+   "module": "panduan",
+   "count": 1611,
+   "bytes": 967826
+  },
+  "qk-panduan-02": {
+   "module": "panduan",
+   "count": 1277,
+   "bytes": 1000964
+  },
+  "qk-panduan-03": {
+   "module": "panduan",
+   "count": 896,
+   "bytes": 1106404
+  },
+  "qk-panduan-04": {
+   "module": "panduan",
+   "count": 900,
+   "bytes": 1105302
+  },
+  "qk-panduan-05": {
+   "module": "panduan",
+   "count": 824,
+   "bytes": 1126570
+  },
+  "qk-panduan-06": {
+   "module": "panduan",
+   "count": 1528,
+   "bytes": 932881
+  },
+  "qk-panduan-07": {
+   "module": "panduan",
+   "count": 1565,
+   "bytes": 919297
+  },
+  "qk-panduan-08": {
+   "module": "panduan",
+   "count": 1051,
+   "bytes": 1042149
+  },
+  "qk-panduan-09": {
+   "module": "panduan",
+   "count": 1071,
+   "bytes": 1037813
+  },
+  "qk-panduan-10": {
+   "module": "panduan",
+   "count": 862,
+   "bytes": 841008
+  },
+  "qk-shuliang-01": {
+   "module": "shuliang",
+   "count": 1927,
+   "bytes": 748219
+  },
+  "qk-shuliang-02": {
+   "module": "shuliang",
+   "count": 1663,
+   "bytes": 727274
+  },
+  "qk-shuliang-03": {
+   "module": "shuliang",
+   "count": 1513,
+   "bytes": 747257
+  },
+  "qk-shuliang-04": {
+   "module": "shuliang",
+   "count": 1479,
+   "bytes": 746889
+  },
+  "qk-shuliang-05": {
+   "module": "shuliang",
+   "count": 108,
+   "bytes": 54014
+  },
+  "qk-shuliang-06": {
+   "module": "shuliang",
+   "count": 333,
+   "bytes": 143541
+  },
+  "qk-shuliang-07": {
+   "module": "shuliang",
+   "count": 333,
+   "bytes": 140564
+  },
+  "qk-shuliang-08": {
+   "module": "shuliang",
+   "count": 453,
+   "bytes": 179780
+  },
+  "qk-shuliang-09": {
+   "module": "shuliang",
+   "count": 300,
+   "bytes": 154096
+  },
+  "qk-tuitui-82": {
+   "module": "tuitui",
+   "count": 357,
+   "bytes": 1803931
+  },
+  "qk-tuitui-83": {
+   "module": "tuitui",
+   "count": 400,
+   "bytes": 1444707
+  },
+  "qk-tuitui-84": {
+   "module": "tuitui",
+   "count": 400,
+   "bytes": 2113066
+  },
+  "qk-tuitui-85": {
+   "module": "tuitui",
+   "count": 400,
+   "bytes": 2071963
+  },
+  "qk-tuitui-86": {
+   "module": "tuitui",
+   "count": 400,
+   "bytes": 1382597
+  },
+  "qk-yanyu-01": {
+   "module": "yanyu",
+   "count": 1432,
+   "bytes": 969679
+  },
+  "qk-yanyu-02": {
+   "module": "yanyu",
+   "count": 1642,
+   "bytes": 905715
+  },
+  "qk-yanyu-03": {
+   "module": "yanyu",
+   "count": 1558,
+   "bytes": 936931
+  },
+  "qk-yanyu-04": {
+   "module": "yanyu",
+   "count": 1123,
+   "bytes": 1020860
+  },
+  "qk-yanyu-05": {
+   "module": "yanyu",
+   "count": 1364,
+   "bytes": 945583
+  },
+  "qk-yanyu-06": {
+   "module": "yanyu",
+   "count": 334,
+   "bytes": 122889
+  },
+  "qk-yanyu-07": {
+   "module": "yanyu",
+   "count": 294,
+   "bytes": 159393
+  },
+  "qk-yanyu-08": {
+   "module": "yanyu",
+   "count": 352,
+   "bytes": 197712
+  },
+  "qk-yiliao-01": {
+   "module": "yiliao",
+   "count": 55,
+   "bytes": 21570
+  },
+  "qk-zhengzhi-01": {
+   "module": "zhengzhi",
+   "count": 300,
+   "bytes": 147017
+  },
+  "qk-ziliao-01": {
+   "module": "ziliao",
+   "count": 1446,
+   "bytes": 772734
+  },
+  "qk-ziliao-02": {
+   "module": "ziliao",
+   "count": 1200,
+   "bytes": 745608
+  },
+  "qk-ziliao-03": {
+   "module": "ziliao",
+   "count": 1106,
+   "bytes": 710378
+  },
+  "qk-ziliao-04": {
+   "module": "ziliao",
+   "count": 789,
+   "bytes": 494705
+  },
+  "shenlun-bank-1": {
+   "module": "shenlun",
+   "count": 6,
+   "bytes": 19334
+  },
+  "zongying-bank-1": {
+   "module": "zongying",
+   "count": 4,
+   "bytes": 12911
+  },
+  "qk-tuitui-87": {
+   "module": "tuitui",
+   "count": 622,
+   "bytes": 3650717
+  },
+  "qk-tuitui-88": {
+   "module": "tuitui",
+   "count": 1000,
+   "bytes": 3536983
+  },
+  "qk-tuitui-89": {
+   "module": "tuitui",
+   "count": 1000,
+   "bytes": 3209121
+  },
+  "qk-tuitui-90": {
+   "module": "tuitui",
+   "count": 1000,
+   "bytes": 5568450
+  },
+  "qk-tuitui-91": {
+   "module": "tuitui",
+   "count": 1000,
+   "bytes": 6605597
+  },
+  "qk-tuitui-92": {
+   "module": "tuitui",
+   "count": 100,
+   "bytes": 400812
+  }
+ }
+}
