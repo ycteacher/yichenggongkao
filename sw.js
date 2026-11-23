@@ -4,10 +4,11 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v49'; /* 修改点：首页改缓存优先秒开＋新增推送通知处理＋base.js走COS，v48→v49 清旧缓存 */
+var CACHE = 'yc-static-v50'; /* 修改点：题库索引/idmap改network-first防老题复活＋图推去重245道＋看板校正，v49→v50 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
-/* 主文件与题库索引：有网时后台更新（stale-while-revalidate），命中缓存秒回 */
-var SWR_PAT = /(index-b34\.js|qbank-index\.json|qbank-idmap\.json)$/;
+/* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
+var SWR_PAT = /(index-b34\.js)$/;
+var NETFIRST_PAT = /(qbank-index\.json|qbank-idmap\.json)$/;
 var dbg = { fetches: 0, lastError: null, lastStatus: null, log: [] };
 function dlog(m){ dbg.log.push((dbg.fetches) + ' ' + m); if (dbg.log.length > 12) dbg.log.shift(); }
 
@@ -130,7 +131,27 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
-  /* 主文件与题库索引：stale-while-revalidate（命中缓存秒回，有网时后台更新） */
+  /* 题库索引/idmap：network-first（网络优先，失败回退缓存）——保证删题后学生不再刷到老题 */
+  if (NETFIRST_PAT.test(url.pathname)) {
+    e.respondWith(
+      fetch(req).then(function (res) {
+        if (res && res.ok) {
+          caches.open(CACHE).then(function (c) {
+            c.put(req, res.clone());
+            trimCache();
+          });
+        }
+        return res;
+      }).catch(function () {
+        return caches.open(CACHE).then(function (c) {
+          return c.match(req).then(function (hit) { return hit || Response.error(); });
+        });
+      })
+    );
+    return;
+  }
+
+  /* 主文件：stale-while-revalidate（命中缓存秒回，有网时后台更新） */
   if (SWR_PAT.test(url.pathname)) {
     e.respondWith(
       caches.open(CACHE).then(function (c) {

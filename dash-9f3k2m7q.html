@@ -241,7 +241,7 @@ td b{color:var(--txt)}
   <div class="sec-h"><span class="bar"></span><h2>核心指标</h2><span class="note" id="kpiNote">累计口径 · 校正后</span></div>
   <div class="kpis" id="kpis"></div>
 
-  <div class="sec-h"><span class="bar"></span><h2>实时运营数据</h2><span class="note" id="liveTs">实时数据池 · 每 15 秒刷新</span></div>
+  <div class="sec-h"><span class="bar"></span><h2>实时运营数据</h2><span class="note" id="liveTs">实时数据池 · 每 10 秒刷新</span></div>
   <div class="kpis live-kpis" id="liveKpis"></div>
   <div class="grid g3" style="margin-top:14px">
     <div class="card">
@@ -692,7 +692,7 @@ function renderLive(ok,data){
     return;
   }
   var ts=data&&data.ts;
-  txt('liveTs','池更新 '+(ts?new Date(ts).toTimeString().slice(0,8):'—')+' · 每 15 秒刷新');
+  txt('liveTs','池更新 '+(ts?new Date(ts).toTimeString().slice(0,8):'—')+' · 每 10 秒刷新');
   txt('distNote','今日 '+agg.todayActive+' 台设备活跃 · 数据池实时聚合');
 
   var osDefs=[['ios','iOS','#38bdf8'],['android','安卓','#22c55e'],['harmony','鸿蒙','#fbbf24'],['pc','电脑','#a78bfa']];
@@ -724,7 +724,7 @@ function loadLive(){
     })
     .catch(function(){LIVE_OK=false;LIVE_DATA=null;renderLive(false,null)});
 }
-renderLive(false,null);loadLive();setInterval(loadLive,15000);
+renderLive(false,null);loadLive();setInterval(loadLive,10000);
 function renderMatTrend(){
   var host=el('matTrend');if(!host)return;
   var days=lastDays(14);
