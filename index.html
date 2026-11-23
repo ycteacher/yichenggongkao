@@ -4,6 +4,12 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <script>
+    /* ===== COS 加速：静态大文件走腾讯云 COS（国内节点），失败自动回退本站地址 =====
+       ycAsset('./assets/xxx.js') 返回 COS 完整地址；COS 不可用时各加载点回退 './' 原地址。 */
+    window.__YC_CDN = 'https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com';
+    window.ycAsset = function(p){
+      try{ return window.__YC_CDN + '/' + String(p).replace(/^\.\//,''); }catch(e){ return p; }
+    };
     /* ===== 修改点②：新增 ycFetch 请求兜底 + 题库失败占位 =====
        8 秒超时（AbortController）+ 失败自动重试 1 次；两次都失败时回调 onFail，
        由调用方渲染「加载失败，点击重试」占位，禁止任何自动循环 reload。 */
@@ -69,10 +75,14 @@
             nt.src='./assets/yc-notify.js?v='+v;
             document.head.appendChild(nt);
             var sc=document.createElement('script');
-            sc.type='module';sc.crossOrigin='';sc.src='./assets/index-b34.js?v='+v;
+            sc.type='module';sc.crossOrigin='';
+            sc.src=(window.ycAsset?window.ycAsset('./assets/index-b34.js'):'./assets/index-b34.js')+'?v='+v;
+            sc.onerror=function(){ try{ var s2=document.createElement('script'); s2.type='module'; s2.crossOrigin=''; s2.src='./assets/index-b34.js?v='+v; document.head.appendChild(s2); }catch(e){} };
             document.head.appendChild(sc);
             var lk=document.createElement('link');
-            lk.rel='stylesheet';lk.crossOrigin='';lk.href='./assets/index-C2M5URtc.css?v='+v;
+            lk.rel='stylesheet';lk.crossOrigin='';
+            lk.href=(window.ycAsset?window.ycAsset('./assets/index-C2M5URtc.css'):'./assets/index-C2M5URtc.css')+'?v='+v;
+            lk.onerror=function(){ try{ var l2=document.createElement('link'); l2.rel='stylesheet'; l2.crossOrigin=''; l2.href='./assets/index-C2M5URtc.css?v='+v; document.head.appendChild(l2); }catch(e){} };
             document.head.appendChild(lk);
             if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ fixIcons(v); }); }
             else { fixIcons(v); }
@@ -80,7 +90,8 @@
         }
         var cached=localStorage.getItem(K);
         if(cached) applyV(cached);
-        window.ycFetch("./assets/qbank-index.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(idx){
+        var idxU=(window.ycAsset?window.ycAsset('./assets/qbank-index.json'):'./assets/qbank-index.json');
+        window.ycFetch(idxU,{cache:"no-store"}).catch(function(){ return window.ycFetch("./assets/qbank-index.json",{cache:"no-store"}); }).then(function(r){return r.json()}).then(function(idx){
           var v=idx&&idx.v?String(idx.v):'';
           if(!v) return;
           if(cached&&cached!==v){
