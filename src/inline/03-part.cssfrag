@@ -6,6 +6,20 @@
 .from-\[\#0E7490\]{--tw-gradient-from: #0E7490 var(--tw-gradient-from-position);--tw-gradient-to: rgb(14 116 144 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}
 .to-\[\#155E75\]{--tw-gradient-to: #155E75 var(--tw-gradient-to-position)}
 
+/* ===== 考试通告卡片（与资料卡同一套规范，红色区分） ===== */
+#yc-notices-card{
+  display:flex; align-items:center; gap:12px;
+  margin:14px 0 0; padding:14px 16px; border-radius:14px;
+  background:linear-gradient(90deg,#DC2626,#B91C1C);
+  color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(185,28,28,.28);
+}
+#yc-notices-card:active{ transform:scale(.985); }
+#yc-notices-card .yc-mat-ic{ font-size:26px !important; flex:none; }
+#yc-notices-card .yc-mat-tx{ flex:1; min-width:0; }
+#yc-notices-card .yc-mat-t{ font-size:15px; font-weight:800; letter-spacing:.5px; }
+#yc-notices-card .yc-mat-s{ font-size:11px; opacity:.92; margin-top:2px; }
+#yc-notices-card .yc-mat-go{ font-size:12px; font-weight:700; flex:none; background:rgba(255,255,255,.18); border-radius:999px; padding:5px 10px; }
+
 /* ===== 资料领取专区卡片 ===== */
 #yc-materials-card{
   display:flex; align-items:center; gap:12px;

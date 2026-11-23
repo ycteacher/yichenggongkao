@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>考试通告 · 亿成公考</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:#F5F6F8;color:#1F2937;min-height:100vh;
+  padding-top:calc(52px + env(safe-area-inset-top,0px));
+}
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding-top:env(safe-area-inset-top,0px);
+  background:linear-gradient(90deg,#B91C1C,#EA580C);color:#fff;
+  display:flex;align-items:center;gap:10px;
+  padding-left:12px;padding-right:12px;height:52px;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);
+}
+.topbar .back{
+  flex:none;background:rgba(255,255,255,.2);border:none;color:#fff;
+  border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:700;cursor:pointer;
+  text-decoration:none;font-family:inherit;
+}
+.topbar .tt{font-size:16.5px;font-weight:800;letter-spacing:.5px}
+.topbar .upd{margin-left:auto;font-size:11px;opacity:.92;white-space:nowrap}
+.wrap{max-width:720px;margin:0 auto;padding:14px 12px 40px}
+.tip{
+  background:#FFF7ED;border:1px solid #FDBA74;color:#9A3412;
+  border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.6;margin-bottom:14px;
+}
+.card{
+  background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+.card .row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card .tag{
+  flex:none;background:#FEF2F2;color:#B91C1C;border:1px solid #FECACA;
+  border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:800;white-space:nowrap;
+}
+.card .tag.sheng{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
+.card .tag.shiye{background:#F0FDF4;color:#15803D;border-color:#BBF7D0}
+.card .date{margin-left:auto;font-size:11.5px;color:#9CA3AF;white-space:nowrap}
+.card h3{font-size:15px;font-weight:800;margin-top:7px;line-height:1.45;color:#111827}
+.card p{font-size:13.5px;line-height:1.7;color:#4B5563;margin-top:6px}
+.card .src{
+  margin-top:8px;font-size:12px;color:#6B7280;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.card .src a{color:#B91C1C;font-weight:700;text-decoration:none;border:1px solid #FECACA;border-radius:999px;padding:3px 10px;background:#FEF2F2}
+.card .src a:active{opacity:.7}
+.foot{text-align:center;font-size:11.5px;color:#9CA3AF;margin-top:18px;line-height:1.7}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back" href="./index.html">‹ 返回主页</a>
+    <span class="tt">📢 考试通告</span>
+    <span class="upd" id="updAt"></span>
+  </div>
+  <div class="wrap">
+    <div class="tip">📢 国考、省考、事业单位最新招考公告，每天更新一次，每天可以来看一看。具体以官方公告为准。</div>
+    <div id="list"></div>
+    <div class="foot">亿成公考 · 考试通告<br>信息整理自官方及权威媒体公开渠道，报考请以官方公告原文为准</div>
+  </div>
+  <script src="./notices-data.js?v=1"></script>
+  <script>
+  (function(){
+    var d = window.YC_NOTICES || {items:[]};
+    document.getElementById('updAt').textContent = '更新：' + (d.updated || '');
+    var list = document.getElementById('list');
+    if(!d.items || !d.items.length){
+      list.innerHTML = '<div class="card"><p>暂无通告，稍后再来看看。</p></div>';
+      return;
+    }
+    var html = '';
+    for(var i=0;i<d.items.length;i++){
+      var it = d.items[i];
+      var cls = it.tag === '省考' ? 'tag sheng' : (it.tag === '事业单位' ? 'tag shiye' : 'tag');
+      html += '<div class="card">' +
+        '<div class="row1"><span class="' + cls + '">' + it.tag + '</span>' +
+        '<span class="date">' + (it.date || '') + '</span></div>' +
+        '<h3>' + it.title + '</h3>' +
+        '<p>' + it.body + '</p>' +
+        '<div class="src"><span>来源：' + (it.source || '官方渠道') + '</span>' +
+        (it.link ? '<a href="' + it.link + '" target="_blank" rel="noopener">查看原文 ›</a>' : '') +
+        '</div></div>';
+    }
+    list.innerHTML = html;
+  })();
+  </script>
+</body>
+</html>

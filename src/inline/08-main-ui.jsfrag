@@ -314,6 +314,24 @@
   }
   document.getElementById("ycChipPts").addEventListener("click", openPoints);
 
+  /* ---------- 考试通告卡片（每天更新，放在资料卡上方） ---------- */
+  function addNoticesCard(){
+    if (document.getElementById("yc-notices-card")) return;
+    var entry = document.querySelector('[data-testid="papers-entry"]');
+    if (!entry) return;
+    var card = document.createElement("div");
+    card.id = "yc-notices-card";
+    card.innerHTML =
+      '<span class="yc-mat-ic" style="font-size:26px">📢</span>' +
+      '<div class="yc-mat-tx"><div class="yc-mat-t">考试通告</div>' +
+      '<div class="yc-mat-s">国考 · 省考 · 事业单位最新公告 · 每天更新，每天可以来看一看</div></div>' +
+      '<span class="yc-mat-go">查看 ›</span>';
+    card.addEventListener("click", function(){
+      window.location.href = "notices.html";
+    });
+    entry.parentNode.insertBefore(card, entry);
+  }
+
   /* ---------- 资料领取专区卡片 ---------- */
   function addMaterialsCard(){
     if (document.getElementById("yc-materials-card")) return;
@@ -416,9 +434,9 @@
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
     });
   }
-  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addNoticesCard(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
     mo.observe(document.body, {childList: true, subtree: true});
-    addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
+    addNoticesCard(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
