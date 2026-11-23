@@ -55,14 +55,58 @@
   }
   .vcard:active { transform:scale(.97); }
   .vcover {
-    position:relative; width:100%; aspect-ratio:16/9;
-    display:flex; align-items:center; justify-content:center;
-    font-size:34px; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.25);
+    position:relative; width:100%; aspect-ratio:16/9; overflow:hidden;
   }
   .vcover img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .vcover .vc-shade {
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.35));
+  }
+  .vcover .vc-ring {
+    position:absolute; right:-26px; bottom:-30px; width:86px; height:86px;
+    border:9px solid rgba(255,255,255,.11); border-radius:50%; pointer-events:none;
+  }
+  .vcover .vc-body {
+    position:absolute; inset:0; padding:8px 10px 7px;
+    display:flex; flex-direction:column; justify-content:space-between; text-align:left;
+  }
+  .vcover .vc-kicker {
+    font-size:clamp(9px,2.4vw,11px); font-weight:600; color:rgba(255,255,255,.85);
+    display:flex; align-items:center; gap:4px; white-space:nowrap; overflow:hidden;
+    padding-right:64px;
+  }
+  .vcover .vc-kicker .ico { font-size:12px; flex:none; }
+  .vcover .vc-kicker .kt { overflow:hidden; text-overflow:ellipsis; }
+  .vcover .vc-big {
+    font-size:clamp(12px,3.4vw,16px); font-weight:800; line-height:1.25; color:#fff;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    text-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+  .vcover .vc-sub {
+    font-size:clamp(9px,2.3vw,10.5px); font-weight:600; color:rgba(255,255,255,.8);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:62px;
+    }
+    @media (max-width:420px){
+      .vcover .vc-sub{padding-right:52px;}
+      .vcover .vc-kicker{padding-right:50px;}
+      .vcover .vc-num{font-size:26px;}
+      .vcover .pdf-tag{font-size:9px;padding:2px 5px;}
+  }
+  .vcover .vc-corner {
+    position:absolute; right:8px; bottom:2px; display:flex; align-items:flex-end; gap:3px;
+    pointer-events:none;
+  }
+  .vcover .vc-play {
+    width:0; height:0; margin-bottom:9px;
+    border-left:9px solid rgba(255,255,255,.55); border-top:6px solid transparent; border-bottom:6px solid transparent;
+  }
+  .vcover .vc-num {
+    font-size:clamp(28px,9vw,40px); font-weight:800; line-height:1;
+    color:rgba(255,255,255,.16); letter-spacing:1px;
+  }
   .vcover .pdf-tag {
     position:absolute; right:6px; top:6px; background:rgba(21,128,61,.92); color:#fff;
-    font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px;
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; z-index:2;
   }
   .vcard .vt { padding:9px 10px 11px; }
   .vcard .vt h3 {
@@ -138,13 +182,14 @@ var CATS = [
   { name:"常识",     icon:"📚", c1:"#15803D", c2:"#4ADE80" },
   { name:"数量关系", icon:"🔢", c1:"#BE185D", c2:"#F472B6" },
   { name:"资料分析", icon:"📊", c1:"#1D4ED8", c2:"#60A5FA" },
-  { name:"套卷精讲", icon:"🎯", c1:"#374151", c2:"#6B7280" }
+  { name:"套卷精讲", icon:"🎯", c1:"#16324F", c2:"#3E6B96" }
 ];
 
 var VIDEOS = [
   { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/yuce2026dsj.mp4"],
     srcs: ["media/yuce2026dsj.mp4"],
     cat: "套卷精讲", title: "2026 国考地市级预测卷全卷精讲：行测 130 题＋申论 5 题逐题伴学", desc: "地市级预测卷全卷精讲，配套讲义可保存打印，跟着视频边做边听。", pic: "",
+    kicker: "国考地市级", big: "地市级预测卷 全卷精讲", sub: "行测130+申论5题",
     pdfs: [
       { name: "配套讲义", file: "files/" + encodeURIComponent("2026国考地市级预测卷·配套讲义.pdf") }
     ] },
@@ -153,6 +198,7 @@ var VIDEOS = [
           "https://yicheng-video.oss-cn-beijing.aliyuncs.com/xingce130-3.mp4"],
     srcs: ["media/xingce130-1.mp4", "media/xingce130-2.mp4", "media/xingce130-3.mp4"],
     cat: "套卷精讲", title: "130 道题一道不落！执法卷预测全卷精讲，近两小时超长伴学", desc: "执法卷预测全卷逐题精讲，近两小时伴学，适合跟着卷子边做边听。", pic: "",
+    kicker: "27国考执法卷", big: "执法卷预测 全卷精讲", sub: "双卷·近2小时",
     pdfs: [
       { name: "行测试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-行测试卷.pdf") },
       { name: "申论试卷", file: "files/" + encodeURIComponent("27国考执法卷预测-申论试卷.pdf") }
@@ -160,6 +206,7 @@ var VIDEOS = [
   { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/jsnt30.mp4"],
     srcs: ["media/jsnt30.mp4"],
     cat: "套卷精讲", title: "江苏省考难题 30 题逐题精讲：图形推理 15 题＋数量关系几何 15 题", desc: "江苏卷最难档真题逐题精讲，配套讲义可保存打印，跟着视频边做边听。", pic: "",
+    kicker: "江苏省考", big: "江苏难题30题 逐题精讲", sub: "图推几何各15题",
     pdfs: [
       { name: "配套讲义", file: "files/" + encodeURIComponent("江苏省考难题30题·配套讲义.pdf") }
     ] },
@@ -168,6 +215,7 @@ var VIDEOS = [
           "https://yicheng-video.oss-cn-beijing.aliyuncs.com/changshi100-3.mp4"],
     srcs: ["media/changshi100-1.mp4", "media/changshi100-2.mp4", "media/changshi100-3.mp4"],
     cat: "常识", title: "27 国考常识知识地图 100 考点精讲：八大板块一次讲透，附 300 道预测题", desc: "常识 100 考点完整精讲，约 100 分钟全程伴学，配套听课讲义可保存打印，跟着视频边听边记。", pic: "",
+    kicker: "27国考", big: "常识知识地图 100考点", sub: "八大板块·300题",
     pdfs: [
       { name: "配套听课讲义", file: "files/" + encodeURIComponent("27国考常识知识地图·配套听课讲义.pdf") }
     ] },
@@ -175,6 +223,7 @@ var VIDEOS = [
           "https://yicheng-video.oss-cn-beijing.aliyuncs.com/yanyu100-2.mp4"],
     srcs: ["media/yanyu100-1.mp4", "media/yanyu100-2.mp4"],
     cat: "言语理解", title: "言语理解 100 题逐题精讲：七大题型一次讲透，约 102 分钟伴学", desc: "言语 100 题完整精讲，难度中等偏上，配套听课讲义可保存打印，跟着视频边听边练。", pic: "",
+    kicker: "100题", big: "七大题型 逐题精讲", sub: "100题·约102分钟",
     pdfs: [
       { name: "配套听课讲义", file: "files/" + encodeURIComponent("言语理解100题·配套听课讲义.pdf") }
     ] },
@@ -183,6 +232,7 @@ var VIDEOS = [
           "https://yicheng-video.oss-cn-beijing.aliyuncs.com/shuliang300-3.mp4"],
     srcs: ["media/shuliang300-1.mp4", "media/shuliang300-2.mp4", "media/shuliang300-3.mp4"],
     cat: "数量关系", title: "数量关系300题合集完整版", desc: "数量关系 300 题完整讲解，八大题型一次讲透，约 3 小时伴学，配套讲义可对照练习。", pic: "",
+    kicker: "300题", big: "300题合集 完整版", sub: "八大题型·3小时",
     links: [
       { name: "配套讲义", url: "https://workbuddy.link/p/bJneQTCCrX4GnZ8e9D9Mfd" }
     ] },
@@ -501,10 +551,20 @@ function renderModule(){
     var v = VIDEOS[list[k]];
     var cc = catOf(v.cat);
     var hasPdf = (v.pdfs && v.pdfs.length) || v.pdf;
+    var num = String(k + 1).length < 2 ? "0" + (k + 1) : String(k + 1);
+    var coverInner =
+      '<div class="vc-shade"></div>' +
+      '<div class="vc-ring"></div>' +
+      '<div class="vc-body">' +
+        '<div class="vc-kicker"><span class="ico">' + cc.icon + '</span><span class="kt">' + esc(v.kicker || cc.name) + '</span></div>' +
+        '<div class="vc-big">' + esc(v.big || v.title || "视频讲解") + '</div>' +
+        '<div class="vc-sub">' + esc(v.sub || "") + '</div>' +
+      '</div>' +
+      '<div class="vc-corner"><span class="vc-play"></span><span class="vc-num">' + num + '</span></div>';
     html += '<div class="vcard" data-idx="' + list[k] + '">' +
       '<div class="vcover" style="background:linear-gradient(135deg,' + cc.c1 + ',' + cc.c2 + ');">' +
         (v.pic ? '<img src="' + esc(v.pic) + '" alt="">' : '') +
-        '<span>' + cc.icon + '</span>' +
+        coverInner +
         (hasPdf ? '<span class="pdf-tag">配试卷</span>' : '') +
       '</div>' +
       '<div class="vt"><h3>' + esc(v.title || "视频讲解") + '</h3></div></div>';
