@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v55'; /* 修改点：收藏夹失效ID自动清理（方案A），v54→v55 清旧缓存 */
+var CACHE = 'yc-static-v56'; /* 修改点：申论综应作答区新增语音录入（Web Speech，含键盘麦克风引导），v55→v56 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
 var SWR_PAT = /(index-b34\.js)$/;
