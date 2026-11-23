@@ -2942,7 +2942,6 @@ document.addEventListener('click', function(e){
     '.yc-notice-tag{flex:none;background:rgba(255,255,255,.22);border-radius:4px;'+
       'padding:1px 7px;font-weight:700;white-space:nowrap;}'+
     '.yc-notice-text{flex:1;}'+
-    '.yc-notice-clock{display:block;color:#FDE68A;font-weight:800;font-size:13.5px;margin-bottom:2px;}'+
     '.yc-notice-text a{color:#FDE68A;font-weight:700;text-decoration:underline;}'+
     '.yc-notice-close{position:absolute;top:5px;right:8px;background:none;border:none;'+
       'color:#fff;font-size:19px;line-height:1;cursor:pointer;opacity:.9;padding:2px 6px;}'+
@@ -2956,10 +2955,10 @@ document.addEventListener('click', function(e){
       'padding:10px 18px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);'+
       'font-family:system-ui,-apple-system,"PingFang SC",sans-serif;display:none;white-space:nowrap;}'+
     '#yc-upd-float:active{transform:translateX(-50%) scale(.96)}'+
-    /* 公告条固定后，顶栏与正文整体下移，滚动时顶部完全不动 */
+    /* 公告条固定后，顶栏与正文整体下移，滚动时顶部完全不动。
+       正文留白改为实测头部总高（公告条+顶栏），不再用 60/92px 估算，消除移动端大片空白 */
     '.yc-topbar{top:var(--yc-notice-h,0px)!important}'+
-    'body.yc-ui{padding-top:calc(60px + var(--yc-notice-h,0px))!important}'+
-    '@media (max-width:700px){body.yc-ui{padding-top:calc(92px + var(--yc-notice-h,0px))!important}}';
+    'body.yc-ui{padding-top:var(--yc-head-h,60px)!important}';
   document.head.appendChild(css);
   var box=document.createElement('div');
   box.id='yc-notice';
@@ -2967,21 +2966,11 @@ document.addEventListener('click', function(e){
     '<div class="yc-notice-inner">'+
       '<span class="yc-notice-tag">公告</span>'+
       '<span class="yc-notice-text">'+
-        '<span class="yc-notice-clock" id="yc-notice-clock"></span>'+
-        '亿成公考刷题神器正在内测、不断升级，可能遇到题目或功能的小问题，欢迎包涵与反馈。'+
-        '欢迎提交<a href="./feedback.html">最下方的调查问卷</a>，说说你的使用感受；'+
-        '问卷积分可兑换考公书籍、家电、平板、手机等实物，也可换一对一视频答疑。'+
+        '11月23日更新：网站全面提速，打开更快了；题目或功能有问题欢迎随时反馈。'+
       '</span>'+
       '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
       '<button class="yc-notice-close" aria-label="关闭">×</button>'+
     '</div>';
-  function pad(n){return n<10?'0'+n:''+n;}
-  function tick(){
-    var d=new Date();
-    var el=document.getElementById('yc-notice-clock');
-    if(el) el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-  }
-  tick(); setInterval(tick,1000);
 
   function doUpdate(btn){
     /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */
@@ -3085,26 +3074,39 @@ document.addEventListener('click', function(e){
   }
   function mount(){
     if(!document.body) return;
-    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'||(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ document.documentElement.style.setProperty('--yc-notice-h','0px'); return; } }catch(e){}
-    document.body.insertBefore(box,document.body.firstChild);
+    var dismissed=false;
+    try{ if(localStorage.getItem('ycgk.notice.dismissed.v1')==='1'||(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ dismissed=true; } }catch(e){}
+    if(!dismissed) document.body.insertBefore(box,document.body.firstChild);
     var btn=box.querySelector('.yc-notice-close');
     if(btn) btn.addEventListener('click',function(){
       try{ localStorage.setItem('ycgk.notice.dismissed.v1','1'); }catch(e){}
       try{ if(window.YCNotify) YCNotify.dismiss('noticeBar'); }catch(e){}
       box.style.display='none';
-      document.documentElement.style.setProperty('--yc-notice-h','0px');
+      measure();
     });
+    /* 头部总高 = 公告条实际高度 + 顶栏实际高度（顶栏在窄屏会换行变高，必须实测） */
     var measure=function(){
-      if(box.style.display==='none') return;
-      document.documentElement.style.setProperty('--yc-notice-h',(box.offsetHeight||0)+'px');
+      var tb=document.querySelector('.yc-topbar');
+      var tbH=tb?(tb.offsetHeight||0):0;
+      var nH=(box.style.display==='none'||!box.parentNode)?0:(box.offsetHeight||0);
+      document.documentElement.style.setProperty('--yc-notice-h',nH+'px');
+      document.documentElement.style.setProperty('--yc-head-h',(nH+tbH)+'px');
     };
     measure();
     window.addEventListener('resize',measure);
+    setTimeout(measure,300);
     setTimeout(measure,600);
     setTimeout(measure,2000);
     if(window.ResizeObserver){
       var ro=new ResizeObserver(function(){ measure(); });
       ro.observe(box);
+      /* 顶栏可能由后续脚本渲染，轮询挂上观察 */
+      var tbTries=0;
+      var tbTimer=setInterval(function(){
+        var tb=document.querySelector('.yc-topbar');
+        if(tb){ ro.observe(tb); clearInterval(tbTimer); }
+        else if(++tbTries>20) clearInterval(tbTimer);
+      },300);
     }
   }
   if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
