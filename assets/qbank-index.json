@@ -1,7 +1,7 @@
 {
- "v": "tt72",
- "total": 49900,
- "mergedTotal": 49890,
+ "v": "tt73",
+ "total": 50000,
+ "mergedTotal": 49990,
  "modules": {
   "changshi": {
    "count": 10426,
@@ -47,7 +47,7 @@
    ]
   },
   "tuitui": {
-   "count": 6775,
+   "count": 6875,
    "files": [
     "qk-tuitui-82",
     "qk-tuitui-83",
@@ -60,7 +60,8 @@
     "qk-tuitui-90",
     "qk-tuitui-91",
     "qk-tuitui-92",
-    "qk-tuitui-93"
+    "qk-tuitui-93",
+    "qk-tuitui-94"
    ]
   },
   "yanyu": {
@@ -390,6 +391,11 @@
    "module": "tuitui",
    "count": 99,
    "bytes": 345094
+  },
+  "qk-tuitui-94": {
+   "module": "tuitui",
+   "count": 100,
+   "bytes": 376943
   }
  }
 }

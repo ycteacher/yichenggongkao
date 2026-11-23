@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v47'; /* 修改点：27国考执法卷申论大作文讲义+精讲视频上架（新视频条目+media/zhifa-dazuowen.mp4+files/PDF），v46→v47 清旧缓存 */
+var CACHE = 'yc-static-v48'; /* 修改点：图推批量出题批次qk-tuitui-batch-20261123-21上架（新分片 qk-tuitui-94），v47→v48 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件与题库索引：有网时后台更新（stale-while-revalidate），命中缓存秒回 */
 var SWR_PAT = /(index-b34\.js|qbank-index\.json|qbank-idmap\.json)$/;
