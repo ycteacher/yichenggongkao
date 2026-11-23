@@ -364,8 +364,9 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
       </ul>
       <h4>视频</h4>
       <ul>
+        <li><b>正在看视频（实时）</b>：近5分钟内处于观看视频状态的设备数，与「实时在线」同口径，必然 ≤ 实时在线。</li>
         <li><b>播放次数</b>：点「开始播放」计1次；一个视频分多段播放算1次。</li>
-        <li><b>播放人数</b>：按匿名设备编号去重。</li>
+        <li><b>播放人数</b>：按匿名设备编号去重，是上线以来累计看过视频的设备数，不是实时值。</li>
         <li><b>完播率</b>：完整看完 ÷ 开始播放。</li>
         <li><b>退出节点</b>：新埋点按 开头30秒 / 中段 / 结尾 三档；历史数据按已看进度四档（&lt;25% / 25–50% / 50–75% / 75–100%）。</li>
         <li><b>难点考点信号</b>：同一设备对同一视频播放 ≥3 次。</li>
@@ -580,7 +581,7 @@ function renderKpis(){
     {t:'累计PV',n:L.pv,c:'var(--cyan)',x:'今日 +'+L.todayPv+(H&&H.pv?' · 昨日 +'+H.pv:'')},
     {t:'累计设备',n:L.devN,c:'var(--cyan)',x:'今日 +'+L.todayNew+(H&&H.dev?' · 昨日 +'+H.dev:'')},
     {t:'视频总播放',n:V.play,c:'var(--violet)',x:'今日 +'+(V.today.play||0)+(H&&H.cumPlay!=null?' · 截昨日累计 '+num(H.cumPlay):'')},
-    {t:'视频观看人数',n:V.uv,c:'var(--violet)',x:'累计 · 按设备去重'},
+    {t:'正在看视频（实时）',n:(L.vidNow||0),c:'var(--violet)',x:'近5分钟 · 累计 '+V.uv+' 台看过'},
     {t:'好评率',n:pct(praise,fb.length),c:'var(--green)',x:'问卷 '+fb.length+' 份'}
   ];
   el('kpis').innerHTML=items.map(function(i){
