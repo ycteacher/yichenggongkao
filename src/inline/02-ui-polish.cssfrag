@@ -135,6 +135,18 @@ body.yc-ui { padding-top: 60px !important; }
   color: #fff; line-height: 1.45; letter-spacing: .3px;
   text-shadow: 0 1px 2px rgba(0,0,0,.12);
 }
+/* 实时更新行：每次上架新内容后同步改这里（addBetaBanner 内 yc-bb-live 文本） */
+.yc-beta-banner .yc-bb-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.yc-beta-banner .yc-bb-live {
+  display: block; font-size: 13.5px; font-weight: 700; color: #FDE68A;
+  line-height: 1.5; letter-spacing: .2px; text-shadow: 0 1px 2px rgba(0,0,0,.12);
+}
+.yc-beta-banner .yc-bb-bell {
+  align-self: flex-start; margin-top: 2px; padding: 5px 12px; border: none; border-radius: 999px;
+  background: rgba(255,255,255,.18); color: #fff; font-size: 12.5px; font-weight: 600;
+  letter-spacing: .3px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.yc-beta-banner .yc-bb-bell:disabled { opacity: .85; }
 
 /* 视频讲解横幅（首页底部，底栏之上） */
 .yc-video-banner {

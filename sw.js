@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v48'; /* 修改点：图推批量出题批次qk-tuitui-batch-20261123-21上架（新分片 qk-tuitui-94），v47→v48 清旧缓存 */
+var CACHE = 'yc-static-v49'; /* 修改点：首页改缓存优先秒开＋新增推送通知处理＋base.js走COS，v48→v49 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件与题库索引：有网时后台更新（stale-while-revalidate），命中缓存秒回 */
 var SWR_PAT = /(index-b34\.js|qbank-index\.json|qbank-idmap\.json)$/;
@@ -108,17 +108,22 @@ self.addEventListener('fetch', function (e) {
   /* ===== 本站资源缓存 ===== */
   if (url.origin !== location.origin) return;
 
-  /* 页面导航：网络优先，保证更新及时生效；断网时回退缓存 */
+  /* 页面导航：缓存优先秒开（老学生不再每次等国外服务器），有网时后台更新，下次打开即最新；
+     断网时用缓存兜底。用户点⟳一键更新会清缓存强制拉最新。 */
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req).then(function (res) {
-        if (res && res.ok) {
-          caches.open(CACHE).then(function (c) { c.put(req, res.clone()); trimCache(); });
-        }
-        return res;
-      }).catch(function () {
-        return caches.match(req).then(function (hit) {
-          return hit || caches.match('./index.html').then(function (h2) { return h2 || Response.error(); });
+      caches.open(CACHE).then(function (c) {
+        return c.match(req).then(function (hit) {
+          var net = fetch(req).then(function (res) {
+            if (res && res.ok) {
+              c.put(req, res.clone()); trimCache();
+            }
+            return res;
+          }).catch(function () { return null; });
+          if (hit) return hit;
+          return net.then(function (res) {
+            return res || caches.match('./index.html').then(function (h2) { return h2 || Response.error(); });
+          });
         });
       })
     );
@@ -157,6 +162,36 @@ self.addEventListener('fetch', function (e) {
         }
         return res;
       }).catch(function () { return Response.error(); });
+    })
+  );
+});
+
+/* ===== 更新推送（Web Push） ===== */
+self.addEventListener('push', function (e) {
+  var d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = { body: e.data ? e.data.text() : '' }; }
+  var title = d.title || '亿成公考 · 更新通知';
+  var opts = {
+    body: d.body || '',
+    icon: './assets/ycicon-192-a.png',
+    badge: './assets/ycicon-192-a.png',
+    tag: 'yc-update',
+    renotify: true,
+    data: { url: d.url || 'https://ycteacher.github.io/yichenggongkao/' }
+  };
+  e.waitUntil(self.registration.showNotification(title, opts));
+});
+
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  var url = (e.notification.data && e.notification.data.url) || 'https://ycteacher.github.io/yichenggongkao/';
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
+      for (var i = 0; i < list.length; i++) {
+        var c = list[i];
+        if (c.url.indexOf('yichenggongkao') !== -1) { return c.focus(); }
+      }
+      return self.clients.openWindow(url);
     })
   );
 });

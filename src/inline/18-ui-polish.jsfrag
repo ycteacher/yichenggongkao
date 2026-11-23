@@ -34,18 +34,11 @@
     '.yc-topbar{top:calc(var(--yc-notice-h,0px) + var(--yc-sat,0px))!important}'+
     'body.yc-ui{padding-top:calc(var(--yc-head-h,60px) + var(--yc-sat,0px))!important}';
   document.head.appendChild(css);
+  /* 通告栏已下线（时有时无体验差）：更新内容改在首页内测横幅「实时更新」一行展示；
+     保留 box 空壳供 measure() 计算头部高度（未插入 → 高度0），一键更新逻辑全部保留在顶栏按钮 */
   var box=document.createElement('div');
   box.id='yc-notice';
-  box.innerHTML=
-    '<div class="yc-notice-inner">'+
-      '<span class="yc-notice-tag">公告</span>'+
-      '<span class="yc-notice-text">'+
-        '11月23日更新：修复部分同学「一直加载失败、打不开」的问题，打开更快了；图推「三个圆」重复题已修复、421道低质题已删除。'+
-        '目前处于测试阶段（预计11月底前全面修复完毕），如遇卡顿或打不开，点右侧⟳一键更新即可。'+
-      '</span>'+
-      '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
-      '<button class="yc-notice-close" aria-label="关闭">×</button>'+
-    '</div>';
+  box.style.display='none';
 
   function doUpdate(btn){
     /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */

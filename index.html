@@ -144,7 +144,17 @@
     <link rel="apple-touch-icon" href="./assets/ycicon-512-a.png?v=4">
     <link rel="manifest" href="./manifest.json?v=1">
         <link href="./assets/material-icons.css?v=1" rel="stylesheet">
-    <script defer="" src="base.js"></script>
+    <script>
+    /* base.js 走 COS（国内秒下），失败回退本站；顶层代码自带 DOM 就绪判断，异步执行安全 */
+    (function(){
+      var s=document.createElement('script');
+      if(window.ycAsset){
+        s.src=window.ycAsset('./base.js');
+        s.onerror=function(){ var s2=document.createElement('script'); s2.src='base.js'; document.head.appendChild(s2); };
+      } else { s.src='base.js'; }
+      document.head.appendChild(s);
+    })();
+    </script>
     <script>window.YC_CS_BANK=window.YC_CS_BANK||[];</script>
         <style>.tt-fig{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.md-tbl{border-collapse:collapse;margin:10px 0;width:100%;font-size:14px}.md-tbl th,.md-tbl td{border:1px solid #E5E1D8;padding:6px 10px;text-align:left;white-space:nowrap}.md-tbl th{background:#F7F5EF;font-weight:600;color:#4A463F}.tt-fig svg{max-width:100%;height:auto}.tt-opt svg{width:64px;height:64px;display:block;margin:0 auto}
 /* ===== Tab bar v1 ===== */
@@ -372,6 +382,18 @@ body.yc-ui { padding-top: 60px !important; }
   color: #fff; line-height: 1.45; letter-spacing: .3px;
   text-shadow: 0 1px 2px rgba(0,0,0,.12);
 }
+/* 实时更新行：每次上架新内容后同步改这里（addBetaBanner 内 yc-bb-live 文本） */
+.yc-beta-banner .yc-bb-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.yc-beta-banner .yc-bb-live {
+  display: block; font-size: 13.5px; font-weight: 700; color: #FDE68A;
+  line-height: 1.5; letter-spacing: .2px; text-shadow: 0 1px 2px rgba(0,0,0,.12);
+}
+.yc-beta-banner .yc-bb-bell {
+  align-self: flex-start; margin-top: 2px; padding: 5px 12px; border: none; border-radius: 999px;
+  background: rgba(255,255,255,.18); color: #fff; font-size: 12.5px; font-weight: 600;
+  letter-spacing: .3px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.yc-beta-banner .yc-bb-bell:disabled { opacity: .85; }
 
 /* 视频讲解横幅（首页底部，底栏之上） */
 .yc-video-banner {
@@ -927,8 +949,53 @@ document.addEventListener('click', function(e){
     var b = document.createElement("div");
     b.id = "yc-beta-banner";
     b.className = "yc-beta-banner";
-    b.innerHTML = '<span class="yc-bb-tag">内测版</span><span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>';
+    b.innerHTML = '<span class="yc-bb-tag">内测版</span>' +
+      '<span class="yc-bb-col">' +
+        '<span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>' +
+        '<span class="yc-bb-live">实时通知：已上架《27国考行政执法卷·申论大作文命题汇总精讲》视频＋配套讲义，「套卷精讲」模块可看可打印</span>' +
+        '<button class="yc-bb-bell" id="yc-bb-bell">🔔 开启更新通知</button>' +
+      '</span>';
     shell.insertBefore(b, shell.firstChild);
+    initBellBtn();
+  }
+
+  /* ---------- 更新通知订阅（Web Push） ---------- */
+  var PUSH_URL = 'https://1538963435-chrm4ii4l7.ap-guangzhou.tencentscf.com';
+  var PUSH_PUB = 'BALPdqFpuTBUSBBBcJMhaDRI9-l__09piSbODt8wRnF9DYOMtO_u4TdhqPGDFdhF1Ye760DfU15NV-RIAuMhcck';
+  function ycUrlB64ToU8(b64){
+    var pad = '='.repeat((4 - b64.length % 4) % 4);
+    var b = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+    var raw = atob(b);
+    var u = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i);
+    return u;
+  }
+  function initBellBtn(){
+    var btn = document.getElementById('yc-bb-bell');
+    if (!btn) return;
+    try { if (localStorage.getItem('ycgk.push.on') === '1') { btn.textContent = '✅ 已开启，上新内容会通知你'; btn.disabled = true; return; } } catch(e){}
+    btn.addEventListener('click', function(){ ycSubscribePush(btn); });
+  }
+  function ycSubscribePush(btn){
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    if (isIOS && !standalone) { btn.textContent = '📱 苹果手机先「添加到主屏幕」，从图标打开后再点开启'; return; }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !window.Notification) {
+      btn.textContent = '⚠️ 当前浏览器不支持通知，建议用手机自带浏览器打开'; return;
+    }
+    btn.disabled = true; btn.textContent = '⏳ 开启中…';
+    Notification.requestPermission().then(function(p){
+      if (p !== 'granted') { btn.disabled = false; btn.textContent = '🔔 需要允许通知，再点一次'; return; }
+      navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription().then(function(ex){
+          return ex || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: ycUrlB64ToU8(PUSH_PUB) });
+        });
+      }).then(function(sub){
+        return fetch(PUSH_URL + '/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub) });
+      }).then(function(r){ return r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)); })
+        .then(function(j){ if (!j.ok) throw new Error('api'); btn.textContent = '✅ 已开启，上新内容会通知你'; try { localStorage.setItem('ycgk.push.on', '1'); } catch(e){} })
+        .catch(function(){ btn.disabled = false; btn.textContent = '🔔 没开成，点此重试'; });
+    });
   }
 
   /* ---------- 听取意见横幅（首页底部） ---------- */
@@ -3021,18 +3088,11 @@ document.addEventListener('click', function(e){
     '.yc-topbar{top:calc(var(--yc-notice-h,0px) + var(--yc-sat,0px))!important}'+
     'body.yc-ui{padding-top:calc(var(--yc-head-h,60px) + var(--yc-sat,0px))!important}';
   document.head.appendChild(css);
+  /* 通告栏已下线（时有时无体验差）：更新内容改在首页内测横幅「实时更新」一行展示；
+     保留 box 空壳供 measure() 计算头部高度（未插入 → 高度0），一键更新逻辑全部保留在顶栏按钮 */
   var box=document.createElement('div');
   box.id='yc-notice';
-  box.innerHTML=
-    '<div class="yc-notice-inner">'+
-      '<span class="yc-notice-tag">公告</span>'+
-      '<span class="yc-notice-text">'+
-        '11月23日更新：修复部分同学「一直加载失败、打不开」的问题，打开更快了；图推「三个圆」重复题已修复、421道低质题已删除。'+
-        '目前处于测试阶段（预计11月底前全面修复完毕），如遇卡顿或打不开，点右侧⟳一键更新即可。'+
-      '</span>'+
-      '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
-      '<button class="yc-notice-close" aria-label="关闭">×</button>'+
-    '</div>';
+  box.style.display='none';
 
   function doUpdate(btn){
     /* 不再用 confirm 弹窗：部分平板/内嵌浏览器会拦截 confirm，导致点了毫无反应 */
@@ -3167,19 +3227,7 @@ document.addEventListener('click', function(e){
   }
   function mount(){
     if(!document.body) return;
-    var dismissed=false;
-    /* 关闭公告只隐藏 72 小时（v2 键存时间戳）；旧 v1 键为永久关闭，此处不再读取，
-       让之前点过 × 的用户重新看到公告条与一键更新按钮 */
-    try{ var dTs=parseInt(localStorage.getItem('ycgk.notice.dismissed.v2')||'0',10)||0; if(dTs&&Date.now()-dTs<72*3600*1000){ dismissed=true; } }catch(e){}
-    if(!dismissed&&(window.YCNotify&&localStorage.getItem(YCNotify.P+'done.noticeBar')==='1')){ dismissed=true; }
-    if(!dismissed) document.body.insertBefore(box,document.body.firstChild);
-    var btn=box.querySelector('.yc-notice-close');
-    if(btn) btn.addEventListener('click',function(){
-      try{ localStorage.setItem('ycgk.notice.dismissed.v2',String(Date.now())); }catch(e){}
-      try{ if(window.YCNotify) YCNotify.dismiss('noticeBar'); }catch(e){}
-      box.style.display='none';
-      measure();
-    });
+    /* 通告栏已下线：不再插入页面；measure() 仍负责实测顶栏高度供布局使用 */
     /* 头部总高 = 公告条实际高度 + 顶栏实际高度（顶栏在窄屏会换行变高，必须实测） */
     var measure=function(){
       var tb=document.querySelector('.yc-topbar');

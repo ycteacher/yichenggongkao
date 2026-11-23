@@ -377,8 +377,53 @@
     var b = document.createElement("div");
     b.id = "yc-beta-banner";
     b.className = "yc-beta-banner";
-    b.innerHTML = '<span class="yc-bb-tag">内测版</span><span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>';
+    b.innerHTML = '<span class="yc-bb-tag">内测版</span>' +
+      '<span class="yc-bb-col">' +
+        '<span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>' +
+        '<span class="yc-bb-live">实时通知：已上架《27国考行政执法卷·申论大作文命题汇总精讲》视频＋配套讲义，「套卷精讲」模块可看可打印</span>' +
+        '<button class="yc-bb-bell" id="yc-bb-bell">🔔 开启更新通知</button>' +
+      '</span>';
     shell.insertBefore(b, shell.firstChild);
+    initBellBtn();
+  }
+
+  /* ---------- 更新通知订阅（Web Push） ---------- */
+  var PUSH_URL = 'https://1538963435-chrm4ii4l7.ap-guangzhou.tencentscf.com';
+  var PUSH_PUB = 'BALPdqFpuTBUSBBBcJMhaDRI9-l__09piSbODt8wRnF9DYOMtO_u4TdhqPGDFdhF1Ye760DfU15NV-RIAuMhcck';
+  function ycUrlB64ToU8(b64){
+    var pad = '='.repeat((4 - b64.length % 4) % 4);
+    var b = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+    var raw = atob(b);
+    var u = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i);
+    return u;
+  }
+  function initBellBtn(){
+    var btn = document.getElementById('yc-bb-bell');
+    if (!btn) return;
+    try { if (localStorage.getItem('ycgk.push.on') === '1') { btn.textContent = '✅ 已开启，上新内容会通知你'; btn.disabled = true; return; } } catch(e){}
+    btn.addEventListener('click', function(){ ycSubscribePush(btn); });
+  }
+  function ycSubscribePush(btn){
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    if (isIOS && !standalone) { btn.textContent = '📱 苹果手机先「添加到主屏幕」，从图标打开后再点开启'; return; }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !window.Notification) {
+      btn.textContent = '⚠️ 当前浏览器不支持通知，建议用手机自带浏览器打开'; return;
+    }
+    btn.disabled = true; btn.textContent = '⏳ 开启中…';
+    Notification.requestPermission().then(function(p){
+      if (p !== 'granted') { btn.disabled = false; btn.textContent = '🔔 需要允许通知，再点一次'; return; }
+      navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription().then(function(ex){
+          return ex || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: ycUrlB64ToU8(PUSH_PUB) });
+        });
+      }).then(function(sub){
+        return fetch(PUSH_URL + '/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub) });
+      }).then(function(r){ return r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)); })
+        .then(function(j){ if (!j.ok) throw new Error('api'); btn.textContent = '✅ 已开启，上新内容会通知你'; try { localStorage.setItem('ycgk.push.on', '1'); } catch(e){} })
+        .catch(function(){ btn.disabled = false; btn.textContent = '🔔 没开成，点此重试'; });
+    });
   }
 
   /* ---------- 听取意见横幅（首页底部） ---------- */
