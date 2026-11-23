@@ -432,7 +432,7 @@ window.__ycLoadModules=function(mods,cb){window.__ycLoadFiles(filesForMods(mods)
 window.__ycLoadIds=function(ids,cb){if(!ids||!ids.length){if(cb)cb();return}var run=function(){window.__ycLoadFiles(filesForIds(ids),cb)};if(window.__ycBankIdmap){run();return}if(!window.__ycIdmapP){window.__ycIdmapP=fetch("./assets/qbank-idmap.json?v="+(window.__ycBankIndex&&window.__ycBankIndex.v||"tt70")).then(function(r){return r.json()}).then(function(j){window.__ycBankIdmap=j||{}}).catch(function(){window.__ycBankIdmap=window.__ycBankIdmap||{}})}window.__ycIdmapP.then(run)};
 window.__ycOpenModule=function(mod,cb){window.__ycLoadModules([mod],cb)};
 /* 启动：只拉轻量索引，不拉题库分片；索引失败 1.5s 后重试一次 */
-(function(){var done=false;var boot=function(j){if(done)return;done=true;window.__ycBankIndex=j||{modules:{},files:{}};TOTAL=Object.keys(window.__ycBankIndex.files||{}).length;finish();prog()};var go=function(){return fetch("./assets/qbank-index.json?v=tt70",{cache:"no-store"}).then(function(r){return r.json()}).then(boot)};go().catch(function(){setTimeout(function(){go().catch(function(){boot(null)})},1500)})})();
+(function(){var done=false;var boot=function(j){if(done)return;done=true;window.__ycBankIndex=j||{modules:{},files:{}};TOTAL=Object.keys(window.__ycBankIndex.files||{}).length;finish();prog()};var go=function(){return (window.ycFetch?window.ycFetch("./assets/qbank-index.json?v=tt70"):fetch("./assets/qbank-index.json?v=tt70")).then(function(r){return r.json()}).then(boot)};go().catch(function(){setTimeout(function(){go().catch(function(){ if(window.__ycBankFail){window.__ycBankFail(go);}else{boot(null);} })},1500)})})();
 })();
 
 /* ===== YC 个人数据看板 + 备考方向 + 倒计时 v1 (b34) ===== */

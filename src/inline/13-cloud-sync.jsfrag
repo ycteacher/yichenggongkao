@@ -352,7 +352,16 @@
           var s=getSync();
           if((cloud.ts||0)>(s.appliedTs||0)){
             var changed=applyCloud(cloud);
-            if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+            /* 修改点：启动拉取不再自动 reload；10 分钟时间窗守卫，只弹提示条，用户点击才刷新 */
+            if(changed){
+              try{
+                var lastUpd=Number(sessionStorage.getItem("yc-sync-upd-ts")||0);
+                if(!lastUpd||Date.now()-lastUpd>10*60*1000){
+                  sessionStorage.setItem("yc-sync-upd-ts",String(Date.now()));
+                  showUpdateBar();
+                }
+              }catch(errUpd){ showUpdateBar(); }
+            }
           }
         });
       },tries?3000:2500);

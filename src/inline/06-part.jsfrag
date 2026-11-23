@@ -1,7 +1,29 @@
 <script>
     (function(){
       function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
+      /* 修改点：新增空内容检测——判断 #root 与 .page-shell 是否真的渲染出内容 */
+      function pageEmpty(){
+        var root=document.getElementById("root");
+        var shell=document.querySelector(".page-shell");
+        return !(shell&&shell.innerHTML.replace(/\s/g,"")) && !(root&&root.innerHTML.replace(/\s/g,""));
+      }
+      /* 修改点：失败占位块，点击才 location.reload()，不自动循环 */
+      function showFail(){
+        if(document.getElementById("yc-boot-fail"))return;
+        var d=document.createElement("div");
+        d.id="yc-boot-fail";
+        d.style.cssText="position:fixed;inset:0;z-index:9999;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px";
+        d.innerHTML='<div style="font-size:15px;color:#4A463F">加载失败，请检查网络后重试</div>'
+          +'<button id="yc-boot-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
+        document.body.appendChild(d);
+        document.getElementById("yc-boot-retry").addEventListener("click",function(){ location.reload(); });
+      }
       var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
-      setTimeout(function(){ clearInterval(t); hide(); },25000);
+      /* 修改点：兜底时长 25 秒 → 10 秒；兜底触发时若页面仍为空，不隐藏骨架变白屏，改为失败占位 */
+      setTimeout(function(){
+        clearInterval(t);
+        if(pageEmpty()){ hide(); showFail(); }
+        else{ hide(); }
+      },10000);
     })();
     </script>

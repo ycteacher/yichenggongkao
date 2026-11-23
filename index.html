@@ -4,6 +4,53 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <script>
+    /* ===== 修改点②：新增 ycFetch 请求兜底 + 题库失败占位 =====
+       8 秒超时（AbortController）+ 失败自动重试 1 次；两次都失败时回调 onFail，
+       由调用方渲染「加载失败，点击重试」占位，禁止任何自动循环 reload。 */
+    window.ycFetch = function(url, opts, onFail){
+      opts = opts || {};
+      function once(){
+        var ctl = new AbortController();
+        var timer = setTimeout(function(){ ctl.abort(); }, 8000);
+        var o = {};
+        for(var k in opts){ o[k] = opts[k]; }
+        o.signal = ctl.signal;
+        return fetch(url, o).then(function(r){
+          clearTimeout(timer);
+          if(!r.ok){ throw new Error('HTTP ' + r.status); }
+          return r;
+        }, function(err){
+          clearTimeout(timer);
+          throw err;
+        });
+      }
+      return once().catch(function(e1){
+        return new Promise(function(resolve, reject){
+          setTimeout(function(){
+            once().then(resolve, function(e2){
+              try{ onFail && onFail(e2); }catch(_){}
+              reject(e2);
+            });
+          }, 1200);
+        });
+      });
+    };
+    /* 题库索引两次都失败时的占位块：用户点击才重试，不自动循环 */
+    window.__ycBankFail = function(retry){
+      if(document.getElementById('yc-bank-fail')) return;
+      var d = document.createElement('div');
+      d.id = 'yc-bank-fail';
+      d.style.cssText = 'position:fixed;inset:0;z-index:9998;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px';
+      d.innerHTML = '<div style="font-size:15px;color:#4A463F">题库加载失败，请检查网络后重试</div>'
+        + '<button id="yc-bank-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
+      document.body.appendChild(d);
+      document.getElementById('yc-bank-retry').addEventListener('click', function(){
+        d.parentNode && d.parentNode.removeChild(d);
+        retry && retry();
+      });
+    };
+    </script>
+    <script>
     (function(){
       /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
       try{
@@ -33,11 +80,16 @@
         }
         var cached=localStorage.getItem(K);
         if(cached) applyV(cached);
-        fetch("./assets/qbank-index.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(idx){
+        window.ycFetch("./assets/qbank-index.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(idx){
           var v=idx&&idx.v?String(idx.v):'';
           if(!v) return;
-          if(cached&&cached!==v){localStorage.setItem(K,v);location.replace(location.pathname+"?ycv="+v+"_"+Date.now());return;}
-          if(!cached){localStorage.setItem(K,v);applyV(v);}
+          if(cached&&cached!==v){
+            /* 修改点：先写新版本号、后执行 replace；写入失败（隐私模式/配额满）try/catch 兜底并放弃刷新，杜绝无限刷新循环 */
+            try{ localStorage.setItem(K,v); }catch(eW){ return; }
+            location.replace(location.pathname+"?ycv="+v+"_"+Date.now());
+            return;
+          }
+          if(!cached){ try{ localStorage.setItem(K,v); }catch(eS){} applyV(v); }
         }).catch(function(){ if(!cached){localStorage.setItem(K,FALLBACK);applyV(FALLBACK);} });
       }catch(e){}
     })();
@@ -378,6 +430,20 @@ body.yc-ui { padding-top: 60px !important; }
   .yc-top-actions::-webkit-scrollbar{display:none}
   body.yc-ui{padding-top:92px!important}
 }
+</style><style>
+/* ===== 修改点④：顶部空白修复（保守方案） =====
+   原则：env(safe-area-inset-top) 全页只在 body 顶部留白消费一次；
+   PWA/APP 容器（standalone 模式）已让出状态栏空间时，页面内不再叠加，消除双重留白。 */
+:root{ --yc-sat: min(env(safe-area-inset-top, 0px), 24px); }
+/* 浏览器普通打开：基础留白 92px 不变，安全区补偿最多加一次（封顶 24px） */
+@media (max-width:700px){
+  body.yc-ui{ padding-top: calc(92px + var(--yc-sat)) !important; }
+}
+/* 已安装 PWA / App 容器（standalone）：状态栏由容器负责，页面内不再补偿 */
+@media (display-mode: standalone){
+  :root{ --yc-sat: 0px; }
+  body.yc-ui{ padding-top: 92px !important; }
+}
 </style></head>
   <body>
     <div id="root"></div>
@@ -397,8 +463,30 @@ body.yc-ui { padding-top: 60px !important; }
     <script>
     (function(){
       function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
+      /* 修改点：新增空内容检测——判断 #root 与 .page-shell 是否真的渲染出内容 */
+      function pageEmpty(){
+        var root=document.getElementById("root");
+        var shell=document.querySelector(".page-shell");
+        return !(shell&&shell.innerHTML.replace(/\s/g,"")) && !(root&&root.innerHTML.replace(/\s/g,""));
+      }
+      /* 修改点：失败占位块，点击才 location.reload()，不自动循环 */
+      function showFail(){
+        if(document.getElementById("yc-boot-fail"))return;
+        var d=document.createElement("div");
+        d.id="yc-boot-fail";
+        d.style.cssText="position:fixed;inset:0;z-index:9999;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px";
+        d.innerHTML='<div style="font-size:15px;color:#4A463F">加载失败，请检查网络后重试</div>'
+          +'<button id="yc-boot-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
+        document.body.appendChild(d);
+        document.getElementById("yc-boot-retry").addEventListener("click",function(){ location.reload(); });
+      }
       var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
-      setTimeout(function(){ clearInterval(t); hide(); },25000);
+      /* 修改点：兜底时长 25 秒 → 10 秒；兜底触发时若页面仍为空，不隐藏骨架变白屏，改为失败占位 */
+      setTimeout(function(){
+        clearInterval(t);
+        if(pageEmpty()){ hide(); showFail(); }
+        else{ hide(); }
+      },10000);
     })();
     </script>
 
@@ -1455,7 +1543,16 @@ document.addEventListener('click', function(e){
           var s=getSync();
           if((cloud.ts||0)>(s.appliedTs||0)){
             var changed=applyCloud(cloud);
-            if(changed&&!sessionStorage.getItem("yc-sync-reload")){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+            /* 修改点：启动拉取不再自动 reload；10 分钟时间窗守卫，只弹提示条，用户点击才刷新 */
+            if(changed){
+              try{
+                var lastUpd=Number(sessionStorage.getItem("yc-sync-upd-ts")||0);
+                if(!lastUpd||Date.now()-lastUpd>10*60*1000){
+                  sessionStorage.setItem("yc-sync-upd-ts",String(Date.now()));
+                  showUpdateBar();
+                }
+              }catch(errUpd){ showUpdateBar(); }
+            }
           }
         });
       },tries?3000:2500);
