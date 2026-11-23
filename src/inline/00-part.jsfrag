@@ -46,6 +46,7 @@
         + '<button id="yc-bank-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
       document.body.appendChild(d);
       document.getElementById('yc-bank-retry').addEventListener('click', function(){
+        try{ sessionStorage.setItem('yc-skip-cdn','1'); }catch(e){}
         d.parentNode && d.parentNode.removeChild(d);
         retry && retry();
       });
@@ -68,12 +69,12 @@
           try{
             var sc=document.createElement('script');
             sc.type='module';sc.crossOrigin='';
-            sc.src=(window.ycAsset?window.ycAsset('./assets/index-b34.js'):'./assets/index-b34.js')+'?v='+v;
+            sc.src=(window.ycAsset&&!ycSkipCdn()?window.ycAsset('./assets/index-b34.js'):'./assets/index-b34.js')+'?v='+v;
             sc.onerror=function(){ try{ var s2=document.createElement('script'); s2.type='module'; s2.crossOrigin=''; s2.src='./assets/index-b34.js?v='+v; document.head.appendChild(s2); }catch(e){} };
             document.head.appendChild(sc);
             var lk=document.createElement('link');
             lk.rel='stylesheet';lk.crossOrigin='';
-            lk.href=(window.ycAsset?window.ycAsset('./assets/index-C2M5URtc.css'):'./assets/index-C2M5URtc.css')+'?v='+v;
+            lk.href=(window.ycAsset&&!ycSkipCdn()?window.ycAsset('./assets/index-C2M5URtc.css'):'./assets/index-C2M5URtc.css')+'?v='+v;
             lk.onerror=function(){ try{ var l2=document.createElement('link'); l2.rel='stylesheet'; l2.crossOrigin=''; l2.href='./assets/index-C2M5URtc.css?v='+v; document.head.appendChild(l2); }catch(e){} };
             document.head.appendChild(lk);
             if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',function(){ fixIcons(v); }); }
@@ -82,8 +83,26 @@
         }
         var cached=localStorage.getItem(K);
         if(cached) applyV(cached);
-        var idxU=(window.ycAsset?window.ycAsset('./assets/qbank-index.json'):'./assets/qbank-index.json');
-        window.ycFetch(idxU,{cache:"no-store"}).catch(function(){ return window.ycFetch("./assets/qbank-index.json",{cache:"no-store"}); }).then(function(r){return r.json()}).then(function(idx){
+        /* 修改点：索引请求改为 CDN 与本站并行赛跑（谁先返回用谁），替代原「CDN 失败再试本站」串行回退；
+           本站请求经 SW 缓存优先，命中秒回。用户点过「重试」后本会话跳过 CDN 直连本站（yc-skip-cdn）。 */
+        function ycSkipCdn(){ try{ return sessionStorage.getItem('yc-skip-cdn')==='1'; }catch(e){ return false; } }
+        function ycIdxUrls(){
+          var u=(window.ycAsset?window.ycAsset('./assets/qbank-index.json'):'./assets/qbank-index.json');
+          if(ycSkipCdn()||u.indexOf(location.origin)===0) return [u];
+          return [u,'./assets/qbank-index.json'];
+        }
+        function ycRaceIdx(urls){
+          return new Promise(function(resolve,reject){
+            var done=false,fails=0;
+            urls.forEach(function(u){
+              window.ycFetch(u,{cache:"no-store"}).then(function(r){
+                if(done){ return; }
+                done=true;resolve(r);
+              }).catch(function(){ fails++; if(fails===urls.length&&!done){ reject(new Error('all-index-src-fail')); } });
+            });
+          });
+        }
+        ycRaceIdx(ycIdxUrls()).then(function(r){return r.json()}).then(function(idx){
           var v=idx&&idx.v?String(idx.v):'';
           if(!v) return;
           if(cached&&cached!==v){

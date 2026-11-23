@@ -16,7 +16,7 @@
         d.innerHTML='<div style="font-size:15px;color:#4A463F">加载失败，请检查网络后重试</div>'
           +'<button id="yc-boot-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
         document.body.appendChild(d);
-        document.getElementById("yc-boot-retry").addEventListener("click",function(){ location.reload(); });
+        document.getElementById("yc-boot-retry").addEventListener("click",function(){ try{sessionStorage.setItem("yc-skip-cdn","1");}catch(e){} location.reload(); });
       }
       var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
       /* 修改点：兜底时长 25 秒 → 10 秒；兜底触发时若页面仍为空，不隐藏骨架变白屏，改为失败占位 */

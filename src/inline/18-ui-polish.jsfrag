@@ -40,7 +40,8 @@
     '<div class="yc-notice-inner">'+
       '<span class="yc-notice-tag">公告</span>'+
       '<span class="yc-notice-text">'+
-        '11月23日更新：网站全面提速，打开更快了；题目或功能有问题欢迎随时反馈。'+
+        '11月23日更新：修复部分同学「一直加载失败、打不开」的问题，打开更快了；图推「三个圆」重复题已修复、421道低质题已删除。'+
+        '目前处于测试阶段（预计11月底前全面修复完毕），如遇卡顿或打不开，点右侧⟳一键更新即可。'+
       '</span>'+
       '<button class="yc-notice-upd" id="yc-notice-upd">⟳ 一键更新</button>'+
       '<button class="yc-notice-close" aria-label="关闭">×</button>'+
