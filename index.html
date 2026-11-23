@@ -274,6 +274,9 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-chip .yc-arrow { font-size: 9px; color: #B3AC9E; }
 .yc-chip.yc-chip-done { border-color: rgba(21,128,61,.35); color: var(--yc-green); }
 .yc-chip svg { width: 13px; height: 13px; }
+/* 顶栏常驻一键更新：卡顿/打不开时真刷新整个应用（清缓存+重拉最新版+重载） */
+.yc-chip.yc-chip-upd { background: #FDE68A; border-color: #F59E0B; color: #7F1D1D; font-weight: 800; }
+.yc-chip.yc-chip-upd.yc-updating { opacity: .6; pointer-events: none; }
 
 /* 遮罩与底部面板 */
 .yc-mask { position: fixed; inset: 0; background: rgba(20,20,20,.45); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity .25s; }
@@ -684,6 +687,7 @@ document.addEventListener('click', function(e){
     '<div class="yc-top-actions">' +
     '<div class="yc-chip" id="ycChipPts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15.5s-4.8-3-4.8-6.4A2.7 2.7 0 0 1 12 7.4a2.7 2.7 0 0 1 4.8 1.7c0 3.4-4.8 6.4-4.8 6.4z"/></svg><span id="ycPtsShort">0</span></div>' +
     '<div class="yc-chip" id="ycChipDir"><span id="ycChipDirText">选择方向</span><span class="yc-arrow">▼</span></div>' +
+    '<div class="yc-chip yc-chip-upd" id="ycChipUpd" role="button" aria-label="一键更新：卡顿、打不开或数据不新时，点这里刷新整个应用到最新版" title="一键更新：卡顿、打不开或数据不新时，点这里刷新整个应用到最新版">⟳ 一键更新</div>' +
     '</div>';
   document.body.appendChild(topbar);
   document.body.classList.add("yc-ui");
@@ -3084,8 +3088,39 @@ document.addEventListener('click', function(e){
   function bindUpd(){
     var b=document.getElementById('yc-notice-upd');
     if(b && !b.dataset.bound){ b.dataset.bound='1'; b.addEventListener('click',function(){ doUpdate(b); }); }
+    /* 顶栏常驻一键更新：公告条关闭/消失时也能真刷新整个应用 */
+    var c=document.getElementById('ycChipUpd');
+    if(c && !c.dataset.bound){
+      c.dataset.bound='1';
+      c.addEventListener('click',function(){
+        if(c.classList.contains('yc-updating')) return;
+        c.classList.add('yc-updating');
+        c.textContent='⟳ 更新中…';
+        doUpdate(c);
+      });
+    }
   }
   bindUpd();
+
+  /* 顶栏一键更新首次提示（只提示一次）：告诉大家这个按钮是干什么的 */
+  (function(){
+    try{
+      if(localStorage.getItem('ycgk.pop.done.updChipHint')==='1') return;
+      localStorage.setItem('ycgk.pop.done.updChipHint','1');
+      var show=function(){
+        var t=document.createElement('div');
+        t.id='yc-upd-chip-hint';
+        t.textContent='顶栏新增「一键更新」：卡顿、打不开时点它，立刻刷新整个应用到最新版';
+        t.style.cssText='position:fixed;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:2147483002;'+
+          'background:#1F2937;color:#FDE68A;border:1.5px solid #FDE68A;border-radius:12px;padding:10px 14px;font-size:12.5px;font-weight:700;'+
+          'box-shadow:0 6px 22px rgba(0,0,0,.4);font-family:inherit;max-width:86vw;line-height:1.6;';
+        var drop=function(){ if(t.parentNode){ t.style.transition='opacity .4s'; t.style.opacity='0'; setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },450); } };
+        document.body.appendChild(t);
+        setTimeout(drop,4200);
+      };
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',show); else setTimeout(show,800);
+    }catch(e){}
+  })();
 
   /* 更新完成提示：一键更新跳转回来后，明确告诉用户"已经是最新版" */
   (function(){

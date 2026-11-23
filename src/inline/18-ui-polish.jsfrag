@@ -93,6 +93,17 @@
   function bindUpd(){
     var b=document.getElementById('yc-notice-upd');
     if(b && !b.dataset.bound){ b.dataset.bound='1'; b.addEventListener('click',function(){ doUpdate(b); }); }
+    /* 顶栏常驻一键更新：公告条关闭/消失时也能真刷新整个应用 */
+    var c=document.getElementById('ycChipUpd');
+    if(c && !c.dataset.bound){
+      c.dataset.bound='1';
+      c.addEventListener('click',function(){
+        if(c.classList.contains('yc-updating')) return;
+        c.classList.add('yc-updating');
+        c.textContent='⟳ 更新中…';
+        doUpdate(c);
+      });
+    }
   }
   bindUpd();
 

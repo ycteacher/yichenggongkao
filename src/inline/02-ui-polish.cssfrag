@@ -37,6 +37,9 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-chip .yc-arrow { font-size: 9px; color: #B3AC9E; }
 .yc-chip.yc-chip-done { border-color: rgba(21,128,61,.35); color: var(--yc-green); }
 .yc-chip svg { width: 13px; height: 13px; }
+/* 顶栏常驻一键更新：卡顿/打不开时真刷新整个应用（清缓存+重拉最新版+重载） */
+.yc-chip.yc-chip-upd { background: #FDE68A; border-color: #F59E0B; color: #7F1D1D; font-weight: 800; }
+.yc-chip.yc-chip-upd.yc-updating { opacity: .6; pointer-events: none; }
 
 /* 遮罩与底部面板 */
 .yc-mask { position: fixed; inset: 0; background: rgba(20,20,20,.45); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity .25s; }
