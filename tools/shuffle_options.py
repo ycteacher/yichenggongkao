@@ -22,8 +22,10 @@
 """
 import argparse
 import json
+import os
 import random
 import re
+import shutil
 import sys
 from glob import glob
 
@@ -32,13 +34,17 @@ LETTERS = "ABCDEFGH"
 PATTERNS = [re.compile(r"故选([A-H])")]
 
 
-def load_js(path):
-    """返回 (push前缀, 题目数组, push后剩余文本)，保持原文件结构"""
-    s = open(path, encoding="utf-8").read()
-    i = s.index("push(") + len("push(")
-    prefix = s[:i]
-    arr, end = json.JSONDecoder().raw_decode(s[i:].lstrip())
-    return prefix, arr, s[i:].lstrip()[end:]
+def load_source_for_seed(path, seed, create_bak=True):
+    """幂等关键：优先从 .bak-<seed> 读原始内容；没有备份才用当前文件并创建备份。
+    保证同文件同种子多次运行，洗牌输入始终是同一份原始数据。
+    dry-run 时 create_bak=False，只读不写。"""
+    bak = f"{path}.bak-{seed}"
+    if os.path.exists(bak):
+        return open(bak, encoding="utf-8").read(), bak, True
+    src = open(path, encoding="utf-8").read()
+    if create_bak:
+        shutil.copy2(path, bak)
+    return src, bak, False
 
 
 def dump_js(path, prefix, arr, tail):
@@ -84,7 +90,11 @@ def main():
     total = shuffled = 0
     for path in paths:
         fname = path.split("/")[-1]
-        prefix, arr, tail = load_js(path)
+        src, bak, from_bak = load_source_for_seed(path, args.seed, create_bak=not args.dry_run)
+        i = src.index("push(") + len("push(")
+        prefix = src[:i]
+        arr, end = json.JSONDecoder().raw_decode(src[i:].lstrip())
+        tail = src[i:].lstrip()[end:]
         changed = 0
         for q in arr:
             total += 1
@@ -108,12 +118,8 @@ def main():
                 dist[q["answer"]] = dist.get(q["answer"], 0) + 1
         print(f"{fname}: 共{len(arr)}题，洗牌{changed}题，答案分布={dict(sorted(dist.items()))}")
         if not args.dry_run and changed:
-            import shutil
-            bak = f"{path}.bak-{args.seed}"
-            if not __import__("os").path.exists(bak):
-                shutil.copy2(path, bak)
             dump_js(path, prefix, arr, tail)
-            print(f"  已写入，备份: {bak}")
+            print(f"  已写入（输入源: {'备份 ' + bak if from_bak else '当前文件，已建备份 ' + bak}）")
     print(f"合计: 扫描{total}题，洗牌{shuffled}题" + ("（dry-run 未写入）" if args.dry_run else ""))
 
 
