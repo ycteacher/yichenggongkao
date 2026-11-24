@@ -1,0 +1,28 @@
+<!-- 打印/导出PDF片段 · 亿成公考
+粘贴位置：index.html 的 </body> 前（或并入 assets/yc-enhance.js 动态注入）。
+适配站点真实类名：.tt-fig=题干图形容器(SVG)、.tt-opt=选项(内嵌SVG)、.md-tbl=表格。
+导出方式：点按钮 → 浏览器打印面板选「另存为PDF」，无需服务器。
+-->
+<button id="yc-print-btn" onclick="window.print()"
+  style="position:fixed;right:12px;bottom:96px;z-index:2147483646;border:none;border-radius:999px;
+         padding:10px 18px;background:#1F2937;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+  🖨 打印 / 导出PDF
+</button>
+<style>
+@media print {
+  @page { size: A4 portrait; margin: 14mm 12mm; }
+  html, body { background: #fff !important; }
+  /* 隐藏屏幕专用元素：底栏、浮条、报错按钮、计时器、打印按钮自身 */
+  .yc-tabbar, #yc-enhance-bar, #yc-print-btn,
+  .yc-timer, .yc-rule, .yc-err-fab { display: none !important; }
+  /* 题卡不跨页断开 */
+  .tt-item, .card, .q-card { page-break-inside: avoid; break-inside: avoid; }
+  /* SVG 适配：题干图形等比缩放不截断，选项图形固定小尺寸 */
+  .tt-fig svg, .tt-opt svg { max-width: 100% !important; height: auto !important; }
+  .tt-opt svg { width: 56px !important; height: 56px !important; }
+  .md-tbl { font-size: 12px !important; }
+  /* 打印黑字、去阴影底色 */
+  * { color: #000 !important; box-shadow: none !important;
+      text-shadow: none !important; background-image: none !important; }
+}
+</style>

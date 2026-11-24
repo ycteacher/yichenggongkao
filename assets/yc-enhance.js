@@ -323,7 +323,7 @@
           if (!sess){
             sess = { t: title, n: total, s: 0, q: [] };
             qStart = Date.now(); lastPos = pos;
-          } else if (sess.t !== title + '|' + total){
+          } else if (sess.t !== title || sess.n !== total){
             saveSession(); /* 换组：旧会话先落盘，再开新会话 */
             sess = { t: title, n: total, s: 0, q: [] };
             qStart = Date.now(); lastPos = pos;
