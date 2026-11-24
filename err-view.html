@@ -83,6 +83,7 @@
     var el = document.getElementById("list");
     renderStats(all);
     renderFix(all);
+    var list = (cur === "全部") ? all : all.filter(function(r){ return typeOf(r) === cur; });
     if (!list.length){ el.innerHTML = '<p class="empty">这个分类下还没有报错记录</p>'; return; }
     var cls = { "题目问题":"t1", "跳转问题":"t2", "其他问题":"t3", "未标注":"t3" };
     el.innerHTML = list.map(function(r){

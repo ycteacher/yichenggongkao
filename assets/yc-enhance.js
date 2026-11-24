@@ -62,7 +62,7 @@
     var nodes = document.querySelectorAll('p.whitespace-pre-line, .whitespace-pre-line');
     for (var i = 0; i < nodes.length; i++){
       var t = (nodes[i].textContent || '').trim();
-      if (t.length > 20) return t.slice(0, 160);
+      if (t.length > 8) return t.slice(0, 160);
     }
     return '';
   }
@@ -263,7 +263,7 @@
   }
   function submitReport(type){
     var title = quizTitle(), pos = quizCounter(), q = quizPrompt();
-    if (!q){ showToast('没有找到当前题目，请稍后再试'); return; }
+    if (!q){ q = '（未取到题干）'; }
     if (!confirm('向亿成老师反馈这道题的问题？\n\n类型：' + type + '\n会一起带上：' + title + ' 第' + (pos || '?') + '题\n「' + q.slice(0, 50) + '…」')) return;
     var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), type: type, title: title, pos: pos || '', q: q, ua: (navigator.userAgent || '').slice(0, 80) };
     errBtn.disabled = true; errBtn.textContent = '提交中…';
