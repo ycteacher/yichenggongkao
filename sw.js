@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v59'; /* 修改点：新增「高频题型混讲」分组与「国考十大高频题型混合大盘点」视频（OSS主源top10.mp4+media兜底），v58→v59 清旧缓存 */
+var CACHE = 'yc-static-v60'; /* 修改点：top10卡片挂载「行测十大高频题型_47题解析讲义（上半）」PDF，v59→v60 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
 var SWR_PAT = /(index-b34\.js)$/;
