@@ -78,7 +78,7 @@
     var els = document.querySelectorAll('button, div[role="button"], div');
     for (var i = els.length - 1; i >= 0; i--){
       var t = (els[i].textContent || '').replace(/\s/g, '');
-      if (/^答题卡\d+\/\d+$/.test(t) && els[i].querySelectorAll('*').length <= 8) return els[i];
+      if (/答题卡\d+\/\d+$/.test(t) && els[i].querySelectorAll('*').length <= 8) return els[i];
     }
     return null;
   }
@@ -87,6 +87,7 @@
     cardEl = answerCardEl();
     if (!cardEl){
       bar.style.top = '60px'; bar.style.left = '12px'; bar.style.bottom = 'auto';
+      bar.style.display = 'flex';
       return;
     }
     var r = cardEl.getBoundingClientRect();
@@ -213,7 +214,8 @@
     var b = e.target && e.target.closest ? e.target.closest('button') : null;
     if (!b) return;
     var txt = (b.textContent || '').replace(/\s/g, '');
-    if (txt === '交卷' && sess){ saveSession(); }
+    var isSubmit = /^交卷/.test(txt) || txt === '查看结果';
+    if (isSubmit && sess){ saveSession(); }
   }, true);
 
   /* ---------- 一键报错：先选问题类型 ---------- */
@@ -318,7 +320,11 @@
         }
         /* 用时跟踪：作答开始后建会话，翻题即结算上一题用时 */
         if (tState && tState.started){
-          if (!sess || sess.t !== title + '|' + total){
+          if (!sess){
+            sess = { t: title, n: total, s: 0, q: [] };
+            qStart = Date.now(); lastPos = pos;
+          } else if (sess.t !== title + '|' + total){
+            saveSession(); /* 换组：旧会话先落盘，再开新会话 */
             sess = { t: title, n: total, s: 0, q: [] };
             qStart = Date.now(); lastPos = pos;
           }

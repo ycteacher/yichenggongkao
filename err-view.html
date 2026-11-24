@@ -82,6 +82,7 @@
   function render(){
     var el = document.getElementById("list");
     renderStats(all);
+    renderFilter();
     renderFix(all);
     var list = (cur === "全部") ? all : all.filter(function(r){ return typeOf(r) === cur; });
     if (!list.length){ el.innerHTML = '<p class="empty">这个分类下还没有报错记录</p>'; return; }
