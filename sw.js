@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v65'; /* 修改点：新增刷题计时器＋一键报错＋套卷申论进度保存（yc-enhance.js/index-b34.js/shenlun.html），v60→v61 清旧缓存 */
+var CACHE = 'yc-static-v66'; /* 修改点：新增刷题计时器＋一键报错＋套卷申论进度保存（yc-enhance.js/index-b34.js/shenlun.html），v60→v61 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
 var SWR_PAT = /(index-b34\.js)$/;
@@ -144,7 +144,7 @@ self.addEventListener('fetch', function (e) {
         return res;
       }).catch(function () {
         return caches.open(CACHE).then(function (c) {
-          return c.match(req).then(function (hit) { return hit || Response.error(); });
+          return c.match(req, { ignoreSearch: true }).then(function (hit) { return hit || Response.error(); });
         });
       })
     );
