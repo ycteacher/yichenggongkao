@@ -10,11 +10,20 @@
   .wrap{max-width:720px;margin:0 auto;}
   h1{font-size:20px;font-weight:900;margin-bottom:4px;}
   .sub{font-size:12px;color:#8A8378;margin-bottom:16px;}
-  .bar{display:flex;gap:8px;margin-bottom:14px;}
-  .bar button{border:none;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;background:#1F2937;color:#fff;}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .stat{background:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 2px 10px rgba(32,32,32,.05);text-align:center;flex:1;min-width:80px;}
+  .stat b{display:block;font-size:20px;font-weight:900;}
+  .stat span{font-size:11px;color:#8A8378;}
+  .bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .bar button{border:none;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;background:#E5E1D8;color:#6B6558;}
+  .bar button.on{background:#1F2937;color:#fff;}
   .card{background:#fff;border-radius:14px;padding:14px 16px;margin-top:10px;box-shadow:0 2px 10px rgba(32,32,32,.05);}
-  .card .meta{font-size:11px;color:#8A8378;display:flex;flex-wrap:wrap;gap:8px;}
+  .card .meta{font-size:11px;color:#8A8378;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
   .card .meta b{color:#B91C1C;}
+  .card .type{display:inline-block;border-radius:8px;padding:1px 8px;font-size:11px;font-weight:700;color:#fff;background:#7C3AED;}
+  .card .type.t1{background:#B91C1C;}
+  .card .type.t2{background:#B45309;}
+  .card .type.t3{background:#6B7280;}
   .card .q{margin-top:8px;font-size:13.5px;line-height:1.7;white-space:pre-line;}
   .empty{margin-top:40px;text-align:center;color:#8A8378;font-size:14px;}
 </style>
@@ -22,16 +31,19 @@
 <body>
 <div class="wrap">
   <h1>⚠ 题目报错记录</h1>
-  <p class="sub">学生在刷题页点「一键报错」提交的记录，实时汇总在这里（最近 300 条）。</p>
-  <div class="bar">
-    <button id="refresh">刷新</button>
-  </div>
+  <p class="sub">学生在刷题页点「一键报错」提交的记录，按类型汇总，实时更新（最近 300 条）。</p>
+  <div class="stats" id="stats"></div>
+  <div class="bar" id="filter"></div>
+  <div class="bar"><button id="refresh">↻ 刷新</button></div>
   <div id="list"><p class="empty">加载中…</p></div>
 </div>
 <script>
 (function(){
   var KEY = "ycgk-err-v1";
   var EP = ["https://textdb.online/" + KEY, "https://textdb.dev/api/data/" + KEY];
+  var TYPES = ["题目问题", "跳转问题", "其他问题"];
+  var all = [], cur = "全部";
+  function typeOf(r){ return TYPES.indexOf(r.type) >= 0 ? r.type : (r.type ? r.type : "未标注"); }
   function load(){
     return Promise.allSettled(EP.map(function(u){ return fetch(u, {cache:"no-store"}).then(function(r){ return r.text(); }); }))
       .then(function(rs){
@@ -44,15 +56,42 @@
       });
   }
   function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function render(list){
-    var el = document.getElementById("list");
-    if (!list.length){ el.innerHTML = '<p class="empty">还没有报错记录</p>'; return; }
-    el.innerHTML = list.map(function(r){
-      return '<div class="card"><div class="meta"><span>' + esc(r.t) + '</span><b>' + esc(r.title) + ' 第' + esc(r.pos) + '题</b></div><div class="q">' + esc(r.q) + '</div></div>';
+  function renderStats(list){
+    var el = document.getElementById("stats");
+    var c1 = list.filter(function(r){ return typeOf(r) === "题目问题"; }).length;
+    var c2 = list.filter(function(r){ return typeOf(r) === "跳转问题"; }).length;
+    var c3 = list.filter(function(r){ return typeOf(r) === "其他问题"; }).length;
+    el.innerHTML = '<div class="stat"><b style="color:#B91C1C;">' + c1 + '</b><span>📝 题目问题</span></div>'
+      + '<div class="stat"><b style="color:#B45309;">' + c2 + '</b><span>🔗 跳转/显示</span></div>'
+      + '<div class="stat"><b style="color:#6B7280;">' + c3 + '</b><span>💬 其他</span></div>'
+      + '<div class="stat"><b>' + list.length + '</b><span>合计</span></div>';
+  }
+  function renderFilter(){
+    var el = document.getElementById("filter");
+    var opts = ["全部"].concat(TYPES);
+    el.innerHTML = opts.map(function(t){
+      return '<button data-f="' + t + '" class="' + (cur === t ? "on" : "") + '">' + t + '</button>';
     }).join("");
   }
-  function refresh(){ load().then(render); }
-  document.getElementById("refresh").onclick = refresh;
+  function render(){
+    var el = document.getElementById("list");
+    var list = cur === "全部" ? all : all.filter(function(r){ return typeOf(r) === cur; });
+    renderStats(all);
+    if (!list.length){ el.innerHTML = '<p class="empty">这个分类下还没有报错记录</p>'; return; }
+    var cls = { "题目问题":"t1", "跳转问题":"t2", "其他问题":"t3", "未标注":"t3" };
+    el.innerHTML = list.map(function(r){
+      var ty = typeOf(r);
+      return '<div class="card"><div class="meta"><span class="type ' + (cls[ty] || "t3") + '">' + esc(ty) + '</span><span>' + esc(r.t) + '</span><b>' + esc(r.title) + ' 第' + esc(r.pos) + '题</b></div><div class="q">' + esc(r.q) + '</div></div>';
+    }).join("");
+  }
+  function refresh(){ load().then(function(list){ all = list; render(); }); }
+  document.getElementById("filter").addEventListener("click", function(e){
+    var b = e.target && e.target.closest ? e.target.closest("button") : null;
+    if (!b) return;
+    cur = b.getAttribute("data-f") || "全部";
+    renderFilter(); render();
+  });
+  document.getElementById("refresh") && (document.getElementById("refresh").onclick = refresh);
   refresh();
   setInterval(refresh, 60000);
 })();

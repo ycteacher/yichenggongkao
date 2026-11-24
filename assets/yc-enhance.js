@@ -1,4 +1,4 @@
-/* 亿成公考 · 刷题增强：套卷/选题计时器 + 一键报错 + 续刷提醒
+/* 亿成公考 · 刷题增强 v2：左上角浮条 + 作答后才计时（每题60秒，规则可见）+ 一键报错分类
    挂在 index.html，纯 DOM 层增强，不侵入 React 内部状态。 */
 (function(){
   if (window.__ycEnhance) return; window.__ycEnhance = true;
@@ -10,18 +10,25 @@
     function(v){ return fetch("https://textdb.dev/api/data/" + ERR_KEY, { method: "POST", headers: { "Content-Type": "text/plain" }, body: v }); }
   ];
   var TIMER_KEY = "yc-timer-v1", PEND_KEY = "yc-err-pending-v1";
+  var SEC_PER_Q = 60; /* 每题限时（秒），计时规则对外可见 */
 
-  /* ---------- 浮条 ---------- */
+  /* ---------- 浮条：左上角 ---------- */
+  var style = document.createElement('style');
+  style.textContent = '#yc-enh-bar{position:fixed;left:12px;top:12px;z-index:2147483000;display:none;align-items:center;gap:8px;font-family:inherit;}@media (max-width:719px){#yc-enh-bar{top:60px;}}';
+  document.head.appendChild(style);
   var bar = document.createElement('div');
-  bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:2147483000;display:none;align-items:center;gap:10px;font-family:inherit;';
+  bar.id = 'yc-enh-bar';
   var timerEl = document.createElement('div');
   timerEl.style.cssText = 'display:none;align-items:center;gap:8px;background:#1F2937;color:#fff;border-radius:999px;padding:11px 20px;font-size:16px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;';
   timerEl.innerHTML = '<span id="yc-timer-ic" style="font-size:14px;opacity:.8;">⏱</span><span id="yc-timer-txt">--:--</span>';
-  timerEl.title = '点一下暂停/继续';
+  timerEl.title = '作答后自动开始计时；点一下暂停/继续';
+  var ruleEl = document.createElement('span');
+  ruleEl.id = 'yc-timer-rule';
+  ruleEl.style.cssText = 'display:none;font-size:11px;font-weight:700;color:#6B6558;background:#fff;border:1px solid #E5E1D8;border-radius:999px;padding:8px 12px;box-shadow:0 4px 14px rgba(0,0,0,.10);white-space:nowrap;';
   var errBtn = document.createElement('button');
   errBtn.style.cssText = 'display:none;border:none;background:#B91C1C;color:#fff;border-radius:999px;padding:11px 18px;font-size:14px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;font-family:inherit;white-space:nowrap;';
   errBtn.textContent = '⚠ 一键报错';
-  bar.appendChild(timerEl); bar.appendChild(errBtn);
+  bar.appendChild(timerEl); bar.appendChild(ruleEl); bar.appendChild(errBtn);
 
   function mountBar(){ if (!bar.parentNode) document.body.appendChild(bar); }
   mountBar();
@@ -64,23 +71,43 @@
     return (m < 10 ? '0' : '') + m + ':' + ('0' + (s % 60)).slice(-2);
   }
 
-  /* ---------- 计时器 ---------- */
-  var tState = null; /* {key, end, paused, remain} */
+  /* ---------- 计时器：作答后才开始 ---------- */
+  var tState = null; /* {key, total(分钟), started, end, paused, remain} */
   function loadTimer(){ try { return JSON.parse(localStorage.getItem(TIMER_KEY) || 'null'); } catch(e){ return null; } }
   function saveTimer(){ try { localStorage.setItem(TIMER_KEY, JSON.stringify(tState)); } catch(e){} }
 
   function ensureTimer(key, total){
     var saved = loadTimer();
     if (tState && tState.key === key) return;
-    if (saved && saved.key === key && (saved.end > Date.now() || saved.paused)){
+    if (saved && saved.key === key && saved.total === total && (saved.started ? (saved.end > Date.now() || saved.paused) : true)){
       tState = saved;
     } else {
-      tState = { key: key, end: Date.now() + total * 60000, paused: false, remain: 0 };
+      tState = { key: key, total: total, started: false, end: 0, paused: false, remain: 0 };
       saveTimer();
     }
   }
+  function startTimer(){
+    if (!tState || tState.started) return;
+    tState.started = true;
+    tState.end = Date.now() + tState.total * 60000;
+    saveTimer(); renderTimer();
+    showToast('计时开始：每题 ' + SEC_PER_Q + ' 秒 × 共 ' + tState.total + ' 题');
+  }
+  /* 刷题屏内的任何作答交互（点选项/上一题/下一题/答题卡）触发计时；退出与收藏不触发 */
+  document.addEventListener('click', function(e){
+    if (!tState || tState.started) return;
+    if (!quizEl()) return;
+    var tgt = e.target;
+    if (!tgt || !tgt.closest) return;
+    var b = tgt.closest('button');
+    if (!b || b === timerEl || b.closest('#yc-enh-bar')) return;
+    var dt = b.getAttribute('data-testid') || '';
+    if (dt === 'quiz-exit' || dt === 'fav-toggle') return;
+    startTimer();
+  }, true);
   timerEl.addEventListener('click', function(){
     if (!tState) return;
+    if (!tState.started){ showToast('作答后自动开始计时'); return; }
     if (tState.end <= Date.now()) return;
     tState.paused = !tState.paused;
     if (tState.paused){ tState.remain = tState.end - Date.now(); }
@@ -89,14 +116,21 @@
   });
   function renderTimer(){
     if (!tState) return;
-    var remain = tState.paused ? tState.remain : (tState.end - Date.now());
     var txt = document.getElementById('yc-timer-txt');
     var ic = document.getElementById('yc-timer-ic');
+    if (!tState.started){
+      if (txt) txt.textContent = fmt(tState.total * 60000);
+      if (ic) ic.textContent = '⏱';
+      timerEl.style.background = '#6B7280';
+      return;
+    }
+    var remain = tState.paused ? tState.remain : (tState.end - Date.now());
     if (txt) txt.textContent = tState.paused ? '暂停 ' + fmt(remain) : fmt(remain);
     if (ic) ic.textContent = tState.paused ? '▶' : '⏱';
     if (remain <= 0){
       timerEl.style.background = '#B91C1C';
-      timerEl.textContent = '⏱ 时间到，注意节奏';
+      if (txt) txt.textContent = '时间到，注意节奏';
+      if (ic) ic.textContent = '⏱';
     } else if (remain <= 60000){
       timerEl.style.background = '#B91C1C';
     } else {
@@ -109,7 +143,20 @@
     }
   }, 500);
 
-  /* ---------- 一键报错 ---------- */
+  /* ---------- 一键报错：先选问题类型 ---------- */
+  var ERR_TYPES = ['题目问题', '跳转问题', '其他问题'];
+  var typeModal = document.createElement('div');
+  typeModal.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483647;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;font-family:inherit;';
+  typeModal.innerHTML = '<div style="background:#fff;border-radius:18px;padding:20px;width:86%;max-width:340px;">'
+    + '<p style="font-size:16px;font-weight:800;margin:0 0 4px;">这道题属于哪类问题？</p>'
+    + '<p style="font-size:12px;color:#8A8378;margin:0 0 14px;">会自动带上板块、题号和题干，选好类型方便统计修复</p>'
+    + '<button data-t="题目问题" style="display:block;width:100%;text-align:left;border:1px solid #E5E1D8;background:#FAF8F3;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;margin-bottom:8px;cursor:pointer;">📝 题目问题（题干/选项/答案有误）</button>'
+    + '<button data-t="跳转问题" style="display:block;width:100%;text-align:left;border:1px solid #E5E1D8;background:#FAF8F3;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;margin-bottom:8px;cursor:pointer;">🔗 跳转或页面显示问题</button>'
+    + '<button data-t="其他问题" style="display:block;width:100%;text-align:left;border:1px solid #E5E1D8;background:#FAF8F3;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;margin-bottom:12px;cursor:pointer;">💬 其他问题</button>'
+    + '<button id="yc-err-cancel" style="display:block;width:100%;border:none;background:transparent;color:#8A8378;font-size:13px;cursor:pointer;padding:6px;">取消</button>'
+    + '</div>';
+  document.body.appendChild(typeModal);
+
   function sendReport(rep, cb){
     Promise.allSettled(EP_GET.map(function(u){ return fetch(u, { cache: 'no-store' }).then(function(r){ return r.text(); }); }))
       .then(function(rs){
@@ -142,11 +189,11 @@
       }
     });
   }
-  errBtn.addEventListener('click', function(){
+  function submitReport(type){
     var title = quizTitle(), pos = quizCounter(), q = quizPrompt();
     if (!q){ showToast('没有找到当前题目，请稍后再试'); return; }
-    if (!confirm('向亿成老师反馈这道题的问题？\n\n会一起带上：' + title + ' 第' + (pos || '?') + '题\n「' + q.slice(0, 50) + '…」')) return;
-    var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), title: title, pos: pos || '', q: q, ua: (navigator.userAgent || '').slice(0, 80) };
+    if (!confirm('向亿成老师反馈这道题的问题？\n\n类型：' + type + '\n会一起带上：' + title + ' 第' + (pos || '?') + '题\n「' + q.slice(0, 50) + '…」')) return;
+    var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), type: type, title: title, pos: pos || '', q: q, ua: (navigator.userAgent || '').slice(0, 80) };
     errBtn.disabled = true; errBtn.textContent = '提交中…';
     sendReport(rep, function(ok){
       errBtn.disabled = false; errBtn.textContent = '⚠ 一键报错';
@@ -160,6 +207,16 @@
         showToast('网络不稳，已本地记录，稍后自动重试');
       }
     });
+  }
+  errBtn.addEventListener('click', function(){
+    typeModal.style.display = 'flex';
+  });
+  typeModal.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    typeModal.style.display = 'none';
+    if (b.id === 'yc-err-cancel') return;
+    submitReport(b.getAttribute('data-t') || '其他问题');
   });
 
   /* ---------- 屏幕侦测 ---------- */
@@ -181,6 +238,8 @@
       }
       if (total > 0){
         timerEl.style.display = 'flex'; renderTimer();
+        ruleEl.style.display = 'block';
+        ruleEl.textContent = '共' + total + '题 · 每题' + SEC_PER_Q + '秒 · 作答后计时';
       }
       errBtn.style.display = 'block';
       bar.style.display = 'flex';
@@ -190,7 +249,7 @@
         lastQuizKey = null; tState = null;
         try { localStorage.removeItem(TIMER_KEY); } catch(e){}
       }
-      timerEl.style.display = 'none'; errBtn.style.display = 'none';
+      timerEl.style.display = 'none'; ruleEl.style.display = 'none'; errBtn.style.display = 'none';
       /* 申论/综应练习页：只留报错入口，不显示计时 */
       var h = document.querySelector('h1');
       var isEssay = h && /申论练习|综应练习/.test(h.textContent || '');

@@ -37,12 +37,13 @@
   textarea.ans{
     display:block;width:100%;min-height:448px;box-sizing:border-box;
     border:none;outline:none;resize:none;background:transparent;
-    --cell:24px;
+    --cell:28px;
     padding:26px 0 0 var(--pad,10px);
     /* 工整有设计感、绝不潦草的本地楷体栈；全部系统本地字体，零联网、零乱码 */
     font-family:"LXGW WenKai","霞鹜文楷","Kaiti SC","STKaiti","华文楷体","KaiTi","楷体","Songti SC","SimSun",serif;
-    font-size:var(--cell);line-height:var(--cell);color:#2B2720;
-    letter-spacing:0;word-break:break-all;overflow-wrap:anywhere;
+    /* 字比格子小一号：字 19px + 字间距补足格宽，仍严格一格一字 */
+    font-size:19px;line-height:var(--cell);color:#2B2720;
+    letter-spacing:calc(var(--cell) - 19px);word-break:break-all;overflow-wrap:anywhere;
     background-image:
       repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell) - 1px),#EBC9AE calc(var(--cell) - 1px),#EBC9AE var(--cell)),
       repeating-linear-gradient(to right,transparent 0,transparent calc(var(--cell) - 1px),#F0D9C4 calc(var(--cell) - 1px),#F0D9C4 var(--cell));
