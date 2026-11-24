@@ -182,10 +182,19 @@ var CATS = [
   { name:"常识",     icon:"📚", c1:"#15803D", c2:"#4ADE80" },
   { name:"数量关系", icon:"🔢", c1:"#BE185D", c2:"#F472B6" },
   { name:"资料分析", icon:"📊", c1:"#1D4ED8", c2:"#60A5FA" },
-  { name:"套卷精讲", icon:"🎯", c1:"#16324F", c2:"#3E6B96" }
+  { name:"套卷精讲", icon:"🎯", c1:"#16324F", c2:"#3E6B96" },
+  { name:"资料分析·快速找数专项", icon:"📊", c1:"#1D4ED8", c2:"#60A5FA" }
 ];
 
 var VIDEOS = [
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/ziliao-zhaoshu.mp4"],
+    srcs: ["media/ziliao-zhaoshu.mp4"],
+    cat: "资料分析·快速找数专项", title: "资料分析·快速找数｜导学与第一讲", desc: "8分钟导学＋第一讲：资料分析先找数、再速算，配套学员版讲义做题、解析版对答案。", pic: "",
+    kicker: "资料分析", big: "快速找数 导学＋第一讲", sub: "8分钟·双讲义",
+    pdfs: [
+      { name: "学员版讲义（做题用）", file: "files/" + encodeURIComponent("资料分析_快速找数专项_学员版.pdf") },
+      { name: "解析版讲义（对答案用）", file: "files/" + encodeURIComponent("资料分析_快速找数专项_解析版.pdf") }
+    ] },
   { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/yuce2026dsj.mp4"],
     srcs: ["media/yuce2026dsj.mp4"],
     cat: "套卷精讲", title: "2026 国考地市级预测卷全卷精讲：行测 130 题＋申论 5 题逐题伴学", desc: "地市级预测卷全卷精讲，配套讲义可保存打印，跟着视频边做边听。", pic: "",
