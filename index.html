@@ -64,7 +64,7 @@
       /* 版本统一来源：assets/qbank-index.json 的 v 字段；禁止在页面多处手写版本号 */
       try{
         var K="yc-page-ver";
-        var FALLBACK="tt79"; /* 兜底：仅首次访问且索引请求失败时使用 */
+        var FALLBACK="tt81"; /* 兜底：仅首次访问且索引请求失败时使用；随线上 qbank-index.json 的 v 同步维护（修改点：tt79→tt81 对齐当前线上版本，避免新用户首屏后触发多余 replace 刷新） */
         function fixIcons(v){
           try{
             var i1=document.querySelector('link[rel="icon"]'),i2=document.querySelector('link[rel="apple-touch-icon"]'),og=document.querySelector('meta[property="og:image"]');
