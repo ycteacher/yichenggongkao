@@ -743,6 +743,12 @@ window.__ycOpenModule=function(mod,cb){window.__ycLoadModules([mod],cb)};
           '<div style="margin-top:4px;height:8px;border-radius:4px;background:' + t.stat + ';overflow:hidden"><div style="height:100%;width:' + r.pct + '%;border-radius:4px;background:' + (r.pct >= 70 ? t.acc : r.pct >= 50 ? t.accent : t.warn) + '"></div></div></div>';
       }).join("") : '<p style="margin:8px 0 0;font-size:12px;color:' + t.sub + '">刷完第一组题，这里就会出现各模块的正确率啦。</p>';
       var dirLine = dir ? dir.region + " · " + dir.cat + " · 预计 " + dir.ym.replace("-", " 年 ") + " 月" + (daysLeft(dir) != null && daysLeft(dir) > 0 ? " · 距考试约 " + daysLeft(dir) + " 天" : "") : "未设置，点首页倒计时横幅去选";
+      var tl = jget("yc-time-log-v1", []);
+      var timeRows = tl.slice(0, 8).map(function (r) {
+        var avg = r.q && r.q.length ? Math.round(r.s / r.q.length) : 0;
+        return '<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-top:8px"><span style="color:' + t.txt + ';font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.t || "刷题") + '</span><span style="color:' + t.sub + ';flex:none;white-space:nowrap">用时 ' + fmtDur(r.s || 0) + (avg ? ' · 均 ' + avg + ' 秒/题' : '') + '</span></div>';
+      }).join("");
+      var timeHtml = tl.length ? timeRows : '<p style="margin:8px 0 0;font-size:12px;color:' + t.sub + '">开始作答后自动计时，交卷或退出后这里就有每次的用时记录。</p>';
       var stat = function (num, label, color) {
         return '<div style="background:' + t.stat + ';border-radius:14px;padding:12px 10px;text-align:center"><p style="margin:0;font-size:20px;font-weight:800;color:' + (color || t.txt) + '">' + num + '</p><p style="margin:3px 0 0;font-size:11px;color:' + t.sub + '">' + label + "</p></div>";
       };
@@ -772,6 +778,8 @@ window.__ycOpenModule=function(mod,cb){window.__ycLoadModules([mod],cb)};
         '<div style="margin-top:14px;background:' + t.card + ';border-radius:18px;padding:16px">' +
         '<p style="margin:0;font-size:14px;font-weight:700;color:' + t.txt + '">近 7 天刷题量</p>' +
         '<div style="margin-top:12px;display:flex;gap:8px;align-items:flex-end">' + barHtml + "</div></div>" +
+        '<div style="margin-top:14px;background:' + t.card + ';border-radius:18px;padding:16px">' +
+        '<p style="margin:0;font-size:14px;font-weight:700;color:' + t.txt + '">刷题用时 · 实时</p>' + timeHtml + "</div>" +
         '<div style="margin-top:14px;background:' + t.card + ';border-radius:18px;padding:16px">' +
         '<p style="margin:0;font-size:14px;font-weight:700;color:' + t.txt + '">各模块正确率</p>' + modHtml + "</div>" +
         '<div style="margin-top:14px;background:' + t.card + ';border-radius:18px;padding:16px">' +

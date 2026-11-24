@@ -10,6 +10,7 @@
     function(v){ return fetch("https://textdb.dev/api/data/" + ERR_KEY, { method: "POST", headers: { "Content-Type": "text/plain" }, body: v }); }
   ];
   var TIMER_KEY = "yc-timer-v1", PEND_KEY = "yc-err-pending-v1";
+  var TIMELOG_KEY = "yc-time-log-v1";
   var SEC_PER_Q = 60; /* 每题限时（秒），计时规则对外可见 */
 
   /* ---------- 浮条 ---------- */
@@ -175,6 +176,46 @@
     }
   }, 500);
 
+  /* ---------- 作答用时记录：每题用时 + 整卷用时，交卷或退出都入账，供个人看板展示 ---------- */
+  var qStart = 0, lastPos = null, sess = null; /* sess: {t, n, s, q:[]} */
+  function saveLog(sess){
+    if (!sess || !sess.s || sess.s < 5) return;
+    try {
+      var log = JSON.parse(localStorage.getItem(TIMELOG_KEY) || '[]');
+      var d = new Date();
+      sess.at = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      log.unshift(sess);
+      if (log.length > 100) log = log.slice(0, 100);
+      localStorage.setItem(TIMELOG_KEY, JSON.stringify(log));
+    } catch(e){}
+  }
+  function flushQ(){
+    if (!sess || !qStart) return;
+    var sec = Math.round((Date.now() - qStart) / 1000);
+    if (sec > 0 && sec < 3600) sess.q.push(sec);
+    qStart = Date.now();
+  }
+  function saveSession(){
+    if (!sess) return;
+    flushQ();
+    saveLog(sess);
+    sess = null; qStart = 0; lastPos = null;
+  }
+  /* 每秒累计作答时长（页面可见且未暂停才计） */
+  setInterval(function(){
+    if (!sess || !tState || !tState.started || tState.paused) return;
+    if (document.visibilityState !== 'visible') return;
+    if (!quizEl()) return;
+    sess.s += 1;
+  }, 1000);
+  /* 点交卷立即入账 */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    var txt = (b.textContent || '').replace(/\s/g, '');
+    if (txt === '交卷' && sess){ saveSession(); }
+  }, true);
+
   /* ---------- 一键报错：先选问题类型 ---------- */
   var typeModal = document.createElement('div');
   typeModal.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483647;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;font-family:inherit;';
@@ -275,6 +316,14 @@
         } else {
           ruleEl.style.display = 'none';
         }
+        /* 用时跟踪：作答开始后建会话，翻题即结算上一题用时 */
+        if (tState && tState.started){
+          if (!sess || sess.t !== title + '|' + total){
+            sess = { t: title, n: total, s: 0, q: [] };
+            qStart = Date.now(); lastPos = pos;
+          }
+          if (pos && pos !== lastPos){ flushQ(); lastPos = pos; }
+        }
       }
       errBtn.style.display = 'block';
       placeBar();
@@ -282,6 +331,7 @@
     } else {
       if (lastQuizKey !== null){
         lastQuizKey = null; tState = null;
+        saveSession(); /* 离开刷题屏，用时入账 */
         try { localStorage.removeItem(TIMER_KEY); } catch(e){}
       }
       timerEl.style.display = 'none'; ruleEl.style.display = 'none'; errBtn.style.display = 'none';

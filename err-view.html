@@ -35,6 +35,12 @@
   <div class="stats" id="stats"></div>
   <div class="bar" id="filter"></div>
   <div class="bar"><button id="refresh">↻ 刷新</button></div>
+  <div class="card" style="margin-top:0;">
+    <p style="font-size:14px;font-weight:800;">📋 修复清单 <span style="font-size:11px;font-weight:600;color:#8A8378;">（实时更新 · 复制后直接发给小林改代码）</span></p>
+    <textarea id="fixcode" readonly spellcheck="false" style="width:100%;height:200px;margin-top:8px;padding:10px;border:1px solid #E5E1D8;border-radius:10px;background:#FAF8F3;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.7;color:#202020;resize:vertical;box-sizing:border-box;"></textarea>
+    <button id="copyfix" style="margin-top:8px;border:none;background:#1F2937;color:#fff;border-radius:999px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;">复制修复清单</button>
+    <span id="copytip" style="margin-left:8px;font-size:12px;color:#15803D;display:none;">已复制 ✓</span>
+  </div>
   <div id="list"><p class="empty">加载中…</p></div>
 </div>
 <script>
@@ -75,8 +81,8 @@
   }
   function render(){
     var el = document.getElementById("list");
-    var list = cur === "全部" ? all : all.filter(function(r){ return typeOf(r) === cur; });
     renderStats(all);
+    renderFix(all);
     if (!list.length){ el.innerHTML = '<p class="empty">这个分类下还没有报错记录</p>'; return; }
     var cls = { "题目问题":"t1", "跳转问题":"t2", "其他问题":"t3", "未标注":"t3" };
     el.innerHTML = list.map(function(r){
@@ -84,6 +90,29 @@
       return '<div class="card"><div class="meta"><span class="type ' + (cls[ty] || "t3") + '">' + esc(ty) + '</span><span>' + esc(r.t) + '</span><b>' + esc(r.title) + ' 第' + esc(r.pos) + '题</b></div><div class="q">' + esc(r.q) + '</div></div>';
     }).join("");
   }
+  function renderFix(list){
+    var box = document.getElementById("fixcode");
+    if (!box) return;
+    if (!list.length){ box.value = "【亿成公考内测报错修复清单】暂无报错记录"; return; }
+    var lines = ["【亿成公考内测报错修复清单】共 " + list.length + " 条 · 导出时间 " + new Date().toLocaleString("zh-CN", {hour12:false})];
+    list.forEach(function(r, i){
+      lines.push((i + 1) + ". [" + typeOf(r) + "] " + (r.title || "未知板块") + " 第" + (r.pos || "?") + "题");
+      lines.push("   题干：" + (r.q || "").replace(/\n/g, " "));
+      lines.push("   时间：" + (r.t || "") + "  设备：" + (r.ua || "").slice(0, 60));
+    });
+    lines.push("—— 以上按报错时间倒序，处理完一条划一条 ——");
+    box.value = lines.join("\n");
+  }
+  document.getElementById("copyfix").addEventListener("click", function(){
+    var box = document.getElementById("fixcode");
+    var tip = document.getElementById("copytip");
+    function done(){ tip.style.display = "inline"; setTimeout(function(){ tip.style.display = "none"; }, 1800); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(box.value).then(done, function(){ box.select(); document.execCommand("copy"); done(); });
+    } else {
+      box.select(); document.execCommand("copy"); done();
+    }
+  });
   function refresh(){ load().then(function(list){ all = list; render(); }); }
   document.getElementById("filter").addEventListener("click", function(e){
     var b = e.target && e.target.closest ? e.target.closest("button") : null;
