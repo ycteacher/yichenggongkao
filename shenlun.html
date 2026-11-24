@@ -276,6 +276,15 @@
     html += '</div>';
     html += '<div class="card" style="margin-top:12px;padding:14px 18px;font-size:12px;line-height:1.8;color:#6B6558;">';
     html += '🖊️ 已升级为<strong>方格稿纸</strong>作答，像在真实考场写字；写完点「交卷批阅」按考试采分点给分，点「AI 深度批阅」立刻拿到逐句精细点评（网页直接用，无需 App）。</div>';
+    var slLast = null;
+    try { slLast = JSON.parse(localStorage.getItem('yc_sl_last_v1') || 'null'); } catch(e){}
+    var slLastQ = (slLast && slLast.tab === state.tab) ? banks().find(function(x){return x.id === slLast.qid;}) : null;
+    if (slLastQ){
+      html += '<div class="card" style="margin-top:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid #B5483C;">';
+      html += '<div style="min-width:0;"><p style="margin:0;font-size:13px;font-weight:800;color:#B5483C;">✍ 继续上次写作</p>';
+      html += '<p style="margin:2px 0 0;font-size:12px;color:#6B6558;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(slLastQ.title) + '</p></div>';
+      html += '<button id="slResume" class="chip on" style="flex-shrink:0;">回去写</button></div>';
+    }
     html += '<div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;">';
     cats.forEach(function(c){
       html += '<button class="chip' + (state.cat===c?' on':'') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
@@ -301,6 +310,12 @@
     });
     html += '</div>';
     app.innerHTML = html;
+    var slRb = document.getElementById('slResume');
+    if (slRb) slRb.onclick = function(){
+      if (slLastQ){ state.cur = slLastQ; state.review = null; state.aiReview = null;
+        state.draft = localStorage.getItem('yc_essay_draft_' + state.tab + ':' + slLastQ.id) || '';
+        render(); window.scrollTo(0,0); }
+    };
     app.querySelectorAll('[data-cat]').forEach(function(b){
       b.onclick = function(){ state.cat = b.getAttribute('data-cat'); render(); };
     });
@@ -308,6 +323,7 @@
       card.onclick = function(){
         var q = banks().find(function(x){return x.id === card.getAttribute('data-q');});
         if(q){ state.cur = q; state.review = null; state.aiReview = null;
+          try{ localStorage.setItem('yc_sl_last_v1', JSON.stringify({tab:state.tab, qid:q.id, t:Date.now()})); }catch(e){}
           state.draft = localStorage.getItem('yc_essay_draft_' + state.tab + ':' + q.id) || '';
           render(); window.scrollTo(0,0); }
       };

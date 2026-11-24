@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>题目报错记录 · 亿成公考</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#F7F4EF;font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;color:#202020;padding:20px 14px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  h1{font-size:20px;font-weight:900;margin-bottom:4px;}
+  .sub{font-size:12px;color:#8A8378;margin-bottom:16px;}
+  .bar{display:flex;gap:8px;margin-bottom:14px;}
+  .bar button{border:none;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;background:#1F2937;color:#fff;}
+  .card{background:#fff;border-radius:14px;padding:14px 16px;margin-top:10px;box-shadow:0 2px 10px rgba(32,32,32,.05);}
+  .card .meta{font-size:11px;color:#8A8378;display:flex;flex-wrap:wrap;gap:8px;}
+  .card .meta b{color:#B91C1C;}
+  .card .q{margin-top:8px;font-size:13.5px;line-height:1.7;white-space:pre-line;}
+  .empty{margin-top:40px;text-align:center;color:#8A8378;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚠ 题目报错记录</h1>
+  <p class="sub">学生在刷题页点「一键报错」提交的记录，实时汇总在这里（最近 300 条）。</p>
+  <div class="bar">
+    <button id="refresh">刷新</button>
+  </div>
+  <div id="list"><p class="empty">加载中…</p></div>
+</div>
+<script>
+(function(){
+  var KEY = "ycgk-err-v1";
+  var EP = ["https://textdb.online/" + KEY, "https://textdb.dev/api/data/" + KEY];
+  function load(){
+    return Promise.allSettled(EP.map(function(u){ return fetch(u, {cache:"no-store"}).then(function(r){ return r.text(); }); }))
+      .then(function(rs){
+        for (var i = 0; i < rs.length; i++){
+          if (rs[i].status === "fulfilled" && rs[i].value && rs[i].value.trim()){
+            try { var d = JSON.parse(rs[i].value); if (d && d.list) return d.list; } catch(e){}
+          }
+        }
+        return [];
+      });
+  }
+  function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function render(list){
+    var el = document.getElementById("list");
+    if (!list.length){ el.innerHTML = '<p class="empty">还没有报错记录</p>'; return; }
+    el.innerHTML = list.map(function(r){
+      return '<div class="card"><div class="meta"><span>' + esc(r.t) + '</span><b>' + esc(r.title) + ' 第' + esc(r.pos) + '题</b></div><div class="q">' + esc(r.q) + '</div></div>';
+    }).join("");
+  }
+  function refresh(){ load().then(render); }
+  document.getElementById("refresh").onclick = refresh;
+  refresh();
+  setInterval(refresh, 60000);
+})();
+</script>
+</body>
+</html>
