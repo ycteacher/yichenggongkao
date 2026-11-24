@@ -952,11 +952,38 @@ document.addEventListener('click', function(e){
     b.innerHTML = '<span class="yc-bb-tag">内测版</span>' +
       '<span class="yc-bb-col">' +
         '<span class="yc-bb-tx">亿成公考免费使用，第一批使用过的用户永久免费，正式上线之后按月收取会员费</span>' +
-        '<span class="yc-bb-live">实时通知：已上架《27国考行政执法卷·申论大作文命题汇总精讲》视频＋配套讲义，「套卷精讲」模块可看可打印</span>' +
+        '<span class="yc-bb-live" id="yc-bb-live">实时通知：加载中…</span>' +
         '<button class="yc-bb-bell" id="yc-bb-bell">🔔 开启更新通知</button>' +
       '</span>';
     shell.insertBefore(b, shell.firstChild);
     initBellBtn();
+    loadLiveNews();
+  }
+
+  /* ---------- 实时通知：从 videos.html 现取最新上架（每次上新自动更新，无需改首页） ---------- */
+  function loadLiveNews(){
+    var el = document.getElementById('yc-bb-live');
+    if (!el) return;
+    var fallback = '实时通知：已上架《27国考行政执法卷·申论大作文命题汇总精讲》视频＋配套讲义，「套卷精讲」模块可看可打印';
+    var show = function(news){
+      if (!news || !news.length) { el.textContent = fallback; return; }
+      var n = news[0];
+      var sameDay = news.slice(1).filter(function(x){ return x.d === n.d; });
+      var t = n.t;
+      for (var i = 0; i < sameDay.length; i++) t += '＋' + sameDay[i].t;
+      el.textContent = '实时通知：刚上新——' + t + '，「' + n.m + '」模块可看';
+    };
+    var fail = function(){ if (el.textContent === '实时通知：加载中…') el.textContent = fallback; };
+    try {
+      fetch('videos.html?t=' + Date.now(), { cache: 'no-store' })
+        .then(function(r){ return r.text(); })
+        .then(function(html){
+          var m = html.match(/var YCGK_NEWS\s*=\s*(\[[\s\S]*?\]);/);
+          if (!m) { fail(); return; }
+          show(JSON.parse(m[1]));
+        })
+        .catch(fail);
+    } catch(e) { fail(); }
   }
 
   /* ---------- 更新通知订阅（Web Push） ---------- */
@@ -3550,7 +3577,7 @@ document.addEventListener('click', function(e){
    此前直接引本站地址，新版号首次不在 SW 缓存内，每次都直连 github.io 拉取，
    国内网络时通时断 → 浮条/计时器一会儿有一会儿没有。 */
 (function(){
-  var V='13';
+  var V='14';
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
   var cos=(window.ycAsset?window.ycAsset('./assets/yc-enhance.js'):'./assets/yc-enhance.js')+'?v='+V;
   var local='./assets/yc-enhance.js?v='+V;
