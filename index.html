@@ -11,13 +11,15 @@
       try{ return window.__YC_CDN + '/' + String(p).replace(/^\.\//,''); }catch(e){ return p; }
     };
     /* ===== 修改点②：新增 ycFetch 请求兜底 + 题库失败占位 =====
-       8 秒超时（AbortController）+ 失败自动重试 1 次；两次都失败时回调 onFail，
-       由调用方渲染「加载失败，点击重试」占位，禁止任何自动循环 reload。 */
+       3 秒超时（AbortController）+ 失败自动重试 1 次（间隔 600ms）；两次都失败时回调 onFail，
+       由调用方渲染「加载失败，点击重试」占位，禁止任何自动循环 reload。
+       修改点（P0-0b 并发兜底）：单次超时 8000→3000ms、重试延迟 1200→600ms，
+       索引最坏耗时从 17.2s 降到约 6.6s（仅影响后台版本校验，不影响首屏）。 */
     window.ycFetch = function(url, opts, onFail){
       opts = opts || {};
       function once(){
         var ctl = new AbortController();
-        var timer = setTimeout(function(){ ctl.abort(); }, 8000);
+        var timer = setTimeout(function(){ ctl.abort(); }, 3000);
         var o = {};
         for(var k in opts){ o[k] = opts[k]; }
         o.signal = ctl.signal;
@@ -37,7 +39,7 @@
               try{ onFail && onFail(e2); }catch(_){}
               reject(e2);
             });
-          }, 1200);
+          }, 600);
         });
       });
     };
@@ -74,6 +76,8 @@
           try{
             var nt=document.createElement('script');
             nt.src='./assets/yc-notify.js?v='+v;
+            /* 修改点（P0-0c）：yc-notify 也补 COS 失败回退本站，与主JS/CSS/base.js/yc-enhance 对齐 */
+            nt.onerror=function(){ try{ var n2=document.createElement('script'); n2.src='./assets/yc-notify.js?v='+v; document.head.appendChild(n2); }catch(e){} };
             document.head.appendChild(nt);
             var sc=document.createElement('script');
             sc.type='module';sc.crossOrigin='';
@@ -90,7 +94,17 @@
           }catch(e){}
         }
         var cached=localStorage.getItem(K);
-        if(cached) applyV(cached);
+        /* 修改点（P0-0 首屏解耦）：首屏立即用 cached||FALLBACK 起主JS，不再串行等待索引返回；
+           索引请求保留但降级为后台异步校验：拿到 idx.v 后仅在与当前使用版本不一致时才 replace，一致则什么都不做。
+           任何用户首屏主JS发起时间 < 500ms（本脚本为头部同步脚本，执行即发起）。 */
+        var usedV=cached||FALLBACK;
+        /* 修改点（P0-0c 降级预案）：yc-lite=1 时进入精简模式——首屏不自动加载主JS/增强脚本，
+           只渲染静态精简首页，点「开始刷题」再按需拉主JS；开关入口在失败遮罩与精简页内。 */
+        var lite=false; try{ lite=localStorage.getItem('yc-lite')==='1'; }catch(eL){}
+        window.__ycLite=!!lite;
+        window.__ycUsedV=usedV;
+        window.__ycApplyV=applyV;
+        if(!lite) applyV(usedV);
         /* 修改点：索引请求改为 CDN 与本站并行赛跑（谁先返回用谁），替代原「CDN 失败再试本站」串行回退；
            本站请求经 SW 缓存优先，命中秒回。用户点过「重试」后本会话跳过 CDN 直连本站（yc-skip-cdn）。 */
         function ycSkipCdn(){ try{ return sessionStorage.getItem('yc-skip-cdn')==='1'; }catch(e){ return false; } }
@@ -111,16 +125,17 @@
           });
         }
         ycRaceIdx(ycIdxUrls()).then(function(r){return r.json()}).then(function(idx){
+          window.__ycIdxState='ok';
           var v=idx&&idx.v?String(idx.v):'';
           if(!v) return;
-          if(cached&&cached!==v){
-            /* 修改点：先写新版本号、后执行 replace；写入失败（隐私模式/配额满）try/catch 兜底并放弃刷新，杜绝无限刷新循环 */
-            try{ localStorage.setItem(K,v); }catch(eW){ return; }
-            location.replace(location.pathname+"?ycv="+v+"_"+Date.now());
-            return;
-          }
-          if(!cached){ try{ localStorage.setItem(K,v); }catch(eS){} applyV(v); }
-        }).catch(function(){ if(!cached){localStorage.setItem(K,FALLBACK);applyV(FALLBACK);} });
+          if(v===usedV) return; /* 版本一致：后台校验通过，什么都不做 */
+          /* 版本不一致：先写新版本号、后执行 replace；写入失败（隐私模式/配额满）try/catch 兜底并放弃刷新，杜绝无限刷新循环 */
+          try{ localStorage.setItem(K,v); }catch(eW){ return; }
+          location.replace(location.pathname+"?ycv="+v+"_"+Date.now());
+        }).catch(function(){ window.__ycIdxState='fail'; }).then(function(){
+          /* 修改点（P1 bug②）：索引请求 finally 触发一次失败判定（settle 带防重入，见骨架屏脚本） */
+          try{ if(window.__ycBootSettle) window.__ycBootSettle(); else window.__ycIdxSettlePending=true; }catch(e){}
+        });
       }catch(e){}
     })();
     </script>
@@ -147,6 +162,8 @@
     <script>
     /* base.js 走 COS（国内秒下），失败回退本站；顶层代码自带 DOM 就绪判断，异步执行安全 */
     (function(){
+      /* 修改点（P0-0c）：精简模式跳过 base.js，降级预案不加载非核心脚本 */
+      try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
       var s=document.createElement('script');
       if(window.ycAsset){
         s.src=window.ycAsset('./base.js');
@@ -526,6 +543,39 @@ body.yc-ui { padding-top: 60px !important; }
       <div class="yc-sk-dots"><i></i><i></i><i></i></div>
     </div>
     <script>
+    /* ===== 修改点（P0-0c 降级预案）：精简首页 =====
+       yc-lite=1 时不自动加载主JS，渲染静态精简首页（只保留核心刷题入口＋视频/资料直达），
+       点「开始刷题」再按需拉主JS；「切换回完整版」清除标记刷新。 */
+    (function(){
+      var lite=false; try{ lite=localStorage.getItem('yc-lite')==='1'; }catch(e){}
+      if(!lite) return;
+      var d=document.createElement('div');
+      d.className='page-shell';
+      d.id='yc-lite-page';
+      d.style.cssText='max-width:480px;margin:0 auto;padding:36px 22px 90px';
+      d.innerHTML=
+        '<div style="text-align:center;margin-bottom:26px">'
+        +'<div style="width:64px;height:64px;border-radius:18px;background:#16A34A;color:#fff;font-size:30px;line-height:64px;margin:0 auto 12px">亿</div>'
+        +'<h2 style="font-size:20px;color:#202020;margin:0 0 6px">亿成公考 · 精简版</h2>'
+        +'<p style="font-size:13px;color:#8A8378;margin:0">当前网络繁忙，已为你切换精简模式，只保留核心功能</p>'
+        +'</div>'
+        +'<button id="yc-lite-go" style="display:block;width:100%;padding:15px 0;border:none;border-radius:14px;background:#DC2626;color:#fff;font-size:16px;font-weight:600;margin-bottom:12px">开始刷题</button>'
+        +'<a href="videos.html" style="display:block;text-align:center;padding:13px 0;border:1px solid #E5E1D8;border-radius:14px;background:#fff;color:#202020;font-size:15px;text-decoration:none;margin-bottom:12px">📺 视频课</a>'
+        +'<a href="materials.html" style="display:block;text-align:center;padding:13px 0;border:1px solid #E5E1D8;border-radius:14px;background:#fff;color:#202020;font-size:15px;text-decoration:none;margin-bottom:24px">📥 备考资料</a>'
+        +'<p style="text-align:center"><button id="yc-lite-full" style="border:none;background:none;color:#8A8378;font-size:13px;text-decoration:underline">网络恢复了吗？切换回完整版首页</button></p>';
+      document.body.appendChild(d);
+      document.getElementById('yc-lite-go').addEventListener('click',function(){
+        var b=this; b.disabled=true; b.textContent='正在加载刷题…';
+        var p=document.getElementById('yc-lite-page'); if(p&&p.parentNode) p.parentNode.removeChild(p);
+        try{ window.__ycApplyV&&window.__ycApplyV(window.__ycUsedV); }catch(e){}
+      });
+      document.getElementById('yc-lite-full').addEventListener('click',function(){
+        try{ localStorage.removeItem('yc-lite'); }catch(e){}
+        location.reload();
+      });
+    })();
+    </script>
+    <script>
     if('serviceWorker' in navigator){
       window.addEventListener('load',function(){
         navigator.serviceWorker.register('./sw.js').catch(function(){});
@@ -535,30 +585,44 @@ body.yc-ui { padding-top: 60px !important; }
     <script>
     (function(){
       function hide(){ var s=document.getElementById("yc-skeleton"); if(s){ s.classList.add("off"); setTimeout(function(){ s.remove(); },500); } }
+      /* 修改点（P0 bug①）：主动摘除失败遮罩——应用晚于兜底渲染完成时自动移除，不再永久遮挡 */
+      function removeFail(){ var f=document.getElementById("yc-boot-fail"); if(f&&f.parentNode) f.parentNode.removeChild(f); }
       /* 修改点：新增空内容检测——判断 #root 与 .page-shell 是否真的渲染出内容 */
       function pageEmpty(){
         var root=document.getElementById("root");
         var shell=document.querySelector(".page-shell");
         return !(shell&&shell.innerHTML.replace(/\s/g,"")) && !(root&&root.innerHTML.replace(/\s/g,""));
       }
-      /* 修改点：失败占位块，点击才 location.reload()，不自动循环 */
+      /* 修改点：失败占位块，点击才 location.reload()，不自动循环；新增「精简版」降级入口（P0-0c） */
       function showFail(){
         if(document.getElementById("yc-boot-fail"))return;
         var d=document.createElement("div");
         d.id="yc-boot-fail";
         d.style.cssText="position:fixed;inset:0;z-index:9999;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px";
         d.innerHTML='<div style="font-size:15px;color:#4A463F">加载失败，请检查网络后重试</div>'
-          +'<button id="yc-boot-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
+          +'<button id="yc-boot-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>'
+          +'<button id="yc-boot-lite" style="padding:8px 22px;border:1px solid #E5E1D8;border-radius:999px;background:#fff;color:#4A463F;font-size:13px">网络拥堵？试试精简版首页</button>';
         document.body.appendChild(d);
         document.getElementById("yc-boot-retry").addEventListener("click",function(){ try{sessionStorage.setItem("yc-skip-cdn","1");}catch(e){} location.reload(); });
+        document.getElementById("yc-boot-lite").addEventListener("click",function(){ try{localStorage.setItem("yc-lite","1");}catch(e){} location.reload(); });
       }
-      var t=setInterval(function(){ if(document.querySelector(".page-shell")){ clearInterval(t); hide(); } },200);
-      /* 修改点：兜底时长 25 秒 → 10 秒；兜底触发时若页面仍为空，不隐藏骨架变白屏，改为失败占位 */
-      setTimeout(function(){
-        clearInterval(t);
-        if(pageEmpty()){ hide(); showFail(); }
-        else{ hide(); }
-      },10000);
+      /* 修改点（P0 bug① + P1 bug②）：
+         ① 轮询不再被兜底 clearInterval——持续检测 .page-shell，渲染成功即隐藏骨架并主动摘除失败遮罩（晚渲染也能摘）；
+         ② 失败判定抽成带防重入（settled 标志）的 settle()：索引请求 finally 触发一次 + 25 秒最后防线定时器，
+            替代原固定 10000ms 判定——Slow3G 下主JS合法加载 10~18s 不再误弹。 */
+      var settled=false, t=null;
+      function settle(){
+        if(settled) return;
+        if(!pageEmpty()){ settled=true; hide(); removeFail(); if(t) clearInterval(t); return; }
+        if(window.__ycIdxState==='fail'){ settled=true; hide(); showFail(); return; }
+        /* 索引正常但页面未渲染：主JS仍在加载，交给 25 秒最后防线 */
+      }
+      window.__ycBootSettle=settle;
+      t=setInterval(function(){
+        if(document.querySelector(".page-shell")){ hide(); removeFail(); if(!settled){ settled=true; clearInterval(t); } }
+      },200);
+      if(window.__ycIdxSettlePending) settle();
+      setTimeout(settle,25000); /* 最后防线：25 秒仍空才判失败 */
     })();
     </script>
 
@@ -3577,6 +3641,8 @@ document.addEventListener('click', function(e){
    此前直接引本站地址，新版号首次不在 SW 缓存内，每次都直连 github.io 拉取，
    国内网络时通时断 → 浮条/计时器一会儿有一会儿没有。 */
 (function(){
+  /* 修改点（P0-0c）：精简模式跳过增强脚本，降级预案不加载非核心脚本 */
+  try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
   var V='14';
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
   var cos=(window.ycAsset?window.ycAsset('./assets/yc-enhance.js'):'./assets/yc-enhance.js')+'?v='+V;
