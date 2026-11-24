@@ -42,8 +42,8 @@
     /* 工整有设计感、绝不潦草的本地楷体栈；全部系统本地字体，零联网、零乱码 */
     font-family:"LXGW WenKai","霞鹜文楷","Kaiti SC","STKaiti","华文楷体","KaiTi","楷体","Songti SC","SimSun",serif;
     /* 字比格子小一号：字 19px + 字间距补足格宽，仍严格一格一字 */
-    font-size:19px;line-height:var(--cell);color:#2B2720;
-    letter-spacing:calc(var(--cell) - 19px);word-break:break-all;overflow-wrap:anywhere;
+    font-size:var(--fs,19px);line-height:var(--cell);color:#2B2720;
+    letter-spacing:calc(var(--cell) - var(--fs,19px));word-break:break-all;overflow-wrap:anywhere;
     background-image:
       repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--cell) - 1px),#EBC9AE calc(var(--cell) - 1px),#EBC9AE var(--cell)),
       repeating-linear-gradient(to right,transparent 0,transparent calc(var(--cell) - 1px),#F0D9C4 calc(var(--cell) - 1px),#F0D9C4 var(--cell));
@@ -408,11 +408,13 @@
     function layoutPaper(){
       if(!state.paperMode) return;
       var avail = ta.clientWidth; if(!avail) return;
-      var cell = avail < 420 ? 20 : (avail < 900 ? 23 : 26); // 手机20/平板23/大屏26，一行字数随屏宽按比例增加
+      var cell = avail < 420 ? 26 : (avail < 900 ? 27 : 28); // 格子放大：手机26/平板27/大屏28
+      var fs = cell - 8;                                     // 字比格子小一圈，写字不挤
       var cols = Math.max(8, Math.floor(avail / cell));       // 一行能放几格
       var used = cols * cell;
       var pad = Math.max(0, Math.floor((avail - used) / 2));  // 居中余量并入padding
       ta.style.setProperty('--cell', cell + 'px');
+      ta.style.setProperty('--fs', fs + 'px');
       ta.style.setProperty('--pad', pad + 'px');
     }
     layoutPaper();
