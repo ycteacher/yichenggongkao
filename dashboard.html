@@ -581,7 +581,7 @@ function renderKpis(){
     {t:'累计PV',n:L.pv,c:'var(--cyan)',x:'今日 +'+L.todayPv+(H&&H.pv?' · 昨日 +'+H.pv:'')},
     {t:'累计设备',n:L.devN,c:'var(--cyan)',x:'今日 +'+L.todayNew+(H&&H.dev?' · 昨日 +'+H.dev:'')},
     {t:'视频总播放',n:V.play,c:'var(--violet)',x:'今日 +'+(V.today.play||0)+(H&&H.cumPlay!=null?' · 截昨日累计 '+num(H.cumPlay):'')},
-    {t:'正在看视频（实时）',n:(L.vidNow||0),c:'var(--violet)',x:'近5分钟 · 累计 '+V.uv+' 台看过'},
+    {t:'正在看视频（实时）',n:Math.min(L.vidNow||0,L.online||0),c:'var(--violet)',x:'近5分钟 · 累计 '+V.uv+' 台看过'},
     {t:'好评率',n:pct(praise,fb.length),c:'var(--green)',x:'问卷 '+fb.length+' 份'}
   ];
   el('kpis').innerHTML=items.map(function(i){
@@ -596,7 +596,7 @@ function renderLive(){
   /* 实时活动卡：在线 / 正在刷题 / 正在看视频 / 已安装 */
   el('rtOnline').textContent=ok?num(L.online):'—';
   el('rtQuiz').textContent=ok?num(L.quizNow||0):'—';
-  el('rtVid').textContent=ok?num(L.vidNow||0):'—';
+  el('rtVid').textContent=ok?num(Math.min(L.vidNow||0,L.online||0)):'—';
   el('rtInst').textContent=ok?num(L.instN||0):'—';
   el('rtInstX').textContent=ok?(L.devN?('占累计设备 '+pct(L.instN,L.devN)):'暂无设备'):'—';
   /* 分钟趋势（近60分钟） */

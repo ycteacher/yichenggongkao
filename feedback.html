@@ -226,6 +226,9 @@
         var picked=[];
         box.querySelectorAll(".opt.on").forEach(function(o){ picked.push(o.textContent); });
         answers[box.dataset.q]=picked.join("、");
+        var cnt=box.parentNode.querySelector(".multi-count");
+        if(!cnt){cnt=document.createElement("span");cnt.className="q-hint multi-count";box.parentNode.querySelector(".q-t").appendChild(cnt);}
+        cnt.textContent=picked.length?("已选 "+picked.length+" 项"):"";
       }else{
         box.querySelectorAll(".opt").forEach(function(o){ o.classList.remove("on"); });
         el.classList.add("on");

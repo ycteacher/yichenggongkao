@@ -3304,7 +3304,6 @@ document.addEventListener('click', function(e){
     var ok=null;
     try{ ok=sessionStorage.getItem('ycUpdOk'); if(ok) sessionStorage.removeItem('ycUpdOk'); }catch(e){}
     if(!ok) return;
-    try{ if(localStorage.getItem('ycgk.pop.done.updToast')==='1') return; localStorage.setItem('ycgk.pop.done.updToast','1'); }catch(e){}
     var t=document.createElement('div');
     t.id='yc-upd-toast';
     t.textContent='✓ 已更新到最新版本';
