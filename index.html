@@ -3637,6 +3637,23 @@ document.addEventListener('click', function(e){
 
 
 <script>
+/* 内测准入模块：COS 优先，失败回退本站（与浮条脚本同一套加载加固）。
+   老用户静默继承、新用户输码激活、到期降级不删进度、码表拉取失败 fail-open 不锁死。 */
+(function(){
+  var VA='1';
+  function loadAcc(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
+  var cosAcc=(window.ycAsset?window.ycAsset('./assets/yc-access.js'):'./assets/yc-access.js')+'?v='+VA;
+  var localAcc='./assets/yc-access.js?v='+VA;
+  var a1=document.createElement('script'); a1.src=cosAcc; a1.async=false;
+  a1.onerror=function(){
+    var a2=document.createElement('script'); a2.src=localAcc; a2.async=false;
+    a2.onerror=function(){ loadAcc(localAcc+'&r=2'); };
+    document.head.appendChild(a2);
+  };
+  document.head.appendChild(a1);
+})();
+</script>
+<script>
 /* 浮条/计时器脚本加载加固：COS 优先（国内稳定），失败回退本站，再失败换参数重试一次。
    此前直接引本站地址，新版号首次不在 SW 缓存内，每次都直连 github.io 拉取，
    国内网络时通时断 → 浮条/计时器一会儿有一会儿没有。 */
