@@ -297,7 +297,7 @@
           location.reload();
         }else{
           closePanel();
-          toast('注册成功！手机尾号 '+tail+' 已绑定，12月收费前注册=永久免费，数据已保存到你的账号');
+          toast('注册成功！手机号就是你的同步码和登录码，换设备登录同一手机号即可同步；12月收费前注册=永久免费');
           refreshEntry();
         }
       });
@@ -352,7 +352,7 @@
       '<div class="yc-acc-li">备案申请已提交、正在办理；服务器迁移同步进行，近两天趋于稳定</div>'+
       '<div class="yc-acc-li">注册后数据保存在你的手机号账号下，换设备不丢</div>'+
       '<div class="yc-acc-li"><b>12月收费前注册 = 永久免费</b></div>'+
-      '<div class="yc-acc-li">通用码（学习码）将逐步由手机号账号替代</div>'+
+      '<div class="yc-acc-li"><b>学习码即将下线：注册后手机号就是你的同步码和登录码</b>，换设备自动同步，无需记码</div>'+
       '<button class="yc-acc-btn main" id="ycAccGo">去注册（10 秒完成）</button>'+
       '<button class="yc-acc-btn ghost" id="ycAccLater">暂不注册，先刷题</button>'+
       '<div id="yc-acc-priv">不验证码、不读取手机信息；手机号不明文保存，仅存加密摘要。</div>';
@@ -426,7 +426,7 @@
       card.innerHTML='<h3>我的账号</h3>'+
         '<div class="yc-acc-tip">已注册：<b>手机尾号 '+esc(acc.tail)+'</b>'+(d?('（'+esc(d)+'）'):'')+(acc.nick?(' · 昵称 <b>'+esc(acc.nick)+'</b>'):'')+'<br>数据已挂到手机号账号下，其他设备用同一手机号登录即可自动同步。</div>'+
         '<div class="yc-acc-li">12月收费前注册 = 永久免费</div>'+
-        '<div class="yc-acc-li">同步由右上角「登录同步」学习码通道承载，已自动绑定</div>'+
+        '<div class="yc-acc-li">手机号就是你的同步码和登录码，换设备登录同一手机号即可同步（学习码即将下线）</div>'+
         '<button class="yc-acc-btn main" id="ycAccClose">好的</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccNickBtn">修改昵称</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccMsgBtn">我的消息</button>';
@@ -435,7 +435,7 @@
       $('ycAccMsgBtn').addEventListener('click',showMsgs);
     }else{
       card.innerHTML='<h3>注册 / 登录</h3>'+
-        '<div class="yc-acc-tip">仅需一个手机号：<b>无验证码、不读取手机信息</b>。手机号是你的唯一身份识别码，<b>注册后不可更改</b>。12月收费前注册 = 永久免费。</div>'+
+        '<div class="yc-acc-tip">仅需一个手机号：<b>无验证码、不读取手机信息</b>。手机号是你的唯一身份识别码，也是你的<b>同步码和登录码</b>，<b>注册后不可更改</b>。12月收费前注册 = 永久免费。</div>'+
         '<input id="ycAccPh1" placeholder="输入 11 位手机号" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccPh2" placeholder="再次输入手机号确认" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccNick" placeholder="昵称（选填，给自己起个名字）" maxlength="20" autocomplete="off">'+

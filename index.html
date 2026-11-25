@@ -1592,15 +1592,39 @@ document.addEventListener('click', function(e){
     ensureUI();
     var c=myCode();
     if(!c){
+      /* 同步码过渡：手机号即同步码/登录码，学习码降级为过渡期通道（即将下线） */
+      var accSync=null;try{accSync=JSON.parse(localStorage.getItem('yicheng-gk-account-v1')||'null')}catch(e){}
+      var hasAcc=!!(accSync&&accSync.code);
       card.innerHTML='<h3>学习账号 · 多设备同步</h3>'+
-        '<div class="yc-sync-tip">生成一个专属学习码，手机、平板登录同一个码，刷题记录、错题本、积分自动同步。</div>'+
+        (hasAcc
+          ?'<div class="yc-sync-tip">你的手机号就是同步码（尾号 '+esc(accSync.tail||'')+'）。同步刚被退出，点下面一键恢复，进度自动接上。</div>'
+          :'<div class="yc-sync-tip"><b>📢 学习码即将下线：</b>注册手机号后，<b>手机号就是你的同步码和登录码</b>，换设备登录同一手机号即可自动同步，无需记任何码。</div>')+
+        '<button class="yc-sync-btn main" id="ycSyncPhone">'+(hasAcc?'恢复同步（手机号用户）':'用手机号注册 / 登录（推荐）')+'</button>'+
+        '<div class="yc-sync-div"'+(hasAcc?' style="display:none"':'')+'><span>过渡期通道（即将下线）</span></div>'+
+        '<div'+(hasAcc?' style="display:none"':'')+'>'+
         '<input class="yc-sync-in" id="ycSyncIn" placeholder="输入学习码" maxlength="12" autocomplete="off">'+
-        '<button class="yc-sync-btn main" id="ycSyncLogin">用学习码登录</button>'+
-        '<div class="yc-sync-div"><span>或</span></div>'+
+        '<button class="yc-sync-btn" id="ycSyncLogin">用学习码登录</button>'+
         '<button class="yc-sync-btn" id="ycSyncGen">生成我的学习码</button>'+
+        '</div>'+
         '<button class="yc-sync-btn" id="ycSyncPaste">用同步数据导入（不用网络）</button>'+
         '<button class="yc-sync-btn" id="ycSyncTest">检测云端连接</button>'+
         '<div class="yc-sync-err" id="ycSyncErr"></div>';
+      card.querySelector("#ycSyncPhone").addEventListener("click",function(){
+        if(hasAcc){
+          var btn=this;btn.disabled=true;btn.textContent="恢复中…";
+          setSync({code:accSync.code,appliedTs:0,lastLocalTs:Date.now()});
+          pull(function(e,cloud){
+            if(e){var err=card.querySelector("#ycSyncErr");if(err)err.textContent="云端连接失败，可点「检测云端连接」查原因";btn.disabled=false;btn.textContent="重试恢复";return}
+            var changed=cloud?applyCloud(cloud):false;
+            ov.classList.remove("on");setChip("ok");
+            if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
+            else{openModal()}
+          });
+        }else{
+          ov.classList.remove("on");
+          if(window.ycOpenAccount)window.ycOpenAccount("reg");
+        }
+      });
       card.querySelector("#ycSyncGen").addEventListener("click",function(){
         var btn=this;btn.disabled=true;btn.textContent="生成中…";
         tryGen(0,function(code){
@@ -1670,9 +1694,12 @@ document.addEventListener('click', function(e){
     }else{
       var s=getSync();
       var t=s.lastPush?new Date(s.lastPush).toLocaleString("zh-CN",{hour12:false}):"尚未同步";
+      var accSync2=null;try{accSync2=JSON.parse(localStorage.getItem('yicheng-gk-account-v1')||'null')}catch(e){}
       card.innerHTML='<h3>学习账号</h3>'+
-        '<div class="yc-sync-code">'+esc(c)+'</div>'+
-        '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。</div>'+
+        (accSync2
+          ?'<div class="yc-sync-tip">已绑定：<b>手机尾号 '+esc(accSync2.tail||'')+'</b><br><b>你的手机号就是同步码</b>：换手机、平板，用同一手机号登录即可自动同步，无需记任何码。<br>最近同步：'+esc(t)+'</div>'
+          :'<div class="yc-sync-code">'+esc(c)+'</div>'+
+           '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。<br><b>📢 学习码即将下线：</b>注册手机号后，手机号就是你的同步码，记得尽快注册。</div>')+
         '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
         '<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>'+
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
@@ -1738,13 +1765,18 @@ document.addEventListener('click', function(e){
     setTimeout(function(){
       try{if(document.querySelector(".yc-sync-hint"))return}catch(e){}
       var c=myCode();
+      var accHint=null;try{accHint=JSON.parse(localStorage.getItem('yicheng-gk-account-v1')||'null')}catch(e){}
+      if(accHint&&accHint.tail){
+        /* 已注册：手机号即同步码，不再提醒学习码 */
+        return;
+      }
       if(c){
         var s=getSync();
         if(Date.now()-(s.lastRemind||0)<REMIND_GAP)return;
-        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
+        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存（学习码即将下线，注册手机号后由手机号替代）</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
       }else{
         if(Date.now()-tsFlag(HINT_FLAG)<REMIND_GAP)return;
-        showBar('<span>想让手机和平板的进度同步？点右上角「登录同步」领学习码</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
+        showBar('<span>注册手机号，手机号就是你的同步码，多设备自动同步。点右上角「注册领永久免费」</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
       }
     },4000);
   }
@@ -3650,7 +3682,7 @@ document.addEventListener('click', function(e){
 (function(){
   /* 修改点（P0-0c）：精简模式跳过增强脚本，降级预案不加载非核心脚本 */
   try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
-  var V='18';
+  var V='19';
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
   var cos=(window.ycAsset?window.ycAsset('./assets/yc-enhance.js'):'./assets/yc-enhance.js')+'?v='+V;
   var local='./assets/yc-enhance.js?v='+V;
