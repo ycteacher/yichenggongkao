@@ -13,9 +13,10 @@ from datetime import date, timedelta
 
 ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"  # Crockford Base32
 OUT_DIR = os.environ.get("ACC_OUT_DIR", "/root/workspace/.tmp/access_codes")
-N_I, N_F, N_T = 1000, 200, 300
-GEN_DATE = date(2026, 11, 25)
-I_DEADLINE = (GEN_DATE + timedelta(days=90)).isoformat()  # I 码激活截止=发后90天（防旧码无限期兑永久）
+N_I_START, N_I_END = 501, 1000  # I 码号段：0501-1000 共 500 个（0001-0500 为老用户元老段，静默补发不靠码）
+N_F, N_T = 200, 300
+GEN_DATE = date(2026, 11, 26)
+I_DEADLINE = (GEN_DATE + timedelta(days=90)).isoformat()  # 仅作字段记录，今晚不启用强制校验
 
 def char_val(ch):
     if ch.isdigit():
@@ -46,10 +47,10 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     codes = {}
     rows = []  # code, type, serial, note
-    for s in range(1, N_I + 1):
+    for s in range(N_I_START, N_I_END + 1):
         c = gen_i(s)
         codes[c[3:-2].replace("-", "")] = {"t": "I", "s": s}  # 键=载荷（YC-前缀与校验位除外），前端按载荷查
-        rows.append([c, "I", s, "内测码·永久免费·激活截止" + I_DEADLINE])
+        rows.append([c, "I", s, "内测码·永久免费·激活截止" + I_DEADLINE + "(仅记录,暂不强制)"])
     for _ in range(N_F):
         c = gen_ft("F")
         codes[c[3:-2].replace("-", "")] = {"t": "F"}
@@ -58,8 +59,9 @@ def main():
         c = gen_ft("T")
         codes[c[3:-2].replace("-", "")] = {"t": "T"}
         rows.append([c, "T", "", "体验码·7天有效·限题量"])
-    table = {"v": 2, "gen": GEN_DATE.isoformat(), "dl": I_DEADLINE, "bl": [], "c": codes}
-    # bl=作废/黑名单载荷列表（前端拒兑）；发放状态(未发/已发)记在本地发放登记，不上公开码表
+    table = {"v": 3, "gen": GEN_DATE.isoformat(), "dl": I_DEADLINE, "bl": [], "c": codes}
+    # bl=作废/黑名单载荷列表（前端拒兑）；st 字段：省略=未发(0)，1=已发，2=作废（同时在 bl）
+    # 发放登记（issuedTo/remark）记在本地 CSV，不上公开码表
     tbl_path = os.path.join(OUT_DIR, "tbl-v1.json")
     with open(tbl_path, "w", encoding="utf-8") as f:
         json.dump(table, f, ensure_ascii=False, separators=(",", ":"))
