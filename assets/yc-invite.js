@@ -24,7 +24,7 @@
   var INVITEE_BASE = 501; /* 受邀人编号起点 */
   var COS_BASE = 'https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com';
   var QR_LIBS = [COS_BASE + '/assets/yc-qrcode.min.js', './assets/yc-qrcode.min.js'];
-  var APPT_URL = ''; /* 占位常量：问诊预约表单链接，待用户提供后配置；为空时降级为引导加微信 */
+  var APPT_URL = './wenzhen.html'; /* 一对一问诊预约表单页（站内 wenzhen.html） */
   var THRESHOLDS = [{ n: 1, label: '抽签资格' }, { n: 3, label: '优先排队' }, { n: 5, label: '保底资格' }];
 
   /* ---------- 工具 ---------- */

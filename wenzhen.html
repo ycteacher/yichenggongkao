@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>亿成老师 · 一对一问诊预约</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#F0FDF4;min-height:100vh;padding:20px 16px 48px;color:#1F2937;}
+  .wrap{max-width:520px;margin:0 auto;}
+  .head{text-align:center;padding:18px 0 6px;}
+  .head h1{font-size:22px;color:#14532D;letter-spacing:1px;}
+  .head p{font-size:13px;color:#6B7280;margin-top:8px;line-height:1.7;}
+  .card{background:#fff;border-radius:16px;padding:22px 18px;margin-top:16px;box-shadow:0 6px 24px rgba(20,83,45,.08);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:14px;font-weight:700;color:#14532D;margin-bottom:6px;}
+  .field label .req{color:#DC2626;margin-left:2px;}
+  .field label .opt{font-size:12px;font-weight:400;color:#9CA3AF;margin-left:4px;}
+  .field input,.field select,.field textarea{width:100%;border:1.5px solid #D1D5DB;border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;background:#fff;color:#1F2937;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#15803D;}
+  .field textarea{resize:vertical;min-height:96px;line-height:1.7;}
+  .field .hint{font-size:12px;color:#9CA3AF;margin-top:4px;line-height:1.6;}
+  .slots{display:flex;gap:8px;flex-wrap:wrap;}
+  .slots label{flex:1;min-width:100px;display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid #D1D5DB;border-radius:10px;padding:10px 8px;font-size:14px;font-weight:600;color:#374151;cursor:pointer;margin:0;}
+  .slots input{width:auto;margin:0;}
+  .slots label.on{border-color:#15803D;background:#F0FDF4;color:#14532D;}
+  .stages{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .stages label{display:flex;align-items:center;justify-content:center;border:1.5px solid #D1D5DB;border-radius:10px;padding:10px 6px;font-size:14px;font-weight:600;color:#374151;cursor:pointer;margin:0;}
+  .stages input{display:none;}
+  .stages label.on{border-color:#15803D;background:#F0FDF4;color:#14532D;}
+  #wz-verify{font-size:12px;margin-top:4px;line-height:1.6;display:none;}
+  #wz-verify.ok{color:#15803D;}
+  #wz-verify.warn{color:#B45309;}
+  #wz-msg{font-size:13px;color:#DC2626;min-height:18px;margin:4px 0 10px;}
+  #wz-go{width:100%;border:none;border-radius:12px;background:#15803D;color:#fff;font-size:16px;font-weight:800;padding:14px;cursor:pointer;letter-spacing:2px;}
+  #wz-go:disabled{opacity:.55;}
+  .priv{font-size:11px;color:#9CA3AF;margin-top:12px;line-height:1.7;text-align:center;}
+  #wz-done{display:none;text-align:center;padding:30px 10px;}
+  #wz-done .big{font-size:40px;}
+  #wz-done h2{font-size:19px;color:#14532D;margin:12px 0 8px;}
+  #wz-done p{font-size:13px;color:#6B7280;line-height:1.8;}
+  #wz-done .no{font-size:17px;font-weight:900;color:#14532D;margin-top:10px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>亿成老师 · 一对一问诊预约</h1>
+    <p>邀请好友达标后即可预约。提交后由亿成老师人工核验并安排时间，请保持联系方式畅通。</p>
+  </div>
+  <div class="card" id="wz-form">
+    <div class="field">
+      <label>内测官编号<span class="req">*</span></label>
+      <input id="wz-no" placeholder="NO.xxxx（老用户可在首页邀请海报查看）" autocomplete="off">
+      <div id="wz-verify"></div>
+    </div>
+    <div class="field">
+      <label>姓名<span class="req">*</span></label>
+      <input id="wz-name" placeholder="怎么称呼你" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>联系方式（微信号 或 手机号）<span class="req">*</span></label>
+      <input id="wz-contact" placeholder="二选一，方便老师联系你" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>报考岗位 / 目标<span class="req">*</span></label>
+      <input id="wz-target" placeholder="如：国考税务岗、省考综合岗" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>当前备考阶段<span class="req">*</span></label>
+      <div class="stages" id="wz-stage">
+        <label><input type="radio" name="st" value="刚开始">刚开始</label>
+        <label><input type="radio" name="st" value="刷题中">刷题中</label>
+        <label><input type="radio" name="st" value="冲刺模考">冲刺模考</label>
+        <label><input type="radio" name="st" value="考前">考前</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>最想问的 3 个问题<span class="req">*</span></label>
+      <textarea id="wz-qs" placeholder="一行一个问题，共写3行&#10;例：资料分析速算总来不及怎么练&#10;例：图形推理对称轴总是找错怎么办&#10;例：申论大作文总凑不够字数怎么破"></textarea>
+      <div class="hint">写具体问题，别写「怎么备考」——问题越具体，问诊越值。</div>
+    </div>
+    <div class="field">
+      <label>可接受的 2 个时段<span class="req">*</span></label>
+      <div class="slots" id="wz-slots">
+        <label><input type="checkbox" value="工作日晚">工作日晚</label>
+        <label><input type="checkbox" value="周末上午">周末上午</label>
+        <label><input type="checkbox" value="周末下午">周末下午</label>
+      </div>
+      <div class="hint">勾选你方便的 2 个时段。</div>
+    </div>
+    <div class="field">
+      <label>备注<span class="opt">选填</span></label>
+      <input id="wz-note" placeholder="还有什么想让老师提前知道的" autocomplete="off">
+    </div>
+    <div id="wz-msg"></div>
+    <button id="wz-go">提交预约</button>
+    <p class="priv">提交内容仅用于亿成老师安排一对一问诊，不会用于其他用途。</p>
+  </div>
+  <div class="card" id="wz-done">
+    <div class="big">🎉</div>
+    <h2>预约已提交</h2>
+    <p>亿成老师会人工核验你的邀请资格，并按你选的时段联系你。<br>请保持联系方式畅通，也可以在站内继续刷题。</p>
+    <div class="no" id="wz-done-no"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var APPT_KEY_PARTS = ['ycgk', 'wz', 'appt', 'v1']; /* 台账键，分段拼装 */
+  var INV_LEDGER_KEY = 'ycgk-inv-ledger-v1';
+  function K(){ return APPT_KEY_PARTS.join('-'); }
+  function $(id){ return document.getElementById(id); }
+
+  function ledgerGet(key){
+    var gets = ['https://textdb.online/' + key, 'https://textdb.dev/api/data/' + key];
+    function once(i){ return fetch(gets[i]).then(function(r){ if (!r.ok) throw new Error('http'); return r.text(); }); }
+    return once(0).catch(function(){ return once(1); }).then(function(t){
+      try{ var a = JSON.parse(t); return Array.isArray(a) ? a : []; }catch(e){ return []; }
+    }).catch(function(){ return []; });
+  }
+  function ledgerPut(key, arr){
+    var v = JSON.stringify(arr.slice(-2000));
+    var puts = [
+      function(){ return fetch('https://textdb.online/update/?key=' + encodeURIComponent(key) + '&value=' + encodeURIComponent(v)); },
+      function(){ return fetch('https://textdb.dev/api/data/' + key, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: v }); }
+    ];
+    return puts[0]().catch(function(){ return puts[1](); }).catch(function(){});
+  }
+
+  /* 单选/多选样式 */
+  function bindGroup(boxId, multi){
+    var box = $(boxId);
+    box.addEventListener('change', function(){
+      var labs = box.querySelectorAll('label');
+      for (var i = 0; i < labs.length; i++){
+        var inp = labs[i].querySelector('input');
+        labs[i].className = inp.checked ? 'on' : '';
+      }
+      if (!multi){
+        var checked = box.querySelectorAll('input:checked');
+        for (var j = 0; j < checked.length; j++){ if (checked[j] !== box.querySelector('input:checked:last-of-type') && checked.length > 1) checked[j].checked = false; }
+      }
+    });
+  }
+  bindGroup('wz-stage', false);
+  bindGroup('wz-slots', true);
+
+  /* 自动填编号 + 资格核验 */
+  function myNo(){
+    try{
+      var rec = JSON.parse(localStorage.getItem('yc-invite-v1') || 'null');
+      if (rec && rec.no) return rec.no;
+    }catch(e){}
+    return 0;
+  }
+  function fmtNo(n){ return 'NO.' + ('0000' + n).slice(-4); }
+  function checkNo(){
+    var raw = ($('wz-no').value || '').trim();
+    var m = raw.replace(/^NO\.?/i, '').replace(/^0+/, '');
+    var n = parseInt(m, 10);
+    if (!(n > 0)){ showVerify('', ''); return 0; }
+    $('wz-no').value = fmtNo(n);
+    ledgerGet(INV_LEDGER_KEY).then(function(a){
+      var c = 0;
+      for (var i = 0; i < a.length; i++){ if (a[i] && a[i].in === n) c++; }
+      if (c >= 5) showVerify('ok', '已核验：' + fmtNo(n) + ' 已邀 ' + c + ' 人，保底资格 ✓');
+      else if (c >= 3) showVerify('ok', '已核验：' + fmtNo(n) + ' 已邀 ' + c + ' 人，优先排队 ✓');
+      else if (c >= 1) showVerify('ok', '已核验：' + fmtNo(n) + ' 已邀 ' + c + ' 人，抽签资格 ✓');
+      else showVerify('warn', '暂未查到 ' + fmtNo(n) + ' 的邀请记录，提交后由亿成老师人工核验');
+    });
+    return n;
+  }
+  function showVerify(cls, txt){
+    var v = $('wz-verify');
+    v.style.display = txt ? 'block' : 'none';
+    v.className = cls; v.textContent = txt;
+  }
+  $('wz-no').addEventListener('blur', checkNo);
+  $('wz-no').addEventListener('change', checkNo);
+  (function(){ var n = myNo(); if (n){ $('wz-no').value = fmtNo(n); checkNo(); } })();
+
+  function setMsg(m){ $('wz-msg').textContent = m || ''; }
+
+  $('wz-go').addEventListener('click', function(){
+    if (this.disabled) return;
+    var btn = this; btn.disabled = true;
+    var finish = function(){ btn.disabled = false; };
+    var no = checkNo();
+    var name = ($('wz-name').value || '').trim();
+    var contact = ($('wz-contact').value || '').trim();
+    var target = ($('wz-target').value || '').trim();
+    var stEl = document.querySelector('#wz-stage input:checked');
+    var stage = stEl ? stEl.value : '';
+    var qs = ($('wz-qs').value || '').split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+    var slots = [];
+    var cks = document.querySelectorAll('#wz-slots input:checked');
+    for (var i = 0; i < cks.length; i++) slots.push(cks[i].value);
+    var note = ($('wz-note').value || '').trim();
+
+    if (!(no > 0)){ setMsg('请填写内测官编号（NO.xxxx）'); finish(); return; }
+    if (!name){ setMsg('请填写姓名'); finish(); return; }
+    if (!contact){ setMsg('请填写微信号或手机号'); finish(); return; }
+    if (!target){ setMsg('请填写报考岗位 / 目标'); finish(); return; }
+    if (!stage){ setMsg('请选择当前备考阶段'); finish(); return; }
+    if (qs.length !== 3){ setMsg('最想问的问题请写满 3 个，一行一个'); finish(); return; }
+    if (slots.length !== 2){ setMsg('请勾选 2 个可接受的时段'); finish(); return; }
+
+    ledgerGet(K()).then(function(a){
+      a.push({ no: no, nm: name, ct: contact, tg: target, st: stage, qs: qs, sl: slots, nt: note, at: Date.now() });
+      return ledgerPut(K(), a);
+    }).then(function(){
+      $('wz-form').style.display = 'none';
+      $('wz-done').style.display = 'block';
+      $('wz-done-no').textContent = fmtNo(no) + ' · ' + name;
+      window.scrollTo(0, 0);
+      finish();
+    }).catch(function(){
+      setMsg('网络繁忙，提交失败，请稍后重试');
+      finish();
+    });
+  });
+})();
+</script>
+</body>
+</html>
