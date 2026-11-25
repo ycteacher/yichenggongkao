@@ -263,7 +263,7 @@
     track('see_announce');
     card.innerHTML='<h3>亿成公考 · 重要通知</h3>'+
       '<div class="yc-acc-tip">为了把你的刷题数据保存得更稳，请花 10 秒完成注册：</div>'+
-      '<div class="yc-acc-li">备案已申请，服务器已迁移，近两天已恢复稳定</div>'+
+      '<div class="yc-acc-li">备案申请已提交、正在办理；服务器迁移同步进行，近两天趋于稳定</div>'+
       '<div class="yc-acc-li">注册后数据保存在你的手机号账号下，换设备不丢</div>'+
       '<div class="yc-acc-li"><b>12月收费前注册 = 永久免费</b></div>'+
       '<div class="yc-acc-li">通用码（学习码）将逐步由手机号账号替代</div>'+

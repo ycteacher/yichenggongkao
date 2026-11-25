@@ -141,7 +141,7 @@ function check(name, cond, detail) {
   await sleep(40); // 等 20ms 钳制定时器触发 announceWhenFree → showAnnounce
   var ov2 = e2.document.body.children.find(function(c){ return c.id === 'yc-acc-ov'; });
   check('公告弹层已挂载', !!ov2);
-  check('公告文案含备案/迁移/免费/暂不注册', ov2.innerHTML.indexOf('备案已申请') > 0 && ov2.innerHTML.indexOf('迁移') > 0 && ov2.innerHTML.indexOf('永久免费') > 0 && ov2.innerHTML.indexOf('暂不注册') > 0);
+  check('公告文案含备案/迁移/免费/暂不注册', ov2.innerHTML.indexOf('备案申请已提交') > 0 && ov2.innerHTML.indexOf('迁移') > 0 && ov2.innerHTML.indexOf('永久免费') > 0 && ov2.innerHTML.indexOf('暂不注册') > 0);
   check('公告含「去注册」按钮', ov2.innerHTML.indexOf('去注册') > 0);
   check('公告埋点 see_announce', evIn(e2, 'see_announce'));
   check('顶栏登录入口已注入', e2.document.body.children.some(function(c){ return c.id === 'ycAccEntry'; }) || true);
