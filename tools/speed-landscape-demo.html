@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>速算特训 · 横屏并排布局 Demo（仅演示，未接入线上）</title>
+<style>
+  :root{
+    --ink:#202020; --sub:#8A8378; --line:#E5E1D8; --green:#15803D; --paper:#FBF9F4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:#F4F1EA;min-height:100vh}
+
+  /* ===== 横屏（宽屏）并排布局：题目在左、草稿纸在右 ===== */
+  .layout{display:flex;flex-direction:column;max-width:1100px;margin:0 auto;padding:16px;gap:14px}
+  .cols{display:flex;gap:14px;align-items:stretch}
+  .qpane{flex:1 1 52%;min-width:0}
+  .spad{flex:1 1 48%;min-width:0;display:flex;flex-direction:column}
+
+  .card{background:#fff;border-radius:20px;border:1px solid var(--line);box-shadow:0 2px 12px rgba(32,32,32,.04)}
+  .qcard{padding:20px}
+  .qtag{display:inline-block;font-size:12px;color:#B45309;background:#FEF3C7;border-radius:999px;padding:2px 10px;margin-bottom:10px}
+  .qtext{font-size:16px;line-height:1.8;white-space:pre-line}
+  .opts{margin-top:14px;display:grid;gap:8px}
+  .opt{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;cursor:pointer;transition:all .15s}
+  .opt.on{border-color:var(--green);background:#F0FDF4;font-weight:600}
+  .opt.ok{border-color:var(--green);background:#DCFCE7}
+  .opt.bad{border-color:#DC2626;background:#FEE2E2}
+
+  /* 草稿纸：格线底纹 + 手写区 */
+  .spad .card{flex:1;display:flex;flex-direction:column;padding:14px}
+  .spad h3{font-size:14px;color:var(--sub);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+  .spad h3 .clear{font-size:12px;color:#B3AC9E;cursor:pointer;border:none;background:none}
+  .scratch{flex:1;min-height:260px;resize:none;border:none;outline:none;font-size:17px;line-height:30px;
+    color:#1E3A5F;font-family:"Kaiti SC",KaiTi,serif;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:30px 30px;background-position:0 0}
+  .keypad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+  .keypad button{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 0;font-size:15px;cursor:pointer}
+  .keypad button:active{background:#F0FDF4}
+
+  .bar{display:flex;gap:10px;align-items:center}
+  .bar .timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--green)}
+  .btn{border:none;border-radius:14px;background:var(--green);color:#fff;font-weight:600;padding:10px 22px;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+
+  .hint{display:none;font-size:13px;color:var(--sub);text-align:center;padding:8px;background:#FFF7E6;border-radius:12px}
+
+  /* ===== 竖屏回退：上下堆叠 + 提示横屏 ===== */
+  @media (orientation:portrait), (max-width:720px){
+    .cols{flex-direction:column}
+    .spad .scratch{min-height:180px}
+    .hint{display:block}
+  }
+  @media (orientation:landscape) and (max-height:500px){
+    .layout{padding:10px;gap:8px}
+    .qcard{padding:14px}
+    .qtext{font-size:14px;line-height:1.7}
+    .scratch{min-height:140px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="bar">
+    <span class="qtag">速算特训 · Demo</span>
+    <span class="timer" id="timer">00:00</span>
+    <span style="flex:1"></span>
+    <button class="btn ghost" id="prev">上一题</button>
+    <button class="btn" id="next">下一题</button>
+  </div>
+
+  <div class="hint">📱 竖屏下题目与草稿纸上下排列；把手机横过来即可左右并排，边看题边演算。</div>
+
+  <div class="cols">
+    <!-- 左：题目 -->
+    <section class="qpane card qcard">
+      <span class="qtag" id="qtag"></span>
+      <p class="qtext" id="qtext"></p>
+      <div class="opts" id="opts"></div>
+    </section>
+
+    <!-- 右：草稿纸 -->
+    <aside class="spad">
+      <div class="card">
+        <h3>草稿纸 <button class="clear" id="clear">清空</button></h3>
+        <textarea class="scratch" id="scratch" placeholder="在这里列式演算…" spellcheck="false"></textarea>
+        <div class="keypad" id="keypad"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* 演示数据：与线上速算题型一致（求基期量），仅 2 题示意 */
+const DEMO = [
+  {tag:"求基期量", text:"2023 年某省社会消费品零售总额为 4826 亿元，同比增长 8.6%。\n则 2022 年该省社会消费品零售总额约为多少亿元？",
+   opts:["约 4385 亿元","约 4444 亿元","约 4520 亿元","约 4610 亿元"], ans:1},
+  {tag:"求增长量", text:"2023 年某市一般公共预算收入 1268 亿元，比上年增长 6.2%。\n则 2023 年比上年约增长多少亿元？",
+   opts:["约 74 亿元","约 79 亿元","约 84 亿元","约 91 亿元"], ans:0}
+];
+let cur = 0, picked = new Array(DEMO.length).fill(-1), t0 = Date.now();
+
+const $ = id => document.getElementById(id);
+function render(){
+  const q = DEMO[cur];
+  $("qtag").textContent = `第 ${cur+1}/${DEMO.length} 题 · ${q.tag}`;
+  $("qtext").textContent = q.text;
+  $("opts").innerHTML = "";
+  q.opts.forEach((o,i)=>{
+    const d = document.createElement("div");
+    d.className = "opt" + (picked[cur]===i ? " on" : "");
+    d.textContent = "ABCD"[i] + ". " + o;
+    d.onclick = ()=>{
+      picked[cur] = i; render();
+      if (i === q.ans) d.classList.add("ok"); else d.classList.add("bad");
+    };
+    $("opts").appendChild(d);
+  });
+}
+$("prev").onclick = ()=>{ cur = (cur-1+DEMO.length)%DEMO.length; render(); };
+$("next").onclick = ()=>{ cur = (cur+1)%DEMO.length; render(); };
+$("clear").onclick = ()=>{ $("scratch").value=""; };
+
+/* 草稿纸快捷键区：数字与常用符号，方便手机端单手演算 */
+"1 2 3 4 5 6 7 8 9 0 . ＝ + − × ÷ %".split(" ").forEach(k=>{
+  const b = document.createElement("button");
+  b.textContent = k;
+  b.onclick = ()=>{ const t = $("scratch"); t.value += k; t.focus(); };
+  $("keypad").appendChild(b);
+});
+
+setInterval(()=>{
+  const s = Math.floor((Date.now()-t0)/1000);
+  $("timer").textContent = String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+},1000);
+
+render();
+</script>
+</body>
+</html>

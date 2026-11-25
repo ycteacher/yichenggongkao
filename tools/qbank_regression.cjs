@@ -7,7 +7,13 @@ global.window = { YC_MORE_QBANKS: [], YC_CS_BANK: [], YC_ESSAY_BANKS: [] };
 const idx = JSON.parse(fs.readFileSync('assets/qbank-index.json', 'utf8'));
 const LETTERS = 'ABCDEFGHIJ';
 const problems = [];
-let total = 0, noExp = 0, badRange = 0, mismatch = 0, missingTail = 0, multiGx = 0;
+let total = 0, noExp = 0, badRange = 0, mismatch = 0, missingTail = 0, multiGx = 0, unrelated = 0, dupOpts = 0;
+
+/* N2 初筛：题干与选项内容相关性（只提示候选，人工复核，不自动改题）
+   口径：题干≥10字 且 正确选项与题干无任何连续二字重合 → CAND_UNRELATED；
+        选项去标点后出现完全重复 → DUP_OPTION。 */
+function normText(s){ return (s||'').replace(/[\s，。、；：？！“”‘’"'"（）()【】\[\]《》<>…·—\-]/g,''); }
+function bigrams(s){ const t = normText(s), r = new Set(); for(let i=0;i<t.length-1;i++) r.add(t.slice(i,i+2)); return r; }
 for (const file of Object.keys(idx.files)) {
   const p = path.join('assets', file + '.js');
   if (!fs.existsSync(p)) { problems.push({ file, type: 'FILE_MISSING' }); continue; }
@@ -24,6 +30,21 @@ for (const file of Object.keys(idx.files)) {
       problems.push({ file, id: q && q.id, type: 'STRUCT' }); continue;
     }
     if (q.answer < 0 || q.answer >= q.options.length) { badRange++; problems.push({ file, id: q.id, type: 'ANSWER_RANGE', answer: q.answer }); continue; }
+    /* N2 初筛（只提示候选）：长题干（≥60字，多为言语/资料类）与正确选项零二字重合、选项完全重复。
+       常识题答案为法条术语，与题干无字面重合，二字重合口径不适用，故仅对长题干启用 */
+    const stem = q.prompt || '';
+    if (normText(stem).length >= 60) {
+      const sb = bigrams(stem), ob = bigrams(q.options[q.answer]);
+      let hit = 0; ob.forEach(b => { if (sb.has(b)) hit++; });
+      if (hit === 0 && normText(q.options[q.answer]).length >= 8) {
+        unrelated++; problems.push({ file, id: q.id, type: 'CAND_UNRELATED', prompt: stem.slice(0, 40) });
+      }
+    }
+    {
+      const seen = new Set(); let dup = false;
+      for (const o of q.options) { const k = normText(o); if (k && seen.has(k)) { dup = true; break; } seen.add(k); }
+      if (dup) { dupOpts++; problems.push({ file, id: q.id, type: 'DUP_OPTION' }); }
+    }
     const exp = q.explanation || '';
     if (!exp.trim()) { noExp++; problems.push({ file, id: q.id, type: 'NO_EXPLANATION' }); continue; }
     const matches = exp.match(/故选([A-J])/g) || [];
@@ -34,7 +55,7 @@ for (const file of Object.keys(idx.files)) {
     if (letters[0] !== want) { mismatch++; problems.push({ file, id: q.id, type: 'MISMATCH', want, got: letters[0], prompt: (q.prompt || '').slice(0, 40) }); }
   }
 }
-const summary = { total, mismatch, multiGuoxuan: multiGx, noGuoxuan: missingTail, noExp, badRange, struct: problems.filter(p => p.type === 'STRUCT').length, loadErrors: problems.filter(p => p.type === 'LOAD_ERROR').length };
+const summary = { total, mismatch, multiGuoxuan: multiGx, noGuoxuan: missingTail, noExp, badRange, struct: problems.filter(p => p.type === 'STRUCT').length, loadErrors: problems.filter(p => p.type === 'LOAD_ERROR').length, unrelatedCandidates: unrelated, dupOptions: dupOpts };
 console.log(JSON.stringify(summary, null, 2));
 if (process.argv.includes('--json')) {
   const out = process.argv[process.argv.indexOf('--json') + 1] || 'tools/regression_report.json';
