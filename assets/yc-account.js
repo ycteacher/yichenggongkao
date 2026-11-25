@@ -355,7 +355,7 @@
       '<div class="yc-acc-li">备案申请已提交、正在办理；服务器迁移同步进行，近两天趋于稳定</div>'+
       '<div class="yc-acc-li">注册后数据保存在你的手机号账号下，换设备不丢</div>'+
       '<div class="yc-acc-li"><b>12月收费前注册 = 永久免费</b></div>'+
-      '<div class="yc-acc-li"><b>学习码即将下线：注册后手机号就是你的同步码和登录码</b>，换设备自动同步，无需记码</div>'+
+      '<div class="yc-acc-li"><b>学习码 11 月 29 日下架：注册后手机号就是你的同步码和登录码</b>，换设备自动同步，无需记码，请抓紧注册</div>'+
       '<div class="yc-acc-li"><b>已有账号？</b>点下方按钮输入同一手机号即直接登录，同一手机号全站只有一个账号，不会重复注册</div>'+
       '<button class="yc-acc-btn main" id="ycAccGo">注册 / 登录（10 秒完成）</button>'+
       '<button class="yc-acc-btn ghost" id="ycAccLater">暂不注册，先刷题</button>'+
@@ -430,7 +430,7 @@
       card.innerHTML='<h3>我的账号</h3>'+
         '<div class="yc-acc-tip">已注册：<b>手机尾号 '+esc(acc.tail)+'</b>'+(d?('（'+esc(d)+'）'):'')+(acc.nick?(' · 昵称 <b>'+esc(acc.nick)+'</b>'):'')+'<br>数据已挂到手机号账号下，其他设备用同一手机号登录即可自动同步。</div>'+
         '<div class="yc-acc-li">12月收费前注册 = 永久免费</div>'+
-        '<div class="yc-acc-li">手机号就是你的同步码和登录码，换设备登录同一手机号即可同步（学习码即将下线）</div>'+
+        '<div class="yc-acc-li">手机号就是你的同步码和登录码，换设备登录同一手机号即可同步（学习码 11 月 29 日下架）</div>'+
         '<button class="yc-acc-btn main" id="ycAccClose">好的</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccNickBtn">修改昵称</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccMsgBtn">我的消息</button>';

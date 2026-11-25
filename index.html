@@ -1598,7 +1598,7 @@ document.addEventListener('click', function(e){
       card.innerHTML='<h3>学习账号 · 多设备同步</h3>'+
         (hasAcc
           ?'<div class="yc-sync-tip">你的手机号就是同步码（尾号 '+esc(accSync.tail||'')+'）。同步刚被退出，点下面一键恢复，进度自动接上。</div>'
-          :'<div class="yc-sync-tip"><b>📢 学习码即将下线：</b>注册手机号后，<b>手机号就是你的同步码和登录码</b>，换设备登录同一手机号即可自动同步，无需记任何码。</div>')+
+          :'<div class="yc-sync-tip"><b>📢 学习码 11 月 29 日下架：</b>注册手机号后，<b>手机号就是你的同步码和登录码</b>，换设备登录同一手机号即可自动同步，无需记任何码，请抓紧注册。</div>')+
         '<button class="yc-sync-btn main" id="ycSyncPhone">'+(hasAcc?'恢复同步（手机号用户）':'用手机号注册 / 登录（推荐）')+'</button>'+
         '<div class="yc-sync-div"'+(hasAcc?' style="display:none"':'')+'><span>过渡期通道（即将下线）</span></div>'+
         '<div'+(hasAcc?' style="display:none"':'')+'>'+
@@ -1699,7 +1699,7 @@ document.addEventListener('click', function(e){
         (accSync2
           ?'<div class="yc-sync-tip">已绑定：<b>手机尾号 '+esc(accSync2.tail||'')+'</b><br><b>你的手机号就是同步码</b>：换手机、平板，用同一手机号登录即可自动同步，无需记任何码。<br>最近同步：'+esc(t)+'</div>'
           :'<div class="yc-sync-code">'+esc(c)+'</div>'+
-           '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。<br><b>📢 学习码即将下线：</b>注册手机号后，手机号就是你的同步码，记得尽快注册。</div>')+
+           '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。<br><b>📢 学习码 11 月 29 日下架：</b>注册手机号后，手机号就是你的同步码，请抓紧注册。</div>')+
         '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
         '<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>'+
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
@@ -1773,7 +1773,7 @@ document.addEventListener('click', function(e){
       if(c){
         var s=getSync();
         if(Date.now()-(s.lastRemind||0)<REMIND_GAP)return;
-        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存（学习码即将下线，注册手机号后由手机号替代）</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
+        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存（学习码 11 月 29 日下架，注册手机号后由手机号替代，请抓紧注册）</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
       }else{
         if(Date.now()-tsFlag(HINT_FLAG)<REMIND_GAP)return;
         showBar('<span>注册手机号，手机号就是你的同步码，多设备自动同步。点右上角「注册领永久免费」</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
@@ -3675,6 +3675,7 @@ document.addEventListener('click', function(e){
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-invite.js?v=4" onerror="var s=document.createElement('script');s.src='./assets/yc-invite.js?v=4';document.head.appendChild(s);"></script>
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-track.js?v=2" onerror="var s=document.createElement('script');s.src='./assets/yc-track.js?v=2';document.head.appendChild(s);"></script>
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-account.js?v=3" onerror="var s=document.createElement('script');s.src='./assets/yc-account.js?v=3';document.head.appendChild(s);"></script>
+<script src="./assets/yc-paper-link.js?v=1" defer></script><!-- 资料领取区「去刷题」深链：?paper=<id> 直达该套卷 -->
 <script>
 /* 浮条/计时器脚本加载加固：COS 优先（国内稳定），失败回退本站，再失败换参数重试一次。
    此前直接引本站地址，新版号首次不在 SW 缓存内，每次都直连 github.io 拉取，
