@@ -1,4 +1,4 @@
-/* yc-account.js v1: 手机号登录注册 + 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
+/* yc-account.js v3: 手机号登录注册（同号去重：已注册=直接登录接回，不重复注册）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
    —— 无验证码无密码：仅一个手机号（11位1开头 + 两次输入确认）
    · 明文手机号不落库不外发：本地与云端只存 MD5 摘要（user_key）+ 后4位 + 省份（聚合）
    · 注册成功提示：唯一身份识别码不可更改 / 12月收费前注册=永久免费 / 不验证码不读取信息
@@ -250,24 +250,27 @@
     nick=sanitizeNick(nick);
     var h=md5(phone), key16=h.slice(0,16), tail=phone.slice(-4);
     provOf(phone,function(prov){
-      var oldSync=getSync(), oldCode=oldSync.code||'', adopted=false;
-      /* 1) 本机已有学习码：沿用（旧数据原地挂载，不删不覆盖） */
-      var ensureCode;
-      if(oldCode){ ensureCode=function(cb){cb(oldCode)}; }
-      else{
-        /* 2) 云端绑定查找：换设备登录同一手机号 → 接回原学习码 */
-        ensureCode=function(cb){
-          cloudGet(BIND_PRE+h,function(e,t){
-            var b=null; try{ b=t?JSON.parse(t):null; }catch(ex){}
-            if(b&&b.c){adopted=true;cb(b.c);return}
-            /* 3) 都没有：生成新学习码（防撞号） */
-            tryGen(0,function(c){cb(c)});
-          });
-        };
-      }
+      var oldSync=getSync(), oldCode=oldSync.code||'', adopted=false, bindTs=0;
+      /* 去重（v3）：先查云端绑定——同一手机号全站唯一账号。
+         已绑定=直接登录接回原账号（即使本机有旧学习码也切到账号码，杜绝一号多码）；
+         未绑定才允许注册；云端不可用时 fail-open（沿用本机码或新生成，联网后 boot 补写绑定）。 */
+      var ensureCode=function(cb){
+        cloudGet(BIND_PRE+h,function(e,t){
+          var b=null; try{ b=t?JSON.parse(t):null; }catch(ex){}
+          if(b&&b.c){ adopted=true; bindTs=b.ts||0; cb(b.c); return; }
+          if(oldCode){ cb(oldCode); return; }
+          /* 都没有：生成新学习码（防撞号） */
+          tryGen(0,function(c){cb(c)});
+        });
+      };
       ensureCode(function(code){
-        if(!oldCode)setSyncCode(code);
-        var acc={v:1,md5:h,tail:tail,prov:prov,ts:Date.now(),code:code,inv:invParam()||'',nick:nick||''};
+        if(adopted){
+          /* 登录接回：同步码强制切到账号码（含本机旧码不同的情况），appliedTs=0 触发拉取合并 */
+          var s=getSync(); s.code=code; s.appliedTs=0; s.lastLocalTs=Date.now(); wr(SYNC_FLAG,s);
+        }else if(!oldCode){
+          setSyncCode(code);
+        }
+        var acc={v:1,md5:h,tail:tail,prov:prov,ts:bindTs||Date.now(),code:code,inv:invParam()||'',nick:nick||''};
         wr(ACC,acc);
         /* 迁移记录：旧键清点挂载，不删不覆盖 */
         var n=0;
@@ -289,11 +292,11 @@
         },function(){});
         /* 邀请关系自动挂载 */
         attachInvite(phone,501);
-        track('register_ok',{k:key16,p:prov,nc:adopted?0:1});
+        if(adopted){ track('login_ok',{k:key16}); } else { track('register_ok',{k:key16,p:prov,nc:1}); }
         done();
         if(adopted){
-          /* 换设备接回原数据：交给同步层拉取 */
-          try{ sessionStorage.setItem('yc-acc-welcome','已登录：'+tail); }catch(e){}
+          /* 换设备/重复提交同一手机号：按登录处理，接回原数据交给同步层拉取 */
+          try{ sessionStorage.setItem('yc-acc-welcome','已登录：'+tail+'（该手机号已注册，已自动接回账号）'); }catch(e){}
           location.reload();
         }else{
           closePanel();
@@ -353,7 +356,8 @@
       '<div class="yc-acc-li">注册后数据保存在你的手机号账号下，换设备不丢</div>'+
       '<div class="yc-acc-li"><b>12月收费前注册 = 永久免费</b></div>'+
       '<div class="yc-acc-li"><b>学习码即将下线：注册后手机号就是你的同步码和登录码</b>，换设备自动同步，无需记码</div>'+
-      '<button class="yc-acc-btn main" id="ycAccGo">去注册（10 秒完成）</button>'+
+      '<div class="yc-acc-li"><b>已有账号？</b>点下方按钮输入同一手机号即直接登录，同一手机号全站只有一个账号，不会重复注册</div>'+
+      '<button class="yc-acc-btn main" id="ycAccGo">注册 / 登录（10 秒完成）</button>'+
       '<button class="yc-acc-btn ghost" id="ycAccLater">暂不注册，先刷题</button>'+
       '<div id="yc-acc-priv">不验证码、不读取手机信息；手机号不明文保存，仅存加密摘要。</div>';
     var goBtn=$('ycAccGo'); if(goBtn) goBtn.addEventListener('click',function(){ track('click_register'); openPanel('reg'); });
@@ -436,10 +440,11 @@
     }else{
       card.innerHTML='<h3>注册 / 登录</h3>'+
         '<div class="yc-acc-tip">仅需一个手机号：<b>无验证码、不读取手机信息</b>。手机号是你的唯一身份识别码，也是你的<b>同步码和登录码</b>，<b>注册后不可更改</b>。12月收费前注册 = 永久免费。</div>'+
+        '<div class="yc-acc-li"><b>已有账号？</b>输入同一手机号即直接登录并接回进度；同一手机号全站唯一，<b>不会重复注册</b>。</div>'+
         '<input id="ycAccPh1" placeholder="输入 11 位手机号" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccPh2" placeholder="再次输入手机号确认" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccNick" placeholder="昵称（选填，给自己起个名字）" maxlength="20" autocomplete="off">'+
-        '<button class="yc-acc-btn main" id="ycAccOk">完成注册</button>'+
+        '<button class="yc-acc-btn main" id="ycAccOk">注册 / 登录</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccCancel">暂不注册</button>'+
         '<div id="yc-acc-err"></div>'+
         '<div id="yc-acc-priv">手机号不明文保存：系统只存加密摘要（MD5）与后 4 位，用于识别身份与聚合统计，不用于其他用途。</div>';
