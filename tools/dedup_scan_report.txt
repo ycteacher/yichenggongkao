@@ -1,0 +1,213 @@
+EXACT_DUP_GROUPS=125  ENTRIES=425
+GROUP keep=tt-20906 n=80 ids=tt-20906,tt-20907,tt-20908,tt-20912,tt-20913,tt-20915,tt-20916,tt-20921,tt-20922,tt-20923,tt-20924,tt-20925,tt-20926,tt-20927,tt-20928,tt-20931,tt-20935,tt-20936,tt-20937,tt-20938,tt-20939,tt-20944,tt-20951,tt-20953,tt-20954,tt-20955,tt-20957,tt-20958,tt-20960,tt-20961,tt-20962,tt-20963,tt-20964,tt-20966,tt-20967,tt-20970,tt-20971,tt-20973,tt-20974,tt-20975,tt-20976,tt-20977,tt-20978,tt-20981,tt-20982,tt-20985,tt-20986,tt-20987,tt-20988,tt-20989,tt-20990,tt-20991,tt-20992,tt-20993,tt-20994,tt-20995,tt-20996,tt-20997,tt-20998,tt-20999,tt-21000,tt-21001,tt-21002,tt-21003,tt-21004,tt-21005,tt-21006,tt-21007,tt-21008,tt-21009,tt-21010,tt-21011,tt-21012,tt-21013,tt-21014,tt-21015,tt-21016,tt-21017,tt-21018,tt-21019 files=qk-tuitui-84.js
+  ANSWER_POS_DIFFERS: [('tt-20906', 2), ('tt-20907', 1), ('tt-20908', 1), ('tt-20912', 2), ('tt-20913', 0), ('tt-20915', 1), ('tt-20916', 3), ('tt-20921', 2), ('tt-20922', 0), ('tt-20923', 1), ('tt-20924', 1), ('tt-20925', 2), ('tt-20926', 3), ('tt-20927', 0), ('tt-20928', 2), ('tt-20931', 1), ('tt-20935', 3), ('tt-20936', 0), ('tt-20937', 1), ('tt-20938', 0), ('tt-20939', 2), ('tt-20944', 3), ('tt-20951', 1), ('tt-20953', 0), ('tt-20954', 3), ('tt-20955', 2), ('tt-20957', 1), ('tt-20958', 0), ('tt-20960', 3), ('tt-20961', 0), ('tt-20962', 1), ('tt-20963', 2), ('tt-20964', 1), ('tt-20966', 2), ('tt-20967', 3), ('tt-20970', 0), ('tt-20971', 2), ('tt-20973', 1), ('tt-20974', 0), ('tt-20975', 1), ('tt-20976', 2), ('tt-20977', 3), ('tt-20978', 0), ('tt-20981', 1), ('tt-20982', 3), ('tt-20985', 2), ('tt-20986', 1), ('tt-20987', 0), ('tt-20988', 0), ('tt-20989', 1), ('tt-20990', 1), ('tt-20991', 2), ('tt-20992', 1), ('tt-20993', 0), ('tt-20994', 3), ('tt-20995', 2), ('tt-20996', 0), ('tt-20997', 3), ('tt-20998', 3), ('tt-20999', 0), ('tt-21000', 3), ('tt-21001', 2), ('tt-21002', 0), ('tt-21003', 1), ('tt-21004', 3), ('tt-21005', 2), ('tt-21006', 1), ('tt-21007', 2), ('tt-21008', 3), ('tt-21009', 2), ('tt-21010', 1), ('tt-21011', 0), ('tt-21012', 3), ('tt-21013', 2), ('tt-21014', 3), ('tt-21015', 2), ('tt-21016', 1), ('tt-21017', 0), ('tt-21018', 1), ('tt-21019', 2)]
+GROUP keep=tt-20909 n=34 ids=tt-20909,tt-20910,tt-20911,tt-20914,tt-20917,tt-20918,tt-20919,tt-20920,tt-20929,tt-20930,tt-20932,tt-20933,tt-20934,tt-20940,tt-20941,tt-20942,tt-20943,tt-20945,tt-20946,tt-20947,tt-20948,tt-20949,tt-20950,tt-20952,tt-20956,tt-20959,tt-20965,tt-20968,tt-20969,tt-20972,tt-20979,tt-20980,tt-20983,tt-20984 files=qk-tuitui-84.js
+  ANSWER_POS_DIFFERS: [('tt-20909', 2), ('tt-20910', 1), ('tt-20911', 0), ('tt-20914', 1), ('tt-20917', 0), ('tt-20918', 3), ('tt-20919', 0), ('tt-20920', 3), ('tt-20929', 0), ('tt-20930', 1), ('tt-20932', 0), ('tt-20933', 1), ('tt-20934', 0), ('tt-20940', 1), ('tt-20941', 2), ('tt-20942', 3), ('tt-20943', 0), ('tt-20945', 3), ('tt-20946', 0), ('tt-20947', 1), ('tt-20948', 2), ('tt-20949', 3), ('tt-20950', 2), ('tt-20952', 1), ('tt-20956', 0), ('tt-20959', 3), ('tt-20965', 2), ('tt-20968', 1), ('tt-20969', 0), ('tt-20972', 1), ('tt-20979', 0), ('tt-20980', 3), ('tt-20983', 0), ('tt-20984', 3)]
+GROUP keep=tt-20261123-23-011 n=10 ids=tt-20261123-20-013,tt-20261123-20-015,tt-20261123-20-050,tt-20261123-21-026,tt-20261123-23-011,tt-20261123-23-015,tt-20261123-23-037,tt-20261123-23-048,tt-20261123-23-054,tt-20261123-23-063 files=qk-tuitui-93.js,qk-tuitui-94.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-20-013', 2), ('tt-20261123-20-015', 2), ('tt-20261123-20-050', 0), ('tt-20261123-21-026', 1), ('tt-20261123-23-011', 2), ('tt-20261123-23-015', 1), ('tt-20261123-23-037', 3), ('tt-20261123-23-048', 2), ('tt-20261123-23-054', 0), ('tt-20261123-23-063', 1)]
+GROUP keep=tt-20261123-23-006 n=8 ids=tt-20261123-007,tt-20261123-23-006,tt-20261123-23-039,tt-20261123-23-044,tt-20261123-23-053,tt-20261123-23-058,tt-20261123-23-064,tt-20261123-23-097 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-007', 3), ('tt-20261123-23-006', 0), ('tt-20261123-23-039', 0), ('tt-20261123-23-044', 2), ('tt-20261123-23-053', 3), ('tt-20261123-23-058', 1), ('tt-20261123-23-064', 3), ('tt-20261123-23-097', 0)]
+GROUP keep=tt-20261123-20-006 n=8 ids=tt-20261123-028,tt-20261123-093,tt-20261123-20-006,tt-20261123-21-011,tt-20261123-23-029,tt-20261123-23-033,tt-20261123-23-041,tt-20261123-23-086 files=qk-tuitui-92.js,qk-tuitui-93.js,qk-tuitui-94.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-028', 2), ('tt-20261123-093', 0), ('tt-20261123-20-006', 1), ('tt-20261123-21-011', 2), ('tt-20261123-23-029', 2), ('tt-20261123-23-033', 0), ('tt-20261123-23-041', 0), ('tt-20261123-23-086', 0)]
+GROUP keep=tt-20261123-23-010 n=7 ids=tt-20261123-022,tt-20261123-034,tt-20261123-23-010,tt-20261123-23-034,tt-20261123-23-040,tt-20261123-23-066,tt-20261123-23-085 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-022', 0), ('tt-20261123-034', 1), ('tt-20261123-23-010', 0), ('tt-20261123-23-034', 2), ('tt-20261123-23-040', 0), ('tt-20261123-23-066', 1), ('tt-20261123-23-085', 2)]
+GROUP keep=tt-21540 n=5 ids=tt-21540,tt-21592,tt-21606,tt-21643,tt-21658 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21540', 2), ('tt-21592', 3), ('tt-21606', 0), ('tt-21643', 0), ('tt-21658', 3)]
+GROUP keep=tt-20261123-005 n=5 ids=tt-20261123-005,tt-20261123-23-025,tt-20261123-23-070,tt-20261123-23-078,tt-20261123-23-089 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-005', 2), ('tt-20261123-23-025', 2), ('tt-20261123-23-070', 2), ('tt-20261123-23-078', 1), ('tt-20261123-23-089', 0)]
+GROUP keep=tt-21525 n=4 ids=tt-21525,tt-21571,tt-21651,tt-21655 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21525', 1), ('tt-21571', 3), ('tt-21651', 1), ('tt-21655', 3)]
+GROUP keep=tt-21528 n=4 ids=tt-21528,tt-21586,tt-21605,tt-21653 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21528', 0), ('tt-21586', 3), ('tt-21605', 0), ('tt-21653', 1)]
+GROUP keep=tt-21539 n=4 ids=tt-21539,tt-21545,tt-21631,tt-21637 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21539', 1), ('tt-21545', 2), ('tt-21631', 2), ('tt-21637', 1)]
+GROUP keep=tt-21562 n=4 ids=tt-21562,tt-21563,tt-21590,tt-21642 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21562', 2), ('tt-21563', 3), ('tt-21590', 0), ('tt-21642', 1)]
+GROUP keep=tt-21612 n=4 ids=tt-21612,tt-21616,tt-21621,tt-21652 files=qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21612', 2), ('tt-21616', 0), ('tt-21621', 0), ('tt-21652', 2)]
+GROUP keep=tt-20261123-001 n=4 ids=tt-20261123-001,tt-20261123-069,tt-20261123-23-005,tt-20261123-23-043 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-001', 0), ('tt-20261123-069', 2), ('tt-20261123-23-005', 2), ('tt-20261123-23-043', 1)]
+GROUP keep=tt-20261123-002 n=4 ids=tt-20261123-002,tt-20261123-23-002,tt-20261123-23-042,tt-20261123-23-079 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-002', 2), ('tt-20261123-23-002', 1), ('tt-20261123-23-042', 2), ('tt-20261123-23-079', 3)]
+GROUP keep=tt-20261123-23-014 n=4 ids=tt-20261123-037,tt-20261123-23-014,tt-20261123-23-035,tt-20261123-23-098 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-037', 0), ('tt-20261123-23-014', 2), ('tt-20261123-23-035', 1), ('tt-20261123-23-098', 2)]
+GROUP keep=tt-21538 n=3 ids=tt-21538,tt-21568,tt-21623 files=qk-tuitui-85.js,qk-tuitui-86.js
+GROUP keep=tt-21542 n=3 ids=tt-21542,tt-21578,tt-21595 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21542', 3), ('tt-21578', 0), ('tt-21595', 3)]
+GROUP keep=tt-21549 n=3 ids=tt-21549,tt-21596,tt-21613 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21549', 0), ('tt-21596', 0), ('tt-21613', 3)]
+GROUP keep=tt-21553 n=3 ids=tt-21553,tt-21593,tt-21650 files=qk-tuitui-85.js,qk-tuitui-86.js
+GROUP keep=tt-21557 n=3 ids=tt-21557,tt-21565,tt-21625 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21557', 2), ('tt-21565', 1), ('tt-21625', 3)]
+GROUP keep=tt-21558 n=3 ids=tt-21558,tt-21570,tt-21585 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21558', 1), ('tt-21570', 3), ('tt-21585', 3)]
+GROUP keep=tt-21584 n=3 ids=tt-21584,tt-21626,tt-21641 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21584', 1), ('tt-21626', 3), ('tt-21641', 3)]
+GROUP keep=tt-21597 n=3 ids=tt-21597,tt-21654,tt-21664 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21597', 3), ('tt-21654', 0), ('tt-21664', 0)]
+GROUP keep=tt-21604 n=3 ids=tt-21604,tt-21620,tt-21667 files=qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21604', 1), ('tt-21620', 3), ('tt-21667', 3)]
+GROUP keep=tt-26242 n=3 ids=tt-26242,tt-26257,tt-26477 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26242', 3), ('tt-26257', 0), ('tt-26477', 1)]
+GROUP keep=tt-20261123-23-020 n=3 ids=tt-20261123-024,tt-20261123-23-020,tt-20261123-23-024 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-024', 2), ('tt-20261123-23-020', 2), ('tt-20261123-23-024', 0)]
+GROUP keep=tt-20261123-23-003 n=3 ids=tt-20261123-029,tt-20261123-23-003,tt-20261123-23-050 files=qk-tuitui-92.js,qk-tuitui-95.js
+GROUP keep=tt-20261123-23-022 n=3 ids=tt-20261123-039,tt-20261123-23-022,tt-20261123-23-027 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-039', 1), ('tt-20261123-23-022', 0), ('tt-20261123-23-027', 0)]
+GROUP keep=tt-20261123-23-061 n=3 ids=tt-20261123-071,tt-20261123-23-061,tt-20261123-23-074 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-071', 0), ('tt-20261123-23-061', 2), ('tt-20261123-23-074', 3)]
+GROUP keep=tt-20261123-23-013 n=3 ids=tt-20261123-072,tt-20261123-23-013,tt-20261123-23-062 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-072', 3), ('tt-20261123-23-013', 1), ('tt-20261123-23-062', 3)]
+GROUP keep=tt-20261123-20-010 n=3 ids=tt-20261123-20-010,tt-20261123-20-037,tt-20261123-23-084 files=qk-tuitui-93.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-20-010', 3), ('tt-20261123-20-037', 0), ('tt-20261123-23-084', 0)]
+GROUP keep=tt-20261123-21-003 n=3 ids=tt-20261123-21-003,tt-20261123-23-023,tt-20261123-23-080 files=qk-tuitui-94.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-21-003', 2), ('tt-20261123-23-023', 1), ('tt-20261123-23-080', 0)]
+GROUP keep=tt-20261123-21-023 n=3 ids=tt-20261123-21-023,tt-20261123-21-056,tt-20261123-23-059 files=qk-tuitui-94.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-21-023', 0), ('tt-20261123-21-056', 2), ('tt-20261123-23-059', 0)]
+GROUP keep=cs-305 n=2 ids=cs-305,zz-30497 files=qk-changshi-01.js,qk-zhengzhi-02.js
+  ANSWER_POS_DIFFERS: [('cs-305', 0), ('zz-30497', 2)]
+GROUP keep=cs-323 n=2 ids=cs-323,zz-30798 files=qk-changshi-01.js,qk-zhengzhi-02.js
+  ANSWER_POS_DIFFERS: [('cs-323', 3), ('zz-30798', 1)]
+GROUP keep=cs-330 n=2 ids=cs-330,zz-32747 files=qk-changshi-01.js,qk-zhengzhi-04.js
+GROUP keep=cs-00379 n=2 ids=cs-388,cs-00379 files=qk-changshi-01.js
+  ANSWER_POS_DIFFERS: [('cs-388', 2), ('cs-00379', 1)]
+GROUP keep=cs-10113 n=2 ids=cs-10113,zz-30848 files=qk-changshi-01.js,qk-zhengzhi-02.js
+  ANSWER_POS_DIFFERS: [('cs-10113', 1), ('zz-30848', 3)]
+GROUP keep=tt-21534 n=2 ids=tt-21534,tt-21609 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21534', 0), ('tt-21609', 2)]
+GROUP keep=tt-21543 n=2 ids=tt-21543,tt-21551 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21543', 3), ('tt-21551', 0)]
+GROUP keep=tt-21548 n=2 ids=tt-21548,tt-21663 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21548', 3), ('tt-21663', 1)]
+GROUP keep=tt-21550 n=2 ids=tt-21550,tt-21580 files=qk-tuitui-85.js
+GROUP keep=tt-21552 n=2 ids=tt-21552,tt-21599 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21552', 3), ('tt-21599', 2)]
+GROUP keep=tt-21554 n=2 ids=tt-21554,tt-21591 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21554', 2), ('tt-21591', 3)]
+GROUP keep=tt-21575 n=2 ids=tt-21575,tt-21598 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21575', 1), ('tt-21598', 3)]
+GROUP keep=tt-21576 n=2 ids=tt-21576,tt-21581 files=qk-tuitui-85.js
+  ANSWER_POS_DIFFERS: [('tt-21576', 0), ('tt-21581', 2)]
+GROUP keep=tt-21579 n=2 ids=tt-21579,tt-21666 files=qk-tuitui-85.js,qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21579', 0), ('tt-21666', 2)]
+GROUP keep=tt-21608 n=2 ids=tt-21608,tt-21628 files=qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21608', 3), ('tt-21628', 1)]
+GROUP keep=tt-21619 n=2 ids=tt-21619,tt-21632 files=qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21619', 0), ('tt-21632', 3)]
+GROUP keep=tt-21645 n=2 ids=tt-21645,tt-21662 files=qk-tuitui-86.js
+  ANSWER_POS_DIFFERS: [('tt-21645', 1), ('tt-21662', 2)]
+GROUP keep=tt-26203 n=2 ids=tt-26203,tt-26307 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26203', 2), ('tt-26307', 1)]
+GROUP keep=tt-26205 n=2 ids=tt-26205,tt-26441 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26205', 3), ('tt-26441', 2)]
+GROUP keep=tt-26208 n=2 ids=tt-26208,tt-26310 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26208', 0), ('tt-26310', 1)]
+GROUP keep=tt-26227 n=2 ids=tt-26227,tt-26375 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26227', 0), ('tt-26375', 3)]
+GROUP keep=tt-26233 n=2 ids=tt-26233,tt-26387 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26233', 3), ('tt-26387', 0)]
+GROUP keep=tt-26240 n=2 ids=tt-26240,tt-26314 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26240', 2), ('tt-26314', 3)]
+GROUP keep=tt-26243 n=2 ids=tt-26243,tt-26271 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26243', 3), ('tt-26271', 1)]
+GROUP keep=tt-26248 n=2 ids=tt-26248,tt-26466 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26248', 0), ('tt-26466', 2)]
+GROUP keep=tt-26251 n=2 ids=tt-26251,tt-26428 files=qk-tuitui-91.js
+GROUP keep=tt-26260 n=2 ids=tt-26260,tt-26270 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26260', 3), ('tt-26270', 0)]
+GROUP keep=tt-26266 n=2 ids=tt-26266,tt-26383 files=qk-tuitui-91.js
+GROUP keep=tt-26286 n=2 ids=tt-26286,tt-26332 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26286', 0), ('tt-26332', 1)]
+GROUP keep=tt-26289 n=2 ids=tt-26289,tt-26415 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26289', 1), ('tt-26415', 0)]
+GROUP keep=tt-26295 n=2 ids=tt-26295,tt-26488 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26295', 0), ('tt-26488', 2)]
+GROUP keep=tt-26297 n=2 ids=tt-26297,tt-26321 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26297', 0), ('tt-26321', 1)]
+GROUP keep=tt-26309 n=2 ids=tt-26309,tt-26326 files=qk-tuitui-91.js
+GROUP keep=tt-26315 n=2 ids=tt-26315,tt-26421 files=qk-tuitui-91.js
+GROUP keep=tt-26322 n=2 ids=tt-26322,tt-26386 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26322', 0), ('tt-26386', 1)]
+GROUP keep=tt-26334 n=2 ids=tt-26334,tt-26413 files=qk-tuitui-91.js
+GROUP keep=tt-26343 n=2 ids=tt-26343,tt-26351 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26343', 1), ('tt-26351', 2)]
+GROUP keep=tt-26354 n=2 ids=tt-26354,tt-26410 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26354', 0), ('tt-26410', 3)]
+GROUP keep=tt-26373 n=2 ids=tt-26373,tt-26379 files=qk-tuitui-91.js
+GROUP keep=tt-26380 n=2 ids=tt-26380,tt-26390 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26380', 2), ('tt-26390', 0)]
+GROUP keep=tt-26388 n=2 ids=tt-26388,tt-26412 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26388', 1), ('tt-26412', 3)]
+GROUP keep=tt-26400 n=2 ids=tt-26400,tt-26448 files=qk-tuitui-91.js
+GROUP keep=tt-26422 n=2 ids=tt-26422,tt-26430 files=qk-tuitui-91.js
+  ANSWER_POS_DIFFERS: [('tt-26422', 0), ('tt-26430', 1)]
+GROUP keep=tt-20261123-003 n=2 ids=tt-20261123-003,tt-20261123-23-004 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-003', 1), ('tt-20261123-23-004', 3)]
+GROUP keep=tt-20261123-004 n=2 ids=tt-20261123-004,tt-20261123-23-087 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-004', 1), ('tt-20261123-23-087', 2)]
+GROUP keep=tt-20261123-008 n=2 ids=tt-20261123-008,tt-20261123-23-012 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-008', 0), ('tt-20261123-23-012', 1)]
+GROUP keep=tt-20261123-012 n=2 ids=tt-20261123-012,tt-20261123-23-092 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-012', 0), ('tt-20261123-23-092', 1)]
+GROUP keep=tt-20261123-013 n=2 ids=tt-20261123-013,tt-20261123-23-088 files=qk-tuitui-92.js,qk-tuitui-95.js
+GROUP keep=tt-20261123-016 n=2 ids=tt-20261123-016,tt-20261123-23-073 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-016', 2), ('tt-20261123-23-073', 1)]
+GROUP keep=tt-20261123-018 n=2 ids=tt-20261123-018,tt-20261123-021 files=qk-tuitui-92.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-018', 2), ('tt-20261123-021', 1)]
+GROUP keep=tt-20261123-026 n=2 ids=tt-20261123-026,tt-20261123-23-047 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-026', 0), ('tt-20261123-23-047', 3)]
+GROUP keep=tt-20261123-027 n=2 ids=tt-20261123-027,tt-20261123-23-052 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-027', 2), ('tt-20261123-23-052', 0)]
+GROUP keep=tt-20261123-23-016 n=2 ids=tt-20261123-035,tt-20261123-23-016 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-035', 1), ('tt-20261123-23-016', 0)]
+GROUP keep=tt-20261123-038 n=2 ids=tt-20261123-038,tt-20261123-23-071 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-038', 3), ('tt-20261123-23-071', 2)]
+GROUP keep=tt-20261123-042 n=2 ids=tt-20261123-042,tt-20261123-23-082 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-042', 2), ('tt-20261123-23-082', 3)]
+GROUP keep=tt-20261123-23-009 n=2 ids=tt-20261123-043,tt-20261123-23-009 files=qk-tuitui-92.js,qk-tuitui-95.js
+GROUP keep=tt-20261123-046 n=2 ids=tt-20261123-046,tt-20261123-23-095 files=qk-tuitui-92.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-046', 1), ('tt-20261123-23-095', 3)]
+GROUP keep=tt-20261123-20-004 n=2 ids=tt-20261123-049,tt-20261123-20-004 files=qk-tuitui-92.js,qk-tuitui-93.js
+GROUP keep=tt-20261123-23-038 n=2 ids=tt-20261123-085,tt-20261123-23-038 files=qk-tuitui-92.js,qk-tuitui-95.js
+GROUP keep=tt-20261123-20-003 n=2 ids=tt-20261123-20-003,tt-20261123-23-007 files=qk-tuitui-93.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-20-003', 3), ('tt-20261123-23-007', 2)]
+GROUP keep=tt-20261123-20-019 n=2 ids=tt-20261123-20-019,tt-20261123-23-049 files=qk-tuitui-93.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-20-019', 0), ('tt-20261123-23-049', 3)]
+GROUP keep=tt-20261123-23-056 n=2 ids=tt-20261123-20-067,tt-20261123-23-056 files=qk-tuitui-93.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-20-067', 0), ('tt-20261123-23-056', 1)]
+GROUP keep=tt-20261123-21-031 n=2 ids=tt-20261123-20-094,tt-20261123-21-031 files=qk-tuitui-93.js,qk-tuitui-94.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-20-094', 1), ('tt-20261123-21-031', 3)]
+GROUP keep=tt-20261123-23-091 n=2 ids=tt-20261123-20-097,tt-20261123-23-091 files=qk-tuitui-93.js,qk-tuitui-95.js
+GROUP keep=tt-20261123-21-008 n=2 ids=tt-20261123-21-008,tt-20261123-21-029 files=qk-tuitui-94.js
+GROUP keep=tt-20261123-21-009 n=2 ids=tt-20261123-21-009,tt-20261123-23-072 files=qk-tuitui-94.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-21-009', 1), ('tt-20261123-23-072', 2)]
+GROUP keep=tt-20261123-21-013 n=2 ids=tt-20261123-21-013,tt-20261123-23-081 files=qk-tuitui-94.js,qk-tuitui-95.js
+GROUP keep=tt-20261123-21-061 n=2 ids=tt-20261123-21-061,tt-20261123-23-075 files=qk-tuitui-94.js,qk-tuitui-95.js
+  ANSWER_POS_DIFFERS: [('tt-20261123-21-061', 0), ('tt-20261123-23-075', 2)]
+GROUP keep=tt-20261123-23-021 n=2 ids=tt-20261123-23-021,tt-20261123-23-032 files=qk-tuitui-95.js
+GROUP keep=yy-102 n=2 ids=yy-167,yy-102 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-110 n=2 ids=yy-175,yy-110 files=qk-yanyu-01.js,qk-yanyu-08.js
+  ANSWER_POS_DIFFERS: [('yy-175', 1), ('yy-110', 0)]
+GROUP keep=yy-111 n=2 ids=yy-176,yy-111 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-113 n=2 ids=yy-178,yy-113 files=qk-yanyu-01.js,qk-yanyu-08.js
+  ANSWER_POS_DIFFERS: [('yy-178', 1), ('yy-113', 0)]
+GROUP keep=yy-114 n=2 ids=yy-179,yy-114 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-115 n=2 ids=yy-180,yy-115 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-116 n=2 ids=yy-181,yy-116 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-117 n=2 ids=yy-182,yy-117 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-118 n=2 ids=yy-183,yy-118 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-119 n=2 ids=yy-184,yy-119 files=qk-yanyu-01.js,qk-yanyu-08.js
+  ANSWER_POS_DIFFERS: [('yy-184', 1), ('yy-119', 0)]
+GROUP keep=yy-120 n=2 ids=yy-185,yy-120 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-121 n=2 ids=yy-186,yy-121 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-122 n=2 ids=yy-187,yy-122 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-123 n=2 ids=yy-188,yy-123 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-124 n=2 ids=yy-189,yy-124 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-125 n=2 ids=yy-190,yy-125 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-126 n=2 ids=yy-191,yy-126 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-127 n=2 ids=yy-192,yy-127 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-128 n=2 ids=yy-193,yy-128 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-129 n=2 ids=yy-194,yy-129 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-130 n=2 ids=yy-195,yy-130 files=qk-yanyu-01.js,qk-yanyu-08.js
+GROUP keep=yy-109 n=2 ids=yy-109,yy-174 files=qk-yanyu-08.js
+MAPPING_WRITTEN tools/dedup_map.json old=300
