@@ -123,8 +123,11 @@ self.addEventListener('fetch', function (e) {
   if (url.origin !== location.origin) return;
 
   /* 页面导航：缓存优先秒开（老学生不再每次等国外服务器），有网时后台更新，下次打开即最新；
-     断网时用缓存兜底。用户点⟳一键更新会清缓存强制拉最新。 */
+     断网时用缓存兜底。用户点⟳一键更新会清缓存强制拉最新。
+     N5/N7 修复：资料文件（.pdf 等）导航不走 SW，交给浏览器原生下载/预览——
+     此前网络慢或失败时会被兜底成 index.html，学生点「保存/打开」拿到的是网页而不是资料。 */
   if (req.mode === 'navigate') {
+    if (/\.[a-z0-9]+$/i.test(url.pathname) && !/\.html?$/i.test(url.pathname)) return;
     e.respondWith(
       caches.open(CACHE).then(function (c) {
         return c.match(req).then(function (hit) {

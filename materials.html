@@ -922,6 +922,21 @@ var IS_IOS = /iPhone|iPad|iPod/i.test(UA);
 var IS_ANDROID = /Android/i.test(UA);
 var supportDownload = 'download' in document.createElement('a');
 
+/* N5 修复：资料直链改为相对路径（取 data-file）。
+   此前 href 硬编码为 github.io 绝对地址，换到自有域名后页面与文件跨源，
+   download 属性会被浏览器忽略，点「保存」会整页跳转到 PDF 而不是下载。
+   改为相对路径后任何域名下都是同源，download 属性始终生效。 */
+(function(){
+  var links = document.querySelectorAll('a.op-save[data-file], a.op-open[data-file]');
+  for(var i=0;i<links.length;i++){
+    var a = links[i], h = a.getAttribute('href') || '';
+    if(h.indexOf('https://ycteacher.github.io/') === 0){
+      var f = a.getAttribute('data-file');
+      if(f) a.setAttribute('href', f);
+    }
+  }
+})();
+
 function closeDlMask(){ document.getElementById('dlMask').classList.remove('show'); }
 
 var curUrl = '';
