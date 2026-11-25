@@ -16,6 +16,10 @@
   var SYNC_FLAG = 'yicheng-gk-sync-v1';
   var BIND_PRE = 'ycgkS1-U-';
   var REG_KEY = 'ycgk-reg-v1';
+  /* 用户信息后台：用户池 + 站内消息（key16=md5(phone).slice(0,16)，永不含手机号明文） */
+  var USER_KEY = 'ycgk-user-v1';
+  var MSG_KEY = 'ycgk-msg-v1';
+  var MSG_READ = 'ycgk.msg.read.v1';
   var GEO_LIBS = ['https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-geo.js', './assets/yc-geo.js'];
   /* 邀请模块对接（与 yc-invite.js v4 同格式） */
   var INV_REC = 'yc-invite-v1';
@@ -102,6 +106,76 @@
     });
   }
 
+  /* ---------- 用户信息池（ycgk-user-v1）：读-合并-写，池上限3000按最后活跃淘汰 ---------- */
+  var userBusy=false;
+  function userMutate(key16,mutFn,cb){
+    if(userBusy){ setTimeout(function(){ userMutate(key16,mutFn,cb); },3000); return; }
+    userBusy=true;
+    cloudGet(USER_KEY,function(e,t){
+      function fin(){ userBusy=false; cb&&cb(); }
+      var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
+      if(!pool||typeof pool!=='object'||!pool.u)pool={v:1,u:{}};
+      var rec=pool.u[key16]||{n:'',p:'',t:0,c:'',tl:'',s:{}};
+      if(!rec.s||typeof rec.s!=='object')rec.s={};
+      try{ mutFn(rec); }catch(ex){}
+      rec.s.la=Date.now();
+      pool.u[key16]=rec;
+      var ids=Object.keys(pool.u);
+      if(ids.length>3000){
+        ids.sort(function(a,b){ return (((pool.u[b]||{}).s||{}).la||0)-(((pool.u[a]||{}).s||{}).la||0); });
+        var keep={}; for(var i=0;i<3000;i++)keep[ids[i]]=pool.u[ids[i]];
+        pool.u=keep;
+      }
+      cloudPut(USER_KEY,JSON.stringify(pool),function(){ fin(); });
+    });
+  }
+  /* 计数递增（pv 打开 / qz 刷题 / vid 看视频），minEvery 毫秒内节流，避免写风暴 */
+  function userBump(field,minEvery){
+    try{
+      var acc=getAcc(); if(!acc||!acc.md5)return;
+      var now=Date.now(), tk='ycgk.user.bump.'+field;
+      if(minEvery&&now-(+(ls(tk)||0))<minEvery)return;
+      lss(tk,String(now));
+      userMutate(acc.md5.slice(0,16),function(rec){ rec.s[field]=(rec.s[field]||0)+1; });
+    }catch(e){}
+  }
+
+  /* ---------- 昵称：清洗（剔除 HTML 敏感字符），2-20 字，选填 ---------- */
+  function sanitizeNick(s){
+    return String(s||'').replace(/[<>"'&\\\/`]/g,'').replace(/\s+/g,' ').trim().slice(0,20);
+  }
+
+  /* ---------- 站内消息（ycgk-msg-v1）：打开+每5分钟拉取，新消息 toast，已读本地记录 ---------- */
+  function readIds(){ var a=rd(MSG_READ); return Array.isArray(a)?a:[]; }
+  function markRead(ids){
+    var cur=readIds();
+    ids.forEach(function(i){ if(cur.indexOf(i)<0)cur.push(i); });
+    wr(MSG_READ,cur.slice(-300));
+  }
+  var msgChecking=false;
+  function checkMsgs(){
+    try{
+      var acc=getAcc(); if(!acc||!acc.md5||msgChecking)return;
+      msgChecking=true;
+      var key16=acc.md5.slice(0,16);
+      cloudGet(MSG_KEY,function(e,t){
+        msgChecking=false;
+        if(e||!t)return;
+        var arr=null; try{ arr=JSON.parse(t); }catch(ex){ return; }
+        if(!Array.isArray(arr))return;
+        var mine=arr.filter(function(m){ return m&&typeof m==='object'&&(m.to===key16||m.to==='all')&&m.text; });
+        var read=readIds();
+        var fresh=mine.filter(function(m){ return read.indexOf(m.id)<0; });
+        if(fresh.length){
+          markRead(fresh.map(function(m){ return m.id; }));
+          fresh.slice(-2).forEach(function(m,i){
+            setTimeout(function(){ toast('📩 '+String(m.text).slice(0,120)); }, i*4600);
+          });
+        }
+      });
+    }catch(e){ msgChecking=false; }
+  }
+
   /* ---------- 省份映射（懒加载内置号段库） ---------- */
   var geoTried=false;
   function loadGeo(cb){
@@ -168,11 +242,12 @@
 
   /* ---------- 注册 / 登录主流程 ---------- */
   var regBusy=false;
-  function doRegister(phone,btn,err){
+  function doRegister(phone,btn,err,nick){
     if(regBusy)return; regBusy=true;
     var done=function(){ regBusy=false; if(btn)btn.disabled=false; };
     if(btn){btn.disabled=true;btn.textContent='提交中…';}
     if(err)err.textContent='';
+    nick=sanitizeNick(nick);
     var h=md5(phone), key16=h.slice(0,16), tail=phone.slice(-4);
     provOf(phone,function(prov){
       var oldSync=getSync(), oldCode=oldSync.code||'', adopted=false;
@@ -192,7 +267,7 @@
       }
       ensureCode(function(code){
         if(!oldCode)setSyncCode(code);
-        var acc={v:1,md5:h,tail:tail,prov:prov,ts:Date.now(),code:code,inv:invParam()||''};
+        var acc={v:1,md5:h,tail:tail,prov:prov,ts:Date.now(),code:code,inv:invParam()||'',nick:nick||''};
         wr(ACC,acc);
         /* 迁移记录：旧键清点挂载，不删不覆盖 */
         var n=0;
@@ -201,6 +276,17 @@
         /* 云端绑定 + 注册台账（异步补写，失败不阻断） */
         cloudPut(BIND_PRE+h,JSON.stringify({c:code,ts:Date.now()}),function(){});
         regPut(key16,prov,function(){});
+        /* 用户信息池：注册即建档（昵称/省份/学习码/尾号/计数），失败不阻断 */
+        userMutate(key16,function(rec){
+          rec.n=nick||rec.n||'';
+          rec.p=prov||rec.p||'';
+          if(!rec.t)rec.t=Date.now();
+          rec.c=code;
+          rec.tl=tail;
+          if(rec.s.pv===undefined)rec.s.pv=1;
+          if(rec.s.qz===undefined)rec.s.qz=0;
+          if(rec.s.vid===undefined)rec.s.vid=0;
+        },function(){});
         /* 邀请关系自动挂载 */
         attachInvite(phone,501);
         track('register_ok',{k:key16,p:prov,nc:adopted?0:1});
@@ -283,6 +369,54 @@
     showAnnounce();
   }
 
+  /* ---------- 修改昵称（随时可改，同步用户池） ---------- */
+  function showNickEdit(){
+    mountUi();
+    var acc=getAcc(); if(!acc)return;
+    card.innerHTML='<h3>修改昵称</h3>'+
+      '<div class="yc-acc-tip">昵称会显示在老师的数据后台，用来识别你的学习数据（2-20 字，选填）。</div>'+
+      '<input id="ycNickIn" maxlength="20" placeholder="给自己起个名字" autocomplete="off" value="'+esc(acc.nick||'')+'">'+
+      '<button class="yc-acc-btn main" id="ycNickOk">保存</button>'+
+      '<button class="yc-acc-btn ghost" id="ycNickBack">返回</button>'+
+      '<div id="yc-acc-err"></div>';
+    $('ycNickBack').addEventListener('click',function(){ openPanel('acc'); });
+    $('ycNickOk').addEventListener('click',function(){
+      var err=$('yc-acc-err');
+      var n=sanitizeNick($('ycNickIn').value);
+      if(n&&n.length<2){ if(err)err.textContent='昵称至少 2 个字符（可留空清除）'; return; }
+      var acc2=getAcc(); acc2.nick=n||''; wr(ACC,acc2);
+      var b=$('ycNickOk'); if(b){ b.disabled=true; b.textContent='保存中…'; }
+      userMutate(acc2.md5.slice(0,16),function(rec){ rec.n=n||''; },function(){
+        toast(n?('昵称已改为「'+n+'」'):'昵称已清除');
+        openPanel('acc');
+      });
+    });
+  }
+
+  /* ---------- 我的消息（回看最近 20 条） ---------- */
+  function showMsgs(){
+    mountUi();
+    var acc=getAcc(); if(!acc)return;
+    var key16=acc.md5.slice(0,16);
+    card.innerHTML='<h3>我的消息</h3><div id="ycMsgList" class="yc-acc-tip">加载中…</div><button class="yc-acc-btn ghost" id="ycMsgBack">返回</button>';
+    $('ycMsgBack').addEventListener('click',function(){ openPanel('acc'); });
+    cloudGet(MSG_KEY,function(e,t){
+      var host=$('ycMsgList'); if(!host)return;
+      if(e||!t){ host.textContent='暂时拿不到消息，请稍后再试'; return; }
+      var arr=null; try{ arr=JSON.parse(t); }catch(ex){}
+      if(!Array.isArray(arr)){ host.textContent='暂无消息'; return; }
+      var mine=arr.filter(function(m){ return m&&(m.to===key16||m.to==='all')&&m.text; })
+        .sort(function(a,b){ return (b.ts||0)-(a.ts||0); }).slice(0,20);
+      if(!mine.length){ host.textContent='暂无消息'; return; }
+      host.innerHTML=mine.map(function(m){
+        var d=m.ts?new Date(m.ts).toLocaleString('zh-CN',{hour12:false}):'';
+        return '<div style="padding:8px 0;border-bottom:1px solid #eef2f7">'+
+          '<div style="font-size:13.5px;color:#0f172a;line-height:1.6">'+esc(String(m.text).slice(0,200))+'</div>'+
+          '<div style="font-size:11px;color:#94a3b8;margin-top:3px">'+esc(d)+(m.to==='all'?' · 全体通知':'')+'</div></div>';
+      }).join('');
+    });
+  }
+
   /* ---------- 登录 / 注册面板 ---------- */
   function openPanel(mode){
     mountUi();
@@ -290,16 +424,21 @@
     if(acc){
       var d=acc.ts?new Date(acc.ts).toLocaleDateString('zh-CN',{hour12:false}):'';
       card.innerHTML='<h3>我的账号</h3>'+
-        '<div class="yc-acc-tip">已注册：<b>手机尾号 '+esc(acc.tail)+'</b>'+(d?('（'+esc(d)+'）'):'')+'<br>数据已挂到手机号账号下，其他设备用同一手机号登录即可自动同步。</div>'+
+        '<div class="yc-acc-tip">已注册：<b>手机尾号 '+esc(acc.tail)+'</b>'+(d?('（'+esc(d)+'）'):'')+(acc.nick?(' · 昵称 <b>'+esc(acc.nick)+'</b>'):'')+'<br>数据已挂到手机号账号下，其他设备用同一手机号登录即可自动同步。</div>'+
         '<div class="yc-acc-li">12月收费前注册 = 永久免费</div>'+
         '<div class="yc-acc-li">同步由右上角「登录同步」学习码通道承载，已自动绑定</div>'+
-        '<button class="yc-acc-btn main" id="ycAccClose">好的</button>';
+        '<button class="yc-acc-btn main" id="ycAccClose">好的</button>'+
+        '<button class="yc-acc-btn ghost" id="ycAccNickBtn">修改昵称</button>'+
+        '<button class="yc-acc-btn ghost" id="ycAccMsgBtn">我的消息</button>';
       $('ycAccClose').addEventListener('click',closePanel);
+      $('ycAccNickBtn').addEventListener('click',showNickEdit);
+      $('ycAccMsgBtn').addEventListener('click',showMsgs);
     }else{
       card.innerHTML='<h3>注册 / 登录</h3>'+
         '<div class="yc-acc-tip">仅需一个手机号：<b>无验证码、不读取手机信息</b>。手机号是你的唯一身份识别码，<b>注册后不可更改</b>。12月收费前注册 = 永久免费。</div>'+
         '<input id="ycAccPh1" placeholder="输入 11 位手机号" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccPh2" placeholder="再次输入手机号确认" inputmode="numeric" maxlength="11" autocomplete="off">'+
+        '<input id="ycAccNick" placeholder="昵称（选填，给自己起个名字）" maxlength="20" autocomplete="off">'+
         '<button class="yc-acc-btn main" id="ycAccOk">完成注册</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccCancel">暂不注册</button>'+
         '<div id="yc-acc-err"></div>'+
@@ -308,9 +447,11 @@
         var err=$('yc-acc-err');
         var p1=($('ycAccPh1')&&$('ycAccPh1').value||'').replace(/\s/g,'');
         var p2=($('ycAccPh2')&&$('ycAccPh2').value||'').replace(/\s/g,'');
+        var nk=sanitizeNick($('ycAccNick')&&$('ycAccNick').value||'');
         if(!/^1\d{10}$/.test(p1)){if(err)err.textContent='请输入 11 位、以 1 开头的手机号';return}
         if(p1!==p2){if(err)err.textContent='两次输入不一致，请重新确认';return}
-        doRegister(p1,$('ycAccOk'),err);
+        if(nk&&nk.length<2){if(err)err.textContent='昵称至少 2 个字符（可留空）';return}
+        doRegister(p1,$('ycAccOk'),err,nk);
       });
       $('ycAccCancel') && $('ycAccCancel').addEventListener('click',closePanel);
       $('ycAccPh2') && $('ycAccPh2').addEventListener('keydown',function(e){ if(e.key==='Enter')$('ycAccOk').click(); });
@@ -370,6 +511,10 @@
     }catch(e){}
     /* 公告强推：未注册每次打开弹（等邀请弹层让位） */
     setTimeout(announceWhenFree,1500);
+    /* 用户池：注册用户打开计数（30 分钟节流）+ 消息拉取（打开 + 每 5 分钟） */
+    userBump('pv',30*60*1000);
+    setTimeout(checkMsgs,6000);
+    setInterval(checkMsgs,5*60*1000);
     /* 补写上次未完成的云端绑定/台账（fail-open 重试） */
     var acc=getAcc();
     if(acc){
@@ -381,4 +526,6 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
   window.ycOpenAccount=openPanel;
+  /* 供 index.html 实时心跳 / videos.html 调用的用户池计数入口 */
+  window.YCUserPool={ bump:userBump };
 })();

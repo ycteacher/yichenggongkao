@@ -628,6 +628,27 @@ var vtrack = (function(){
     document.addEventListener('visibilitychange', function(){ if (!document.hidden) beat(); });
   })();
 
+  /* 用户池：注册用户看视频计数（读-合并-写 ycgk-user-v1，30 分钟节流；本页不加载 yc-account.js，内联精简实现） */
+  (function(){
+    try{
+      var acc=null; try{ acc=JSON.parse(localStorage.getItem('yicheng-gk-account-v1')||'null'); }catch(e){}
+      if(!acc||!acc.md5)return;
+      var TK='ycgk.user.bump.vid', now=Date.now();
+      if(now-(+(localStorage.getItem(TK)||0))<1800000)return;
+      try{ localStorage.setItem(TK,String(now)); }catch(e){}
+      var K16=acc.md5.slice(0,16), UKEY='ycgk-user-v1';
+      fetch('https://textdb.dev/api/data/'+UKEY,{cache:'no-store'}).then(function(r){ return r.text(); }).then(function(t){
+        var pool=null; try{ pool=t?JSON.parse(t):null; }catch(e){}
+        if(!pool||typeof pool!=='object'||!pool.u)pool={v:1,u:{}};
+        var rec=pool.u[K16]||{n:'',p:'',t:0,c:'',tl:'',s:{}};
+        if(!rec.s||typeof rec.s!=='object')rec.s={};
+        rec.s.vid=(rec.s.vid||0)+1; rec.s.la=now;
+        pool.u[K16]=rec;
+        fetch('https://textdb.dev/api/data/'+UKEY,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(pool)}).catch(function(){});
+      }).catch(function(){});
+    }catch(e){}
+  })();
+
   /* 播放器埋点：开始播放（每次打开播放页只计一次）、观看时长（每5秒）、完整看完（最后一段播完） */
   function bindPlayer(player, getPart, nParts){
     var started = false, endCount = 0, watchT = null, maxPos = 0;

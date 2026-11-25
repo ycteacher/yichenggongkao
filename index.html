@@ -1322,6 +1322,8 @@ document.addEventListener('click', function(e){
       p.online[did]=now;
       /* 当前活动类型：quiz=正在刷题/做题页；空=其他页面（视频页由 videos.html 上报 vid） */
       try{ p.act[did]=(document.querySelector('[data-testid="plan-exit"]')||document.querySelector('.yc-ob-mask.on'))?'quiz':''; }catch(e){ p.act[did]=''; }
+      /* 用户池：注册用户刷题活动计数（5 分钟节流，见 yc-account.js userBump） */
+      try{ if(p.act[did]==='quiz'&&window.YCUserPool)window.YCUserPool.bump('qz',5*60*1000); }catch(e){}
       /* 分钟级心跳计数：供看板画实时分钟趋势（保留最近3小时） */
       if(!p.min||typeof p.min!=='object')p.min={};
       var mk=today+pad(new Date().getHours())+pad(new Date().getMinutes());
@@ -3648,7 +3650,7 @@ document.addEventListener('click', function(e){
 (function(){
   /* 修改点（P0-0c）：精简模式跳过增强脚本，降级预案不加载非核心脚本 */
   try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
-  var V='17';
+  var V='18';
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
   var cos=(window.ycAsset?window.ycAsset('./assets/yc-enhance.js'):'./assets/yc-enhance.js')+'?v='+V;
   var local='./assets/yc-enhance.js?v='+V;
