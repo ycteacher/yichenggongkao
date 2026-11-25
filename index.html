@@ -1946,6 +1946,7 @@ document.addEventListener('click', function(e){
         '<div class="yc-share-rule"><b>一对一申论批改</b><span>100 分</span></div>'+
         '<div class="yc-share-rule"><b>一对一综应批改</b><span>100 分</span></div>'+
         '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>600 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
+        '<div class="yc-share-rule"><b>分享达标解锁问诊资格</b><span>邀 1 人=抽签 · 3 人=优先排队 · 5 人=保底</span></div>'+
       '</div>'+
       '<button class="yc-sync-btn" id="ycShareRedeem">兑换详情 · 认识亿成老师 ›</button>'+
       '<button class="yc-sync-btn" id="ycShareClose">关闭</button>';
@@ -1970,6 +1971,8 @@ document.addEventListener('click', function(e){
     try{new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.share&r="+Date.now()}catch(e){}
     shOv.classList.add("on");
   }
+  /* 供顶栏固定分享入口调用（yc-account.js 注入的「📣 分享」按钮） */
+  window.ycOpenShare=openShare;
   /* 积分中心补一条邀请规则 */
   function patchPointsModal(){
     if(window.__ycShareRulePatched)return;
@@ -3636,6 +3639,8 @@ document.addEventListener('click', function(e){
 
 
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-invite.js?v=4" onerror="var s=document.createElement('script');s.src='./assets/yc-invite.js?v=4';document.head.appendChild(s);"></script>
+<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-track.js?v=2" onerror="var s=document.createElement('script');s.src='./assets/yc-track.js?v=2';document.head.appendChild(s);"></script>
+<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-account.js?v=1" onerror="var s=document.createElement('script');s.src='./assets/yc-account.js?v=1';document.head.appendChild(s);"></script>
 <script>
 /* 浮条/计时器脚本加载加固：COS 优先（国内稳定），失败回退本站，再失败换参数重试一次。
    此前直接引本站地址，新版号首次不在 SW 缓存内，每次都直连 github.io 拉取，
@@ -3643,7 +3648,7 @@ document.addEventListener('click', function(e){
 (function(){
   /* 修改点（P0-0c）：精简模式跳过增强脚本，降级预案不加载非核心脚本 */
   try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
-  var V='16';
+  var V='17';
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
   var cos=(window.ycAsset?window.ycAsset('./assets/yc-enhance.js'):'./assets/yc-enhance.js')+'?v='+V;
   var local='./assets/yc-enhance.js?v='+V;

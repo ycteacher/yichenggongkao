@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v82'; /* 修改点：图推大分片切分+装载提示+四小修，v81→v82 清旧缓存 */
+var CACHE = 'yc-static-v83'; /* 修改点：埋点层+手机号账号体系（yc-track/yc-account），v82→v83 清旧缓存 */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
 var SWR_PAT = /(index-b34|yc-enhance)\.js$/;
@@ -32,7 +32,7 @@ self.addEventListener('message', function (e) {
 
 /* P1-3 离线壳：install 预缓存最小离线资源（首页HTML＋base.js＋样式＋图标，约0.5MB），
    断网首开也能渲染出页面与失败提示，不再白屏；逐项容错，任一失败不阻塞安装。 */
-var OFFSHELL = ['./index.html', './base.js', './assets/index-C2M5URtc.css', './assets/ycicon-192-a.png'];
+var OFFSHELL = ['./index.html', './base.js', './assets/index-C2M5URtc.css', './assets/ycicon-192-a.png', './assets/yc-track.js', './assets/yc-account.js'];
 
 self.addEventListener('install', function (e) {
   /* P1-3：预缓存离线壳（不自动 skipWaiting —— B6：新版本先进入 waiting，由页面底部更新浮条引导用户点击后生效） */

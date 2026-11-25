@@ -312,6 +312,39 @@ td b{color:var(--txt)}
     <div class="card"><h3>刷题段位 <span class="hint">匿名</span></h3><div class="desc">每满 100 题升一档 · 同学 A/B/C…</div><div id="rank"></div><div class="desc" style="margin:12px 0 4px">目前刷得最多</div><div id="rankTop" style="font-size:18px;font-weight:800;color:var(--amber)">—</div></div>
   </div>
 
+  <div class="sec-h"><span class="bar"></span><h2>注册与账号</h2><span class="note" id="regNote">手机号注册台账 · 云端实时</span></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3>注册总览 <span class="hint">聚合统计 · 无明文</span></h3>
+      <div class="desc">注册台账仅存哈希锚点+省份，手机号不明文保存</div>
+      <div class="fbmini">
+        <div class="fbm"><div class="n" style="color:var(--green)" id="regTotal">…</div><div class="t">注册总数</div></div>
+        <div class="fbm"><div class="n" style="color:var(--cyan)" id="regToday">…</div><div class="t">当日新增</div></div>
+        <div class="fbm"><div class="n" style="color:var(--amber)" id="regConv">…</div><div class="t">注册转化</div></div>
+        <div class="fbm"><div class="n" style="color:var(--pink)" id="regProvN">…</div><div class="t">覆盖省份</div></div>
+      </div>
+      <div class="desc" style="margin:12px 0 6px">注册转化漏斗（埋点事件池）</div>
+      <div class="funnel" id="regFunnel"></div>
+    </div>
+    <div class="card">
+      <h3>地区分布 <span class="hint">内置号段库映射省级</span></h3>
+      <div class="desc">按注册手机号段映射到省，不调第三方、不做个人画像、仅聚合</div>
+      <div id="regProv"></div>
+    </div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card">
+      <h3>功能使用量 <span class="hint">埋点事件池 · 近 3000 条</span></h3>
+      <div class="desc">收藏/标错、笔记、分享、注册等事件计数（多端同步与邀请见「分享与裂变」）</div>
+      <div id="featUse"></div>
+    </div>
+    <div class="card">
+      <h3>注册趋势 <span class="hint">按日新增</span></h3>
+      <div class="desc">注册台账按日聚合</div>
+      <div id="regTrend"></div>
+    </div>
+  </div>
+
   <div class="sec-h"><span class="bar"></span><h2>每日明细与反馈</h2><span class="note">按日增量 · 真实问卷</span></div>
   <div class="grid g2">
     <div class="card"><h3>每日明细 <span class="hint"><button class="refresher" id="dailyToggle" type="button" style="padding:3px 10px;font-size:11px">展开全部</button></span></h3><div class="desc">设备为当日去重，其余为当日增量 · 默认显示最近 7 天</div><div style="overflow-x:auto"><table id="daily"></table></div></div>
@@ -542,6 +575,85 @@ function renderAll(d,fb){renderKpis(d);renderFunnel(d);bars('devices',[['iPhone'
 /* 加载 */
 function fetchBank(){fetch(BANK_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(s){if(s&&s.total){BANK=s;renderBank()}}).catch(function(){})}
 function refreshMetrics(){fetch(METRICS_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(d){if(d){STATS=d;renderAll(d,FB)}}).catch(function(){})}
+
+/* ===== 注册与账号（ycgk-reg-v1 台账 + ycgk-track-v1 事件池） ===== */
+var REG_URLS=['https://textdb.online/ycgk-reg-v1','https://textdb.dev/api/data/ycgk-reg-v1'];
+var TRACK_URLS=['https://textdb.online/ycgk-track-v1','https://textdb.dev/api/data/ycgk-track-v1'];
+var FEAT_NAMES={fav:'收藏 / 取消收藏',wrong:'标错 / 重练标记',note:'笔记保存',share_click:'分享入口点击',see_announce:'看到注册公告',click_register:'点「去注册」',register_ok:'完成注册',login_ok:'跨设备登录',open:'打开应用'};
+function fetchPool(urls,cb){
+  var i=0;
+  (function next(){
+    if(i>=urls.length){cb(null);return}
+    fetch(urls[i]+(urls[i].indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+      var d=null;try{d=JSON.parse(t)}catch(e){}
+      cb(d);}).catch(function(){i++;next()});
+  })();
+}
+function renderReg(reg,track){
+  var regs=(reg&&reg.r)||{};
+  var keys=Object.keys(regs);
+  var today=new Date(),tk=''+today.getFullYear()+('0'+(today.getMonth()+1)).slice(-2)+('0'+today.getDate()).slice(-2);
+  var todayN=0,provM={},dayM={};
+  keys.forEach(function(k){
+    var r=regs[k]||{};var d=new Date(r.t||0);
+    var dk=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+    if(dk===tk)todayN++;
+    dayM[dk]=(dayM[dk]||0)+1;
+    var p=r.p||'未知';provM[p]=(provM[p]||0)+1;
+  });
+  txt('regTotal',keys.length);
+  txt('regToday',todayN);
+  var provKeys=Object.keys(provM);txt('regProvN',provKeys.length);
+  /* 事件池计数 */
+  var evs=(track&&track.v===2&&Array.isArray(track.ev))?track.ev:[];
+  var cnt={};
+  evs.forEach(function(e){if(e&&e.e)cnt[e.e]=(cnt[e.e]||0)+1});
+  /* 注册转化漏斗：打开→见公告→点注册→完成注册 */
+  var steps=[
+    {v:cnt.open||0,l:'打开应用',c:'#38bdf8',c2:'#0284c7'},
+    {v:cnt.see_announce||0,l:'看到公告',c:'#a78bfa',c2:'#7c3aed'},
+    {v:cnt.click_register||0,l:'点「去注册」',c:'#fbbf24',c2:'#d97706'},
+    {v:cnt.register_ok||0,l:'完成注册',c:'#22c55e',c2:'#15803d'}
+  ];
+  var base=steps[0].v||1;
+  var f=el('regFunnel');
+  if(f)f.innerHTML=steps.map(function(s,i){
+    var h='<div class="fstep" style="--c:'+s.c+'"><div class="fv" style="color:'+s.c+'">'+s.v+'</div><div class="fl">'+s.l+'</div><div class="fr">占打开 '+pct(s.v,base)+'</div><div class="fb"></div></div>';
+    return i<steps.length-1?h+'<div class="farr">›</div>':h;
+  }).join('');
+  /* 地区分布 */
+  var provRows=provKeys.map(function(k){return [k,provM[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
+  if(provRows.length)liveBars('regProv',provRows,['#22c55e','#38bdf8','#a78bfa','#fbbf24','#f472b6']);
+  else el('regProv').innerHTML='<div style="color:var(--mut);font-size:12px;padding:10px 0">暂无注册数据</div>';
+  /* 功能使用量 */
+  var featRows=Object.keys(FEAT_NAMES).map(function(k){return [FEAT_NAMES[k],cnt[k]||0]}).filter(function(r){return r[1]>0}).sort(function(a,b){return b[1]-a[1]});
+  if(featRows.length)liveBars('featUse',featRows,['#38bdf8','#22c55e','#fbbf24','#f472b6','#a78bfa','#f87171']);
+  else el('featUse').innerHTML='<div style="color:var(--mut);font-size:12px;padding:10px 0">事件池暂无数据（学生端更新后开始计数）</div>';
+  /* 注册趋势（近 14 天） */
+  var days=Object.keys(dayM).sort().slice(-14);
+  var t=el('regTrend');
+  if(t){
+    if(days.length){
+      var mx=Math.max.apply(null,days.map(function(d){return dayM[d]}).concat([1]));
+      t.innerHTML=days.map(function(d){
+        return '<div class="brow" style="--c:#22c55e;--c2:#22c55e"><div class="bl"><span>'+d.slice(4,6)+'-'+d.slice(6)+'</span><b>'+dayM[d]+'</b></div><div class="bt"><div class="bfill" style="width:'+Math.max(4,dayM[d]/mx*100).toFixed(1)+'%"></div></div></div>';
+      }).join('');
+    }else t.innerHTML='<div style="color:var(--mut);font-size:12px;padding:10px 0">暂无注册</div>';
+  }
+  /* 注册转化率（完成注册/打开，事件池口径） */
+  txt('regConv',pct(cnt.register_ok||0,cnt.open||0));
+  txt('regNote','注册台账 '+keys.length+' 人 · 事件池 '+evs.length+' 条 · 刷新于 '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));
+}
+function refreshReg(){
+  fetchPool(REG_URLS,function(reg){
+    fetchPool(TRACK_URLS,function(track){
+      renderReg(reg,track);
+    });
+  });
+}
+refreshReg();
+setInterval(refreshReg,60000);
+
 function refreshFb(){
   function tryUrls(urls,i){if(i>=urls.length)return;fetch(urls[i]+(urls[i].indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.list){FB=d;renderFb(d)}}).catch(function(){tryUrls(urls,i+1)})}
   tryUrls([FB_URL,FB_FALLBACK],0);

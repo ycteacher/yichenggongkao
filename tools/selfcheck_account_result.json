@@ -1,0 +1,197 @@
+{
+  "ts": "2026-11-25T20:34:06.773Z",
+  "total": 38,
+  "pass": 38,
+  "results": [
+    {
+      "name": "埋点层暴露 API",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "埋点层 md5 与 node crypto 一致（4 向量）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "track 事件入队（含启动 open）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "事件含匿名锚点且不含手机号明文",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "flush 读合并写：旧事件保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "flush 读合并写：新事件并入",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "flush 后本地队列清空",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "公告弹层已挂载",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "公告文案含备案/迁移/免费/暂不注册",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "公告含「去注册」按钮",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "公告埋点 see_announce",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "顶栏登录入口已注入",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "顶栏分享入口已注入",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "注册面板含两次输入确认",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "注册面板含不可更改/免费/无验证码提示",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "注册面板隐私声明（仅摘要）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "提交回调已绑定",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "账号记录已写入",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "账号记录不含手机号明文",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "账号记录 md5 与 node 一致",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "账号记录含尾号/省份/同步码",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "迁移记录已写入",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "旧数据不删不覆盖",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "云端绑定已写（键为哈希）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "云端全部写入不含手机号明文",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "注册台账已写（聚合）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "注册事件埋点 register_ok",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "注册后打开不再弹公告",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "跨设备登录：账号记录写入",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "跨设备登录：接回原学习码 654321",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "跨设备登录：触发刷新以拉取云端数据",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "非 1 开头拦截",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "两次输入不一致拦截",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "拦截后不落库",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "号段库映射可用",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "13800138000 → 北京",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "18957509123 → 浙江",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "未分配号段返回空",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}
