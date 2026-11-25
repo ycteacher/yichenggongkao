@@ -175,6 +175,9 @@
     <button class="submit" style="margin-top:16px" onclick="location.href='index.html'">回去继续刷题</button>
   </div>
 
+  <div class="sec-t">官方回复 · 你提的问题我们回话了</div>
+  <div class="card" id="replyBox"><p class="q-hint">加载中…</p></div>
+
   <div class="sec-t">我的积分</div>
   <div class="card">
     <div class="pts-hero"><span class="num" id="ptsNum">0</span><span class="unit">分 · 打开刷题应用首页右上角「积分」可看明细</span></div>
@@ -287,6 +290,31 @@
 
   // 初始化积分显示
   document.getElementById("ptsNum").textContent=getPoints().balance||0;
+
+  /* 官方回复展示：读取回复库，展示最近 6 条 */
+  var RP_GET=["https://textdb.online/ycgk-fb-reply-v1","https://textdb.dev/api/data/ycgk-fb-reply-v1"];
+  function escHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  (function(){
+    var box=document.getElementById("replyBox");
+    Promise.allSettled(RP_GET.map(function(u){ return fetch(u,{cache:"no-store"}).then(function(r){ return r.text(); }); })).then(function(rs){
+      var d=null;
+      for (var i=0;i<rs.length;i++){
+        if (rs[i].status==="fulfilled" && rs[i].value && rs[i].value.trim()){
+          try{ var j=JSON.parse(rs[i].value); if (j && j.replies && j.replies.length){ d=j; break; } }catch(e){}
+        }
+      }
+      if(!box) return;
+      if(!d){ box.innerHTML='<p class="q-hint">你的意见我们正在看，回复会展示在这里。</p>'; return; }
+      var items=d.replies.slice(-6).reverse();
+      var h="";
+      items.forEach(function(r){
+        var t=new Date(r.at||r.ts||Date.now());
+        var label=(t.getMonth()+1)+"月"+t.getDate()+"日";
+        h+='<div style="padding:10px 2px;border-bottom:1px dashed rgba(148,163,184,.35)"><div style="font-size:12px;color:#94a3b8;margin-bottom:4px">'+label+' · 官方回复</div><div style="font-size:14px;line-height:1.7;white-space:pre-wrap">'+escHtml(r.text)+'</div></div>';
+      });
+      box.innerHTML=h;
+    }).catch(function(){ if(box) box.innerHTML='<p class="q-hint">回复暂时拉不到，稍后再看。</p>'; });
+  })();
 })();
 </script>
 </body>
