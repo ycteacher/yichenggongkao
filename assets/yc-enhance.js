@@ -15,19 +15,20 @@
 
   /* ---------- 浮条 ---------- */
   var style = document.createElement('style');
-  style.textContent = '#yc-enh-bar{position:fixed;left:12px;top:60px;z-index:2147483000;display:none;align-items:flex-start;flex-direction:column;gap:6px;font-family:inherit;}';
+  /* 修改点：浮条改横排（计时器＋报错两按钮挨在一起），整体靠右对齐，不再竖排堆叠挡题目 */
+  style.textContent = '#yc-enh-bar{position:fixed;right:12px;top:60px;z-index:2147483000;display:none;align-items:center;flex-direction:row;gap:8px;font-family:inherit;}';
   document.head.appendChild(style);
   var bar = document.createElement('div');
   bar.id = 'yc-enh-bar';
   var timerEl = document.createElement('div');
-  timerEl.style.cssText = 'display:none;align-items:center;gap:8px;background:#1F2937;color:#fff;border-radius:999px;padding:11px 20px;font-size:16px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;';
+  timerEl.style.cssText = 'display:none;align-items:center;gap:8px;background:#1F2937;color:#fff;border-radius:999px;padding:9px 14px;font-size:15px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;';
   timerEl.innerHTML = '<span id="yc-timer-ic" style="font-size:14px;opacity:.8;">⏱</span><span id="yc-timer-txt">--:--</span>';
   timerEl.title = '作答后自动开始计时（每题60秒）；点一下暂停/继续';
   var ruleEl = document.createElement('span');
   ruleEl.id = 'yc-timer-rule';
   ruleEl.style.cssText = 'display:none;font-size:11px;font-weight:700;color:#6B6558;background:#fff;border:1px solid #E5E1D8;border-radius:999px;padding:8px 12px;box-shadow:0 4px 14px rgba(0,0,0,.10);white-space:nowrap;';
   var errBtn = document.createElement('button');
-  errBtn.style.cssText = 'display:none;border:none;background:#B91C1C;color:#fff;border-radius:999px;padding:11px 18px;font-size:14px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;font-family:inherit;white-space:nowrap;';
+  errBtn.style.cssText = 'display:none;border:none;background:#B91C1C;color:#fff;border-radius:999px;padding:9px 14px;font-size:14px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;font-family:inherit;white-space:nowrap;';
   errBtn.textContent = '⚠ 一键报错';
   bar.appendChild(timerEl); bar.appendChild(ruleEl); bar.appendChild(errBtn);
 
@@ -82,11 +83,12 @@
     }
     return null;
   }
+  /* 修改点：浮条整体靠右对齐（right:12px），与答题卡行同高——该行右侧是空白区，不挡题目内容 */
   function placeBar(){
     if (!quizEl()){ return; }
     cardEl = answerCardEl();
     if (!cardEl){
-      bar.style.top = '60px'; bar.style.left = '12px'; bar.style.bottom = 'auto';
+      bar.style.top = '60px'; bar.style.right = '12px'; bar.style.left = 'auto'; bar.style.bottom = 'auto';
       bar.style.display = 'flex';
       return;
     }
@@ -98,9 +100,9 @@
     }
     bar.style.display = 'flex';
     bar.style.bottom = 'auto';
+    bar.style.left = 'auto';
+    bar.style.right = '12px';
     bar.style.top = Math.max(8, r.top) + 'px';
-    var wide = window.innerWidth >= 720;
-    bar.style.left = wide ? (r.right + 10) + 'px' : Math.min(window.innerWidth - 128, r.right + 8) + 'px';
   }
   window.addEventListener('scroll', function(){ if (quizEl()) placeBar(); }, { passive: true, capture: true });
   window.addEventListener('resize', function(){ if (quizEl()) placeBar(); });
@@ -312,12 +314,8 @@
       }
       if (total > 0){
         timerEl.style.display = 'flex'; renderTimer();
-        if (window.innerWidth >= 720){
-          ruleEl.style.display = 'block';
-          ruleEl.textContent = '共' + total + '题 · 每题' + SEC_PER_Q + '秒 · 作答后计时';
-        } else {
-          ruleEl.style.display = 'none';
-        }
+        /* 修改点：计时规则不再以浮层展示（挡题目）；规则信息保留在计时器长按提示与开始计时提示里 */
+        ruleEl.style.display = 'none';
         /* 用时跟踪：作答开始后建会话，翻题即结算上一题用时 */
         if (tState && tState.started){
           if (!sess){
@@ -350,7 +348,8 @@
         bar.style.display = 'flex';
         bar.style.top = 'auto';
         bar.style.bottom = '20px';
-        bar.style.left = '12px';
+        bar.style.right = '12px';
+        bar.style.left = 'auto';
         if (!lastEssaySeen){
           lastEssaySeen = true;
           if (window.__ycEssayResume){
