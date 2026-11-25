@@ -361,7 +361,7 @@
     html += '<p style="margin:0;font-size:14px;font-weight:700;">我的作答</p>';
     html += '<p id="wc" style="margin:0;font-size:12px;color:#8A8378;"></p></div>';
     html += '<div class="paper-wrap">';
-    html += '<div class="paper-hint" id="paperHint">答题纸 · 每格一字</div>';
+    html += '<div class="paper-hint" id="paperHint">答题纸 · 每格一字 · 数字英文自动占满格</div>';
     html += '<textarea id="ans" class="ans' + (state.paperMode ? '' : ' plain') + '" placeholder="在此打字作答，自动保存草稿…"></textarea>';
     html += '</div>';
     html += '<div class="paper-tools">';
@@ -398,12 +398,27 @@
       var n = countChars(ta.value);
       wc.innerHTML = '已写 <strong style="color:' + (n > q.wordLimit ? '#DC2626' : '#15803D') + '">' + n + '</strong> / 限 ' + q.wordLimit + ' 字' + (n > q.wordLimit ? '（超字数啦，精简一下）' : '');
     }
+    // 稿纸模式下打开旧草稿：统一转全角，保证格线对齐（普通模式保留原文）
+    if(state.paperMode && ta.value){
+      ta.value = toGrid(toFullwidth(ta.value));
+      state.draft = ta.value;
+      localStorage.setItem('yc_essay_draft_' + state.tab + ':' + q.id, ta.value);
+    }
     updWc();
 
     /* ===== 方格稿纸：严格一格一字 ===== */
     // 半角标点转全角，确保标点也占满一格（考场作文标点同样占格）
-    var PUNC_MAP={',':'\uff0c','.':'\u3002','?':'\uff1f','!':'\uff01',':':'\uff1a',';':'\uff1b','(':'\uff08',')':'\uff09','"':'\u201c','\'':'\u2018','<':'\u300a','>':'\u300b'};
-    function toFullwidth(s){ return (s||'').replace(/[,.?!:;()"'<>]/g,function(c){ return PUNC_MAP[c]||c; }); }
+    // 注意：半角句点'.'不转'。'——小数(3.14)和英文句子里的点号不能变成中文句号
+    var PUNC_MAP={',':'\uff0c','?':'\uff1f','!':'\uff01',':':'\uff1a',';':'\uff1b','(':'\uff08',')':'\uff09','"':'\u201c','\'':'\u2018','<':'\u300a','>':'\u300b'};
+    function toFullwidth(s){ return (s||'').replace(/[,?!:;()"'<>]/g,function(c){ return PUNC_MAP[c]||c; }); }
+    // 稿纸模式专用：半角数字/字母/点号/空格转全角，宽度恰好一格，保证严格一格一字
+    // （普通模式不做任何转换，保留用户原文）
+    function toGrid(s){
+      return (s||'')
+        .replace(/[0-9a-zA-Z]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)+65248); })
+        .replace(/\./g,'\uff0e')
+        .replace(/ /g,'\u3000');
+    }
     // 固定舒适字号（不随屏幕放大），屏幕越宽则一行格子越多；字恰好落入格中
     function layoutPaper(){
       if(!state.paperMode) return;
@@ -423,7 +438,8 @@
 
     ta.oninput = function(){
       var pos = ta.selectionStart;
-      var converted = toFullwidth(ta.value);
+      // 仅稿纸模式做全角化（保证一格一字）；普通模式保留用户原文，不做任何转换
+      var converted = state.paperMode ? toGrid(toFullwidth(ta.value)) : ta.value;
       if(converted !== ta.value){
         ta.value = converted;
         try{ ta.setSelectionRange(pos,pos); }catch(e){}
@@ -434,6 +450,15 @@
     function setMode(isPaper){
       state.paperMode = isPaper;
       localStorage.setItem('yc_paper_mode', isPaper?'paper':'plain');
+      if(isPaper){
+        // 切到稿纸模式时，把已有内容统一转成全角，保证格线对齐
+        var c = toGrid(toFullwidth(ta.value));
+        if(c !== ta.value){
+          var p = ta.selectionStart;
+          ta.value = c;
+          try{ ta.setSelectionRange(p,p); }catch(e){}
+        }
+      }
       ta.classList.toggle('plain', !isPaper);
       document.getElementById('segPaper').classList.toggle('on', isPaper);
       document.getElementById('segPlain').classList.toggle('on', !isPaper);
