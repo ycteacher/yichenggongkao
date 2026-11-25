@@ -30,8 +30,21 @@ self.addEventListener('message', function (e) {
   }
 });
 
-self.addEventListener('install', function () {
-  /* B6：不自动 skipWaiting —— 新版本先进入 waiting，由页面底部更新浮条引导用户点击后生效 */
+/* P1-3 离线壳：install 预缓存最小离线资源（首页HTML＋base.js＋样式＋图标，约0.5MB），
+   断网首开也能渲染出页面与失败提示，不再白屏；逐项容错，任一失败不阻塞安装。 */
+var OFFSHELL = ['./index.html', './base.js', './assets/index-C2M5URtc.css', './assets/ycicon-192-a.png'];
+
+self.addEventListener('install', function (e) {
+  /* P1-3：预缓存离线壳（不自动 skipWaiting —— B6：新版本先进入 waiting，由页面底部更新浮条引导用户点击后生效） */
+  e.waitUntil(
+    caches.open(CACHE).then(function (c) {
+      return Promise.all(OFFSHELL.map(function (u) {
+        return fetch(new Request(u, { cache: 'no-store' })).then(function (r) {
+          if (r && r.ok) return c.put(u, r);
+        }).catch(function () {});
+      }));
+    })
+  );
 });
 
 self.addEventListener('activate', function (e) {
@@ -123,7 +136,12 @@ self.addEventListener('fetch', function (e) {
           }).catch(function () { return null; });
           if (hit) return hit;
           return net.then(function (res) {
-            return res || caches.match('./index.html').then(function (h2) { return h2 || Response.error(); });
+            /* P1-3：兜底链 网络失败 → 预缓存index → 内联离线提示页，任何情况不再白屏 */
+            return res || caches.match('./index.html').then(function (h2) {
+              return h2 || new Response(
+                '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>亿成公考 · 离线</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF8F2;font-family:-apple-system,sans-serif"><div style="text-align:center;padding:24px"><div style="font-size:40px">📡</div><div style="font-size:16px;color:#4A463F;margin:12px 0 6px">当前无网络连接</div><div style="font-size:13px;color:#8A857C">网络恢复后刷新即可继续刷题</div></div></body></html>',
+                { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+            });
           });
         });
       })
