@@ -1145,12 +1145,13 @@ document.addEventListener('click', function(e){
   }
   function openRedeemDone(rec){
     var steps;
+    var qrBlock='<div style="text-align:center;margin:10px 0 2px"><img src="./assets/wx-qr-yicheng.jpg" alt="亿成老师微信二维码" style="width:180px;height:auto;border-radius:12px;border:1px solid var(--yc-line);display:inline-block"><div style="font-size:11px;color:var(--yc-mut);margin-top:4px">长按识别加微信 · 备注「积分兑换」· 微信号 mshongwen</div></div>';
     if(rec.kind==="service"){
       steps='<div class="yc-rd-step"><b>1</b><span>亿成老师会在 <b>24 小时内</b>通过站内消息联系你，和你约时间（批改 / 咨询都是老师亲自来）</span></div>'+
-            '<div class="yc-rd-step"><b>2</b><span>着急的话可以加微信 <b>mshongwen</b>（备注：订单号），老师优先安排</span></div>';
+            '<div class="yc-rd-step"><b>2</b><span>着急的话，<b>长按识别下方二维码</b>加老师微信，备注「积分兑换」优先安排</span></div>'+qrBlock;
     }else{
       steps='<div class="yc-rd-step"><b>1</b><span>兑换已登记，<b>发货前</b>会通过站内消息通知你填写收货信息（内测期统一安排发出）</span></div>'+
-            '<div class="yc-rd-step"><b>2</b><span>想更快拿到，可加微信 <b>mshongwen</b>（备注：订单号）跟老师确认</span></div>';
+            '<div class="yc-rd-step"><b>2</b><span>想更快拿到，<b>长按识别下方二维码</b>加老师微信，备注「积分兑换」跟老师确认</span></div>'+qrBlock;
     }
     modal.innerHTML=
       '<h3>✅ 兑换成功</h3>'+
