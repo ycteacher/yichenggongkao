@@ -112,14 +112,28 @@
     fetch('https://textdb.online/update/?key='+encodeURIComponent(key)+'&value='+encodeURIComponent(val)).then(function(){ok=true;fin()},function(){fin()});
     fetch('https://textdb.dev/api/data/'+key,{method:'POST',headers:{'Content-Type':'text/plain'},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
   }
-  /* 注册台账：读-合并-写（聚合，仅哈希锚点+时间+省份+来源+加密留底，不含手机号明文） */
-  function regPut(key16,prov,src,e,cb){
+  /* 注册台账：读-合并-写（哈希锚点+时间+省份+来源+留底；pt=手机号明文、ip=出口IP，站长看板直读） */
+  function regPut(key16,prov,src,e,extra,cb){
     cloudGet(REG_KEY,function(err,t){
       var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
       if(!pool||typeof pool!=='object'||!pool.r)pool={v:1,r:{}};
-      pool.r[key16]={t:Date.now(),p:prov||'',s:src||{},e:e||''};
+      var old=pool.r[key16]||{};
+      var rec={t:old.t||Date.now(),p:prov||old.p||'',s:(src&&src.pv!==undefined)?src:(old.s||{}),e:e||old.e||''};
+      if(extra){ if(extra.pt)rec.pt=extra.pt; if(extra.ip)rec.ip=extra.ip; }
+      pool.r[key16]=rec;
       cloudPut(REG_KEY,JSON.stringify(pool),function(){ cb&&cb(); });
     });
+  }
+  /* 出口IP：双源竞速，4秒超时，失败留空不阻断 */
+  function fetchIP(cb){
+    var done=false;
+    function fin(v){ if(!done){done=true;cb(String(v||'').trim())} }
+    try{
+      var t=setTimeout(function(){fin('')},4000);
+      fetch('https://api.ipify.org?format=json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){clearTimeout(t);fin(d&&d.ip)}).catch(function(){
+        fetch('https://api.ip.sb/ip',{cache:'no-store'}).then(function(r){return r.text()}).then(function(s){clearTimeout(t);fin(s)}).catch(function(){clearTimeout(t);fin('')});
+      });
+    }catch(e){ fin(''); }
   }
 
   /* ---------- 用户信息池（ycgk-user-v1）：读-合并-写，池上限3000按最后活跃淘汰 ---------- */
@@ -244,7 +258,8 @@
   }catch(e){} })();
   function landSrc(){ try{
     var l=JSON.parse(sessionStorage.getItem(LAND_KEY)||'{}');
-    return { i:(l.i||invParam()||''), q:(l.q||'').slice(0,150), r:(l.r||'').slice(0,60) };
+    var f=''; try{ var us=JSON.parse(localStorage.getItem('yc-user-source')||'null'); if(us&&us.key)f=String(us.key).slice(0,32); }catch(e){}
+    return { i:(l.i||invParam()||''), q:(l.q||'').slice(0,150), r:(l.r||'').slice(0,60), f:f };
   }catch(e){ return {i:'',q:'',r:''}; } }
   function ALPHABET(){ return '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; }
   function codeToNum(code){ var A=ALPHABET(),n=0; for(var i=0;i<code.length;i++){var v=A.indexOf(code[i]);if(v<0)return -1;n=n*32+v;} return n>0&&n<100000?n:-1; }
@@ -307,10 +322,12 @@
         var n=0;
         try{ for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&(k.indexOf('yicheng-gk-')===0||k.indexOf('yc-quiz')===0||k.indexOf('yc-notes')===0||k.indexOf('yc-invite')===0))n++;} }catch(e){}
         wr(MIG,{ts:Date.now(),keys:n,oldCode:oldCode,anchor:key16});
-        /* 云端绑定 + 注册台账（异步补写，失败不阻断）；台账附加密留底，私钥仅站长持有 */
+        /* 云端绑定 + 注册台账（异步补写，失败不阻断）；台账含明文手机号与IP留底，站长看板直读 */
         cloudPut(BIND_PRE+h,JSON.stringify({c:code,ts:Date.now()}),function(){});
         bkEncrypt(phone,function(ct){
-          regPut(key16,prov,landSrc(),ct,function(){});
+          fetchIP(function(ip){
+            regPut(key16,prov,landSrc(),ct,{pt:phone,ip:ip},function(){});
+          });
         });
         /* 用户信息池：注册即建档（昵称/省份/学习码/尾号/计数），失败不阻断 */
         userMutate(key16,function(rec){
@@ -559,6 +576,15 @@
       cloudGet(BIND_PRE+acc.md5,function(e,t){
         if(e||!t)cloudPut(BIND_PRE+acc.md5,JSON.stringify({c:acc.code,ts:acc.ts}),function(){});
       });
+      /* 明文留底回填：每台设备只跑一次，补 pt/ip 供看板直读（旧注册无留底字段） */
+      try{
+        if(!ls('ycgk-bk2')&&acc.ph){
+          lss('ycgk-bk2','1');
+          fetchIP(function(ip){
+            regPut(acc.md5.slice(0,16),acc.prov||'',{},'',{pt:acc.ph,ip:ip},function(){});
+          });
+        }
+      }catch(ex){}
     }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

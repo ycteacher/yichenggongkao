@@ -3,6 +3,9 @@
    本地队列暂存，定期重试上报 textdb；失败静默降级，不影响主功能。
    v2: 修复内嵌 md5（T[5] 常数转录错误 1200143054→1200080426、UTF-8 长度口径），
        与 tools/md5_ref.js 同源（blueimp 核心，BSD）。 */
+/* v3: 用户来源归因——解析 ?from= 参数，首触写入 localStorage(yc-user-source)，
+   全事件携带来源 key；新增 yc_source_visit(首次进入) 与 yc_source_installed(安装/standalone) 事件；
+   来源映射集中在 SOURCE_MAP，新增来源只加映射不改逻辑。 */
 (function(){
   if(window.YCTrack) return;
   var QKEY='ycgk.track.q.v1', UIDKEY='ycgk.track.uid.v1';
@@ -81,7 +84,8 @@
   function track(ev,extra){
     try{
       var q=queue();
-      q.push({e:String(ev).slice(0,40),t:Date.now(),a:anchor(),x:extra||null});
+      var sc=''; try{ var us=JSON.parse(ls(SRC_KEY)||'null'); if(us&&us.key)sc=us.key; }catch(e){}
+      q.push({e:String(ev).slice(0,40),t:Date.now(),a:anchor(),s:sc,x:extra||null});
       saveQ(q);
       flush();
     }catch(e){}
@@ -121,6 +125,33 @@
       putPool(batch,function(r){fin(r)});
     });
   }
-  window.YCTrack={track:track,flush:flush,anchor:anchor,md5:md5};
+  /* ---------- 用户来源归因（v3） ---------- */
+  var SRC_KEY='yc-user-source';
+  var SOURCE_MAP={share_video:'通过外链分享视频获取用户'};
+  function getSrc(){ try{ var s=JSON.parse(ls(SRC_KEY)||'null'); return (s&&s.key)?s:null; }catch(e){ return null; } }
+  function srcName(k){ return SOURCE_MAP[k]||''; }
+  function initSource(){
+    try{
+      var m=location.search.match(/[?&]from=([a-zA-Z0-9_-]{1,32})/);
+      if(!m||!SOURCE_MAP[m[1]])return;               /* 未知来源不记录 */
+      if(getSrc())return;                            /* 首触归因：已有记录不覆盖不重报 */
+      lss(SRC_KEY,JSON.stringify({key:m[1],at:Date.now()}));
+      track('yc_source_visit',{k:m[1],n:SOURCE_MAP[m[1]]});
+    }catch(e){}
+  }
+  function reportInstalled(){
+    try{
+      if(ls('yc-src-inst.v1'))return;                /* 每台设备只报一次 */
+      lss('yc-src-inst.v1','1');
+      var sc=getSrc();
+      track('yc_source_installed',{k:(sc&&sc.key)||'',n:sc?srcName(sc.key):'',at:sc?sc.at:0});
+    }catch(e){}
+  }
+  window.YCTrack={track:track,flush:flush,anchor:anchor,md5:md5,getSrc:getSrc,srcName:srcName,reportInstalled:reportInstalled,SOURCE_MAP:SOURCE_MAP};
+  try{initSource()}catch(e){}
+  try{
+    if(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)reportInstalled();
+    window.addEventListener('appinstalled',reportInstalled);
+  }catch(e){}
   try{track('open')}catch(e){}
 })();
