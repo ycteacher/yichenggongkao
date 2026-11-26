@@ -112,17 +112,35 @@
     loadMini(0);
   }
 
-  /* ---- 一键保存 / 下载：真下载，下完告诉用户文件去哪了 ---- */
+  /* ---- 一键保存 / 下载：按环境降级，真成功才报成功，绝不空弹「已开始下载」 ---- */
   var dlBtn = document.getElementById("dlBtn"), dlStatus = document.getElementById("dlStatus");
   var fname = decodeURIComponent((file.split("/").pop() || "讲义.pdf"));
+  /* 环境检测：微信内置浏览器 / 安卓 WebView 里 a.download 常不触发下载，直接走浏览器原生打开 */
+  var uaStr = navigator.userAgent || "";
+  var isWxUa = /MicroMessenger/i.test(uaStr);
+  var isAndroidWv = /Android/i.test(uaStr) && /;\s*wv\)/i.test(uaStr);
+  var nativeOpen = function(msg){
+    var w = null;
+    try { w = window.open(file, "_blank"); } catch(e){}
+    if (!w) { location.href = file; }
+    dlBtn.disabled = false;
+    dlStatus.innerHTML = (msg || "📄 已在新页面打开「" + esc(fname) + "」") + "：<br>" +
+      "· 长按文件选「保存 / 下载」，或点浏览器右上角菜单里的「下载 / 保存」<br>" +
+      "· 微信里打开的：点右上角「···」选「在浏览器打开」后再保存更稳";
+  };
   dlBtn.addEventListener("click", function(){
     if (!file) { dlStatus.textContent = "没有找到讲义文件"; return; }
     dlBtn.disabled = true;
+    if (isWxUa || isAndroidWv) { nativeOpen(); return; }
     dlStatus.textContent = "正在准备文件，请稍等…";
-    fetch(file).then(function(r){
+    /* 超时防线：9 秒拿不到文件就放弃 blob 下载，转原生打开，绝不长时间停在「正在准备文件」 */
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ try { ctrl.abort(); } catch(e){} }, 9000) : null;
+    fetch(file, ctrl ? { signal: ctrl.signal } : undefined).then(function(r){
       if (!r.ok) throw new Error("http " + r.status);
       return r.blob();
     }).then(function(b){
+      if (timer) clearTimeout(timer);
       var url = URL.createObjectURL(b);
       var a = document.createElement("a");
       a.href = url;
@@ -134,12 +152,12 @@
       dlStatus.innerHTML = "✅ 已开始下载「" + esc(fname) + "」，去这里找：<br>" +
         "· 苹果手机：Safari 可能问「是否下载」，点下载后，在<b>「文件」App → 浏览 → 下载项</b>里<br>" +
         "· 安卓手机：看<b>通知栏</b>的下载完成提示，文件在「文件管理」的 <b>Download</b> 文件夹<br>" +
-        "· 电脑：在浏览器右上角<b>下载列表</b>里";
+        "· 电脑：在浏览器右上角<b>下载列表</b>里<br>" +
+        "· 没看到文件？再点一次「一键保存」重试，或在上方预览里长按页面选「保存」";
       setTimeout(function(){ try { URL.revokeObjectURL(url); } catch(e){} }, 60000);
     }).catch(function(){
-      dlBtn.disabled = false;
-      dlStatus.innerHTML = "一键下载没成功，已帮你用新页面打开：长按页面选「保存 / 下载」，或点浏览器菜单里的「下载」即可。";
-      try { window.open(file, "_blank"); } catch(e){ location.href = file; }
+      if (timer) clearTimeout(timer);
+      nativeOpen("⏳ 在线下载没成功，已帮你用新页面打开「" + esc(fname) + "」");
     });
   });
 
