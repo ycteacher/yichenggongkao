@@ -3971,31 +3971,38 @@ document.addEventListener('click', function(e){
     new MutationObserver(schedule).observe(document.getElementById('root'), {childList:true, subtree:true});
   }
   /* ===== ?goto= 快捷深链：sprint.html 等页面的「错题本 / 卷子」直达入口 =====
-     读参暂存后清参（版本重载丢参时按暂存恢复），等底部标签栏渲染后点击对应页签。 */
+     读参暂存后清参（版本重载丢参时按暂存恢复），等底部标签栏渲染后点击对应页签；
+     点击成功即清暂存，避免下次无参打开重复跳转。 */
   var GKEY = 'yc-goto-link.v1';
+  var gval = null;
   var mg = location.search.match(/[?&]goto=(wrong|papers)/);
   if (mg) {
-    try { sessionStorage.setItem(GKEY, JSON.stringify({g: mg[1], at: Date.now()})); } catch(e){}
+    gval = mg[1];
+    try { sessionStorage.setItem(GKEY, JSON.stringify({g: gval, at: Date.now()})); } catch(e){}
     try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}
   } else {
     try {
       var raw = sessionStorage.getItem(GKEY);
       if (raw) {
         var st = JSON.parse(raw);
-        if (st && st.g && Date.now() - st.at <= 5*60*1000) mg = [null, st.g];
+        if (st && st.g && Date.now() - st.at <= 5*60*1000) gval = st.g;
         sessionStorage.removeItem(GKEY);
       }
     } catch(e){}
   }
-  if (mg) {
-    var gname = mg[1] === 'wrong' ? '错题本' : '卷子';
+  if (gval) {
+    var gname = gval === 'wrong' ? '错题本' : '卷子';
     var gn = 0, giv = setInterval(function(){
       gn++;
       var btns = document.querySelectorAll('.yc-tabbar button');
       if (btns.length) {
         clearInterval(giv);
         for (var i = 0; i < btns.length; i++) {
-          if (btns[i].textContent.indexOf(gname) > -1) { btns[i].click(); return; }
+          if (btns[i].textContent.indexOf(gname) > -1) {
+            btns[i].click();
+            try { sessionStorage.removeItem(GKEY); } catch(e){}
+            return;
+          }
         }
         return;
       }
