@@ -1320,6 +1320,25 @@ document.addEventListener('click', function(e){
     checkGrants();
   })();
 
+  /* ---------- 拍题讲解入口卡片（醒目红渐变，置于最上方） ---------- */
+  function addScanCard(){
+    if (document.getElementById("yc-scan-card")) return;
+    var entry = document.querySelector('[data-testid="papers-entry"]');
+    if (!entry) return;
+    var card = document.createElement("div");
+    card.id = "yc-scan-card";
+    card.style.cssText = "display:flex;align-items:center;gap:12px;padding:14px 16px;margin:10px 0;border-radius:16px;background:linear-gradient(135deg,#B02A2A,#DC2626);color:#fff;box-shadow:0 4px 14px rgba(176,42,42,.35);cursor:pointer";
+    card.innerHTML =
+      '<span style="font-size:26px">📷</span>' +
+      '<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:800">拍题讲解 <span style="font-size:10px;background:rgba(255,255,255,.25);border-radius:99px;padding:2px 7px;vertical-align:2px">新功能</span></div>' +
+      '<div style="font-size:12px;opacity:.92;margin-top:3px">拍一道题，AI 判答案讲过程，还能找到题库原题</div></div>' +
+      '<span style="font-size:13px;font-weight:700;opacity:.95">去拍 ›</span>';
+    card.addEventListener("click", function(){
+      window.location.href = "scan.html";
+    });
+    entry.parentNode.insertBefore(card, entry);
+  }
+
   /* ---------- 考试通告卡片（每天更新，放在资料卡上方） ---------- */
   function addNoticesCard(){
     if (document.getElementById("yc-notices-card")) return;
@@ -1530,9 +1549,9 @@ document.addEventListener('click', function(e){
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
     });
   }
-  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addNoticesCard(); addMaterialsCard(); addGaopinCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addScanCard(); addNoticesCard(); addMaterialsCard(); addGaopinCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
     mo.observe(document.body, {childList: true, subtree: true});
-    addNoticesCard(); addMaterialsCard(); addGaopinCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
+    addScanCard(); addNoticesCard(); addMaterialsCard(); addGaopinCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

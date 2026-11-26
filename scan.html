@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>拍题讲解 · 亿成公考</title>
+<script src="./assets/yc-track.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#F7F4EF;color:#202020;min-height:100vh;padding:16px 14px 40px}
+.wrap{max-width:48rem;margin:0 auto}
+h1{font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px}
+.sub{font-size:12px;color:#8A8378;margin-top:4px;line-height:1.6}
+.card{background:#FFFDF8;border:1.5px solid #F0E4D4;border-radius:16px;padding:16px;margin-top:14px;box-shadow:0 2px 10px rgba(32,32,32,.04)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:999px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;padding:12px 20px}
+.btn-p{background:#B02A2A;color:#fff;width:100%}
+.btn-p:disabled{opacity:.55;cursor:default}
+.btn-g{background:#F3F0E9;color:#5b5560;font-size:12px;padding:8px 14px}
+.photo-box{border:2px dashed #D9CFC0;border-radius:14px;padding:22px 14px;text-align:center;cursor:pointer}
+.photo-box:active{background:#FAF6EE}
+.photo-box .big{font-size:34px}
+.photo-box p{font-size:13px;font-weight:700;margin-top:6px}
+.photo-box span{display:block;font-size:11px;color:#B3AC9E;margin-top:3px}
+#imgPrev{max-width:100%;max-height:300px;border-radius:10px;display:block;margin:0 auto}
+.prog{height:8px;background:#F0E9DC;border-radius:99px;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,#B02A2A,#DC2626);width:0%;transition:width .3s}
+.hint{font-size:11px;color:#B3AC9E;margin-top:6px;line-height:1.6}
+label.lb{display:block;font-size:12px;font-weight:800;color:#6B6558;margin-bottom:6px}
+textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.7;font-family:inherit;background:#fff;resize:vertical}
+.match{border:1.5px solid #E4DACA;border-radius:12px;padding:12px;margin-top:10px;background:#fff}
+.match .mh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.match .mt{font-size:13px;font-weight:800;color:#B02A2A}
+.match .ms{font-size:11px;color:#8A8378}
+.match .mq{font-size:13px;line-height:1.7;margin-top:8px;color:#3a3630}
+.match .ma{font-size:12.5px;line-height:1.8;margin-top:8px;color:#5b5560;background:#F7F5F0;border-radius:10px;padding:9px 11px}
+.match a{color:#B02A2A;font-weight:700;font-size:12.5px;text-decoration:none}
+.ai-out{white-space:pre-wrap;font-size:13.5px;line-height:1.9;margin-top:10px;color:#3a3630}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:99px;padding:3px 9px}
+.none{margin-top:10px;font-size:12.5px;color:#8A8378;background:#F7F5F0;border-radius:10px;padding:10px 12px;line-height:1.7}
+.modal-mask{position:fixed;inset:0;background:rgba(20,16,12,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#FFFDF8;border-radius:18px;max-width:360px;width:100%;padding:20px}
+.modal input{width:100%;border:1.5px solid #E4DACA;border-radius:10px;height:40px;padding:0 10px;font-size:13px;font-family:inherit;margin-top:4px}
+.home{display:inline-flex;align-items:center;gap:4px;color:#8A8378;font-size:12px;text-decoration:none;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="home" href="./index.html">‹ 返回首页</a>
+  <h1>📷 拍题讲解</h1>
+  <p class="sub">拍一道题 → 自动认字 → 题库里找原题 · AI 判答案讲过程。真题卷、练习册、讲义上的题都能拍。</p>
+
+  <div class="card">
+    <label class="lb">第 1 步 · 拍题或选照片</label>
+    <div class="photo-box" id="pick">
+      <div class="big">📸</div>
+      <p>点击拍照 / 从相册选择</p>
+      <span>只拍一道题，字越清楚识别越准</span>
+    </div>
+    <input type="file" id="file" accept="image/*" capture="environment" style="display:none">
+    <div id="imgWrap" style="display:none;margin-top:10px"><img id="imgPrev" alt="题目照片"></div>
+    <div class="prog" id="prog" style="display:none"><i id="progBar"></i></div>
+    <p class="hint" id="ocrHint"></p>
+  </div>
+
+  <div class="card" id="step2" style="display:none">
+    <label class="lb">第 2 步 · 认出来的题目（识别错了可直接改）</label>
+    <textarea id="ocrText" placeholder="题目文字会出现在这里，也可以直接手动粘贴题目"></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn btn-p" id="goMatch" style="flex:1">🔍 在题库里找原题</button>
+    </div>
+    <button class="btn btn-p" id="goAi" style="margin-top:10px">✦ AI 判答案 · 讲过程</button>
+    <p class="hint">第一次用 AI 讲题需要填一次接口（跟申论批阅共用），密钥只存你自己手机里。</p>
+    <div id="matchOut"></div>
+    <div id="aiOut"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function track(ev, extra){ try{ if(window.YCTrack&&window.YCTrack.track) window.YCTrack.track(ev, extra||{}); }catch(e){} }
+  track('yc_scan_open');
+
+  var MOD_NAMES = {changshi:'常识',panduan:'判断',shuliang:'数量',tuitui:'图推',yanyu:'言语',ziliao:'资料',zhengzhi:'政治理论',jundui:'军队文职',jiaoshi:'教师编',yangqi:'央国企',yiliao:'医疗编',shenlun:'申论',zongying:'综应'};
+
+  var pick = document.getElementById('pick'), file = document.getElementById('file');
+  pick.addEventListener('click', function(){ file.click(); });
+  file.addEventListener('change', function(){ if (file.files && file.files[0]) handleImage(file.files[0]); });
+
+  var ocrDone = false;
+  function handleImage(f){
+    var url = URL.createObjectURL(f);
+    var iw = document.getElementById('imgWrap'), ip = document.getElementById('imgPrev');
+    ip.src = url; iw.style.display = 'block';
+    var prog = document.getElementById('prog'), bar = document.getElementById('progBar'), hint = document.getElementById('ocrHint');
+    prog.style.display = 'block'; bar.style.width = '0%';
+    hint.textContent = '正在启动识别引擎…（第一次用要下载识别库，约十几 MB，之后有缓存）';
+    track('yc_scan_ocr_start');
+    var worker = null;
+    Tesseract.createWorker('chi_sim', 1, { logger: function(m){
+        if (m.status === 'recognizing text') { bar.style.width = Math.round((m.progress||0)*100) + '%'; }
+        else if (m.status && m.progress !== undefined) { bar.style.width = Math.round(m.progress*100) + '%'; hint.textContent = '识别准备中：' + m.status; }
+      }})
+      .then(function(w){ worker = w; return w.recognize(f); })
+      .then(function(res){
+        var text = (res.data && res.data.text || '').trim();
+        document.getElementById('ocrText').value = text;
+        document.getElementById('step2').style.display = 'block';
+        hint.textContent = text ? ('识别完成，共 ' + text.length + ' 字。识别不准的地方可以直接改。') : '没认出文字，试试拍得再清楚一点，或手动粘贴题目。';
+        prog.style.display = 'none';
+        document.getElementById('step2').scrollIntoView({behavior:'smooth'});
+        track('yc_scan_ocr_done', { len: text.length });
+        if (worker) worker.terminate();
+      })
+      .catch(function(e){
+        hint.textContent = '识别没成功（' + (e && e.message || '未知错误') + '）。可以直接在下面手动粘贴题目文字。';
+        prog.style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        if (worker) worker.terminate();
+      });
+  }
+
+  /* ===== 题库比对 ===== */
+  function norm(s){ return String(s||'').toLowerCase().replace(/[^0-9a-z\u4e00-\u9fff]/g,''); }
+  function h24(s){ var t=s.slice(0,24), h=5381; for(var i=0;i<t.length;i++){ h=((h<<5)+h+t.charCodeAt(i))|0; } return h>>>0; }
+  function dice(a,b){
+    if (a.length<2||b.length<2) return 0;
+    var m=new Map(), n=a.length-1;
+    for(var i=0;i<n;i++){ var g=a.substr(i,2); m.set(g,(m.get(g)||0)+1); }
+    var hit=0, tot=n+(b.length-1);
+    for(var j=0;j<b.length-1;j++){ var g2=b.substr(j,2), c=m.get(g2)||0; if(c>0){hit++;m.set(g2,c-1);} }
+    return 2*hit/tot;
+  }
+  var scanIdx = null, idxLoading = false, hashMap = null;
+  function loadIndex(cb){
+    if (scanIdx) return cb(scanIdx);
+    if (idxLoading) return;
+    idxLoading = true;
+    fetch('./assets/scan-index.json?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        scanIdx = j;
+        /* e 是 [哈希, 题id, 文件序号] 三元组数组，加载后建哈希→条目 的倒排表 */
+        hashMap = new Map();
+        j.e.forEach(function(e){
+          var a = hashMap.get(e[0]);
+          if (!a) { a = []; hashMap.set(e[0], a); }
+          a.push({ id: e[1], fi: e[2] });
+        });
+        cb(j);
+      })
+      .catch(function(){ idxLoading = false; cb(null); });
+  }
+  var shardCache = {};
+  function loadShard(f, cb){
+    if (shardCache[f]) return cb(shardCache[f]);
+    var s = document.createElement('script');
+    s.src = './assets/' + f + '.js?t=' + Date.now();
+    s.onload = function(){
+      var w = window, arr = [];
+      try{
+        if (Array.isArray(w.YC_MORE_QBANKS)) arr = w.YC_MORE_QBANKS.flat();
+        if (Array.isArray(w.YC_CS_BANK)) arr = arr.concat(w.YC_CS_BANK);
+      }catch(e){}
+      shardCache[f] = arr; cb(arr);
+    };
+    s.onerror = function(){ shardCache[f] = []; cb([]); };
+    document.body.appendChild(s);
+  }
+
+  document.getElementById('goMatch').addEventListener('click', function(){
+    var text = norm(document.getElementById('ocrText').value);
+    var out = document.getElementById('matchOut');
+    if (text.length < 10) { out.innerHTML = '<p class="none">题目太短，先补全题干再找。</p>'; return; }
+    out.innerHTML = '<p class="none">正在比对全库 5.7 万题…</p>';
+    track('yc_scan_match');
+    loadIndex(function(idx){
+      if (!idx) { out.innerHTML = '<p class="none">题库索引没加载出来，刷新后再试。</p>'; return; }
+      /* OCR 文本滑窗（步长1、窗长24）取哈希，命中题库指纹即为候选；步长1保证任意前缀长度都能对齐 */
+      var cands = new Map();
+      for (var i = 0; i + 10 <= text.length; i += 1) {
+        var h = h24(text.slice(i));
+        var list = hashMap && hashMap.get(h);
+        if (list) for (var k = 0; k < list.length; k++) {
+          var e = list[k], key = e.fi + ':' + e.id;
+          if (!cands.has(key)) cands.set(key, { id: e.id, fi: e.fi });
+        }
+      }
+      if (!cands.size) { renderNone(); return; }
+      /* 按分片分组，逐片加载后用全文相似度复核 */
+      var byFile = new Map();
+      cands.forEach(function(c){ var a = byFile.get(c.fi) || []; a.push(c.id); byFile.set(c.fi, a); });
+      var fileKeys = Array.from(byFile.keys()).slice(0, 6);
+      var results = [], pending = fileKeys.length;
+      fileKeys.forEach(function(fi){
+        loadShard(idx.files[fi], function(arr){
+          var map = new Map(); arr.forEach(function(q){ map.set(q.id, q); });
+          (byFile.get(fi) || []).forEach(function(id){
+            var q = map.get(id);
+            if (!q || !q.prompt) return;
+            var stem = norm(q.prompt) + norm((q.options||[]).join(''));
+            results.push({ q: q, fi: fi, score: dice(text, stem) });
+          });
+          pending--;
+          if (!pending) finish();
+        });
+      });
+      function finish(){
+        results.sort(function(a,b){ return b.score - a.score; });
+        results = results.filter(function(r){ return r.score >= 0.45; }).slice(0, 3);
+        if (!results.length) { renderNone(); return; }
+        var html = '';
+        results.forEach(function(r, n){
+          var mk = idx.fm[idx.files[r.fi]] || '';
+          var mn = MOD_NAMES[mk] || '题库';
+          var ans = typeof r.q.answer === 'number' && r.q.options ? esc(r.q.options[r.q.answer]) : esc(r.q.answer);
+          html += '<div class="match">' +
+            '<div class="mh"><span class="mt">' + (n===0?'✅ 最可能就是它':'其他可能') + ' · ' + esc(mn) + ' · ' + esc(r.q.id) + '</span>' +
+            '<span class="ms">相似度 ' + Math.round(r.score*100) + '%</span></div>' +
+            '<p class="mq">' + esc(r.q.prompt) + '</p>' +
+            '<div class="ma"><b>答案：</b>' + ans + (r.q.explanation ? '<br><b>解析：</b>' + esc(r.q.explanation) : '') + '</div>' +
+            (mk ? '<p style="margin-top:8px"><a href="./index.html?m=' + esc(mk) + '">去刷这个模块 ›</a></p>' : '') +
+            '</div>';
+        });
+        out.innerHTML = html;
+        track('yc_scan_match_hit', { n: results.length });
+      }
+      function renderNone(){
+        out.innerHTML = '<p class="none">题库里没找到这道题（或相似度不够）。没关系，直接点上面「AI 判答案 · 讲过程」，AI 会按题干现场判答案、写过程。</p>';
+        track('yc_scan_match_none');
+      }
+    });
+  });
+
+  /* ===== AI 判答案 · 讲过程 ===== */
+  function getCfg(){ try{ return JSON.parse(localStorage.getItem('yc_ai_cfg') || 'null'); }catch(e){ return null; } }
+  function callAI(prompt, ok, fail, btn){
+    var cfg = getCfg();
+    if (!cfg || !cfg.url || !cfg.key) { showCfg(); fail('还没配置 AI 接口'); return; }
+    var old = btn.textContent; btn.disabled = true; btn.textContent = 'AI 正在讲…';
+    var done = false, timer = setTimeout(function(){ if(!done){done=true;btn.disabled=false;btn.textContent=old;fail('超时');} }, 90000);
+    fetch(cfg.url, { method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + cfg.key},
+        body: JSON.stringify({ model: cfg.model || 'deepseek-chat', temperature: 0.3, stream: false,
+          messages: [{ role:'user', content: prompt }] }) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (done) return; done = true; clearTimeout(timer);
+        btn.disabled = false; btn.textContent = old;
+        var t = d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content;
+        if (!t) fail(d && d.error && d.error.message || '接口未返回内容');
+        else ok(t);
+      })
+      .catch(function(e){ if(done) return; done=true; clearTimeout(timer); btn.disabled=false; btn.textContent=old; fail(e && e.message || '网络错误'); });
+  }
+  function showCfg(){
+    var old = document.querySelector('.modal-mask'); if (old) old.remove();
+    var c = getCfg() || { url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat', key:'' };
+    var mask = document.createElement('div'); mask.className = 'modal-mask';
+    mask.innerHTML = '<div class="modal"><p style="font-size:16px;font-weight:800;margin:0">设置在线 AI（拍题讲解用）</p>' +
+      '<p style="font-size:12px;line-height:1.8;color:#6B6558;margin:10px 0;">填一次 OpenAI 兼容接口即可，密钥只保存在你本机浏览器，不会上传。跟申论页的 AI 批阅共用这套配置。</p>' +
+      '<label style="font-size:12px;color:#6B6558">接口地址</label><input id="cUrl" value="' + esc(c.url) + '">' +
+      '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px">模型名</label><input id="cModel" value="' + esc(c.model||'deepseek-chat') + '">' +
+      '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px">API Key</label><input id="cKey" type="password" placeholder="sk-...">' +
+      '<div style="margin-top:16px;display:flex;gap:10px"><button class="btn btn-g" id="cCancel" style="flex:1">先不用</button><button class="btn btn-p" id="cSave" style="flex:1;width:auto">保存</button></div></div>';
+    document.body.appendChild(mask);
+    mask.querySelector('#cCancel').onclick = function(){ mask.remove(); };
+    mask.querySelector('#cSave').onclick = function(){
+      localStorage.setItem('yc_ai_cfg', JSON.stringify({
+        url: mask.querySelector('#cUrl').value.trim(),
+        model: mask.querySelector('#cModel').value.trim() || 'deepseek-chat',
+        key: mask.querySelector('#cKey').value.trim()
+      }));
+      mask.remove();
+    };
+  }
+  document.getElementById('goAi').addEventListener('click', function(){
+    var q = document.getElementById('ocrText').value.trim();
+    var out = document.getElementById('aiOut'), btn = this;
+    if (q.length < 6) { out.innerHTML = '<p class="none">先把题目文字补全（拍照识别或手动粘贴）。</p>'; return; }
+    track('yc_scan_ai');
+    var prompt = '你是公务员考试资深讲师。下面是一道学生拍题识别出来的题目（可能有少量识别错别字，先自行纠正理解）。请严格按以下格式输出：\n' +
+      '【答案】给出正确答案（如有选项写选项字母和内容）\n' +
+      '【过程】一步步写清解题过程，含用到的公式/考点，最后给正确选项\n' +
+      '【易错点】一句话点出这类题最容易错在哪\n' +
+      '【考点】所属模块与考点名\n题目：\n' + q;
+    out.innerHTML = '<p class="none">AI 正在判答案、写过程…</p>';
+    callAI(prompt, function(text){
+      out.innerHTML = '<div class="match"><div class="mh"><span class="mt">✦ AI 判答案 · 讲过程</span><span class="ms">由在线大模型生成</span></div>' +
+        '<div class="ai-out">' + esc(text) + '</div></div>';
+      track('yc_scan_ai_done', { len: text.length });
+    }, function(err){
+      out.innerHTML = '<p class="none">AI 没讲成（' + esc(err) + '）。' + (err.indexOf('配置') > -1 ? '填好接口再点一次就行。' : '检查网络或接口设置后再试。') + '</p>';
+    }, btn);
+  });
+})();
+</script>
+</body>
+</html>
