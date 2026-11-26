@@ -1209,7 +1209,10 @@ document.addEventListener('click', function(e){
   }
   flushRedeemQueue();
 
-  /* ---------- 老师手动送积分（学生端领取，ycgk-grant-v1） ---------- */
+  /* ---------- 老师手动送积分（学生端领取，ycgk-grant-v1）----------
+     领取口径（2026-11-27 用户要求）：弹窗必须学生点「确定」才算收到——
+     点确定 → 积分入账 + 永久标记该条不再弹；
+     未点确定（没收到/误操作退出）→ 不做任何标记，下次打开应用重新弹。 */
   (function(){
     var APPLIED="yicheng-gk-grants-applied-v1";
     function appliedGet(){ try{ var a=JSON.parse(localStorage.getItem(APPLIED)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
@@ -1230,6 +1233,34 @@ document.addEventListener('click', function(e){
         }).catch(function(){done++;if(done===urls.length&&!got)cb(new Error("net"),null);});
       });
     }
+    var giftQueue=[], giftShowing=false;
+    function showNextGift(){
+      if(giftShowing||!giftQueue.length) return;
+      if(!document.body){ setTimeout(showNextGift,300); return; }
+      giftShowing=true;
+      var g=giftQueue.shift();
+      var ov=document.createElement("div");
+      ov.id="yc-gift-modal";
+      ov.style.cssText="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:24px";
+      var card=document.createElement("div");
+      card.style.cssText="background:#FAF8F2;border-radius:18px;max-width:340px;width:100%;padding:26px 22px 20px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25)";
+      card.innerHTML='<div style="font-size:44px;line-height:1">🎁</div>'
+        +'<div style="font-size:19px;font-weight:800;color:#4A463F;margin-top:10px">惊喜送分！</div>'
+        +'<div style="font-size:14px;color:#4A463F;line-height:1.7;margin-top:12px">因为你最近刷题学习或提交的调查问卷被我们采纳，送 <b style="color:#DC2626;font-size:18px">'+g.amt+'</b> 积分给你！</div>'
+        +(g.reason?'<div style="font-size:12px;color:#8A857B;margin-top:10px">理由：'+String(g.reason).replace(/[<>&"]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c];})+'</div>':'')
+        +'<button id="yc-gift-ok" style="margin-top:18px;padding:11px 0;width:100%;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:700">确定，收下积分</button>';
+      ov.appendChild(card);
+      document.body.appendChild(ov);
+      document.getElementById("yc-gift-ok").addEventListener("click",function(){
+        try{ addPoints(g.amt, g.reason||"老师赠送", "老师手动调整"); }catch(e){}
+        var applied=appliedGet();
+        if(applied.indexOf(g.id)<0){ applied.push(g.id); appliedSet(applied); }
+        ov.remove();
+        giftShowing=false;
+        showNextGift();
+      });
+      /* 无关闭按钮、点遮罩不关闭：必须点「确定」；中途退出应用则不做任何标记，下次打开重新弹 */
+    }
     function checkGrants(){
       var ids=myGrantIds();
       if(!ids.tail&&!ids.code) return;
@@ -1237,7 +1268,7 @@ document.addEventListener('click', function(e){
         if(e||!t) return;
         var arr; try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
         if(!Array.isArray(arr)) return;
-        var applied=appliedGet(), changed=false;
+        var applied=appliedGet();
         var nrm=function(s){ return String(s||"").replace(/\s+/g," ").trim(); };
         arr.forEach(function(g){
           if(!g||!g.id||applied.indexOf(g.id)>-1) return;
@@ -1247,10 +1278,9 @@ document.addEventListener('click', function(e){
           else{ hit=g.tail?String(g.tail)===String(ids.tail):(!g.tail&&g.code&&g.code===ids.code); }
           if(!hit) return;
           var amt=parseInt(g.amount,10);
-          applied.push(g.id); changed=true;
-          if(amt) addPoints(amt, g.reason||"老师赠送", "老师手动调整");
+          if(amt) giftQueue.push({id:g.id, amt:amt, reason:g.reason||""});
         });
-        if(changed) appliedSet(applied);
+        showNextGift();
       });
     }
     checkGrants();
