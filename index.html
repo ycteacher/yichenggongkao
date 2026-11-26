@@ -1270,6 +1270,24 @@ document.addEventListener('click', function(e){
     entry.parentNode.insertBefore(card, entry);
   }
 
+  /* ---------- 高频考点聚合入口卡片（P2：基于现有模块聚合，不新出题） ---------- */
+  function addGaopinCard(){
+    if (document.getElementById("yc-gaopin-card")) return;
+    var entry = document.querySelector('[data-testid="papers-entry"]');
+    if (!entry) return;
+    var card = document.createElement("div");
+    card.id = "yc-gaopin-card";
+    card.innerHTML =
+      '<span class="yc-mat-ic" style="font-size:26px">🎯</span>' +
+      '<div class="yc-mat-tx"><div class="yc-mat-t">高频考点速练</div>' +
+      '<div class="yc-mat-s">资料 · 数量 · 判断 · 言语 · 常识高频考点，直达对应模块开刷</div></div>' +
+      '<span class="yc-mat-go">进入 ›</span>';
+    card.addEventListener("click", function(){
+      window.location.href = "gaopin.html";
+    });
+    entry.parentNode.insertBefore(card, entry);
+  }
+
   /* ---------- 资料领取专区卡片 ---------- */
   function addMaterialsCard(){
     if (document.getElementById("yc-materials-card")) return;
@@ -1444,9 +1462,9 @@ document.addEventListener('click', function(e){
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
     });
   }
-  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addNoticesCard(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
+  var mo = new MutationObserver(function(){ replaceIcons(); hideProfileCard(); tagGrids(); addNoticesCard(); addMaterialsCard(); addGaopinCard(); addBetaBanner(); addFbBanner(); addVideoBanner(); });
     mo.observe(document.body, {childList: true, subtree: true});
-    addNoticesCard(); addMaterialsCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
+    addNoticesCard(); addMaterialsCard(); addGaopinCard(); addBetaBanner(); addFbBanner(); addVideoBanner();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
@@ -3985,17 +4003,21 @@ document.addEventListener('click', function(e){
 (function(){
   /* 修改点（P0-0c）：精简模式跳过增强脚本，降级预案不加载非核心脚本 */
   try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
-  var V='20';
+  var V='21';
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
-  var cos=(window.ycAsset?window.ycAsset('./assets/yc-enhance.js'):'./assets/yc-enhance.js')+'?v='+V;
-  var local='./assets/yc-enhance.js?v='+V;
-  var s1=document.createElement('script'); s1.src=cos; s1.async=false;
-  s1.onerror=function(){
-    var s2=document.createElement('script'); s2.src=local; s2.async=false;
-    s2.onerror=function(){ try{ sessionStorage.setItem('yc-skip-cdn','1'); }catch(e){} load(local+'&r=2'); };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
+  function loadFallback(name){
+    var cos=(window.ycAsset?window.ycAsset('./assets/'+name):'./assets/'+name)+'?v='+V;
+    var local='./assets/'+name+'?v='+V;
+    var s1=document.createElement('script'); s1.src=cos; s1.async=false;
+    s1.onerror=function(){
+      var s2=document.createElement('script'); s2.src=local; s2.async=false;
+      s2.onerror=function(){ try{ sessionStorage.setItem('yc-skip-cdn','1'); }catch(e){} load(local+'&r=2'); };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+  }
+  loadFallback('yc-enhance.js');
+  loadFallback('yc-draft.js'); /* 做题页草稿纸：默认展开，笔迹与选项事件隔离，防误触 */
 })();
 </script>
 <script>

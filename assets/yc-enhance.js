@@ -17,6 +17,8 @@
   var style = document.createElement('style');
   /* 修改点：浮条改横排（计时器＋报错两按钮挨在一起），整体靠右对齐，不再竖排堆叠挡题目 */
   style.textContent = '#yc-enh-bar{position:fixed;right:12px;top:60px;z-index:2147483000;display:none;align-items:center;flex-direction:row;gap:8px;font-family:inherit;}';
+  /* 修改点（P2宽屏）：电脑端做题材料常驻左侧，题目选项右移——用户反馈"写题时看不到材料" */
+  style.textContent += '@media (min-width:1400px){.page-shell-compact{margin-left:calc(50% - 104px) !important;margin-right:0 !important;}.page-shell-compact > .mt-5.rounded-3xl{position:fixed;left:calc(50% - 660px);top:80px;width:520px;max-height:calc(100vh - 120px);overflow-y:auto;margin-top:0 !important;}}';
   document.head.appendChild(style);
   var bar = document.createElement('div');
   bar.id = 'yc-enh-bar';
@@ -30,7 +32,11 @@
   var errBtn = document.createElement('button');
   errBtn.style.cssText = 'display:none;border:none;background:#B91C1C;color:#fff;border-radius:999px;padding:9px 14px;font-size:14px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;font-family:inherit;white-space:nowrap;';
   errBtn.textContent = '⚠ 一键报错';
-  bar.appendChild(timerEl); bar.appendChild(ruleEl); bar.appendChild(errBtn);
+  var totalEl = document.createElement('div');
+  totalEl.style.cssText = 'display:none;align-items:center;gap:8px;background:#15803D;color:#fff;border-radius:999px;padding:9px 14px;font-size:15px;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.32);cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;';
+  totalEl.innerHTML = '<span id="yc-total-ic" style="font-size:14px;opacity:.8;">⏳</span><span id="yc-total-txt">00:00</span>';
+  totalEl.title = '本次做题总用时；点一下暂停/继续';
+  bar.appendChild(totalEl); bar.appendChild(timerEl); bar.appendChild(ruleEl); bar.appendChild(errBtn);
 
   function mountBar(){ if (!bar.parentNode) document.body.appendChild(bar); }
   mountBar();
@@ -295,6 +301,33 @@
     submitReport(b.getAttribute('data-t') || '其他问题');
   });
 
+  /* ---------- 套卷总计时（P2：电脑端做套卷看不到计时）：本次做题累计用时，可暂停 ---------- */
+  var pKey = null, pSec = 0, pPaused = false;
+  function fmtSec(n){ var m = Math.floor(n / 60); return (m < 10 ? '0' : '') + m + ':' + ('0' + (n % 60)).slice(-2); }
+  totalEl.addEventListener('click', function(){
+    if (pKey === null) return;
+    pPaused = !pPaused;
+    document.getElementById('yc-total-ic').textContent = pPaused ? '▶' : '⏳';
+    document.getElementById('yc-total-txt').textContent = (pPaused ? '暂停 ' : '') + fmtSec(pSec);
+  });
+  setInterval(function(){
+    if (pKey === null || pPaused) return;
+    if (document.visibilityState !== 'visible' || !quizEl()) return;
+    pSec += 1;
+    document.getElementById('yc-total-txt').textContent = fmtSec(pSec);
+  }, 1000);
+
+  /* ---------- 收藏夹入口轻提示（P3）：点收藏后告知收藏夹位置，不重做功能 ---------- */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('[data-testid="fav-toggle"]') : null;
+    if (!b) return;
+    setTimeout(function(){
+      var star = b.querySelector('.material-icons');
+      var fav = star && (star.textContent || '').trim() === 'star';
+      showToast(fav ? '已收藏本题！底部「★ 收藏」页签随时回看' : '已取消收藏');
+    }, 80);
+  }, true);
+
   /* ---------- 屏幕侦测 ---------- */
   var lastQuizKey = null, lastEssaySeen = false;
   function detect(){
@@ -306,6 +339,9 @@
       var key = title + '|' + total;
       if (key !== lastQuizKey){
         lastQuizKey = key;
+        pKey = key; pSec = 0; pPaused = false;
+        document.getElementById('yc-total-ic').textContent = '⏳';
+        document.getElementById('yc-total-txt').textContent = '00:00';
         if (total > 0) ensureTimer(key, total);
         if (window.__ycResumeN){
           showToast('已回到上次进度：第 ' + window.__ycResumeN + ' 题，接着刷');
@@ -335,6 +371,8 @@
     } else {
       if (lastQuizKey !== null){
         lastQuizKey = null; tState = null;
+        if (pKey !== null && pSec >= 30) showToast('本次做题用时 ' + fmtSec(pSec) + '，交卷或退出都会记录');
+        pKey = null; pSec = 0; pPaused = false;
         saveSession(); /* 离开刷题屏，用时入账 */
         try { localStorage.removeItem(TIMER_KEY); } catch(e){}
       }

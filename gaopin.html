@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>高频考点速练 · 亿成公考</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:#F7F4EF;color:#202020;min-height:100vh;
+  padding-top:calc(52px + env(safe-area-inset-top,0px));
+}
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding-top:env(safe-area-inset-top,0px);
+  background:linear-gradient(90deg,#15803D,#0E7490);color:#fff;
+  display:flex;align-items:center;gap:10px;
+  padding-left:12px;padding-right:12px;height:52px;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);
+}
+.topbar .back{
+  flex:none;background:rgba(255,255,255,.2);border:none;color:#fff;
+  border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:700;cursor:pointer;
+  text-decoration:none;font-family:inherit;
+}
+.topbar .tt{font-size:16.5px;font-weight:800;letter-spacing:.5px}
+.wrap{max-width:720px;margin:0 auto;padding:14px 12px 40px}
+.tip{
+  background:#E6F4EA;border:1px solid #A7D7B9;color:#1F6B3C;
+  border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.6;margin-bottom:14px;
+}
+.card{
+  background:#fff;border-radius:18px;padding:16px;margin-bottom:12px;
+  box-shadow:0 2px 12px rgba(32,32,32,.06);
+}
+.card .row1{display:flex;align-items:center;gap:10px}
+.card .ic{
+  flex:none;width:44px;height:44px;border-radius:14px;background:#E6F4EA;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.card h3{font-size:15.5px;font-weight:800;color:#202020}
+.card .sub{font-size:12px;color:#8A8378;margin-top:3px;line-height:1.6}
+.card .kps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.card .kp{
+  background:#FBF9F4;border:1px solid #E5E1D8;border-radius:999px;
+  padding:3px 10px;font-size:12px;color:#4A463F;
+}
+.card .go{
+  display:block;margin-top:12px;text-align:center;background:#15803D;color:#fff;
+  border-radius:12px;padding:11px 0;font-size:14px;font-weight:800;text-decoration:none;
+}
+.card .go:active{transform:scale(.99)}
+.foot{text-align:center;font-size:11.5px;color:#B3AC9E;margin-top:18px;line-height:1.7}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back" href="./index.html">‹ 返回主页</a>
+    <span class="tt">🎯 高频考点速练</span>
+  </div>
+  <div class="wrap">
+    <div class="tip">按模块整理的高频考点直达入口，点「去刷这类题」直接进入对应模块练习；题目全部来自站内现有题库，不额外出新题。</div>
+
+    <div class="card">
+      <div class="row1"><div class="ic">📊</div><div><h3>资料分析</h3><div class="sub">行测提分最快模块 · 建议配合「速算特训」每天练手感</div></div></div>
+      <div class="kps"><span class="kp">基期量 / 现期量</span><span class="kp">增长率 / 增长量</span><span class="kp">比重</span><span class="kp">平均数 / 倍数</span><span class="kp">年均增长</span></div>
+      <a class="go" href="./index.html?m=ziliao">去刷这类题 ›</a>
+    </div>
+
+    <div class="card">
+      <div class="row1"><div class="ic">🧮</div><div><h3>数量关系</h3><div class="sub">高频题型优先，先掌握套路再抠难题</div></div></div>
+      <div class="kps"><span class="kp">工程问题</span><span class="kp">行程问题</span><span class="kp">利润经济</span><span class="kp">排列组合 / 概率</span><span class="kp">几何问题</span></div>
+      <a class="go" href="./index.html?m=shuliang">去刷这类题 ›</a>
+    </div>
+
+    <div class="card">
+      <div class="row1"><div class="ic">🧩</div><div><h3>判断推理</h3><div class="sub">图推记特征、定义抓关键、逻辑背规则</div></div></div>
+      <div class="kps"><span class="kp">图形推理</span><span class="kp">定义判断</span><span class="kp">类比推理</span><span class="kp">逻辑判断</span></div>
+      <a class="go" href="./index.html?m=panduan">去刷这类题 ›</a>
+    </div>
+
+    <div class="card">
+      <div class="row1"><div class="ic">📖</div><div><h3>言语理解</h3><div class="sub">逻辑填空重积累，片段阅读重结构</div></div></div>
+      <div class="kps"><span class="kp">逻辑填空</span><span class="kp">中心理解</span><span class="kp">细节判断</span><span class="kp">语句排序</span></div>
+      <a class="go" href="./index.html?m=yanyu">去刷这类题 ›</a>
+    </div>
+
+    <div class="card">
+      <div class="row1"><div class="ic">📚</div><div><h3>常识判断</h3><div class="sub">政治理论优先，时政持续更新</div></div></div>
+      <div class="kps"><span class="kp">政治理论</span><span class="kp">法律常识</span><span class="kp">科技 / 人文</span><span class="kp">时政要闻</span></div>
+      <a class="go" href="./index.html?m=changshi">去刷这类题 ›</a>
+    </div>
+
+    <div class="card">
+      <div class="row1"><div class="ic">⚡</div><div><h3>速算特训</h3><div class="sub">资料分析专用：草稿验算 + AI 圈错，主页「速算特训」进入</div></div></div>
+      <div class="kps"><span class="kp">截位直除</span><span class="kp">错位加减</span><span class="kp">415 份数法</span><span class="kp">假设分配</span></div>
+      <a class="go" href="./index.html">回主页进速算特训 ›</a>
+    </div>
+
+    <div class="foot">亿成公考 · 高频考点速练<br>入口聚合自站内现有题库模块，题目持续更新</div>
+  </div>
+</body>
+</html>
