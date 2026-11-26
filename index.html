@@ -1040,6 +1040,22 @@ document.addEventListener('click', function(e){
       var acc=ls("yicheng-gk-account-v1")||ls("yicheng-gk-user-v1")||null;
       if(acc&&acc.tail4)return acc.tail4;
       if(acc&&acc.phoneTail)return acc.phoneTail;
+      if(acc&&acc.tail)return acc.tail;
+    }catch(e){}
+    return "";
+  }
+  function rdNick(){
+    try{
+      var acc=ls("yicheng-gk-account-v1")||ls("yicheng-gk-user-v1")||null;
+      if(acc&&acc.nick)return acc.nick;
+    }catch(e){}
+    return "";
+  }
+  function rdSyncCode(){
+    try{
+      if(typeof myCode==="function"){ var c=myCode(); if(c) return c; }
+      var s=ls("yicheng-gk-sync-v1")||null;
+      if(s&&s.code)return s.code;
     }catch(e){}
     return "";
   }
@@ -1138,7 +1154,7 @@ document.addEventListener('click', function(e){
     var p=getPoints();
     if((p.balance||0)<it.cost || getRedeems().some(function(x){return x.itemId===id})){ openShop(); return; }
     addPoints(-it.cost,"积分兑换","兑换「"+it.name+"」");
-    var rec={oid:"RD"+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*900+100), itemId:it.id, item:it.name, cost:it.cost, kind:it.kind, code:(typeof myCode==="function"?myCode():"")||"", tail:rdTail(), at:rdTime(), status:"submitted"};
+    var rec={oid:"RD"+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*900+100), itemId:it.id, item:it.name, cost:it.cost, kind:it.kind, code:rdSyncCode(), tail:rdTail(), nick:rdNick(), at:rdTime(), status:"submitted"};
     saveRedeems(getRedeems().concat([rec]));
     rdSubmit(rec,function(ok){ if(!ok) rdQueue(rec); });
     openRedeemDone(rec);
