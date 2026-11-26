@@ -4,11 +4,11 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v89'; /* 修改点：注册本地留底——完整手机号仅存学生本机localStorage，云端仍哈希+尾号（v88→v89 清旧缓存） */
+var CACHE = 'yc-static-v91'; /* v90→v91：内测群二维码组件升级v2（常驻小卡+弹层时机对齐任务书） */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
 var SWR_PAT = /(index-b34|yc-enhance)\.js$/;
-var NETFIRST_PAT = /(qbank-index\.json|qbank-idmap\.json)$/;
+var NETFIRST_PAT = /(qbank-index\.json|qbank-idmap\.json|group_qr_config\.json)$/;
 var dbg = { fetches: 0, lastError: null, lastStatus: null, log: [] };
 function dlog(m){ dbg.log.push((dbg.fetches) + ' ' + m); if (dbg.log.length > 12) dbg.log.shift(); }
 
