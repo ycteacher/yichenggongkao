@@ -1,10 +1,11 @@
-/* yc-group-qr.js v2: 「亿成公考应用内测群」二维码投放组件
+/* yc-group-qr.js v3: 「亿成公考应用内测群」二维码投放组件
    数据源：assets/group_qr_config.json（全站唯一，改配置即全站换码，页面零改动）
    能力：
      - 全屏弹层 showPopup：大图居中 + 群名 + 引导文案 +「我知道了」/「不再提醒」
      - 常驻小卡 mountCard：小尺寸二维码直接展示（不点击可见，可长按保存），点卡片=全屏弹层
      - 距到期≤2天或已过期：弹层/小卡不显示二维码，改显示 fallback_text
-     - 自动弹频控：每天最多2次；点「不再提醒」后不再自动弹（常驻小卡保留）
+     - 自动弹频控：每天最多2次；点「不再提醒」=本次使用（本会话）不再弹、悬浮窗一并隐藏，
+       下次打开应用第一时间强制弹一次（老版本永久静音用户同步迁移为此行为）
      - 埋点 yc_group_qr_show / yc_group_qr_click，带 scene 与触发方式(auto/manual)
    弹层时机：每天第2次打开应用；交卷/出分后；每日打卡完成（计划页任务刷完）；新用户注册完成。
    常驻小卡：首页底部「进群刷题搭子，扫码即入」；学习账号面板（个人中心）顶部横幅；
@@ -30,9 +31,14 @@
       .catch(function(){});
   } catch(e) {}
 
-  /* ---------- 频控状态：每天最多2次自动弹；mute=不再提醒 ---------- */
+  /* ---------- 频控状态：每天最多2次自动弹；「不再提醒」=仅本次使用内静音，下次打开第一时间再提醒 ---------- */
   var KEY = 'ycgk.gqr.v1', DAY = 864e5, DAILY_CAP = 2;
+  var SESS_MUTE = 'yc-gqr-mute-sess';   /* sessionStorage：本次使用内不再弹、悬浮窗隐藏 */
+  var RELAUNCH_KEY = 'ycgk.gqr.relaunch'; /* localStorage：下次打开第一时间强制提醒（一次性） */
   var pageAutoFired = false; /* 同一页面不重复自动弹 */
+  function sessMuted(){
+    try { return sessionStorage.getItem(SESS_MUTE) === '1'; } catch(e) { return false; }
+  }
   function stGet(){
     var s = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
@@ -109,16 +115,24 @@
     var btn = document.getElementById('yc-gqr-close');
     if (btn) btn.addEventListener('click', closePopup);
     var mute = document.getElementById('yc-gqr-mute');
-    if (mute) mute.addEventListener('click', function(){ var s = stGet(); s.mute = 1; stSet(s); closePopup(); });
+    if (mute) mute.addEventListener('click', function(){
+      try { sessionStorage.setItem(SESS_MUTE, '1'); } catch(e) {}
+      try { localStorage.setItem(RELAUNCH_KEY, '1'); } catch(e) {} /* 下次打开第一时间再提醒 */
+      var s = stGet(); s.mute = 0; stSet(s); /* 清除旧版永久静音，统一为新规则 */
+      closePopup();
+      removeHomeCard();
+    });
   }
 
-  /* ---------- 自动弹（受频控+不再提醒） / 手动点开（不受频控） ---------- */
-  function autoPopup(scene){
-    var s = stGet();
-    if (s.mute) return false; /* 点过「不再提醒」后不再自动弹 */
-    if (pageAutoFired) return false; /* 同一页面不重复弹 */
-    if (s.n >= DAILY_CAP) return false; /* 每天最多2次 */
-    s.n += 1; stSet(s);
+  /* ---------- 自动弹（受频控+本次使用静音） / 手动点开（不受频控） ---------- */
+  function autoPopup(scene, force){
+    if (!force) {
+      if (sessMuted()) return false; /* 点过「不再提醒」：本次使用内不再自动弹 */
+      if (pageAutoFired) return false; /* 同一页面不重复弹 */
+      var s = stGet();
+      if (s.n >= DAILY_CAP) return false; /* 每天最多2次 */
+      s.n += 1; stSet(s);
+    }
     pageAutoFired = true;
     showPopup(scene, 'auto');
     return true;
@@ -153,6 +167,7 @@
   /* ---------- 首页底部小卡（常驻，fixed 于底部导航上方） ---------- */
   var homeCard = null;
   function ensureHomeCard(){
+    if (sessMuted()) { removeHomeCard(); return; } /* 本次使用内静音：悬浮窗暂时不显示 */
     if (homeCard && homeCard.parentNode) return;
     removeHomeCard();
     homeCard = document.createElement('div');
@@ -376,12 +391,26 @@
   /* ---------- 启动 ---------- */
   function start(){
     if (window.__YC_GQR_PAGE) { mountStandalone(); return; }
-    /* 每天第2次打开应用自动弹（打卡=每天首次打开，见积分逻辑；第2次打开弹群码） */
+    /* 「不再提醒」迁移与下次打开第一时间提醒：
+       - 老版本永久静音用户（s.mute=1）迁移为新规则：本次打开即第一时间提醒；
+       - 上次使用点过「不再提醒」的用户（RELAUNCH_KEY=1）：本次打开第一时间提醒（一次性，弹后清除）。 */
     try {
       var s0 = stGet();
-      s0.opens = (s0.opens || 0) + 1;
-      stSet(s0);
-      if (s0.opens === 2) setTimeout(function(){ autoPopup('open2'); }, 1500);
+      var relaunch = false;
+      try { relaunch = localStorage.getItem(RELAUNCH_KEY) === '1'; } catch(e) {}
+      if (s0.mute) { s0.mute = 0; relaunch = true; } /* 旧版永久静音 → 新规则 */
+      if (relaunch) {
+        try { localStorage.removeItem(RELAUNCH_KEY); } catch(e) {}
+        stSet(s0);
+        setTimeout(function(){ autoPopup('relaunch', true); }, 800); /* 第一时间提醒，不受频控限制 */
+      }
+    } catch(e) {}
+    /* 每天第2次打开应用自动弹（打卡=每天首次打开，见积分逻辑；第2次打开弹群码） */
+    try {
+      var s1 = stGet();
+      s1.opens = (s1.opens || 0) + 1;
+      stSet(s1);
+      if (s1.opens === 2) setTimeout(function(){ autoPopup('open2'); }, 1500);
     } catch(e) {}
     var mo = null;
     try {
