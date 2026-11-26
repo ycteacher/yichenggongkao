@@ -4089,33 +4089,37 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
-/* ===== 国考冲刺 banner（2026-11-29 笔试倒计时）=====
-   1) 距 11-29 的天数按访问当日自动计算，11-29 当天显示「今日开考」，11-30 起整条 banner 不再渲染；
-   2) banner 只在首页显示：监听 #root 渲染，检测到首页专属标记「今日目标进度」才显示，
-      首次检测到首页前保持可见（fail-open，主包改版也不至于整条消失）；
-   3) 点击进入 sprint.html 国考冲刺专区。 */
+/* ===== 国考冲刺 banner（同步码取消倒计时）=====
+   1) 2026-11-29 23:59:59 同步码正式取消；倒计时精确到秒，从上架即开始走；
+   2) 文案明确：还没注册手机号的同学抓紧注册——注册是你唯一的凭证，防止忘掉；
+   3) 11-30 00:00 起整条 banner 不再渲染；只在首页显示（沿用原判定，fail-open）；
+   4) 点击进入 sprint.html 国考冲刺专区。 */
 (function(){
-  var EXAM = '2026-11-29';
-  function dayDiff(){
-    try{
-      var p = EXAM.split('-'), e = new Date(+p[0], +p[1]-1, +p[2]);
-      var n = new Date();
-      e = new Date(e.getFullYear(), e.getMonth(), e.getDate());
-      n = new Date(n.getFullYear(), n.getMonth(), n.getDate());
-      return Math.round((e - n) / 86400000);
-    }catch(err){ return 1; }
+  var DEADLINE = new Date(2026, 10, 29, 23, 59, 59); /* 2026-11-29 23:59:59 */
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function tick(){
+    var ms = DEADLINE - new Date();
+    if (ms <= 0) return false;
+    var s = Math.floor(ms / 1000);
+    var d = Math.floor(s / 86400); s %= 86400;
+    var h = Math.floor(s / 3600); s %= 3600;
+    var m = Math.floor(s / 60); s %= 60;
+    var el = document.getElementById('yc-sb-cd');
+    if (el) el.textContent = d + ' 天 ' + pad(h) + ' 时 ' + pad(m) + ' 分 ' + pad(s) + ' 秒';
+    return true;
   }
-  var d = dayDiff();
-  if (d < 0) return; /* 11-29 已过：不渲染 */
-  var label = d === 0 ? '国考今日开考' : '国考倒计时 ' + d + ' 天';
+  if (DEADLINE - new Date() <= 0) return; /* 同步码已取消：不渲染 */
   var banner = document.createElement('a');
   banner.id = 'yc-sprint-banner';
   banner.href = './sprint.html';
-  banner.setAttribute('aria-label', label + '，进入国考冲刺专区');
-  banner.innerHTML = '<span class="yc-sb-fire">🔥</span><span class="yc-sb-txt"><b id="yc-sb-days"></b><i>免费刷真题 · 领真题卷</i></span><span class="yc-sb-go">›</span>';
+  banner.setAttribute('aria-label', '同步码取消倒计时，还没注册手机号的同学请抓紧注册，进入国考冲刺专区');
+  banner.innerHTML = '<span class="yc-sb-fire">⏳</span>' +
+    '<span class="yc-sb-txt"><b id="yc-sb-cd"></b>' +
+    '<i>11月29日 23:59:59 同步码正式取消 · 还没注册手机号的同学请抓紧注册——注册是你唯一的凭证，防止忘掉</i></span>' +
+    '<span class="yc-sb-go">›</span>';
   document.body.insertBefore(banner, document.getElementById('root'));
-  var daysEl = banner.querySelector('#yc-sb-days');
-  if (daysEl) daysEl.textContent = label;
+  tick();
+  setInterval(tick, 1000);
   /* 首页专属显示：结构化反向判定——出现刷题页特征（主包退出按钮的 data-testid，
      与主包自身判定刷题页的口径一致）或底部激活页签不是首页时收起；回到首页恢复；
      信号缺失时保持现状（fail-open，主包改版不会让 banner 整条消失） */
