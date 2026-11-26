@@ -285,7 +285,8 @@
         }else if(!oldCode){
           setSyncCode(code);
         }
-        var acc={v:1,md5:h,tail:tail,prov:prov,ts:bindTs||Date.now(),code:code,inv:invParam()||'',nick:nick||''};
+        /* 本地留底：完整手机号只存学生本机（localStorage），不上传云端；云端仍只存哈希+尾号 */
+        var acc={v:2,md5:h,ph:phone,tail:tail,prov:prov,ts:bindTs||Date.now(),code:code,inv:invParam()||'',nick:nick||''};
         wr(ACC,acc);
         /* 迁移记录：旧键清点挂载，不删不覆盖 */
         var n=0;
