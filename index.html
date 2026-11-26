@@ -405,6 +405,28 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-ledger-item { display: flex; justify-content: space-between; padding: 9px 2px; border-bottom: 1px dashed var(--yc-line); font-size: 12px; }
 .yc-ledger-item .yc-lr { color: var(--yc-green); font-weight: 700; }
 
+/* 积分兑换商城 */
+.yc-rule-shop { cursor: pointer; border-color: rgba(21,128,61,.35); background: linear-gradient(135deg, rgba(21,128,61,.08), rgba(21,128,61,.03)); }
+.yc-rule-shop b { color: var(--yc-green); }
+.yc-shop-list { margin-top: 12px; max-height: 46vh; overflow-y: auto; }
+.yc-shop-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 2px; border-bottom: 1px dashed var(--yc-line); }
+.yc-shop-nm { font-size: 13.5px; font-weight: 700; color: var(--yc-ink); }
+.yc-shop-tag { font-style: normal; font-size: 10px; color: #4F46E5; background: #EEF2FF; border-radius: 5px; padding: 1px 5px; margin-left: 4px; vertical-align: 1px; }
+.yc-shop-tag.goods { color: #B45309; background: #FEF3C7; }
+.yc-shop-ds { font-size: 11px; color: var(--yc-mut); margin-top: 3px; line-height: 1.5; }
+.yc-shop-r { flex: none; text-align: right; }
+.yc-shop-pv { font-size: 12px; font-weight: 800; color: var(--yc-green); margin-bottom: 6px; }
+.yc-shop-btn { border: 0; background: var(--yc-green); color: #fff; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.yc-shop-btn:active { transform: scale(.96); }
+.yc-shop-done { font-size: 12px; color: var(--yc-mut); }
+.yc-shop-lack { font-size: 11px; color: #B45309; }
+.yc-shop-note { margin-top: 12px; font-size: 11.5px; line-height: 1.7; color: var(--yc-mut); background: #FAFAF7; border-radius: 10px; padding: 10px 12px; }
+.yc-shop-link { display: block; width: 100%; margin-top: 10px; border: 0; background: none; color: var(--yc-green); font-size: 13px; font-weight: 700; padding: 8px 0; cursor: pointer; text-align: center; }
+.yc-rd-oid { font-family: monospace; font-size: 13px; background: #FAFAF7; border: 1px dashed var(--yc-line); border-radius: 8px; padding: 8px 10px; margin-top: 6px; word-break: break-all; cursor: pointer; }
+.yc-rd-step { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; font-size: 12.5px; line-height: 1.6; color: var(--yc-ink); text-align: left; }
+.yc-rd-step b { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--yc-green); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.yc-rd-step span { flex: 1; }
+
 /* 我的方向横幅（选完后显示） */
 .yc-dir-banner {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -984,14 +1006,177 @@ document.addEventListener('click', function(e){
       '<div class="yc-rule"><b>每日打卡 +2</b><span>每天打开应用自动到账</span></div>' +
       '<div class="yc-rule"><b>刷题 +1 / 答对再 +1</b><span>做完题几秒内自动累计</span></div>' +
       '<div class="yc-rule"><b>连续学习有加成</b><span>连续天数越多，打卡分越高</span></div>' +
-      '<div class="yc-rule"><b>兑换商城筹备中</b><span>积分先攒着，商城上线即可兑换</span></div>' +
+      '<div class="yc-rule yc-rule-shop" id="ycShopEntry"><b>🎁 积分兑换商城</b><span>批改 / 咨询 / 实物好礼，点这里去兑换</span></div>' +
       "</div>" +
       '<div class="yc-ledger"><div class="yc-sec-t">最近明细</div>' + (ledger || '<div class="yc-ledger-item"><span>暂无记录，去做两道题吧</span><span></span></div>') + "</div>" +
       '<button class="yc-close" id="ycPtsClose">关闭</button>';
     document.getElementById("ycPtsClose").addEventListener("click", closeAll);
+    var shopEntry=document.getElementById("ycShopEntry");
+    if(shopEntry) shopEntry.addEventListener("click", openShop);
     mask.classList.add("on"); modal.classList.add("on");
   }
   document.getElementById("ycChipPts").addEventListener("click", openPoints);
+
+  /* ---------- 积分兑换商城 v1：我有积分 → 我要兑换 → 兑换完怎么办 ---------- */
+  var SHOP_ITEMS=[
+    {id:"s1",name:"一对一申论批改",cost:100,kind:"service",desc:"1 篇精批＋逐条批注讲解"},
+    {id:"s2",name:"一对一综应批改",cost:100,kind:"service",desc:"1 篇精批＋逐条批注讲解"},
+    {id:"s3",name:"30分钟一对一咨询",cost:600,kind:"service",desc:"政策 / 选岗 / 报名方向问诊"},
+    {id:"g1",name:"纸质真题卷",cost:500,kind:"goods",desc:"近三年国考/省考真题，包邮到家"},
+    {id:"g2",name:"考公书籍",cost:2000,kind:"goods",desc:"行测/申论教材、题库任选一本"},
+    {id:"g3",name:"加湿器",cost:5000,kind:"goods",desc:"桌面静音款，备考宿舍必备"},
+    {id:"g4",name:"智能电饭煲",cost:10000,kind:"goods",desc:"家用迷你款"},
+    {id:"g5",name:"小米平板",cost:30000,kind:"goods",desc:"刷题看课两不误"},
+    {id:"g6",name:"千元手机",cost:60000,kind:"goods",desc:"红米/荣耀新款，上岸换机"}
+  ];
+  function getRedeems(){ return ls("yicheng-gk-redeems-v1") || []; }
+  function saveRedeems(r){ ls("yicheng-gk-redeems-v1", r); }
+  function shopItem(id){ for(var i=0;i<SHOP_ITEMS.length;i++){ if(SHOP_ITEMS[i].id===id) return SHOP_ITEMS[i]; } return null; }
+  function rdTime(){ return new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16); }
+  function rdTail(){
+    try{
+      var acc=ls("yicheng-gk-account-v1")||ls("yicheng-gk-user-v1")||null;
+      if(acc&&acc.tail4)return acc.tail4;
+      if(acc&&acc.phoneTail)return acc.phoneTail;
+    }catch(e){}
+    return "";
+  }
+  /* 云端兑换台账：GET 合并 → POST（textdb.dev 为主，online 短文本备用） */
+  var RD_POOL="ycgk-redeem-v1";
+  function rdCloudGet(cb){
+    var done=0,got=false;
+    function fin(t){ done++; if(t&&!got){got=true;cb(null,t);} if(done===2&&!got)cb(new Error("网络不通"),null); }
+    ["https://textdb.dev/api/data/"+RD_POOL,"https://textdb.online/"+RD_POOL].forEach(function(u){
+      fetch(u,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){fin((t||"").trim()||null)}).catch(function(){fin(null)});
+    });
+  }
+  function rdCloudPut(arr,cb){
+    var body=JSON.stringify(arr), ok=false, done=0;
+    function fin(){ done++; if(done===2) cb(ok); }
+    fetch("https://textdb.dev/api/data/"+RD_POOL,{method:"POST",headers:{"Content-Type":"text/plain"},body:body}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+    if(body.length<1500){ fetch("https://textdb.online/update/?key="+encodeURIComponent(RD_POOL)+"&value="+encodeURIComponent(body)).then(function(){fin()},function(){fin()}); }
+    else fin();
+  }
+  function rdSubmit(rec,cb){
+    rdCloudGet(function(e,t){
+      var arr=[];
+      try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
+      if(!Array.isArray(arr)) arr=[];
+      arr.push(rec);
+      rdCloudPut(arr,function(ok){ cb(ok); });
+    });
+  }
+  function rdQueue(rec){ var q=ls("yicheng-gk-redeem-queue-v1")||[]; q.push(rec); ls("yicheng-gk-redeem-queue-v1",q); }
+  function flushRedeemQueue(){
+    var q=ls("yicheng-gk-redeem-queue-v1")||[];
+    if(!q.length) return;
+    var pending=q.slice();
+    ls("yicheng-gk-redeem-queue-v1",[]);
+    (function next(i){
+      if(i>=pending.length) return;
+      rdSubmit(pending[i],function(ok){ if(!ok) rdQueue(pending[i]); next(i+1); });
+    })(0);
+  }
+  function copyRdOid(oid,btn){
+    function ok(){ btn.textContent="订单号已复制 ✓"; setTimeout(function(){btn.textContent=oid;},2500); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(oid).then(ok,function(){window.prompt("全选复制订单号：",oid)}); }
+    else window.prompt("全选复制订单号：",oid);
+  }
+  function openShop(){
+    var p=getPoints(), bal=p.balance||0, done=[];
+    getRedeems().forEach(function(x){ done.push(x.itemId); });
+    var items=SHOP_ITEMS.map(function(it){
+      var has=done.indexOf(it.id)>-1, can=bal>=it.cost, btn;
+      if(has) btn='<span class="yc-shop-done">已兑换 ✓</span>';
+      else if(can) btn='<button class="yc-shop-btn" data-rid="'+it.id+'">立即兑换</button>';
+      else btn='<span class="yc-shop-lack">还差 '+(it.cost-bal)+' 分</span>';
+      return '<div class="yc-shop-item"><div class="yc-shop-l"><div class="yc-shop-nm">'+esc(it.name)+(it.kind==="service"?'<i class="yc-shop-tag">服务</i>':'<i class="yc-shop-tag goods">实物</i>')+'</div><div class="yc-shop-ds">'+esc(it.desc)+'</div></div><div class="yc-shop-r"><div class="yc-shop-pv">'+it.cost+' 分</div>'+btn+'</div></div>';
+    }).join("");
+    modal.innerHTML=
+      '<h3>积分兑换商城</h3><span class="yc-tagline">当前余额 '+bal+' 分 · 每档限兑 1 次</span>'+
+      '<div class="yc-shop-list">'+items+'</div>'+
+      '<div class="yc-shop-note">兑换成功后会生成订单号，亿成老师收到后尽快落实：服务类 24 小时内联系你排期；实物类发货前通知你填收货信息，都会通过站内消息通知你。</div>'+
+      '<button class="yc-shop-link" id="ycMyRedeems">我的兑换记录 ›</button>'+
+      '<button class="yc-close" id="ycShopBack">返回积分中心</button>';
+    modal.querySelectorAll(".yc-shop-btn").forEach(function(b){
+      b.addEventListener("click",function(){ redeemConfirm(b.getAttribute("data-rid")); });
+    });
+    document.getElementById("ycMyRedeems").addEventListener("click",openRedeems);
+    document.getElementById("ycShopBack").addEventListener("click",openPoints);
+    mask.classList.add("on"); modal.classList.add("on");
+  }
+  function redeemConfirm(id){
+    var it=shopItem(id); if(!it) return;
+    var p=getPoints(), bal=p.balance||0;
+    if(getRedeems().some(function(x){return x.itemId===id})){ openShop(); return; }
+    if(bal<it.cost){
+      modal.innerHTML=
+        '<h3>积分还不够</h3>'+
+        '<p style="margin:14px 4px 4px;font-size:13.5px;line-height:1.8;color:var(--yc-ink)">「'+esc(it.name)+'」需要 <b>'+it.cost+' 分</b>，你现在有 '+bal+' 分，还差 <b>'+(it.cost-bal)+' 分</b>。</p>'+
+        '<div class="yc-rd-step"><b>1</b><span>每天打开应用打卡 +2，刷题每题 +1、答对再 +1</span></div>'+
+        '<div class="yc-rd-step"><b>2</b><span>邀请同学：每带 1 位新同学 +10 分，首页点「邀请好友」拿专属链接</span></div>'+
+        '<button class="yc-close" id="ycRdNo">知道了，去攒积分</button>';
+      document.getElementById("ycRdNo").addEventListener("click",closeAll);
+      mask.classList.add("on"); modal.classList.add("on");
+      return;
+    }
+    modal.innerHTML=
+      '<h3>确认兑换</h3>'+
+      '<div class="yc-rd-step" style="margin-top:14px"><b>🎁</b><span><b>'+esc(it.name)+'</b><br><span style="color:var(--yc-mut);font-size:12px">'+esc(it.desc)+'</span></span></div>'+
+      '<div class="yc-rd-step"><b>−</b><span>消耗积分 <b>'+it.cost+' 分</b>，兑换后剩余 '+(bal-it.cost)+' 分</span></div>'+
+      '<div class="yc-rd-step"><b>✓</b><span>兑换后生成订单号，老师会按上面的说明尽快联系你落实</span></div>'+
+      '<button class="yc-shop-btn" id="ycRdGo" style="display:block;width:100%;margin-top:16px;padding:12px 0;font-size:14px">确认兑换</button>'+
+      '<button class="yc-shop-link" id="ycRdNo">再想想</button>';
+    document.getElementById("ycRdGo").addEventListener("click",function(){ redeemDo(id); });
+    document.getElementById("ycRdNo").addEventListener("click",openShop);
+    mask.classList.add("on"); modal.classList.add("on");
+  }
+  function redeemDo(id){
+    var it=shopItem(id); if(!it) return;
+    var p=getPoints();
+    if((p.balance||0)<it.cost || getRedeems().some(function(x){return x.itemId===id})){ openShop(); return; }
+    addPoints(-it.cost,"积分兑换","兑换「"+it.name+"」");
+    var rec={oid:"RD"+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*900+100), itemId:it.id, item:it.name, cost:it.cost, kind:it.kind, code:(typeof myCode==="function"?myCode():"")||"", tail:rdTail(), at:rdTime(), status:"submitted"};
+    saveRedeems(getRedeems().concat([rec]));
+    rdSubmit(rec,function(ok){ if(!ok) rdQueue(rec); });
+    openRedeemDone(rec);
+  }
+  function openRedeemDone(rec){
+    var steps;
+    if(rec.kind==="service"){
+      steps='<div class="yc-rd-step"><b>1</b><span>亿成老师会在 <b>24 小时内</b>通过站内消息联系你，和你约时间（批改 / 咨询都是老师亲自来）</span></div>'+
+            '<div class="yc-rd-step"><b>2</b><span>着急的话可以加微信 <b>mshong</b>（备注：订单号），老师优先安排</span></div>';
+    }else{
+      steps='<div class="yc-rd-step"><b>1</b><span>兑换已登记，<b>发货前</b>会通过站内消息通知你填写收货信息（内测期统一安排发出）</span></div>'+
+            '<div class="yc-rd-step"><b>2</b><span>想更快拿到，可加微信 <b>mshong</b>（备注：订单号）跟老师确认</span></div>';
+    }
+    modal.innerHTML=
+      '<h3>✅ 兑换成功</h3>'+
+      '<div class="yc-rd-step" style="margin-top:14px"><b>🎁</b><span><b>'+esc(rec.item)+'</b> · 消耗 '+rec.cost+' 分<br><span style="color:var(--yc-mut);font-size:12px">'+rdTime()+'</span></span></div>'+
+      '<div style="margin-top:12px;text-align:left"><div style="font-size:12px;color:var(--yc-mut)">你的订单号（点一下复制，联系老师时用得上）</div><div class="yc-rd-oid" id="ycRdOid">'+esc(rec.oid)+'</div></div>'+
+      '<div style="margin-top:14px;border-top:1px dashed var(--yc-line);padding-top:6px;font-size:12px;font-weight:700;color:var(--yc-ink);text-align:left">接下来：</div>'+steps+
+      '<button class="yc-shop-btn" id="ycRdBack" style="display:block;width:100%;margin-top:16px;padding:12px 0;font-size:14px">返回积分中心</button>'+
+      '<button class="yc-shop-link" id="ycRdClose">完成</button>';
+    document.getElementById("ycRdOid").addEventListener("click",function(){ copyRdOid(rec.oid,this); });
+    document.getElementById("ycRdBack").addEventListener("click",openPoints);
+    document.getElementById("ycRdClose").addEventListener("click",closeAll);
+    mask.classList.add("on"); modal.classList.add("on");
+  }
+  function openRedeems(){
+    var list=getRedeems();
+    var html=list.length?list.slice().reverse().map(function(r){
+      return '<div class="yc-shop-item"><div class="yc-shop-l"><div class="yc-shop-nm">'+esc(r.item)+'</div><div class="yc-shop-ds">'+esc(r.at)+' · 订单 '+esc(r.oid)+'</div></div><div class="yc-shop-r"><span class="yc-shop-done">老师落实中</span></div></div>';
+    }).join(""):'<div class="yc-shop-note" style="text-align:center">还没有兑换记录，去商城逛逛吧</div>';
+    modal.innerHTML=
+      '<h3>我的兑换记录</h3><span class="yc-tagline">兑换后老师会主动联系你</span>'+
+      '<div class="yc-shop-list">'+html+'</div>'+
+      '<button class="yc-shop-btn" id="ycRdShop" style="display:block;width:100%;margin-top:14px;padding:12px 0;font-size:14px">去兑换商城</button>'+
+      '<button class="yc-close" id="ycRdBack2" style="margin-top:8px">返回积分中心</button>';
+    document.getElementById("ycRdShop").addEventListener("click",openShop);
+    document.getElementById("ycRdBack2").addEventListener("click",openPoints);
+    mask.classList.add("on"); modal.classList.add("on");
+  }
+  flushRedeemQueue();
 
   /* ---------- 考试通告卡片（每天更新，放在资料卡上方） ---------- */
   function addNoticesCard(){
@@ -2018,7 +2203,7 @@ document.addEventListener('click', function(e){
       '<button class="yc-sync-btn" id="ycShareNative">分享给同学（微信 / QQ）</button>'+
       '<div class="yc-share-stats" id="ycShareStats">邀请统计加载中…</div>'+
       '<div class="yc-share-rules">'+
-        '<div class="yc-share-rt">积分可兑换 · 加微信 mshong 找亿成老师兑换</div>'+
+        '<div class="yc-share-rt">积分可兑换 · 首页右上角「积分」进商城直接兑换</div>'+
         '<div class="yc-share-rule"><b>一对一申论批改</b><span>100 分</span></div>'+
         '<div class="yc-share-rule"><b>一对一综应批改</b><span>100 分</span></div>'+
         '<div class="yc-share-rule"><b>30 分钟一对一咨询</b><span>600 分 · 政策 / 选岗 / 报名方向问诊</span></div>'+
@@ -2055,7 +2240,7 @@ document.addEventListener('click', function(e){
     var rules=document.querySelectorAll(".yc-rule");
     for(var i=0;i<rules.length;i++){
       if(rules[i].textContent.indexOf("邀请好友")>-1){window.__ycShareRulePatched=true;return}
-      if(rules[i].textContent.indexOf("兑换商城筹备中")>-1){
+      if(rules[i].textContent.indexOf("积分兑换商城")>-1){
         var d=document.createElement("div");
         d.className="yc-rule";
         d.innerHTML='<b>邀请好友 +10 / 人</b><span>点首页「邀请好友」卡片，拿专属链接</span>';

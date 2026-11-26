@@ -351,6 +351,15 @@ td b{color:var(--txt)}
   </div>
 
   <div class="card" style="margin-top:14px">
+    <h3>积分兑换订单 <span class="hint">学生站内兑换 · 需要你落实</span></h3>
+    <div class="desc">学生在积分中心兑换后订单实时到这里：服务类（批改/咨询）24 小时内联系学生排期；实物类发货前通知填收货信息。联系学生可凭学习码或订单号。</div>
+    <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
+      <button id="rdGo" style="background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">刷新订单</button>
+      <span class="hint" id="rdMsg"></span>
+    </div>
+    <div id="rdList" style="font-size:13px"></div>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3>手机号留底（加密） <span class="hint">云端仅密文 · 本地解密</span></h3>
     <div class="desc">注册时手机号用站长公钥加密后写入台账，云端无明文；在此粘贴私钥后本地解密查看，私钥只存本机、不上传。11-26 晚之前的注册没有留底字段。</div>
     <textarea id="bkKey" placeholder="粘贴私钥 PEM 原文（含 -----BEGIN----- 首尾行）" style="width:100%;height:88px;font-size:12px;padding:8px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);box-sizing:border-box;font-family:monospace"></textarea>
@@ -1090,6 +1099,40 @@ btn.addEventListener('click',function(){
   load.then(function(){return html2canvas(el('stage'),{backgroundColor:'#0d1117',scale:Math.min(2,window.devicePixelRatio||1),useCORS:true,logging:false})}).then(function(cv){el('shotImg').src=cv.toDataURL('image/jpeg',0.92);el('shotOverlay').style.display='block';done()}).catch(function(){done();alert('生成失败，请用手机截图')});
 });
 el('shotCloseBtn').addEventListener('click',function(){el('shotOverlay').style.display='none'});
+
+/* ===== 积分兑换订单（ycgk-redeem-v1） ===== */
+function escRd(t){return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function loadRedeems(){
+  var msg=document.getElementById("rdMsg"), list=document.getElementById("rdList");
+  if(!list) return;
+  msg.textContent="加载中…";
+  var urls=["https://textdb.dev/api/data/ycgk-redeem-v1","https://textdb.online/ycgk-redeem-v1"];
+  var done=0, got=false;
+  function fin(t){
+    done++;
+    if(t&&!got){ got=true; renderRedeems(t); msg.textContent="共 "+t.split("\"oid\"").length-1+" 单 · "+new Date().toLocaleTimeString("zh-CN",{hour12:false}); }
+    if(done===2&&!got){ msg.textContent="暂无兑换订单（或网络不通）"; renderRedeems(null); }
+  }
+  urls.forEach(function(u){
+    fetch(u,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){fin((t||"").trim()||null)}).catch(function(){fin(null)});
+  });
+}
+function renderRedeems(t){
+  var list=document.getElementById("rdList"); if(!list) return;
+  var arr=[];
+  try{ arr=JSON.parse(t||"[]")||[]; }catch(e){ arr=[]; }
+  if(!Array.isArray(arr)||!arr.length){ list.innerHTML='<div class="desc">还没有学生兑换。学生兑换后会实时出现在这里，凭订单号/学习码联系落实。</div>'; return; }
+  arr.slice().reverse().forEach(function(r){
+    var kind=r.kind==="service"?'<span style="color:#4F46E5;font-weight:700">服务</span>':'<span style="color:#B45309;font-weight:700">实物</span>';
+    var el=document.createElement("div");
+    el.style.cssText="display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px dashed var(--line)";
+    el.innerHTML='<div style="min-width:0"><div style="font-weight:700">'+escRd(r.item)+' · '+kind+' · '+escRd(r.cost)+'分</div><div style="font-size:11px;color:var(--mut);margin-top:2px">'+escRd(r.at)+' · 订单 '+escRd(r.oid)+' · 学习码 '+escRd(r.code||"—")+(r.tail?(' · 尾号'+escRd(r.tail)):'')+'</div></div><div style="flex:none;font-size:12px;color:var(--amber);font-weight:700">待落实</div>';
+    list.appendChild(el);
+  });
+}
+var rdGoBtn=document.getElementById("rdGo");
+if(rdGoBtn) rdGoBtn.addEventListener("click",function(){ document.getElementById("rdList").innerHTML=""; loadRedeems(); });
+loadRedeems();
 </script>
 </body>
 </html>
