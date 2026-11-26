@@ -26,6 +26,21 @@
   var INV_REC = 'yc-invite-v1';
   var INV_LEDGER = 'ycgk-inv-ledger-v1';
   var INV_SALT = 'ycgk-salt-v1:';
+  /* 手机号加密留底：RSA-OAEP 公钥加密，私钥仅站长持有；云端只存密文，看板本地解密显示 */
+  var BK_PUB = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3xNptRrD73OLNODoijVJqlJvkcKGFyNePYttl5c3z++F55FamgtgWORKuqawEB5L3W2a48tzEcxr6Bz4fqYTP/7AGuWEPIf0uWp2U+ExjMGUorCkKhLqv4xnpND0v7h5NK1iSd2wqsA3jjI3rvDZjYfiX/mHzjcBy8UZ4bE1FEqCHhcUMK9HnZXkfn440aueAtE5T4gIJ8cjhsH1BYpg3oSFvtOc/VzoP3EGS0jjaAhUMzpheouvJnRrjB1iYEapDAbBrseAqLOltGcicPrLSaDfuFsIG/pR7sysrJJyHwiCt0V3JVHGnAHCix8y6iMp6XCkpicOEftP7+P/EUrbJwIDAQAB';
+  function bkEncrypt(phone,cb){
+    try{
+      if(!(window.crypto&&crypto.subtle))return cb(null);
+      var bin=atob(BK_PUB),raw=new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++)raw[i]=bin.charCodeAt(i);
+      crypto.subtle.importKey('spki',raw,{name:'RSA-OAEP',hash:'SHA-256'},false,['encrypt']).then(function(k){
+        return crypto.subtle.encrypt({name:'RSA-OAEP'},k,new TextEncoder().encode(phone));
+      }).then(function(ct){
+        var u=new Uint8Array(ct),s='';for(var j=0;j<u.length;j++)s+=String.fromCharCode(u[j]);
+        cb(btoa(s));
+      }).catch(function(){cb(null)});
+    }catch(e){ cb(null); }
+  }
 
   /* ---------- 标准 MD5（与 yc-track.js 同源修正版，RFC 1321） ---------- */
   function md5(str){
@@ -97,12 +112,12 @@
     fetch('https://textdb.online/update/?key='+encodeURIComponent(key)+'&value='+encodeURIComponent(val)).then(function(){ok=true;fin()},function(){fin()});
     fetch('https://textdb.dev/api/data/'+key,{method:'POST',headers:{'Content-Type':'text/plain'},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
   }
-  /* 注册台账：读-合并-写（聚合，仅哈希锚点+时间+省份+来源，不含手机号明文） */
-  function regPut(key16,prov,src,cb){
-    cloudGet(REG_KEY,function(e,t){
+  /* 注册台账：读-合并-写（聚合，仅哈希锚点+时间+省份+来源+加密留底，不含手机号明文） */
+  function regPut(key16,prov,src,e,cb){
+    cloudGet(REG_KEY,function(err,t){
       var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
       if(!pool||typeof pool!=='object'||!pool.r)pool={v:1,r:{}};
-      pool.r[key16]={t:Date.now(),p:prov||'',s:src||{}};
+      pool.r[key16]={t:Date.now(),p:prov||'',s:src||{},e:e||''};
       cloudPut(REG_KEY,JSON.stringify(pool),function(){ cb&&cb(); });
     });
   }
@@ -292,9 +307,11 @@
         var n=0;
         try{ for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&(k.indexOf('yicheng-gk-')===0||k.indexOf('yc-quiz')===0||k.indexOf('yc-notes')===0||k.indexOf('yc-invite')===0))n++;} }catch(e){}
         wr(MIG,{ts:Date.now(),keys:n,oldCode:oldCode,anchor:key16});
-        /* 云端绑定 + 注册台账（异步补写，失败不阻断） */
+        /* 云端绑定 + 注册台账（异步补写，失败不阻断）；台账附加密留底，私钥仅站长持有 */
         cloudPut(BIND_PRE+h,JSON.stringify({c:code,ts:Date.now()}),function(){});
-        regPut(key16,prov,landSrc(),function(){});
+        bkEncrypt(phone,function(ct){
+          regPut(key16,prov,landSrc(),ct,function(){});
+        });
         /* 用户信息池：注册即建档（昵称/省份/学习码/尾号/计数），失败不阻断 */
         userMutate(key16,function(rec){
           rec.n=nick||rec.n||'';

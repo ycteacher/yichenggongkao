@@ -350,6 +350,18 @@ td b{color:var(--txt)}
     </div>
   </div>
 
+  <div class="card" style="margin-top:14px">
+    <h3>手机号留底（加密） <span class="hint">云端仅密文 · 本地解密</span></h3>
+    <div class="desc">注册时手机号用站长公钥加密后写入台账，云端无明文；在此粘贴私钥后本地解密查看，私钥只存本机、不上传。11-26 晚之前的注册没有留底字段。</div>
+    <textarea id="bkKey" placeholder="粘贴私钥 PEM 原文（含 -----BEGIN----- 首尾行）" style="width:100%;height:88px;font-size:12px;padding:8px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);box-sizing:border-box;font-family:monospace"></textarea>
+    <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
+      <button id="bkGo" style="background:#c66c48;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">解密显示</button>
+      <button id="bkClear" style="background:transparent;color:var(--mut);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer">清除本机钥匙</button>
+      <span class="hint" id="bkMsg"></span>
+    </div>
+    <div style="overflow-x:auto"><table id="bkTable"></table></div>
+  </div>
+
   <div class="sec-h"><span class="bar"></span><h2>用户信息后台</h2><span class="note" id="userNote">云端用户池 · 每 60 秒刷新</span></div>
   <div class="card">
     <h3>用户列表 <span class="hint">按昵称搜索 · 点击行展开个人数据</span></h3>
@@ -686,6 +698,56 @@ function refreshReg(){
     });
   });
 }
+/* ===== 手机号加密留底：本地解密（私钥只存看板本机，不上传） ===== */
+function bkStr2bin(b64){var s=atob(b64),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
+function bkImportPriv(pem,cb){
+  try{
+    var b64=pem.replace(/-----[A-Z ]+-----/g,'').replace(/\s+/g,'');
+    crypto.subtle.importKey('pkcs8',bkStr2bin(b64),{name:'RSA-OAEP',hash:'SHA-256'},false,['decrypt'])
+      .then(function(k){cb(k)},function(){cb(null)});
+  }catch(e){cb(null)}
+}
+function bkDecryptAll(){
+  var msg=el('bkMsg'),tbl=el('bkTable');
+  var pem=(el('bkKey').value||'').trim();
+  if(!pem){msg.textContent='先粘贴私钥';return}
+  if(!(window.crypto&&crypto.subtle)){msg.textContent='当前浏览器不支持解密';return}
+  msg.textContent='解密中…';
+  bkImportPriv(pem,function(k){
+    if(!k){msg.textContent='私钥格式不对，请粘贴完整 PEM';return}
+    try{localStorage.setItem('yc-dash-bk-key',pem)}catch(e){}
+    fetchPool(REG_URLS,function(reg){
+      var regs=(reg&&reg.r)||{};
+      var rows=Object.keys(regs).map(function(k16){var r=regs[k16]||{};return {k:k16,t:r.t||0,p:r.p||'',e:r.e||''}})
+        .sort(function(a,b){return b.t-a.t});
+      var html='',okN=0,failN=0,skipN=0,done=0;
+      function flush(){
+        tbl.innerHTML='<tr style="color:var(--mut)"><th style="text-align:left;padding:4px 10px">时间</th><th style="text-align:left;padding:4px 10px">省份</th><th style="text-align:left;padding:4px 10px">手机号</th></tr>'+html||
+          '<tr><td colspan="3" style="padding:10px;color:var(--mut)">暂无留底记录</td></tr>';
+        msg.textContent='共 '+rows.length+' 条：明文 '+okN+' · 未留底 '+skipN+' · 解密失败 '+failN;
+      }
+      if(!rows.length){flush();return}
+      rows.forEach(function(r){
+        var d=new Date(r.t),ds=d.toLocaleString('zh-CN',{hour12:false});
+        if(!r.e){skipN++;html+='<tr><td style="padding:4px 10px">'+ds+'</td><td style="padding:4px 10px">'+(r.p||'—')+'</td><td style="padding:4px 10px;color:var(--mut)">未留底（旧版注册）</td></tr>';done++;if(done===rows.length)flush();return}
+        crypto.subtle.decrypt({name:'RSA-OAEP'},k,bkStr2bin(r.e)).then(function(pt){
+          var u=new Uint8Array(pt),s='';for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);
+          okN++;html+='<tr><td style="padding:4px 10px">'+ds+'</td><td style="padding:4px 10px">'+(r.p||'—')+'</td><td style="padding:4px 10px;font-family:monospace">'+s+'</td></tr>';
+          done++;if(done===rows.length)flush();
+        }).catch(function(){failN++;html+='<tr><td style="padding:4px 10px">'+ds+'</td><td style="padding:4px 10px">'+(r.p||'—')+'</td><td style="padding:4px 10px;color:#c0392b">解密失败</td></tr>';done++;if(done===rows.length)flush()});
+      });
+    });
+  });
+}
+(function(){
+  var go=el('bkGo'),clr=el('bkClear');
+  if(go)go.addEventListener('click',bkDecryptAll);
+  if(clr)clr.addEventListener('click',function(){
+    try{localStorage.removeItem('yc-dash-bk-key')}catch(e){}
+    el('bkKey').value='';el('bkTable').innerHTML='';el('bkMsg').textContent='本机钥匙已清除';
+  });
+  try{var saved=localStorage.getItem('yc-dash-bk-key');if(saved&&el('bkKey')&&!el('bkKey').value)el('bkKey').value=saved}catch(e){}
+})();
 refreshReg();
 setInterval(refreshReg,60000);
 
