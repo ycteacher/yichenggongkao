@@ -1234,6 +1234,35 @@ document.addEventListener('click', function(e){
       });
     }
     var giftQueue=[], giftShowing=false;
+    /* 到账回执：学生点「确定」后写 ycgk-grant-ack-v1（看板显示是否真正送出）；
+       本地待发队列保证失败下次打开补发，回执失败不影响积分入账。 */
+    var ACK_POOL="ycgk-grant-ack-v1", ACK_PENDING="yicheng-gk-grant-ack-pending-v1", ackBusy=false;
+    function sendGiftAck(g){
+      try{
+        var pend=JSON.parse(localStorage.getItem(ACK_PENDING)||"[]"); if(!Array.isArray(pend))pend=[];
+        var ids=myGrantIds();
+        pend.push({gid:g.id,c:ids.code||"",tl:ids.tail||"",n:ids.nick||"",at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)});
+        localStorage.setItem(ACK_PENDING,JSON.stringify(pend));
+      }catch(e){}
+      flushAcks();
+    }
+    function flushAcks(){
+      if(ackBusy) return;
+      var pend; try{ pend=JSON.parse(localStorage.getItem(ACK_PENDING)||"[]"); }catch(e){ pend=[]; }
+      if(!Array.isArray(pend)||!pend.length) return;
+      ackBusy=true;
+      fetch("https://textdb.dev/api/data/"+ACK_POOL,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+        var pool=null; try{ pool=JSON.parse(t||"null"); }catch(e){}
+        if(!pool||typeof pool!=="object"||!Array.isArray(pool.a)) pool={v:1,a:[]};
+        var known={}; pool.a.forEach(function(x){ if(x&&x.gid)known[x.gid]=1; });
+        pend.forEach(function(x){ if(x&&!known[x.gid]){ pool.a.push(x); known[x.gid]=1; } });
+        if(pool.a.length>500) pool.a=pool.a.slice(-500);
+        var body=JSON.stringify(pool), ok=false;
+        function done(){ if(ok){ try{ localStorage.removeItem(ACK_PENDING); }catch(e){} } ackBusy=false; }
+        fetch("https://textdb.dev/api/data/"+ACK_POOL,{method:"POST",headers:{"Content-Type":"text/plain"},body:body}).then(function(r){ if(r.ok)ok=true; done(); },function(){ done(); });
+        fetch("https://textdb.online/update/?key="+encodeURIComponent(ACK_POOL)+"&value="+encodeURIComponent(body)).then(function(){ ok=true; done(); },function(){ done(); });
+      }).catch(function(){ ackBusy=false; });
+    }
     function showNextGift(){
       if(giftShowing||!giftQueue.length) return;
       if(!document.body){ setTimeout(showNextGift,300); return; }
@@ -1248,6 +1277,7 @@ document.addEventListener('click', function(e){
         +'<div style="font-size:19px;font-weight:800;color:#4A463F;margin-top:10px">惊喜送分！</div>'
         +'<div style="font-size:14px;color:#4A463F;line-height:1.7;margin-top:12px">因为你最近刷题学习或提交的调查问卷被我们采纳，送 <b style="color:#DC2626;font-size:18px">'+g.amt+'</b> 积分给你！</div>'
         +(g.reason?'<div style="font-size:12px;color:#8A857B;margin-top:10px">理由：'+String(g.reason).replace(/[<>&"]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c];})+'</div>':'')
+        +'<div style="font-size:12px;color:#B45309;margin-top:10px">点「确定」积分自动到账；不点的话，这次积分可能收不到哦</div>'
         +'<button id="yc-gift-ok" style="margin-top:18px;padding:11px 0;width:100%;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:700">确定，收下积分</button>';
       ov.appendChild(card);
       document.body.appendChild(ov);
@@ -1255,6 +1285,7 @@ document.addEventListener('click', function(e){
         try{ addPoints(g.amt, g.reason||"老师赠送", "老师手动调整"); }catch(e){}
         var applied=appliedGet();
         if(applied.indexOf(g.id)<0){ applied.push(g.id); appliedSet(applied); }
+        try{ sendGiftAck(g); }catch(e){}
         ov.remove();
         giftShowing=false;
         showNextGift();
@@ -1272,9 +1303,11 @@ document.addEventListener('click', function(e){
         var nrm=function(s){ return String(s||"").replace(/\s+/g," ").trim(); };
         arr.forEach(function(g){
           if(!g||!g.id||applied.indexOf(g.id)>-1) return;
-          /* 新记录（带昵称）：尾号+昵称都对才到账；旧记录保持兼容——仅尾号或学习码匹配 */
+          /* 匹配优先级：带学习码的记录按学习码精确匹配（唯一，防尾号+昵称撞车）；
+             其次尾号+昵称双字段；旧记录保持兼容——仅尾号或学习码匹配 */
           var hit;
-          if(g.nick){ hit=String(g.tail)===String(ids.tail)&&nrm(g.nick)===nrm(ids.nick); }
+          if(g.code){ hit=!!ids.code&&String(g.code)===String(ids.code); }
+          else if(g.nick){ hit=String(g.tail)===String(ids.tail)&&nrm(g.nick)===nrm(ids.nick); }
           else{ hit=g.tail?String(g.tail)===String(ids.tail):(!g.tail&&g.code&&g.code===ids.code); }
           if(!hit) return;
           var amt=parseInt(g.amount,10);
@@ -1283,6 +1316,7 @@ document.addEventListener('click', function(e){
         showNextGift();
       });
     }
+    flushAcks();
     checkGrants();
   })();
 
