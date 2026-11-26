@@ -140,6 +140,44 @@
   .no-pdf { font-size:12px; color:#9A9387; margin-top:10px; }
   .play-tip { font-size:12px; color:#8A8378; line-height:1.7; margin-top:4px; }
   .play-tip b { color:#15803D; }
+
+  /* ---- 一键刷题（视频配套练习） ---- */
+  .quiz-tip-bar {
+    background:#FDF6EC; border:1px solid #F0E4CE; border-radius:14px;
+    padding:11px 14px; font-size:12.5px; color:#7A5C1E; line-height:1.75; margin-bottom:14px;
+  }
+  .quiz-btn {
+    display:flex; align-items:center; justify-content:center; gap:4px;
+    width:100%; min-height:44px; margin-top:8px; padding:10px 12px;
+    background:#B02A2A; color:#fff; border:none; border-radius:12px;
+    font-size:14px; font-weight:700; font-family:inherit; cursor:pointer;
+    transition:transform .1s; -webkit-tap-highlight-color:transparent;
+  }
+  .quiz-btn:active { transform:scale(.97); }
+  .quiz-btn.big { margin-top:14px; font-size:15px; }
+  .quiz-modal-mask {
+    position:fixed; inset:0; z-index:2147483646; background:rgba(32,32,32,.45);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .quiz-modal {
+    background:#fff; border-radius:20px; padding:22px 20px 16px; width:100%; max-width:340px;
+    box-shadow:0 12px 40px rgba(0,0,0,.18);
+  }
+  .quiz-modal h4 { margin:0 0 6px; font-size:16px; color:#202020; }
+  .quiz-modal p { margin:0 0 16px; font-size:13px; color:#8A8378; line-height:1.6; }
+  .quiz-modal button {
+    display:block; width:100%; min-height:44px; margin-top:8px; padding:11px 12px;
+    border:none; border-radius:12px; font-size:14px; font-weight:700; font-family:inherit; cursor:pointer;
+  }
+  .quiz-modal .qm-resume { background:#B02A2A; color:#fff; }
+  .quiz-modal .qm-fresh { background:#F3EFE7; color:#4A463F; }
+  .quiz-modal .qm-cancel { background:transparent; color:#9A9387; font-weight:400; }
+  .quiz-toast {
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:2147483647;
+    background:#1F2937; color:#fff; border-radius:999px; padding:10px 20px;
+    font-size:14px; font-weight:700; box-shadow:0 6px 22px rgba(0,0,0,.35);
+    white-space:nowrap; font-family:inherit;
+  }
   .speed-bar {
     display:flex; align-items:center; gap:8px; margin-top:14px; flex-wrap:wrap;
   }
@@ -188,7 +226,6 @@ var CATS = [
 
 /* 空分组占位提示（11-26实操测试P2：不允许裸空分组）：制作中＋预计上架时间 */
 var CAT_ETA = {
-  "判断推理": "制作中 · 预计上架：源片交付后 48 小时内",
   "言语理解": "制作中 · 预计上架：源片交付后 48 小时内"
 };
 
@@ -197,12 +234,44 @@ var CAT_ETA = {
    d = 上新日期（月-日），t = 上了什么，m = 在哪个模块看
    首页横幅每次打开都会来这里取最新一条，不用再改首页代码 */
 var YCGK_NEWS = [
+  {"d":"11-26","t":"《判断推理300题》逐题精讲（定义/类比/逻辑三模块+完整版）","m":"判断推理"},
   {"d":"11-25","t":"《找数专项》第二讲·三种材料怎么读 ＋ 第三讲·真题实战","m":"资料分析"},
-  {"d":"11-24","t":"《政治理论300题》逐题精讲完整版（2小时45分）","m":"政治理论"},
-  {"d":"11-24","t":"《申论大作文框架讲义》5分钟讲透写作框架","m":"套卷精讲"}
+  {"d":"11-24","t":"《政治理论300题》逐题精讲完整版（2小时45分）","m":"政治理论"}
 ];
 
 var VIDEOS = [
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/judge300.mp4"],
+    srcs: ["https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/judge300.mp4"],
+    cat: "判断推理", title: "判断推理300题逐题精讲：4小时05分完整版", desc: "定义判断、类比推理、逻辑判断三大模块300题逐题精讲，配套总讲义可保存打印，看视频前先刷一遍题效果最好。", pic: "",
+    kicker: "判断推理", big: "判断推理300题 逐题精讲", sub: "4小时05分·完整版",
+    quiz: { bank: "vid-judge300", label: "判断推理300题" },
+    pdfs: [
+      { name: "判断推理300题逐题精讲总讲义", file: "files/" + encodeURIComponent("判断推理300题逐题精讲总讲义.pdf") }
+    ] },
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/judge_define.mp4"],
+    srcs: ["https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/judge_define.mp4"],
+    cat: "判断推理", title: "定义判断100题逐题精讲", desc: "找关键词＋比对选项，定义判断五大易错点逐题讲透，看完做题不再凭感觉。", pic: "",
+    kicker: "判断推理", big: "定义判断100题 逐题精讲", sub: "1小时33分·定义100题",
+    quiz: { bank: "vid-judge-define", label: "定义判断100题" },
+    pdfs: [
+      { name: "判断推理定义判断100题讲义", file: "files/" + encodeURIComponent("判断推理定义判断100题讲义.pdf") }
+    ] },
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/judge_analogy.mp4"],
+    srcs: ["https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/judge_analogy.mp4"],
+    cat: "判断推理", title: "类比推理100题逐题精讲", desc: "造句法＋二级辨析，类比推理的得分套路一次讲清，快准稳。", pic: "",
+    kicker: "判断推理", big: "类比推理100题 逐题精讲", sub: "1小时05分·类比100题",
+    quiz: { bank: "vid-judge-analogy", label: "类比推理100题" },
+    pdfs: [
+      { name: "判断推理类比推理100题讲义", file: "files/" + encodeURIComponent("判断推理类比推理100题讲义.pdf") }
+    ] },
+  { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/judge_logic.mp4"],
+    srcs: ["https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/judge_logic.mp4"],
+    cat: "判断推理", title: "逻辑判断100题逐题精讲", desc: "翻译推理、真假话、加强削弱三大题型逐题精讲，逻辑判断从此有章法。", pic: "",
+    kicker: "判断推理", big: "逻辑判断100题 逐题精讲", sub: "1小时27分·逻辑100题",
+    quiz: { bank: "vid-judge-logic", label: "逻辑判断100题" },
+    pdfs: [
+      { name: "判断推理逻辑判断100题讲义", file: "files/" + encodeURIComponent("判断推理逻辑判断100题讲义.pdf") }
+    ] },
   { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/zheng300.mp4"],
     srcs: ["https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/zheng300.mp4"],
     cat: "政治理论", title: "政治理论300题逐题精讲：2小时45分完整版", desc: "政治理论300题逐题精讲，2小时45分钟完整版，配套讲义可保存打印。", pic: "",
@@ -740,6 +809,64 @@ function renderHome(){
   window.scrollTo(0, 0);
 }
 
+/* ===== 一键刷题（视频配套练习） =====
+   无做题记录 → 轻提示后直接开始；有做题记录 → 弹「继续上次进度 / 重新开始」，绝不静默清进度。
+   做题记录由主包 __ycStartBank 写入 yc-video-quiz-v1（题号清单），这里实时比对 yc-quiz-progress-v2。 */
+function bankInfo(bank){
+  try {
+    var vq = JSON.parse(localStorage.getItem('yc-video-quiz-v1') || '{}');
+    var rec = vq[bank];
+    if (!rec || !rec.ids || !rec.ids.length) return null;
+    var po = null;
+    try { po = JSON.parse(localStorage.getItem('yc-quiz-progress-v2') || 'null'); } catch (e2) { po = null; }
+    var n = 0;
+    if (po && po.done) {
+      for (var i = 0; i < rec.ids.length; i++) {
+        var d = po.done[rec.ids[i]];
+        if (d && ((d.c || 0) + (d.w || 0) > 0)) n++;
+      }
+    }
+    return { total: rec.total || rec.ids.length, answered: n };
+  } catch (e) { return null; }
+}
+function goBankQuiz(v, mode){
+  location.href = './index.html?bank=' + encodeURIComponent(v.quiz.bank) +
+    '&from=video&mode=' + mode + '&label=' + encodeURIComponent(v.quiz.label || '');
+}
+function quizLightToast(msg){
+  var t = document.createElement('div');
+  t.className = 'quiz-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 1600);
+}
+function showQuizModal(v, info){
+  var mask = document.createElement('div');
+  mask.className = 'quiz-modal-mask';
+  mask.innerHTML =
+    '<div class="quiz-modal">' +
+      '<h4>' + esc(v.quiz.label || "配套刷题") + '</h4>' +
+      '<p>你已做过 ' + info.answered + ' / ' + info.total + ' 题，可以接着上次继续，也可以重新从头开始。</p>' +
+      '<button type="button" class="qm-resume">继续上次进度（已答 ' + info.answered + ' 题）</button>' +
+      '<button type="button" class="qm-fresh">重新开始（清掉本组答题记录）</button>' +
+      '<button type="button" class="qm-cancel">先不了</button>' +
+    '</div>';
+  mask.querySelector('.qm-resume').addEventListener('click', function(){ goBankQuiz(v, 'resume'); });
+  mask.querySelector('.qm-fresh').addEventListener('click', function(){ goBankQuiz(v, 'fresh'); });
+  mask.querySelector('.qm-cancel').addEventListener('click', function(){ if (mask.parentNode) mask.parentNode.removeChild(mask); });
+  document.body.appendChild(mask);
+}
+function quizBtnGo(v){
+  if (!v || !v.quiz) return;
+  var info = bankInfo(v.quiz.bank);
+  if (info && info.answered > 0) {
+    showQuizModal(v, info);
+  } else {
+    quizLightToast('知道了，开始刷题');
+    setTimeout(function(){ goBankQuiz(v, 'fresh'); }, 700);
+  }
+}
+
 function renderModule(){
   var c = catOf(state.cat);
   var list = videosOf(state.cat);
@@ -754,7 +881,10 @@ function renderModule(){
       '<p class="sub">上传好之后会第一时间出现在这里，<br>先去刷题模块练起来吧～</p></div>';
     return;
   }
-  var html = '<div class="vgrid">';
+  /* 学习方法提示条：仅判断推理分组显示（视频+刷题配套学习路径） */
+  var tipBar = (state.cat === "判断推理") ?
+    '<div class="quiz-tip-bar">💡 学习方法：先花 30 分钟刷完本模块题 → 再回来看视频逐题解析；也可以边看视频边对照讲义动手做，正确率提升最快。</div>' : '';
+  var html = tipBar + '<div class="vgrid">';
   for (var k = 0; k < list.length; k++) {
     var v = VIDEOS[list[k]];
     var cc = catOf(v.cat);
@@ -775,13 +905,22 @@ function renderModule(){
         coverInner +
         (hasPdf ? '<span class="pdf-tag">配试卷</span>' : '') +
       '</div>' +
-      '<div class="vt"><h3>' + esc(v.title || "视频讲解") + '</h3></div></div>';
+      '<div class="vt"><h3>' + esc(v.title || "视频讲解") + '</h3>' +
+        (v.quiz ? '<button type="button" class="quiz-btn" data-idx="' + list[k] + '">📝 一键刷题 · ' + esc(v.quiz.label || "") + '</button>' : '') +
+      '</div></div>';
   }
   html += '</div>';
   document.getElementById("view").innerHTML = html;
   var cards = document.querySelectorAll(".vcard");
   for (var j = 0; j < cards.length; j++) {
     cards[j].addEventListener("click", function(){ state.view = "play"; state.idx = parseInt(this.getAttribute("data-idx"), 10); render(); });
+  }
+  var qbtns = document.querySelectorAll(".quiz-btn");
+  for (var q1 = 0; q1 < qbtns.length; q1++) {
+    qbtns[q1].addEventListener("click", function(ev){
+      ev.stopPropagation();
+      quizBtnGo(VIDEOS[parseInt(this.getAttribute("data-idx"), 10)]);
+    });
   }
   window.scrollTo(0, 0);
 }
@@ -841,6 +980,7 @@ function renderPlay(){
     '</div>' : '';
   var tipHtml = (v.oss || v.srcs) ?
     '<p class="play-tip">💡 第一次打开要缓冲几秒钟，缓冲完播放就很顺畅了；<b>建议横屏观看</b>——点上面「⛶ 全屏」再把手机横过来，字更大更清楚。</p>' : '';
+  var quizHtml = v.quiz ? '<button type="button" class="quiz-btn big" id="playQuizBtn">📝 一键刷题 · ' + esc(v.quiz.label || "") + '</button>' : '';
   document.getElementById("view").innerHTML =
     '<div class="card">' +
       '<div class="video-box" oncontextmenu="return false">' + playerHtml + '</div>' +
@@ -849,8 +989,13 @@ function renderPlay(){
         (v.desc ? '<p class="desc">' + esc(v.desc) + '</p>' : '') +
         speedHtml +
         tipHtml +
+        quizHtml +
         pdfHtml +
       '</div></div>';
+  if (v.quiz) {
+    var pqb = document.getElementById("playQuizBtn");
+    if (pqb) pqb.addEventListener("click", function(){ quizBtnGo(v); });
+  }
   if (v.oss || v.srcs) {
     var player = document.getElementById("localPlayer");
     var bar = document.getElementById("speedBar");
