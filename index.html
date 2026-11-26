@@ -1168,7 +1168,7 @@ document.addEventListener('click', function(e){
   function openRedeems(){
     var list=getRedeems();
     var html=list.length?list.slice().reverse().map(function(r){
-      return '<div class="yc-shop-item"><div class="yc-shop-l"><div class="yc-shop-nm">'+esc(r.item)+'</div><div class="yc-shop-ds">'+esc(r.at)+' · 订单 '+esc(r.oid)+'</div></div><div class="yc-shop-r"><span class="yc-shop-done">老师落实中</span></div></div>';
+      return '<div class="yc-shop-item"><div class="yc-shop-l"><div class="yc-shop-nm">'+esc(r.item)+'</div><div class="yc-shop-ds">'+esc(r.at)+' · 订单 '+esc(r.oid)+'</div></div><div class="yc-shop-r"><span class="yc-shop-done" data-rdoid="'+esc(r.oid)+'">老师落实中</span></div></div>';
     }).join(""):'<div class="yc-shop-note" style="text-align:center">还没有兑换记录，去商城逛逛吧</div>';
     modal.innerHTML=
       '<h3>我的兑换记录</h3><span class="yc-tagline">兑换后老师会主动联系你</span>'+
@@ -1178,8 +1178,57 @@ document.addEventListener('click', function(e){
     document.getElementById("ycRdShop").addEventListener("click",openShop);
     document.getElementById("ycRdBack2").addEventListener("click",openPoints);
     mask.classList.add("on"); modal.classList.add("on");
+    rdCloudGet(function(e,t){
+      if(e||!t||!list.length) return;
+      var arr=[]; try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
+      if(!Array.isArray(arr)) return;
+      var doneMap={};
+      arr.forEach(function(r){ if(r&&r.oid&&r.status==="done") doneMap[r.oid]=r; });
+      modal.querySelectorAll("[data-rdoid]").forEach(function(sp){
+        var rec=doneMap[sp.getAttribute("data-rdoid")];
+        if(rec) sp.textContent="已交付 ✓"+(rec.doneAt?(" · "+rec.doneAt):"");
+      });
+    });
   }
   flushRedeemQueue();
+
+  /* ---------- 老师手动送积分（学生端领取，ycgk-grant-v1） ---------- */
+  (function(){
+    var APPLIED="yicheng-gk-grants-applied-v1";
+    function appliedGet(){ try{ var a=JSON.parse(localStorage.getItem(APPLIED)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+    function appliedSet(a){ try{ localStorage.setItem(APPLIED,JSON.stringify(a)); }catch(e){} }
+    function myGrantCode(){
+      try{ var s=JSON.parse(localStorage.getItem("yicheng-gk-sync-v1")||"{}"); return (s&&s.code)||""; }catch(e){ return ""; }
+    }
+    function fetchGrants(cb){
+      var urls=["https://textdb.dev/api/data/ycgk-grant-v1","https://textdb.online/ycgk-grant-v1"];
+      var done=0,got=false;
+      urls.forEach(function(u){
+        fetch(u,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+          if(t&&!got){got=true;cb(null,t);}
+          done++;if(done===urls.length&&!got)cb(new Error("empty"),null);
+        }).catch(function(){done++;if(done===urls.length&&!got)cb(new Error("net"),null);});
+      });
+    }
+    function checkGrants(){
+      var code=myGrantCode();
+      if(!code) return;
+      fetchGrants(function(e,t){
+        if(e||!t) return;
+        var arr; try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
+        if(!Array.isArray(arr)) return;
+        var applied=appliedGet(), changed=false;
+        arr.forEach(function(g){
+          if(!g||g.code!==code||!g.id||applied.indexOf(g.id)>-1) return;
+          var amt=parseInt(g.amount,10);
+          applied.push(g.id); changed=true;
+          if(amt) addPoints(amt, g.reason||"老师赠送", "老师手动调整");
+        });
+        if(changed) appliedSet(applied);
+      });
+    }
+    checkGrants();
+  })();
 
   /* ---------- 考试通告卡片（每天更新，放在资料卡上方） ---------- */
   function addNoticesCard(){

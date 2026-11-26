@@ -360,6 +360,18 @@ td b{color:var(--txt)}
     <div id="rdList" style="font-size:13px"></div>
   </div>
   <div class="card" style="margin-top:14px">
+    <h3>手动送积分 <span class="hint">按学习码发放 · 学生下次打开应用到账</span></h3>
+    <div class="desc">输入学生<b>学习码</b>（兑换订单里就有）和分数：正数送分、负数扣分，事由默认「老师赠送」。学生需已点过「登录同步」，下次打开应用自动到账。</div>
+    <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
+      <input id="gtCode" placeholder="学习码6位" style="width:110px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
+      <input id="gtAmt" type="number" placeholder="±分数" style="width:90px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
+      <input id="gtReason" placeholder="事由（默认老师赠送）" style="flex:1;min-width:140px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
+      <button id="gtGo" style="background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">确认送出</button>
+    </div>
+    <div class="hint" id="gtMsg"></div>
+    <div id="gtList" style="font-size:12px;margin-top:6px"></div>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3>手机号留底（加密） <span class="hint">云端仅密文 · 本地解密</span></h3>
     <div class="desc">注册时手机号用站长公钥加密后写入台账，云端无明文；在此粘贴私钥后本地解密查看，私钥只存本机、不上传。11-26 晚之前的注册没有留底字段。</div>
     <textarea id="bkKey" placeholder="粘贴私钥 PEM 原文（含 -----BEGIN----- 首尾行）" style="width:100%;height:88px;font-size:12px;padding:8px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);box-sizing:border-box;font-family:monospace"></textarea>
@@ -1126,13 +1138,94 @@ function renderRedeems(t){
     var kind=r.kind==="service"?'<span style="color:#4F46E5;font-weight:700">服务</span>':'<span style="color:#B45309;font-weight:700">实物</span>';
     var el=document.createElement("div");
     el.style.cssText="display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px dashed var(--line)";
-    el.innerHTML='<div style="min-width:0"><div style="font-weight:700">'+escRd(r.item)+' · '+kind+' · '+escRd(r.cost)+'分</div><div style="font-size:11px;color:var(--mut);margin-top:2px">'+escRd(r.at)+' · 订单 '+escRd(r.oid)+' · 学习码 '+escRd(r.code||"—")+(r.tail?(' · 尾号'+escRd(r.tail)):'')+'</div></div><div style="flex:none;font-size:12px;color:var(--amber);font-weight:700">待落实</div>';
+    var right;
+    if(r.status==="done"){
+      right='<div style="flex:none;font-size:12px;color:#16A34A;font-weight:700;text-align:right">已交付 ✓'+(r.doneAt?('<div style="font-weight:400;font-size:10px;color:var(--mut)">'+escRd(r.doneAt)+'</div>'):'')+'</div>';
+    }else{
+      right='<button class="rd-done-btn" data-oid="'+escRd(r.oid||"")+'" style="flex:none;font-size:12px;border:none;border-radius:8px;background:#B45309;color:#fff;padding:6px 10px;font-weight:700;cursor:pointer">标记已交付</button>';
+    }
+    el.innerHTML='<div style="min-width:0"><div style="font-weight:700">'+escRd(r.item)+' · '+kind+' · '+escRd(r.cost)+'分</div><div style="font-size:11px;color:var(--mut);margin-top:2px">'+escRd(r.at)+' · 订单 '+escRd(r.oid)+' · 学习码 '+escRd(r.code||"—")+(r.tail?(' · 尾号'+escRd(r.tail)):'')+'</div></div>'+right;
     list.appendChild(el);
   });
+  list.querySelectorAll(".rd-done-btn").forEach(function(b){
+    b.addEventListener("click",function(){ markDone(b.getAttribute("data-oid"),b); });
+  });
+}
+function rdPut(arr,cb){
+  var body=JSON.stringify(arr), ok=false, done=0;
+  function fin(){ done++; if(done===2) cb(ok); }
+  fetch("https://textdb.dev/api/data/ycgk-redeem-v1",{method:"POST",headers:{"Content-Type":"text/plain"},body:body}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+  if(body.length<1500){ fetch("https://textdb.online/update/?key="+encodeURIComponent("ycgk-redeem-v1")+"&value="+encodeURIComponent(body)).then(function(){fin()},function(){fin()}); }
+  else fin();
+}
+function markDone(oid,btn){
+  if(!oid) return;
+  if(btn){ btn.disabled=true; btn.textContent="写入中…"; }
+  fetch("https://textdb.dev/api/data/ycgk-redeem-v1",{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+    var arr=[]; try{ arr=JSON.parse(t||"[]")||[]; }catch(e){ arr=[]; }
+    if(!Array.isArray(arr)) arr=[];
+    var hit=null;
+    arr.forEach(function(r){ if(r&&r.oid===oid) hit=r; });
+    if(!hit){ if(btn){ btn.disabled=false; btn.textContent="标记已交付"; } alert("未找到该订单，请点「刷新」后重试"); return; }
+    hit.status="done"; hit.doneAt=new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16);
+    rdPut(arr,function(ok){
+      if(ok){ loadRedeems(); }
+      else if(btn){ btn.disabled=false; btn.textContent="标记已交付"; alert("网络没写进去，请稍后再点一次"); }
+    });
+  }).catch(function(){ if(btn){ btn.disabled=false; btn.textContent="标记已交付"; } });
 }
 var rdGoBtn=document.getElementById("rdGo");
 if(rdGoBtn) rdGoBtn.addEventListener("click",function(){ document.getElementById("rdList").innerHTML=""; loadRedeems(); });
 loadRedeems();
+/* ===== 手动送积分（ycgk-grant-v1） ===== */
+var GRANT_POOL="ycgk-grant-v1";
+function grantGet(cb){
+  var done=0,got=false;
+  function fin(t){ done++; if(t&&!got){got=true;cb(null,t);} if(done===2&&!got)cb(new Error("网络不通"),null); }
+  ["https://textdb.dev/api/data/"+GRANT_POOL,"https://textdb.online/"+GRANT_POOL].forEach(function(u){
+    fetch(u,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){fin((t||"").trim()||null)}).catch(function(){fin(null)});
+  });
+}
+function grantPut(arr,cb){
+  var body=JSON.stringify(arr), ok=false, done=0;
+  function fin(){ done++; if(done===2) cb(ok); }
+  fetch("https://textdb.dev/api/data/"+GRANT_POOL,{method:"POST",headers:{"Content-Type":"text/plain"},body:body}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+  if(body.length<1500){ fetch("https://textdb.online/update/?key="+encodeURIComponent(GRANT_POOL)+"&value="+encodeURIComponent(body)).then(function(){fin()},function(){fin()}); }
+  else fin();
+}
+function renderGrants(t){
+  var box=document.getElementById("gtList"); if(!box) return;
+  var arr=[];
+  try{ arr=JSON.parse(t||"[]")||[]; }catch(e){ arr=[]; }
+  if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<span style="color:var(--mut)">还没有发放记录</span>'; return; }
+  box.innerHTML=arr.slice().reverse().slice(0,8).map(function(g){
+    return '<div style="padding:4px 0;border-bottom:1px dashed var(--line)">'+escRd(g.at)+' · 学习码 '+escRd(g.code)+' · <b style="color:'+(g.amount>=0?'#16A34A':'#B45309')+'">'+(g.amount>=0?'+':'')+escRd(g.amount)+'分</b> · '+escRd(g.reason||"老师赠送")+'</div>';
+  }).join("");
+}
+function loadGrants(){ grantGet(function(e,t){ if(!e) renderGrants(t); }); }
+var gtGoBtn=document.getElementById("gtGo");
+if(gtGoBtn) gtGoBtn.addEventListener("click",function(){
+  var msg=document.getElementById("gtMsg");
+  var code=(document.getElementById("gtCode").value||"").trim();
+  var amt=parseInt(document.getElementById("gtAmt").value,10);
+  var reason=(document.getElementById("gtReason").value||"老师赠送").trim()||"老师赠送";
+  if(!/^\d{6}$/.test(code)){ msg.textContent="请输入6位学习码"; return; }
+  if(!amt||isNaN(amt)){ msg.textContent="请输入分数（正数送分、负数扣分）"; return; }
+  reason=reason.replace(/\+/g,"＋");
+  gtGoBtn.disabled=true; gtGoBtn.textContent="写入中…"; msg.textContent="";
+  grantGet(function(e,t){
+    var arr=[];
+    try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
+    if(!Array.isArray(arr)) arr=[];
+    arr.push({id:"G"+Date.now()+Math.floor(Math.random()*900+100),code:code,amount:amt,reason:reason,at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)});
+    grantPut(arr,function(ok){
+      gtGoBtn.disabled=false; gtGoBtn.textContent="确认送出";
+      if(ok){ msg.textContent="已发出：学习码 "+code+" "+(amt>=0?"+":"")+amt+"分（"+reason+"），学生下次打开应用到账"; document.getElementById("gtCode").value=""; document.getElementById("gtAmt").value=""; document.getElementById("gtReason").value=""; loadGrants(); }
+      else{ msg.textContent="网络没写进去，请稍后再点一次"; }
+    });
+  });
+});
+loadGrants();
 </script>
 </body>
 </html>
