@@ -38,9 +38,18 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
 .ai-out{white-space:pre-wrap;font-size:13.5px;line-height:1.9;margin-top:10px;color:#3a3630}
 .tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:99px;padding:3px 9px}
 .none{margin-top:10px;font-size:12.5px;color:#8A8378;background:#F7F5F0;border-radius:10px;padding:10px 12px;line-height:1.7}
-.modal-mask{position:fixed;inset:0;background:rgba(20,16,12,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:#FFFDF8;border-radius:18px;max-width:360px;width:100%;padding:20px}
-.modal input{width:100%;border:1.5px solid #E4DACA;border-radius:10px;height:40px;padding:0 10px;font-size:13px;font-family:inherit;margin-top:4px}
+.crop-wrap{position:relative;overflow:hidden;border-radius:12px;background:#141210;width:fit-content;max-width:100%;margin:0 auto}
+.crop-wrap img{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;pointer-events:none}
+.crop-box{position:absolute;border:2.5px solid #FFD54D;border-radius:4px;box-shadow:0 0 0 9999px rgba(10,8,6,.55);cursor:move;touch-action:none}
+.crop-h{position:absolute;width:26px;height:26px;border-radius:50%;background:#FFD54D;border:2.5px solid #FFFDF8;box-shadow:0 1px 5px rgba(0,0,0,.45);touch-action:none}
+.crop-h.tl{left:-13px;top:-13px;cursor:nwse-resize}
+.crop-h.tr{right:-13px;top:-13px;cursor:nesw-resize}
+.crop-h.bl{left:-13px;bottom:-13px;cursor:nesw-resize}
+.crop-h.br{right:-13px;bottom:-13px;cursor:nwse-resize}
+.hist-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.hist-item{border:1.5px solid #E4DACA;border-radius:12px;padding:10px 12px;margin-top:8px;background:#fff;cursor:pointer}
+.hist-item .ht{font-size:13px;font-weight:700;color:#3a3630;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-item .hs{font-size:11px;color:#8A8378;margin-top:3px;line-height:1.6}
 .home{display:inline-flex;align-items:center;gap:4px;color:#8A8378;font-size:12px;text-decoration:none;margin-bottom:10px}
 </style>
 </head>
@@ -63,16 +72,39 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
     <p class="hint" id="ocrHint"></p>
   </div>
 
+  <div class="card" id="cropCard" style="display:none">
+    <label class="lb">第 2 步 · 框住要讲的那道题</label>
+    <div class="crop-wrap" id="cropWrap">
+      <img id="cropImg" alt="待裁剪照片">
+      <div class="crop-box" id="cropBox">
+        <div class="crop-h tl"></div><div class="crop-h tr"></div><div class="crop-h bl"></div><div class="crop-h br"></div>
+      </div>
+    </div>
+    <p class="hint">拖中间移动选框，拖四个黄点缩放——框住一道题，识别最准。</p>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn btn-g" id="cropRepick" style="flex:1">重拍一张</button>
+      <button class="btn btn-p" id="cropOk" style="flex:2;width:auto">✓ 就识别这一块</button>
+    </div>
+  </div>
+
   <div class="card" id="step2" style="display:none">
-    <label class="lb">第 2 步 · 认出来的题目（识别错了可直接改）</label>
+    <label class="lb">第 3 步 · 认出来的题目（识别错了可直接改）</label>
     <textarea id="ocrText" placeholder="题目文字会出现在这里，也可以直接手动粘贴题目"></textarea>
     <div style="display:flex;gap:10px;margin-top:12px">
       <button class="btn btn-p" id="goMatch" style="flex:1">🔍 在题库里找原题</button>
     </div>
-    <button class="btn btn-p" id="goAi" style="margin-top:10px">✦ AI 判答案 · 讲过程</button>
-    <p class="hint">第一次用 AI 讲题需要填一次接口（跟申论批阅共用），密钥只存你自己手机里。</p>
+    <button class="btn btn-p" id="goAi" style="margin-top:10px;display:none">✦ AI 判答案 · 讲过程</button>
     <div id="matchOut"></div>
     <div id="aiOut"></div>
+  </div>
+
+  <div class="card" id="histCard" style="display:none">
+    <div class="hist-head" id="histToggle">
+      <label class="lb" style="margin:0">📚 拍过的题（<span id="histN">0</span>）</label>
+      <span id="histArrow" style="font-size:12px;color:#8A8378">展开 ▾</span>
+    </div>
+    <div id="histList" style="display:none"></div>
+    <div id="histFoot" style="display:none;margin-top:8px;text-align:right"><a href="javascript:void(0)" id="histClear" style="font-size:11px;color:#B3AC9E">清空记录</a></div>
   </div>
 </div>
 
@@ -88,11 +120,90 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
   pick.addEventListener('click', function(){ file.click(); });
   file.addEventListener('change', function(){ if (file.files && file.files[0]) handleImage(file.files[0]); });
 
-  var ocrDone = false;
+  /* ===== 裁剪选框：拖动移动、拖四角缩放，框住一道题再识别 ===== */
+  var cropImgEl = document.getElementById('cropImg'), cropBox = document.getElementById('cropBox');
+  var cropRect = {x:0, y:0, w:0, h:0}; /* 相对 crop-wrap 显示坐标 */
+  var cropMode = null, cropStart = null, cropOrig = null;
+
+  function applyCropBox(){
+    cropBox.style.left = cropRect.x + 'px';
+    cropBox.style.top = cropRect.y + 'px';
+    cropBox.style.width = cropRect.w + 'px';
+    cropBox.style.height = cropRect.h + 'px';
+  }
+  function initCrop(){
+    var wrap = document.getElementById('cropWrap');
+    var W = wrap.clientWidth, H = cropImgEl.clientHeight || wrap.clientHeight;
+    cropRect = { x: W*0.08, y: H*0.08, w: W*0.84, h: H*0.5 };
+    applyCropBox();
+  }
+  function ptFromEvent(ev){
+    var r = document.getElementById('cropWrap').getBoundingClientRect();
+    return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+  }
+  function clampCrop(){
+    var wrap = document.getElementById('cropWrap');
+    var W = wrap.clientWidth, H = cropImgEl.clientHeight || wrap.clientHeight;
+    cropRect.w = Math.max(40, Math.min(cropRect.w, W));
+    cropRect.h = Math.max(40, Math.min(cropRect.h, H));
+    cropRect.x = Math.max(0, Math.min(cropRect.x, W - cropRect.w));
+    cropRect.y = Math.max(0, Math.min(cropRect.y, H - cropRect.h));
+  }
+  function onDown(ev, mode){
+    ev.preventDefault(); ev.stopPropagation();
+    cropMode = mode; cropStart = ptFromEvent(ev); cropOrig = {x:cropRect.x, y:cropRect.y, w:cropRect.w, h:cropRect.h};
+    var el = ev.currentTarget;
+    try{ el.setPointerCapture(ev.pointerId); }catch(e){}
+  }
+  function onMove(ev){
+    if (!cropMode) return;
+    var p = ptFromEvent(ev), dx = p.x - cropStart.x, dy = p.y - cropStart.y;
+    if (cropMode === 'move') { cropRect.x = cropOrig.x + dx; cropRect.y = cropOrig.y + dy; }
+    else {
+      if (cropMode.indexOf('w') > -1) { cropRect.x = cropOrig.x + dx; cropRect.w = cropOrig.w - dx; }
+      if (cropMode.indexOf('e') > -1) { cropRect.w = cropOrig.w + dx; }
+      if (cropMode.indexOf('n') > -1) { cropRect.y = cropOrig.y + dy; cropRect.h = cropOrig.h - dy; }
+      if (cropMode.indexOf('s') > -1) { cropRect.h = cropOrig.h + dy; }
+      if (cropRect.w < 40) { cropRect.w = 40; if (cropMode.indexOf('w') > -1) cropRect.x = cropOrig.x + cropOrig.w - 40; }
+      if (cropRect.h < 40) { cropRect.h = 40; if (cropMode.indexOf('n') > -1) cropRect.y = cropOrig.y + cropOrig.h - 40; }
+    }
+    clampCrop(); applyCropBox();
+  }
+  function onUp(){ cropMode = null; }
+  cropBox.addEventListener('pointerdown', function(ev){ onDown(ev, 'move'); });
+  Array.prototype.forEach.call(document.querySelectorAll('.crop-h'), function(h){
+    var m = { tl:'nw', tr:'ne', bl:'sw', br:'se' }[h.className.split(' ')[1]]; /* 角标→方向 */
+    h.addEventListener('pointerdown', function(ev){ onDown(ev, m); });
+  });
+  document.addEventListener('pointermove', onMove);
+  document.addEventListener('pointerup', onUp);
+  document.addEventListener('pointercancel', onUp);
+
   function handleImage(f){
-    var url = URL.createObjectURL(f);
-    var iw = document.getElementById('imgWrap'), ip = document.getElementById('imgPrev');
-    ip.src = url; iw.style.display = 'block';
+    cropImgEl.onload = function(){
+      document.getElementById('cropCard').style.display = 'block';
+      document.getElementById('step2').style.display = 'none';
+      requestAnimationFrame(initCrop);
+      document.getElementById('cropCard').scrollIntoView({behavior:'smooth'});
+    };
+    cropImgEl.src = URL.createObjectURL(f);
+  }
+  document.getElementById('cropRepick').addEventListener('click', function(){ file.click(); });
+  document.getElementById('cropOk').addEventListener('click', function(){
+    var wrap = document.getElementById('cropWrap');
+    var nat = cropImgEl.naturalWidth, dispW = cropImgEl.clientWidth;
+    if (!nat || !dispW) return;
+    var scale = nat / dispW;
+    var sx = cropRect.x * scale, sy = cropRect.y * scale, sw = cropRect.w * scale, sh = cropRect.h * scale;
+    var cv = document.createElement('canvas');
+    var maxSide = 1600, k = Math.min(1, maxSide / Math.max(sw, sh));
+    cv.width = Math.round(sw * k); cv.height = Math.round(sh * k);
+    cv.getContext('2d').drawImage(cropImgEl, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+    document.getElementById('cropCard').style.display = 'none';
+    runOcr(cv);
+  });
+
+  function runOcr(source){
     var prog = document.getElementById('prog'), bar = document.getElementById('progBar'), hint = document.getElementById('ocrHint');
     prog.style.display = 'block'; bar.style.width = '0%';
     hint.textContent = '正在启动识别引擎…（第一次用要下载识别库，约十几 MB，之后有缓存）';
@@ -102,15 +213,16 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
         if (m.status === 'recognizing text') { bar.style.width = Math.round((m.progress||0)*100) + '%'; }
         else if (m.status && m.progress !== undefined) { bar.style.width = Math.round(m.progress*100) + '%'; hint.textContent = '识别准备中：' + m.status; }
       }})
-      .then(function(w){ worker = w; return w.recognize(f); })
+      .then(function(w){ worker = w; return w.recognize(source); })
       .then(function(res){
         var text = (res.data && res.data.text || '').trim();
         document.getElementById('ocrText').value = text;
         document.getElementById('step2').style.display = 'block';
-        hint.textContent = text ? ('识别完成，共 ' + text.length + ' 字。识别不准的地方可以直接改。') : '没认出文字，试试拍得再清楚一点，或手动粘贴题目。';
+        hint.textContent = text ? ('识别完成，共 ' + text.length + ' 字。识别不准的地方可以直接改。') : '没认出文字，试试框得再准一点，或手动粘贴题目。';
         prog.style.display = 'none';
         document.getElementById('step2').scrollIntoView({behavior:'smooth'});
         track('yc_scan_ocr_done', { len: text.length });
+        histNewRecord(text);
         if (worker) worker.terminate();
       })
       .catch(function(e){
@@ -225,24 +337,90 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
         });
         out.innerHTML = html;
         track('yc_scan_match_hit', { n: results.length });
+        histUpdateMatch(results, idx);
       }
       function renderNone(){
-        out.innerHTML = '<p class="none">题库里没找到这道题（或相似度不够）。没关系，直接点上面「AI 判答案 · 讲过程」，AI 会按题干现场判答案、写过程。</p>';
+        out.innerHTML = '<p class="none">题库里没找到这道题（或相似度不够）。' + (aiEp ? '直接点上面「AI 判答案 · 讲过程」，会按题干现场判答案、写过程。' : '') + '</p>';
         track('yc_scan_match_none');
+        histUpdateNone();
       }
     });
   });
 
-  /* ===== AI 判答案 · 讲过程 ===== */
-  function getCfg(){ try{ return JSON.parse(localStorage.getItem('yc_ai_cfg') || 'null'); }catch(e){ return null; } }
+  /* ===== 拍题记录：只存在学生自己手机里（localStorage），不上传任何服务器 ===== */
+  var HIST_KEY = 'yc_scan_hist_v1', curRec = null;
+  function histLoad(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }catch(e){ return []; } }
+  function histSave(a){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(a.slice(-100))); }catch(e){} }
+  function histNewRecord(text){
+    if (!text) { curRec = null; return; }
+    var a = histLoad();
+    curRec = { t: Date.now(), q: text, hit: null, ai: null };
+    a.push(curRec); histSave(a); histRender();
+  }
+  function histUpdateMatch(results, idx){
+    if (!curRec) return;
+    curRec.hit = results.map(function(r){ return { m: MOD_NAMES[idx.fm[idx.files[r.fi]]] || '题库', id: r.q.id, s: Math.round(r.score*100) }; });
+    histSave(histLoad()); histRender();
+  }
+  function histUpdateNone(){
+    if (!curRec) return;
+    curRec.hit = []; histSave(histLoad()); histRender();
+  }
+  function histUpdateAi(text){
+    if (!curRec) return;
+    curRec.ai = text; histSave(histLoad()); histRender();
+  }
+  function histRender(){
+    var a = histLoad(), card = document.getElementById('histCard');
+    document.getElementById('histN').textContent = a.length;
+    if (!a.length) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    document.getElementById('histFoot').style.display = 'block';
+    var list = document.getElementById('histList'), html = '';
+    for (var i = a.length - 1; i >= 0; i--) {
+      var r = a[i], d = new Date(r.t);
+      var ts = (d.getMonth()+1) + '月' + d.getDate() + '日 ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2);
+      var st = r.hit === null ? '还没找' : (r.hit.length ? '✅ ' + r.hit[0].m + ' · ' + r.hit[0].id + ' · ' + r.hit[0].s + '%' : '题库未收录') + (r.ai ? ' · 已讲' : '');
+      html += '<div class="hist-item" data-i="' + i + '"><div class="ht">' + esc(r.q.slice(0, 42)) + '</div><div class="hs">' + ts + ' · ' + st + '</div></div>';
+    }
+    list.innerHTML = html;
+    Array.prototype.forEach.call(list.querySelectorAll('.hist-item'), function(el){
+      el.addEventListener('click', function(){
+        var r = a[parseInt(el.getAttribute('data-i'), 10)];
+        if (!r) return;
+        document.getElementById('ocrText').value = r.q;
+        document.getElementById('step2').style.display = 'block';
+        curRec = r;
+        document.getElementById('step2').scrollIntoView({behavior:'smooth'});
+      });
+    });
+  }
+  document.getElementById('histToggle').addEventListener('click', function(){
+    var list = document.getElementById('histList'), open = list.style.display !== 'none';
+    list.style.display = open ? 'none' : 'block';
+    document.getElementById('histArrow').textContent = open ? '展开 ▾' : '收起 ▴';
+  });
+  document.getElementById('histClear').addEventListener('click', function(){
+    if (!confirm('清空全部拍题记录？本机删除后不可恢复。')) return;
+    histSave([]); curRec = null; histRender();
+  });
+  histRender();
+
+  /* ===== AI 判答案 · 讲过程（讲题能力由站点统一配置，学生端零操作；未接好前按钮不显示） ===== */
+  var aiEp = null;
+  try {
+    fetch('./assets/ai-endpoint.json?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ if (j && j.url && j.key) { aiEp = j; document.getElementById('goAi').style.display = 'inline-flex'; } })
+      .catch(function(){});
+  } catch(e) {}
   function callAI(prompt, ok, fail, btn){
-    var cfg = getCfg();
-    if (!cfg || !cfg.url || !cfg.key) { showCfg(); fail('还没配置 AI 接口'); return; }
-    var old = btn.textContent; btn.disabled = true; btn.textContent = 'AI 正在讲…';
+    if (!aiEp) { fail('讲题功能还没接好'); return; }
+    var old = btn.textContent; btn.disabled = true; btn.textContent = '正在讲…';
     var done = false, timer = setTimeout(function(){ if(!done){done=true;btn.disabled=false;btn.textContent=old;fail('超时');} }, 90000);
-    fetch(cfg.url, { method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + cfg.key},
-        body: JSON.stringify({ model: cfg.model || 'deepseek-chat', temperature: 0.3, stream: false,
+    fetch(aiEp.url, { method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + aiEp.key},
+        body: JSON.stringify({ model: aiEp.model, temperature: 0.3, stream: false,
           messages: [{ role:'user', content: prompt }] }) })
       .then(function(r){ return r.json(); })
       .then(function(d){
@@ -254,27 +432,6 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
       })
       .catch(function(e){ if(done) return; done=true; clearTimeout(timer); btn.disabled=false; btn.textContent=old; fail(e && e.message || '网络错误'); });
   }
-  function showCfg(){
-    var old = document.querySelector('.modal-mask'); if (old) old.remove();
-    var c = getCfg() || { url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat', key:'' };
-    var mask = document.createElement('div'); mask.className = 'modal-mask';
-    mask.innerHTML = '<div class="modal"><p style="font-size:16px;font-weight:800;margin:0">设置在线 AI（拍题讲解用）</p>' +
-      '<p style="font-size:12px;line-height:1.8;color:#6B6558;margin:10px 0;">填一次 OpenAI 兼容接口即可，密钥只保存在你本机浏览器，不会上传。跟申论页的 AI 批阅共用这套配置。</p>' +
-      '<label style="font-size:12px;color:#6B6558">接口地址</label><input id="cUrl" value="' + esc(c.url) + '">' +
-      '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px">模型名</label><input id="cModel" value="' + esc(c.model||'deepseek-chat') + '">' +
-      '<label style="font-size:12px;color:#6B6558;display:block;margin-top:10px">API Key</label><input id="cKey" type="password" placeholder="sk-...">' +
-      '<div style="margin-top:16px;display:flex;gap:10px"><button class="btn btn-g" id="cCancel" style="flex:1">先不用</button><button class="btn btn-p" id="cSave" style="flex:1;width:auto">保存</button></div></div>';
-    document.body.appendChild(mask);
-    mask.querySelector('#cCancel').onclick = function(){ mask.remove(); };
-    mask.querySelector('#cSave').onclick = function(){
-      localStorage.setItem('yc_ai_cfg', JSON.stringify({
-        url: mask.querySelector('#cUrl').value.trim(),
-        model: mask.querySelector('#cModel').value.trim() || 'deepseek-chat',
-        key: mask.querySelector('#cKey').value.trim()
-      }));
-      mask.remove();
-    };
-  }
   document.getElementById('goAi').addEventListener('click', function(){
     var q = document.getElementById('ocrText').value.trim();
     var out = document.getElementById('aiOut'), btn = this;
@@ -285,13 +442,14 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
       '【过程】一步步写清解题过程，含用到的公式/考点，最后给正确选项\n' +
       '【易错点】一句话点出这类题最容易错在哪\n' +
       '【考点】所属模块与考点名\n题目：\n' + q;
-    out.innerHTML = '<p class="none">AI 正在判答案、写过程…</p>';
+    out.innerHTML = '<p class="none">正在判答案、写过程…</p>';
     callAI(prompt, function(text){
       out.innerHTML = '<div class="match"><div class="mh"><span class="mt">✦ AI 判答案 · 讲过程</span><span class="ms">由在线大模型生成</span></div>' +
         '<div class="ai-out">' + esc(text) + '</div></div>';
       track('yc_scan_ai_done', { len: text.length });
+      histUpdateAi(text);
     }, function(err){
-      out.innerHTML = '<p class="none">AI 没讲成（' + esc(err) + '）。' + (err.indexOf('配置') > -1 ? '填好接口再点一次就行。' : '检查网络或接口设置后再试。') + '</p>';
+      out.innerHTML = '<p class="none">这次没讲成（' + esc(err) + '），稍后再试一次。</p>';
     }, btn);
   });
 })();
