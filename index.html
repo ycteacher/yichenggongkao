@@ -4003,21 +4003,30 @@ document.addEventListener('click', function(e){
   document.body.insertBefore(banner, document.getElementById('root'));
   var daysEl = banner.querySelector('#yc-sb-days');
   if (daysEl) daysEl.textContent = label;
-  /* 首页专属显示：检测到首页标记才显示，离开首页（进刷题/卷子等）自动收起 */
-  var seenHome = false, tmr = null;
+  /* 首页专属显示：结构化反向判定——出现刷题页特征（主包退出按钮的 data-testid，
+     与主包自身判定刷题页的口径一致）或底部激活页签不是首页时收起；回到首页恢复；
+     信号缺失时保持现状（fail-open，主包改版不会让 banner 整条消失） */
+  var tmr = null;
   function checkHome(){
     tmr = null;
     var root = document.getElementById('root');
     if (!root) return;
-    var isHome = root.textContent.indexOf('今日目标进度') > -1;
-    if (isHome) seenHome = true;
-    if (seenHome) banner.style.display = isHome ? '' : 'none';
+    var isHome = null;
+    if (root.querySelector('[data-testid="quiz-exit"],[data-testid="pick-exit"],[data-testid="essay-exit"]')) {
+      isHome = false; /* 刷题/选岗/申论页 */
+    } else {
+      var tb = document.querySelector('.yc-tabbar');
+      var on = tb && tb.querySelector('button.on');
+      if (on) isHome = (on === tb.querySelector('button')); /* 激活页签是否为首页（首个页签） */
+    }
+    if (isHome === false) banner.style.display = 'none';
+    else if (isHome === true) banner.style.display = '';
   }
   function schedule(){
     if (!tmr) tmr = setTimeout(checkHome, 400);
   }
   if (window.MutationObserver){
-    new MutationObserver(schedule).observe(document.getElementById('root'), {childList:true, subtree:true});
+    new MutationObserver(schedule).observe(document.getElementById('root'), {childList:true, subtree:true, attributes:true, attributeFilter:['class']});
   }
   /* ===== ?goto= 快捷深链：sprint.html 等页面的「错题本 / 卷子」直达入口 =====
      读参暂存后清参（版本重载丢参时按暂存恢复），等底部标签栏渲染后点击对应页签；
