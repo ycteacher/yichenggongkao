@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>国考冲刺专区 · 亿成公考</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { overflow-x:hidden; max-width:100%; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#FAF8F3; color:#202020; min-height:100vh; }
+  .topbar {
+    position:sticky; top:0; z-index:20; background:#FAF8F3; border-bottom:1px solid #EDE9E0;
+    padding:12px 16px; display:flex; align-items:center; gap:12px;
+    padding-top:calc(12px + env(safe-area-inset-top));
+  }
+  .topbar a.back {
+    display:flex; align-items:center; justify-content:center; width:36px; height:36px;
+    border-radius:999px; background:#fff; box-shadow:0 1px 4px rgba(32,32,32,.08);
+    text-decoration:none; color:#202020; font-size:18px; flex:none;
+  }
+  .topbar .tt { flex:1; min-width:0; }
+  .topbar .tt h1 { font-size:17px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .topbar .tt p { font-size:12px; color:#8A8378; margin-top:2px; }
+  .wrap { max-width:48rem; margin:0 auto; padding:16px 16px 48px; }
+  /* 倒计时卡 */
+  .hero {
+    background:linear-gradient(135deg,#B02A2A,#DC2626); border-radius:18px; padding:20px 18px;
+    color:#fff; box-shadow:0 6px 18px rgba(176,42,42,.25); margin-bottom:14px;
+  }
+  .hero .big { font-size:26px; font-weight:800; letter-spacing:1px; }
+  .hero .sub { font-size:13px; color:rgba(255,255,255,.88); margin-top:6px; line-height:1.7; }
+  .hero .sub b { color:#FFE08A; }
+  /* 快捷入口 */
+  .quick { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px; }
+  .quick a {
+    background:#fff; border-radius:14px; padding:12px 8px; text-align:center; text-decoration:none;
+    box-shadow:0 2px 8px rgba(32,32,32,.05); display:block;
+  }
+  .quick .ic { font-size:22px; line-height:1.2; }
+  .quick .nm { font-size:13px; font-weight:700; color:#202020; margin-top:4px; }
+  .quick .ds { font-size:11px; color:#9A9387; margin-top:2px; line-height:1.4; }
+  /* 分区标题 */
+  .sec-t { font-size:15px; font-weight:800; color:#202020; margin:22px 0 10px; display:flex; align-items:center; gap:8px; }
+  .sec-t::before { content:""; width:4px; height:16px; border-radius:2px; background:#B02A2A; display:inline-block; }
+  .sec-note { font-size:12px; color:#8A8378; line-height:1.7; margin:-4px 0 10px; }
+  /* 卷子分组 */
+  details.grp { background:#fff; border-radius:14px; box-shadow:0 2px 8px rgba(32,32,32,.05); margin-bottom:10px; overflow:hidden; }
+  details.grp summary {
+    list-style:none; cursor:pointer; padding:13px 14px; font-size:14px; font-weight:700; color:#202020;
+    display:flex; align-items:center; gap:8px; user-select:none;
+  }
+  details.grp summary::-webkit-details-marker { display:none; }
+  details.grp summary .cnt { margin-left:auto; font-size:12px; font-weight:600; color:#B02A2A; background:#FBEAEA; border-radius:999px; padding:2px 10px; }
+  details.grp summary .arr { color:#B3AC9E; font-size:12px; transition:transform .2s; }
+  details.grp[open] summary .arr { transform:rotate(90deg); }
+  details.grp .bd { border-top:1px solid #F3F0E9; }
+  .prow { display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid #F7F4EF; }
+  .prow:last-child { border-bottom:0; }
+  .prow .no { flex:none; width:26px; height:26px; border-radius:8px; background:#F7F4EF; color:#8A8378; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .prow .nm { flex:1; min-width:0; font-size:13px; color:#202020; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .prow a.go { flex:none; font-size:12px; font-weight:700; color:#B02A2A; text-decoration:none; background:#FBEAEA; border-radius:999px; padding:6px 12px; }
+  .prow a.go:active { transform:scale(.97); }
+  /* 资料卡 */
+  .mat { background:#fff; border-radius:14px; box-shadow:0 2px 8px rgba(32,32,32,.05); padding:14px; margin-bottom:10px; display:flex; align-items:center; gap:12px; }
+  .mat .ic { flex:none; width:40px; height:40px; border-radius:12px; background:#FBEAEA; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .mat .tx { flex:1; min-width:0; }
+  .mat .t { font-size:14px; font-weight:700; color:#202020; }
+  .mat .s { font-size:12px; color:#8A8378; margin-top:3px; line-height:1.6; }
+  .mat a.op { flex:none; font-size:12px; font-weight:700; color:#15803D; background:#EAF6EE; border-radius:999px; padding:7px 14px; text-decoration:none; }
+  .foot { text-align:center; font-size:11px; color:#B3AC9E; margin-top:26px; line-height:1.8; }
+  /* 平板 */
+  @media (min-width:640px){
+    .wrap { padding:20px 24px 56px; }
+    .hero { padding:26px 24px; }
+    .hero .big { font-size:30px; }
+    .quick { gap:14px; }
+    .quick a { padding:16px 10px; }
+  }
+  /* 电脑 */
+  @media (min-width:1024px){
+    .quick { grid-template-columns:repeat(3, 1fr); max-width:640px; }
+    .grp .bd { display:grid; grid-template-columns:1fr 1fr; column-gap:0 18px; }
+    .prow:nth-last-child(1):nth-child(odd) { border-bottom:0; }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back" href="./index.html" aria-label="返回首页">←</a>
+    <div class="tt">
+      <h1>国考冲刺专区</h1>
+      <p>真题卷免费刷 · 冲刺资料免费领</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="big" id="cdBig">国考冲刺</div>
+      <div class="sub" id="cdSub">2027国考笔试 <b>11月29日</b> 开考 · 真题同源卷＋冲刺要点，考前把状态拉满</div>
+    </div>
+
+    <div class="quick">
+      <a href="./index.html?goto=wrong">
+        <div class="ic">📕</div>
+        <div class="nm">错题本</div>
+        <div class="ds">错题重练 · 考前必回炉</div>
+      </a>
+      <a href="./index.html" id="resumeBtn">
+        <div class="ic">⏯️</div>
+        <div class="nm" id="resumeNm">断点续刷</div>
+        <div class="ds" id="resumeDs">接着上次继续做</div>
+      </a>
+      <a href="./materials.html#sec-gk">
+        <div class="ic">📥</div>
+        <div class="nm">资料专区</div>
+        <div class="ds">冲刺要点 · 速记手册</div>
+      </a>
+    </div>
+
+    <div class="sec-t">历年国考真题卷 · 免费刷</div>
+    <p class="sec-note">按历年国考真题大纲整编，含答案与逐题解析；点「去刷题」直接开卷，做一半下次也能接着做。</p>
+    <div id="paperGroups"></div>
+
+    <div class="sec-t">考前冲刺资料 · 免费领</div>
+    <div class="mat">
+      <div class="ic">要点</div>
+      <div class="tx">
+        <div class="t">《27国考行测五大模块冲刺要点》</div>
+        <div class="s">考前快速过一遍：五大模块高频考点与抢分技巧</div>
+      </div>
+      <a class="op" href="./materials.html#sec-gk">去领取 ›</a>
+    </div>
+    <div class="mat">
+      <div class="ic">速记</div>
+      <div class="tx">
+        <div class="t">常识高频速记 · 冲刺手册合集</div>
+        <div class="s">法律政治经济 · 人文科技地理，高频考点速记</div>
+      </div>
+      <a class="op" href="./materials.html#sec-gk">去领取 ›</a>
+    </div>
+
+    <div class="foot">亿成公考 · 国考冲刺专区<br>卷子和资料持续更新，收藏本页考前天天来</div>
+  </div>
+
+<script>
+/* ===== 倒计时：距 2026-11-29 笔试，按访问当日自动计算；11-30 起切换为开考状态 ===== */
+(function(){
+  var EXAM = '2026-11-29';
+  function dayDiff(){
+    try{
+      var p = EXAM.split('-'), e = new Date(+p[0], +p[1]-1, +p[2]);
+      var n = new Date();
+      e = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+      n = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+      return Math.round((e - n) / 86400000);
+    }catch(err){ return 1; }
+  }
+  var d = dayDiff();
+  var big = document.getElementById('cdBig'), sub = document.getElementById('cdSub');
+  if (d > 0) {
+    big.textContent = '距国考笔试还有 ' + d + ' 天';
+  } else if (d === 0) {
+    big.textContent = '国考今日开考';
+    sub.innerHTML = '稳住心态，正常发挥就是最好的水平。<b>祝旗开得胜！</b>';
+  } else {
+    big.textContent = '国考笔试已开考';
+    sub.innerHTML = '<b>祝所有同学旗开得胜！</b>卷子和资料继续保留，考后复盘、备战省考都能用。';
+  }
+})();
+
+/* ===== 断点续刷：读本机上次做题记录（yc-paper-resume-v1），直达那套卷继续做 ===== */
+(function(){
+  var NAME = {
+    'pp-final':'最终版·行政执法卷押题卷（一）','pp-zf3':'27国考行政执法卷预测·第3套',
+    'pp-sheng1':'27国考省级卷（副省级）预测·第1套','pp-sheng2':'27国考省级卷（副省级）预测·第2套',
+    'pp-di1':'27国考地市级卷预测·第1套','pp-di2':'27国考地市级卷预测·第2套'
+  };
+  function pname(id){
+    if (NAME[id]) return NAME[id];
+    var m = id.match(/^pp-(101|1\d\d)$/);
+    if (m) { var n = parseInt(id.slice(3),10); return '27国考行政执法押题卷（' + (n===101?'二':numCN(n-100)) + '）'; }
+    var m2 = id.match(/^pp-(\d+)$/);
+    if (m2) { var k = parseInt(m2[1],10); if (k>=1&&k<=8) return '国考行测整套卷·第'+k+'套'; if (k>=120&&k<=131) return '国考行测整套卷·第'+(k-112)+'套'; }
+    return '上次的卷子';
+  }
+  function numCN(n){ var u=['','一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十']; return u[n]||n; }
+  var r = null;
+  try { r = JSON.parse(localStorage.getItem('yc-paper-resume-v1') || 'null'); } catch(e){ r = null; }
+  var btn = document.getElementById('resumeBtn'), nm = document.getElementById('resumeNm'), ds = document.getElementById('resumeDs');
+  if (r && r.pid && (r.i|0) > 0 && r.ids && r.ids.length) {
+    btn.href = './index.html?paper=' + encodeURIComponent(r.pid);
+    nm.textContent = '断点续刷';
+    ds.textContent = '《' + pname(r.pid) + '》第 ' + ((r.i|0)+1) + ' 题';
+  } else {
+    btn.href = './index.html?goto=papers';
+    ds.textContent = '还没有进行中的卷子，去开一卷';
+  }
+})();
+
+/* ===== 真题卷列表：全部走现有刷题入口（index.html?paper=），不新建存储 ===== */
+(function(){
+  function numCN(n){ var u=['','一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十']; return u[n]||n; }
+  function zyName(n){ return n===0 ? '最终版·行政执法卷押题卷（一）' : '27国考行政执法押题卷（' + numCN(n) + '）'; }
+  var GROUPS = [
+    { name:'27国考 · 行政执法押题卷', open:true, papers:(function(){
+        var a = [{id:'pp-final', n:'最终版·行政执法卷押题卷（一）'},{id:'pp-zf3', n:'27国考行政执法卷预测·第3套'}];
+        for (var i = 101; i <= 119; i++) a.push({id:'pp-'+i, n:zyName(i-99)});
+        return a;
+      })() },
+    { name:'27国考 · 省级 / 地市级预测卷', open:true, papers:[
+        {id:'pp-sheng1', n:'27国考省级卷（副省级）预测·第1套'},
+        {id:'pp-sheng2', n:'27国考省级卷（副省级）预测·第2套'},
+        {id:'pp-di1', n:'27国考地市级卷预测·第1套'},
+        {id:'pp-di2', n:'27国考地市级卷预测·第2套'}
+      ] },
+    { name:'国考行测整套卷（历年真题同源）', open:false, papers:(function(){
+        var a = [];
+        for (var i = 1; i <= 8; i++) a.push({id:'pp-0'+i, n:'国考行测整套卷·第'+i+'套'});
+        for (var j = 120; j <= 131; j++) a.push({id:'pp-'+j, n:'国考行测整套卷·第'+(j-112)+'套'});
+        return a;
+      })() }
+  ];
+  var host = document.getElementById('paperGroups'), html = '';
+  for (var g = 0; g < GROUPS.length; g++) {
+    var grp = GROUPS[g];
+    html += '<details class="grp"' + (grp.open ? ' open' : '') + '>'
+         + '<summary><span class="arr">▶</span>' + grp.name + '<span class="cnt">' + grp.papers.length + ' 套</span></summary><div class="bd">';
+    for (var i = 0; i < grp.papers.length; i++) {
+      var p = grp.papers[i];
+      html += '<div class="prow"><span class="no">' + (i+1) + '</span><span class="nm">' + p.n + '</span>'
+           + '<a class="go" href="./index.html?paper=' + p.id + '">去刷题 ›</a></div>';
+    }
+    html += '</div></details>';
+  }
+  host.innerHTML = html;
+})();
+</script>
+</body>
+</html>
