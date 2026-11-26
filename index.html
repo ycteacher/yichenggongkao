@@ -1197,8 +1197,11 @@ document.addEventListener('click', function(e){
     var APPLIED="yicheng-gk-grants-applied-v1";
     function appliedGet(){ try{ var a=JSON.parse(localStorage.getItem(APPLIED)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
     function appliedSet(a){ try{ localStorage.setItem(APPLIED,JSON.stringify(a)); }catch(e){} }
-    function myGrantCode(){
-      try{ var s=JSON.parse(localStorage.getItem("yicheng-gk-sync-v1")||"{}"); return (s&&s.code)||""; }catch(e){ return ""; }
+    function myGrantIds(){
+      var out={code:"",tail:""};
+      try{ var s=JSON.parse(localStorage.getItem("yicheng-gk-sync-v1")||"{}"); out.code=(s&&s.code)||""; }catch(e){}
+      try{ var acc=JSON.parse(localStorage.getItem("yicheng-gk-account-v1")||localStorage.getItem("yicheng-gk-user-v1")||"null"); if(acc&&typeof acc==="object"){ out.tail=acc.tail||acc.tail4||acc.phoneTail||""; } }catch(e){}
+      return out;
     }
     function fetchGrants(cb){
       var urls=["https://textdb.dev/api/data/ycgk-grant-v1","https://textdb.online/ycgk-grant-v1"];
@@ -1211,15 +1214,18 @@ document.addEventListener('click', function(e){
       });
     }
     function checkGrants(){
-      var code=myGrantCode();
-      if(!code) return;
+      var ids=myGrantIds();
+      if(!ids.tail&&!ids.code) return;
       fetchGrants(function(e,t){
         if(e||!t) return;
         var arr; try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
         if(!Array.isArray(arr)) return;
         var applied=appliedGet(), changed=false;
         arr.forEach(function(g){
-          if(!g||g.code!==code||!g.id||applied.indexOf(g.id)>-1) return;
+          if(!g||!g.id||applied.indexOf(g.id)>-1) return;
+          /* 新记录按手机号后四位匹配；旧学习码记录保持兼容领取 */
+          var hit=g.tail?String(g.tail)===String(ids.tail):(!g.tail&&g.code&&g.code===ids.code);
+          if(!hit) return;
           var amt=parseInt(g.amount,10);
           applied.push(g.id); changed=true;
           if(amt) addPoints(amt, g.reason||"老师赠送", "老师手动调整");
@@ -3955,6 +3961,7 @@ document.addEventListener('click', function(e){
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-track.js?v=2" onerror="var s=document.createElement('script');s.src='./assets/yc-track.js?v=2';document.head.appendChild(s);"></script>
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-account.js?v=5" onerror="var s=document.createElement('script');s.src='./assets/yc-account.js?v=5';document.head.appendChild(s);"></script>
 <script src="./assets/yc-paper-link.js?v=3" defer></script><!-- 深链：?paper=<id> 直达套卷；?bank=<分片>&from=video 视频配套一键刷题（v3） -->
+<script src="./assets/yc-group-qr.js?v=2" defer></script><!-- 内测群二维码投放：数据源 assets/group_qr_config.json，改配置即全站换码 -->
 <script>
 /* 浮条/计时器脚本加载加固：COS 优先（国内稳定），失败回退本站，再失败换参数重试一次。
    此前直接引本站地址，新版号首次不在 SW 缓存内，每次都直连 github.io 拉取，

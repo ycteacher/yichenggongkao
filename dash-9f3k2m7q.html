@@ -360,10 +360,10 @@ td b{color:var(--txt)}
     <div id="rdList" style="font-size:13px"></div>
   </div>
   <div class="card" style="margin-top:14px">
-    <h3>手动送积分 <span class="hint">按学习码发放 · 学生下次打开应用到账</span></h3>
-    <div class="desc">输入学生<b>学习码</b>（兑换订单里就有）和分数：正数送分、负数扣分，事由默认「老师赠送」。学生需已点过「登录同步」，下次打开应用自动到账。</div>
+    <h3>手动送积分 <span class="hint">按手机号后四位发放 · 学生下次打开应用到账</span></h3>
+    <div class="desc">输入学生<b>手机号后四位</b>（兑换订单里就有）和分数：正数送分、负数扣分，事由默认「老师赠送」。学生需已用手机号注册，下次打开应用自动到账。<b>注意：如两名学生尾号相同，会同时到账，请留意发放记录。</b></div>
     <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
-      <input id="gtCode" placeholder="学习码6位" style="width:110px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
+      <input id="gtCode" placeholder="手机号后四位" maxlength="4" inputmode="numeric" style="width:130px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <input id="gtAmt" type="number" placeholder="±分数" style="width:90px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <input id="gtReason" placeholder="事由（默认老师赠送）" style="flex:1;min-width:140px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <button id="gtGo" style="background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">确认送出</button>
@@ -1199,7 +1199,7 @@ function renderGrants(t){
   try{ arr=JSON.parse(t||"[]")||[]; }catch(e){ arr=[]; }
   if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<span style="color:var(--mut)">还没有发放记录</span>'; return; }
   box.innerHTML=arr.slice().reverse().slice(0,8).map(function(g){
-    return '<div style="padding:4px 0;border-bottom:1px dashed var(--line)">'+escRd(g.at)+' · 学习码 '+escRd(g.code)+' · <b style="color:'+(g.amount>=0?'#16A34A':'#B45309')+'">'+(g.amount>=0?'+':'')+escRd(g.amount)+'分</b> · '+escRd(g.reason||"老师赠送")+'</div>';
+    return '<div style="padding:4px 0;border-bottom:1px dashed var(--line)">'+escRd(g.at)+' · 尾号 '+escRd(g.tail||g.code)+' · <b style="color:'+(g.amount>=0?'#16A34A':'#B45309')+'">'+(g.amount>=0?'+':'')+escRd(g.amount)+'分</b> · '+escRd(g.reason||"老师赠送")+'</div>';
   }).join("");
 }
 function loadGrants(){ grantGet(function(e,t){ if(!e) renderGrants(t); }); }
@@ -1209,7 +1209,7 @@ if(gtGoBtn) gtGoBtn.addEventListener("click",function(){
   var code=(document.getElementById("gtCode").value||"").trim();
   var amt=parseInt(document.getElementById("gtAmt").value,10);
   var reason=(document.getElementById("gtReason").value||"老师赠送").trim()||"老师赠送";
-  if(!/^\d{6}$/.test(code)){ msg.textContent="请输入6位学习码"; return; }
+  if(!/^\d{4}$/.test(code)){ msg.textContent="请输入手机号后四位（4位数字）"; return; }
   if(!amt||isNaN(amt)){ msg.textContent="请输入分数（正数送分、负数扣分）"; return; }
   reason=reason.replace(/\+/g,"＋");
   gtGoBtn.disabled=true; gtGoBtn.textContent="写入中…"; msg.textContent="";
@@ -1217,10 +1217,10 @@ if(gtGoBtn) gtGoBtn.addEventListener("click",function(){
     var arr=[];
     try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
     if(!Array.isArray(arr)) arr=[];
-    arr.push({id:"G"+Date.now()+Math.floor(Math.random()*900+100),code:code,amount:amt,reason:reason,at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)});
+    arr.push({id:"G"+Date.now()+Math.floor(Math.random()*900+100),tail:code,amount:amt,reason:reason,at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)});
     grantPut(arr,function(ok){
       gtGoBtn.disabled=false; gtGoBtn.textContent="确认送出";
-      if(ok){ msg.textContent="已发出：学习码 "+code+" "+(amt>=0?"+":"")+amt+"分（"+reason+"），学生下次打开应用到账"; document.getElementById("gtCode").value=""; document.getElementById("gtAmt").value=""; document.getElementById("gtReason").value=""; loadGrants(); }
+      if(ok){ msg.textContent="已发出：尾号 "+code+" "+(amt>=0?"+":"")+amt+"分（"+reason+"），学生下次打开应用到账"; document.getElementById("gtCode").value=""; document.getElementById("gtAmt").value=""; document.getElementById("gtReason").value=""; loadGrants(); }
       else{ msg.textContent="网络没写进去，请稍后再点一次"; }
     });
   });
