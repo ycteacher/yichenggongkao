@@ -1147,10 +1147,10 @@ document.addEventListener('click', function(e){
     var steps;
     if(rec.kind==="service"){
       steps='<div class="yc-rd-step"><b>1</b><span>亿成老师会在 <b>24 小时内</b>通过站内消息联系你，和你约时间（批改 / 咨询都是老师亲自来）</span></div>'+
-            '<div class="yc-rd-step"><b>2</b><span>着急的话可以加微信 <b>mshong</b>（备注：订单号），老师优先安排</span></div>';
+            '<div class="yc-rd-step"><b>2</b><span>着急的话可以加微信 <b>mshongwen</b>（备注：订单号），老师优先安排</span></div>';
     }else{
       steps='<div class="yc-rd-step"><b>1</b><span>兑换已登记，<b>发货前</b>会通过站内消息通知你填写收货信息（内测期统一安排发出）</span></div>'+
-            '<div class="yc-rd-step"><b>2</b><span>想更快拿到，可加微信 <b>mshong</b>（备注：订单号）跟老师确认</span></div>';
+            '<div class="yc-rd-step"><b>2</b><span>想更快拿到，可加微信 <b>mshongwen</b>（备注：订单号）跟老师确认</span></div>';
     }
     modal.innerHTML=
       '<h3>✅ 兑换成功</h3>'+
@@ -3925,4 +3925,98 @@ document.addEventListener('click', function(e){
   document.head.appendChild(s1);
 })();
 </script>
+<script>
+/* ===== 国考冲刺 banner（2026-11-29 笔试倒计时）=====
+   1) 距 11-29 的天数按访问当日自动计算，11-29 当天显示「今日开考」，11-30 起整条 banner 不再渲染；
+   2) banner 只在首页显示：监听 #root 渲染，检测到首页专属标记「今日目标进度」才显示，
+      首次检测到首页前保持可见（fail-open，主包改版也不至于整条消失）；
+   3) 点击进入 sprint.html 国考冲刺专区。 */
+(function(){
+  var EXAM = '2026-11-29';
+  function dayDiff(){
+    try{
+      var p = EXAM.split('-'), e = new Date(+p[0], +p[1]-1, +p[2]);
+      var n = new Date();
+      e = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+      n = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+      return Math.round((e - n) / 86400000);
+    }catch(err){ return 1; }
+  }
+  var d = dayDiff();
+  if (d < 0) return; /* 11-29 已过：不渲染 */
+  var label = d === 0 ? '国考今日开考' : '国考倒计时 ' + d + ' 天';
+  var banner = document.createElement('a');
+  banner.id = 'yc-sprint-banner';
+  banner.href = './sprint.html';
+  banner.setAttribute('aria-label', label + '，进入国考冲刺专区');
+  banner.innerHTML = '<span class="yc-sb-fire">🔥</span><span class="yc-sb-txt"><b id="yc-sb-days"></b><i>免费刷真题 · 领真题卷</i></span><span class="yc-sb-go">›</span>';
+  document.body.insertBefore(banner, document.getElementById('root'));
+  var daysEl = banner.querySelector('#yc-sb-days');
+  if (daysEl) daysEl.textContent = label;
+  /* 首页专属显示：检测到首页标记才显示，离开首页（进刷题/卷子等）自动收起 */
+  var seenHome = false, tmr = null;
+  function checkHome(){
+    tmr = null;
+    var root = document.getElementById('root');
+    if (!root) return;
+    var isHome = root.textContent.indexOf('今日目标进度') > -1;
+    if (isHome) seenHome = true;
+    if (seenHome) banner.style.display = isHome ? '' : 'none';
+  }
+  function schedule(){
+    if (!tmr) tmr = setTimeout(checkHome, 400);
+  }
+  if (window.MutationObserver){
+    new MutationObserver(schedule).observe(document.getElementById('root'), {childList:true, subtree:true});
+  }
+  /* ===== ?goto= 快捷深链：sprint.html 等页面的「错题本 / 卷子」直达入口 =====
+     读参暂存后清参（版本重载丢参时按暂存恢复），等底部标签栏渲染后点击对应页签。 */
+  var GKEY = 'yc-goto-link.v1';
+  var mg = location.search.match(/[?&]goto=(wrong|papers)/);
+  if (mg) {
+    try { sessionStorage.setItem(GKEY, JSON.stringify({g: mg[1], at: Date.now()})); } catch(e){}
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}
+  } else {
+    try {
+      var raw = sessionStorage.getItem(GKEY);
+      if (raw) {
+        var st = JSON.parse(raw);
+        if (st && st.g && Date.now() - st.at <= 5*60*1000) mg = [null, st.g];
+        sessionStorage.removeItem(GKEY);
+      }
+    } catch(e){}
+  }
+  if (mg) {
+    var gname = mg[1] === 'wrong' ? '错题本' : '卷子';
+    var gn = 0, giv = setInterval(function(){
+      gn++;
+      var btns = document.querySelectorAll('.yc-tabbar button');
+      if (btns.length) {
+        clearInterval(giv);
+        for (var i = 0; i < btns.length; i++) {
+          if (btns[i].textContent.indexOf(gname) > -1) { btns[i].click(); return; }
+        }
+        return;
+      }
+      if (gn > 150) clearInterval(giv);
+    }, 200);
+  }
+})();
+</script>
+<style>
+/* 国考冲刺 banner：窄条卡，随页面滚动，不遮挡任何操作 */
+#yc-sprint-banner{
+  display:flex;align-items:center;gap:10px;box-sizing:border-box;
+  max-width:48rem;margin:10px auto 0;width:calc(100% - 32px);
+  padding:10px 14px;border-radius:14px;text-decoration:none;
+  background:linear-gradient(135deg,#B02A2A,#DC2626);
+  box-shadow:0 4px 14px rgba(176,42,42,.25);
+}
+#yc-sprint-banner .yc-sb-fire{font-size:18px;line-height:1;flex:none}
+#yc-sprint-banner .yc-sb-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+#yc-sprint-banner .yc-sb-txt b{color:#fff;font-size:15px;font-weight:800;letter-spacing:.5px}
+#yc-sprint-banner .yc-sb-txt i{color:rgba(255,255,255,.85);font-size:11px;font-style:normal}
+#yc-sprint-banner .yc-sb-go{color:rgba(255,255,255,.9);font-size:20px;font-weight:700;flex:none}
+@media (min-width:640px){ #yc-sprint-banner{padding:12px 18px} #yc-sprint-banner .yc-sb-txt b{font-size:16px} }
+</style>
 </body></html>
