@@ -170,7 +170,7 @@
     }catch(e){}
   }
 
-  /* ---------- 昵称：清洗（剔除 HTML 敏感字符），2-20 字，选填 ---------- */
+  /* ---------- 昵称：清洗（剔除 HTML 敏感字符），2-20 字，必填（与老师送分匹配用） ---------- */
   function sanitizeNick(s){
     return String(s||'').replace(/[<>"'&\\\/`]/g,'').replace(/\s+/g,' ').trim().slice(0,20);
   }
@@ -428,8 +428,9 @@
     mountUi();
     var acc=getAcc(); if(!acc)return;
     card.innerHTML='<h3>修改昵称</h3>'+
-      '<div class="yc-acc-tip">昵称会显示在老师的数据后台，用来识别你的学习数据（2-20 字，选填）。</div>'+
-      '<input id="ycNickIn" maxlength="20" placeholder="给自己起个名字" autocomplete="off" value="'+esc(acc.nick||'')+'">'+
+      '<div class="yc-acc-tip">昵称会显示在老师的数据后台，用来识别你的学习数据（2-20 字，必填）。</div>'+
+      '<div class="yc-acc-tip">昵称用于接收老师送分，请与老师登记的一致；修改后旧的送分可能匹配不到。</div>'+
+      '<input id="ycNickIn" maxlength="20" placeholder="昵称（必填，2-20 字）" autocomplete="off" value="'+esc(acc.nick||'')+'">'+
       '<button class="yc-acc-btn main" id="ycNickOk">保存</button>'+
       '<button class="yc-acc-btn ghost" id="ycNickBack">返回</button>'+
       '<div id="yc-acc-err"></div>';
@@ -437,7 +438,7 @@
     $('ycNickOk').addEventListener('click',function(){
       var err=$('yc-acc-err');
       var n=sanitizeNick($('ycNickIn').value);
-      if(n&&n.length<2){ if(err)err.textContent='昵称至少 2 个字符（可留空清除）'; return; }
+      if(!n||n.length<2){ if(err)err.textContent='请填写昵称（至少 2 个字符）'; return; }
       var acc2=getAcc(); acc2.nick=n||''; wr(ACC,acc2);
       var b=$('ycNickOk'); if(b){ b.disabled=true; b.textContent='保存中…'; }
       userMutate(acc2.md5.slice(0,16),function(rec){ rec.n=n||''; },function(){
@@ -493,7 +494,7 @@
         '<div class="yc-acc-li"><b>已有账号？</b>输入同一手机号即直接登录并接回进度；同一手机号全站唯一，<b>不会重复注册</b>。</div>'+
         '<input id="ycAccPh1" placeholder="输入 11 位手机号" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccPh2" placeholder="再次输入手机号确认" inputmode="numeric" maxlength="11" autocomplete="off">'+
-        '<input id="ycAccNick" placeholder="昵称（选填，给自己起个名字）" maxlength="20" autocomplete="off">'+
+        '<input id="ycAccNick" placeholder="昵称（必填，2-20字，与送分匹配用）" maxlength="20" autocomplete="off">'+
         '<button class="yc-acc-btn main" id="ycAccOk">注册 / 登录</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccCancel">暂不注册</button>'+
         '<div id="yc-acc-err"></div>'+
@@ -505,7 +506,7 @@
         var nk=sanitizeNick($('ycAccNick')&&$('ycAccNick').value||'');
         if(!/^1\d{10}$/.test(p1)){if(err)err.textContent='请输入 11 位、以 1 开头的手机号';return}
         if(p1!==p2){if(err)err.textContent='两次输入不一致，请重新确认';return}
-        if(nk&&nk.length<2){if(err)err.textContent='昵称至少 2 个字符（可留空）';return}
+        if(!nk||nk.length<2){if(err)err.textContent='请填写昵称（至少 2 个字符，与送分匹配用）';return}
         doRegister(p1,$('ycAccOk'),err,nk);
       });
       $('ycAccCancel') && $('ycAccCancel').addEventListener('click',closePanel);
