@@ -1018,6 +1018,7 @@ document.addEventListener('click', function(e){
   document.getElementById("ycChipPts").addEventListener("click", openPoints);
 
   /* ---------- 积分兑换商城 v1：我有积分 → 我要兑换 → 兑换完怎么办 ---------- */
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
   var SHOP_ITEMS=[
     {id:"s1",name:"一对一申论批改",cost:100,kind:"service",desc:"1 篇精批＋逐条批注讲解"},
     {id:"s2",name:"一对一综应批改",cost:100,kind:"service",desc:"1 篇精批＋逐条批注讲解"},
