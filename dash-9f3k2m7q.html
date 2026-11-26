@@ -361,11 +361,12 @@ td b{color:var(--txt)}
     <div id="rdList" style="font-size:13px"></div>
   </div>
   <div class="card" style="margin-top:14px">
-    <h3>手动送积分 <span class="hint">按手机号后四位+昵称发放 · 学生下次打开应用到账</span></h3>
-    <div class="desc">输入学生<b>手机号后四位 + 昵称</b>，两者都对才到账；昵称需与学生注册时一致（学生可随时改昵称，改后需重新按新昵称发放）。正数送分、负数扣分，事由默认「老师赠送」。学生需已用手机号注册，下次打开应用自动到账。</div>
+    <h3>手动送积分 <span class="hint">学习码优先 · 学生点确定后到账 · 未确认会重新弹窗</span></h3>
+    <div class="desc">输入学生<b>手机号后四位 + 昵称</b>（两者都对才到账，昵称需与学生注册时一致）。若有多位学生尾号+昵称相同，必须填<b>学习码</b>区分（可在下方「用户明文留底」卡里查）；只填尾号+昵称时系统会自动核对注册档案并在发送后报告匹配结果。学生打开应用会弹「惊喜送分」弹窗，<b>点「确定」积分自动到账</b>；没点确定（没收到或误退出）下次打开会重新弹。每条发放记录右侧显示学生是否已确认到账。</div>
     <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
       <input id="gtCode" placeholder="手机号后四位" maxlength="4" inputmode="numeric" style="width:130px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <input id="gtNick" placeholder="学生昵称（与注册一致）" maxlength="20" style="width:180px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
+      <input id="gtStu" placeholder="学习码（选填，撞名时必填）" maxlength="20" style="width:190px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <input id="gtAmt" type="number" placeholder="±分数" style="width:90px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <input id="gtReason" placeholder="事由（默认老师赠送）" style="flex:1;min-width:140px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <button id="gtGo" style="background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">确认送出</button>
@@ -1197,15 +1198,18 @@ function markDone(oid,btn){
 var rdGoBtn=document.getElementById("rdGo");
 if(rdGoBtn) rdGoBtn.addEventListener("click",function(){ document.getElementById("rdList").innerHTML=""; loadRedeems(); });
 loadRedeems();
-/* ===== 手动送积分（ycgk-grant-v1） ===== */
+/* ===== 手动送积分（ycgk-grant-v1 + 到账回执 ycgk-grant-ack-v1 + 注册档案核对 ycgk-user-v1） ===== */
 var GRANT_POOL="ycgk-grant-v1";
-function grantGet(cb){
+var ACK_POOL="ycgk-grant-ack-v1";
+var USER_POOL="ycgk-user-v1";
+function poolGet(pool,cb){
   var done=0,got=false;
   function fin(t){ done++; if(t&&!got){got=true;cb(null,t);} if(done===2&&!got)cb(new Error("网络不通"),null); }
-  ["https://textdb.dev/api/data/"+GRANT_POOL,"https://textdb.online/"+GRANT_POOL].forEach(function(u){
+  ["https://textdb.dev/api/data/"+pool,"https://textdb.online/"+pool].forEach(function(u){
     fetch(u,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){fin((t||"").trim()||null)}).catch(function(){fin(null)});
   });
 }
+function grantGet(cb){ poolGet(GRANT_POOL,cb); }
 function grantPut(arr,cb){
   var body=JSON.stringify(arr), ok=false, done=0;
   function fin(){ done++; if(done===2) cb(ok); }
@@ -1213,21 +1217,36 @@ function grantPut(arr,cb){
   if(body.length<1500){ fetch("https://textdb.online/update/?key="+encodeURIComponent(GRANT_POOL)+"&value="+encodeURIComponent(body)).then(function(){fin()},function(){fin()}); }
   else fin();
 }
-function renderGrants(t){
+function renderGrants(t,acks){
   var box=document.getElementById("gtList"); if(!box) return;
   var arr=[];
   try{ arr=JSON.parse(t||"[]")||[]; }catch(e){ arr=[]; }
   if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<span style="color:var(--mut)">还没有发放记录</span>'; return; }
+  var ackMap={}; (Array.isArray(acks)?acks:[]).forEach(function(a){ if(a&&a.gid)ackMap[a.gid]=a; });
   box.innerHTML=arr.slice().reverse().slice(0,8).map(function(g){
-    return '<div style="padding:4px 0;border-bottom:1px dashed var(--line)">'+escRd(g.at)+' · 尾号 '+escRd(g.tail||g.code)+(g.nick?(' · '+escRd(g.nick)):'')+' · <b style="color:'+(g.amount>=0?'#16A34A':'#B45309')+'">'+(g.amount>=0?'+':'')+escRd(g.amount)+'分</b> · '+escRd(g.reason||"老师赠送")+'</div>';
+    var ack=ackMap[g.id];
+    var st=ack
+      ? '<span style="color:#16A34A">✓ 学生已确认到账'+(ack.at?(' · '+escRd(ack.at)):'')+'</span>'
+      : '<span style="color:#B45309">⏳ 待学生确认（点确定才到账，未确认下次打开重新弹）</span>';
+    return '<div style="padding:4px 0;border-bottom:1px dashed var(--line)">'+escRd(g.at)+' · 尾号 '+escRd(g.tail||g.code)+(g.nick?(' · '+escRd(g.nick)):'')+(g.code?(' · 码 '+escRd(g.code)):'')+' · <b style="color:'+(g.amount>=0?'#16A34A':'#B45309')+'">'+(g.amount>=0?'+':'')+escRd(g.amount)+'分</b> · '+escRd(g.reason||"老师赠送")+' · '+st+'</div>';
   }).join("");
 }
-function loadGrants(){ grantGet(function(e,t){ if(!e) renderGrants(t); }); }
+function loadGrants(){
+  grantGet(function(e,t){
+    if(e) return;
+    poolGet(ACK_POOL,function(e2,at){
+      var acks=[];
+      if(!e2&&at){ try{ var p=JSON.parse(at); if(p&&Array.isArray(p.a))acks=p.a; }catch(e3){} }
+      renderGrants(t,acks);
+    });
+  });
+}
 var gtGoBtn=document.getElementById("gtGo");
 if(gtGoBtn) gtGoBtn.addEventListener("click",function(){
   var msg=document.getElementById("gtMsg");
   var code=(document.getElementById("gtCode").value||"").trim();
   var nick=(document.getElementById("gtNick").value||"").trim();
+  var stu=(document.getElementById("gtStu").value||"").trim();
   var amt=parseInt(document.getElementById("gtAmt").value,10);
   var reason=(document.getElementById("gtReason").value||"老师赠送").trim()||"老师赠送";
   if(!/^\d{4}$/.test(code)){ msg.textContent="请输入手机号后四位（4位数字）"; return; }
@@ -1235,16 +1254,41 @@ if(gtGoBtn) gtGoBtn.addEventListener("click",function(){
   if(nick.replace(/\s+/g," ").length<2){ msg.textContent="昵称至少 2 个字符（需与学生注册时一致）"; return; }
   if(!amt||isNaN(amt)){ msg.textContent="请输入分数（正数送分、负数扣分）"; return; }
   reason=reason.replace(/\+/g,"＋");
-  gtGoBtn.disabled=true; gtGoBtn.textContent="写入中…"; msg.textContent="";
-  grantGet(function(e,t){
-    var arr=[];
-    try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
-    if(!Array.isArray(arr)) arr=[];
-    arr.push({id:"G"+Date.now()+Math.floor(Math.random()*900+100),tail:code,nick:nick,amount:amt,reason:reason,at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)});
-    grantPut(arr,function(ok){
-      gtGoBtn.disabled=false; gtGoBtn.textContent="确认送出";
-      if(ok){ msg.textContent="已发出：尾号 "+code+" · "+nick+" "+(amt>=0?"+":"")+amt+"分（"+reason+"），学生下次打开应用到账"; document.getElementById("gtCode").value=""; document.getElementById("gtNick").value=""; document.getElementById("gtAmt").value=""; document.getElementById("gtReason").value=""; loadGrants(); }
-      else{ msg.textContent="网络没写进去，请稍后再点一次"; }
+  gtGoBtn.disabled=true; gtGoBtn.textContent="核对中…"; msg.textContent="";
+  /* 技术加强：发送前对照注册档案（ycgk-user-v1：学习码/尾号/昵称），防尾号+昵称撞车送错人 */
+  poolGet(USER_POOL,function(uerr,ut){
+    var users=[];
+    if(!uerr&&ut){ try{ var up=JSON.parse(ut); if(up&&up.u)users=Object.keys(up.u).map(function(k){return up.u[k]||{};}); }catch(e){} }
+    var nrm=function(s){ return String(s||"").replace(/\s+/g," ").trim(); };
+    var grant={id:"G"+Date.now()+Math.floor(Math.random()*900+100),tail:code,nick:nick,amount:amt,reason:reason,at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)};
+    var note="";
+    if(stu){
+      grant.code=stu;
+      var m=users.filter(function(u){ return String(u.c||"")===stu; });
+      if(m.length===1){
+        if(m[0].tl&&String(m[0].tl)!==String(code)){ gtGoBtn.disabled=false; gtGoBtn.textContent="确认送出"; msg.textContent="学习码 "+stu+" 对应的学生尾号是 "+m[0].tl+"，与输入尾号 "+code+" 不符，请核对后再发"; return; }
+        note="已核对学习码 "+stu+"（昵称 "+(m[0].n||nick)+"）。";
+      } else if(m.length===0){
+        note="学习码未在注册档案中找到（可能是老学员未建档），已按学习码发放。";
+      } else {
+        note="注意：学习码 "+stu+" 对应多名学生，请人工核对。";
+      }
+    } else {
+      var m2=users.filter(function(u){ return String(u.tl||"")===String(code)&&nrm(u.n||"")===nrm(nick); });
+      if(m2.length===1){ if(m2[0].c)grant.code=m2[0].c; note="已核对：匹配到 1 位学生（学习码 "+(m2[0].c||"无")+"）。"; }
+      else if(m2.length>=2){ gtGoBtn.disabled=false; gtGoBtn.textContent="确认送出"; msg.textContent="有 "+m2.length+" 位学生尾号+昵称相同，为避免送错，请填写其中一位的学习码再送（学习码可在下方「用户明文留底」卡里查）"; return; }
+      else { note="注册档案中未找到该尾号+昵称（可能是老学员未建档），请自行核对。"; }
+    }
+    grantGet(function(e,t){
+      var arr=[];
+      try{ arr=JSON.parse(t||"[]")||[]; }catch(e2){ arr=[]; }
+      if(!Array.isArray(arr)) arr=[];
+      arr.push(grant);
+      grantPut(arr,function(ok){
+        gtGoBtn.disabled=false; gtGoBtn.textContent="确认送出";
+        if(ok){ msg.textContent="已发出：尾号 "+code+" · "+nick+" "+(amt>=0?"+":"")+amt+"分（"+reason+"）。"+note+"学生打开应用会弹「惊喜送分」，点确定即到账；没点确定下次打开会重新弹，发放记录右侧可看是否已确认。"; document.getElementById("gtCode").value=""; document.getElementById("gtNick").value=""; document.getElementById("gtStu").value=""; document.getElementById("gtAmt").value=""; document.getElementById("gtReason").value=""; loadGrants(); }
+        else{ msg.textContent="网络没写进去，请稍后再点一次"; }
+      });
     });
   });
 });
