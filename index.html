@@ -115,9 +115,9 @@
             nt.onerror=function(){ try{ var n2=document.createElement('script'); n2.src='./assets/yc-notify.js?v='+v; document.head.appendChild(n2); }catch(e){} };
             document.head.appendChild(nt);
             var sc=document.createElement('script');
-            sc.type='module';sc.crossOrigin='';
+            sc.type='module';sc.async=false;sc.crossOrigin='';
             sc.src=(window.ycAsset&&!ycSkipCdn()?window.ycAsset('./assets/index-b34.js'):'./assets/index-b34.js')+'?v='+v;
-            sc.onerror=function(){ try{ var s2=document.createElement('script'); s2.type='module'; s2.crossOrigin=''; s2.src='./assets/index-b34.js?v='+v; document.head.appendChild(s2); }catch(e){} };
+            sc.onerror=function(){ try{ var s2=document.createElement('script'); s2.type='module'; s2.async=false; s2.crossOrigin=''; s2.src='./assets/index-b34.js?v='+v; document.head.appendChild(s2); }catch(e){} };
             document.head.appendChild(sc);
             var lk=document.createElement('link');
             lk.rel='stylesheet';lk.crossOrigin='';
@@ -657,7 +657,14 @@ body.yc-ui { padding-top: 60px !important; }
         if(document.querySelector(".page-shell")){ hide(); removeFail(); if(!settled){ settled=true; clearInterval(t); } }
       },200);
       if(window.__ycIdxSettlePending) settle();
-      setTimeout(settle,25000); /* 最后防线：25 秒仍空才判失败 */
+      /* 修改点（P0 #root not found 修复配套）：暴露 __ycBootFail——主包 #root 等待重试超限（10s）时调用，
+         立即弹失败遮罩并摘除骨架屏，避免从「卡死」变「无限重试」。 */
+      window.__ycBootFail=function(){ if(!document.getElementById("yc-boot-fail")){ settled=true; showFail(); } hide(); };
+      /* 修改点（P0 补漏）：25 秒最后防线升级——此前仅当索引失败(idxState==='fail')才弹 showFail，
+         「索引正常但页面空白」时 25s 防线不生效。现改为：25s 时页面仍空，无论索引状态一律 showFail。
+         阈值论证：Slow3G 下主JS典型装载 10~18s，25s 留有余量；骨架屏在 .page-shell 渲染即被 200ms 轮询摘除，
+         索引/分片装载不占骨架屏，故不会误伤正常慢加载。 */
+      setTimeout(function(){ if(settled) return; if(!pageEmpty()){ settle(); return; } settled=true; hide(); showFail(); },25000);
     })();
     </script>
 
