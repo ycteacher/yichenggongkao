@@ -331,6 +331,11 @@ td b{color:var(--txt)}
       <div class="desc">按注册手机号段映射到省，不调第三方、不做个人画像、仅聚合</div>
       <div id="regProv"></div>
     </div>
+    <div class="card">
+      <h3>注册来源 <span class="hint">首次打开渠道</span></h3>
+      <div class="desc">邀请链接 / 外部来路 / 自然进入（11-26 起记录，此前注册无来源标记）</div>
+      <div id="regSrc"></div>
+    </div>
   </div>
   <div class="grid g2" style="margin-top:14px">
     <div class="card">
@@ -646,6 +651,13 @@ function renderReg(reg,track){
   var provRows=provKeys.map(function(k){return [k,provM[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
   if(provRows.length)liveBars('regProv',provRows,['#22c55e','#38bdf8','#a78bfa','#fbbf24','#f472b6']);
   else el('regProv').innerHTML='<div style="color:var(--mut);font-size:12px;padding:10px 0">暂无注册数据</div>';
+  /* 注册来源分布：s.i=邀请链接，s.r=外部来路，其余=自然进入（11-26 起记录） */
+  var srcM={};
+  keys.forEach(function(k){ var r=regs[k]||{}; var s=r.s||{}; var tag=(s.i?'邀请链接':(s.r?'外部来路':'自然进入')); srcM[tag]=(srcM[tag]||0)+1; });
+  var srcRows=Object.keys(srcM).map(function(k){return [k,srcM[k]]}).sort(function(a,b){return b[1]-a[1]});
+  var srcHost=el('regSrc');
+  if(srcHost){ if(srcRows.length)liveBars('regSrc',srcRows,['#38bdf8','#fbbf24','#a78bfa']);
+    else srcHost.innerHTML='<div style="color:var(--mut);font-size:12px;padding:10px 0">暂无来源数据</div>'; }
   /* 功能使用量 */
   var featRows=Object.keys(FEAT_NAMES).map(function(k){return [FEAT_NAMES[k],cnt[k]||0]}).filter(function(r){return r[1]>0}).sort(function(a,b){return b[1]-a[1]});
   if(featRows.length)liveBars('featUse',featRows,['#38bdf8','#22c55e','#fbbf24','#f472b6','#a78bfa','#f87171']);

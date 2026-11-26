@@ -1,4 +1,5 @@
-/* yc-account.js v3: 手机号登录注册（同号去重：已注册=直接登录接回，不重复注册）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
+/* yc-account.js v4: 手机号登录注册（同号去重：已注册=直接登录接回，不重复注册）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
+   v4 变更：注册台账新增来源字段 s={i:邀请码,q:查询串,r:外部来路域名}，首触暂存于 sessionStorage（yc-land-v1），仅聚合上报
    —— 无验证码无密码：仅一个手机号（11位1开头 + 两次输入确认）
    · 明文手机号不落库不外发：本地与云端只存 MD5 摘要（user_key）+ 后4位 + 省份（聚合）
    · 注册成功提示：唯一身份识别码不可更改 / 12月收费前注册=永久免费 / 不验证码不读取信息
@@ -96,12 +97,12 @@
     fetch('https://textdb.online/update/?key='+encodeURIComponent(key)+'&value='+encodeURIComponent(val)).then(function(){ok=true;fin()},function(){fin()});
     fetch('https://textdb.dev/api/data/'+key,{method:'POST',headers:{'Content-Type':'text/plain'},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
   }
-  /* 注册台账：读-合并-写（聚合，仅哈希锚点+时间+省份） */
-  function regPut(key16,prov,cb){
+  /* 注册台账：读-合并-写（聚合，仅哈希锚点+时间+省份+来源，不含手机号明文） */
+  function regPut(key16,prov,src,cb){
     cloudGet(REG_KEY,function(e,t){
       var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
       if(!pool||typeof pool!=='object'||!pool.r)pool={v:1,r:{}};
-      pool.r[key16]={t:Date.now(),p:prov||''};
+      pool.r[key16]={t:Date.now(),p:prov||'',s:src||{}};
       cloudPut(REG_KEY,JSON.stringify(pool),function(){ cb&&cb(); });
     });
   }
@@ -216,6 +217,20 @@
     });
   }
   function invParam(){ try{ var v=new URLSearchParams(location.search).get('inv'); return v?String(v).toUpperCase().replace(/[^0-9A-Z]/g,''):''; }catch(e){ return ''; } }
+  /* 修改点（v4 渠道来源）：首次打开暂存查询串与外部来路（sessionStorage，仅本会话，首触保留），
+     注册时随台账聚合上报 {i:邀请码, q:查询串, r:外部来路域名}——不含手机号明文，不做个人画像 */
+  var LAND_KEY='yc-land-v1';
+  (function(){ try{
+    if(!sessionStorage.getItem(LAND_KEY)){
+      var q=(location.search||''); var inv='';
+      try{ var m=q.match(/[?&]inv=([^&]+)/); if(m)inv=decodeURIComponent(m[1]).toUpperCase().replace(/[^0-9A-Z]/g,'').slice(0,8); }catch(e){}
+      sessionStorage.setItem(LAND_KEY, JSON.stringify({ q:q.slice(0,150), r:(document.referrer||'').replace(/^https?:\/\//,'').split('/')[0].slice(0,60), i:inv }));
+    }
+  }catch(e){} })();
+  function landSrc(){ try{
+    var l=JSON.parse(sessionStorage.getItem(LAND_KEY)||'{}');
+    return { i:(l.i||invParam()||''), q:(l.q||'').slice(0,150), r:(l.r||'').slice(0,60) };
+  }catch(e){ return {i:'',q:'',r:''}; } }
   function ALPHABET(){ return '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; }
   function codeToNum(code){ var A=ALPHABET(),n=0; for(var i=0;i<code.length;i++){var v=A.indexOf(code[i]);if(v<0)return -1;n=n*32+v;} return n>0&&n<100000?n:-1; }
   function attachInvite(phone,myNo){
@@ -278,7 +293,7 @@
         wr(MIG,{ts:Date.now(),keys:n,oldCode:oldCode,anchor:key16});
         /* 云端绑定 + 注册台账（异步补写，失败不阻断） */
         cloudPut(BIND_PRE+h,JSON.stringify({c:code,ts:Date.now()}),function(){});
-        regPut(key16,prov,function(){});
+        regPut(key16,prov,landSrc(),function(){});
         /* 用户信息池：注册即建档（昵称/省份/学习码/尾号/计数），失败不阻断 */
         userMutate(key16,function(rec){
           rec.n=nick||rec.n||'';
