@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>亿成公考 · 离线</title>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF8F2;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  .box{text-align:center;padding:24px;max-width:320px}
+  .ico{font-size:44px;line-height:1}
+  .t1{font-size:17px;color:#4A463F;font-weight:700;margin:14px 0 8px}
+  .t2{font-size:13px;color:#8A857C;line-height:1.8;margin:0 0 20px}
+  .btn{padding:11px 34px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .btn:active{transform:scale(.97)}
+  .tip{font-size:12px;color:#B45309;margin-top:12px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="ico">📡</div>
+  <div class="t1">当前没有网络连接</div>
+  <p class="t2">断网状态下无法加载题库。<br>联网后点「一键更新」获取最新题目与功能。</p>
+  <button class="btn" id="yc-offline-update">一键更新</button>
+  <div class="tip" id="yc-offline-tip"></div>
+</div>
+<script>
+(function(){
+  var btn = document.getElementById('yc-offline-update');
+  var tip = document.getElementById('yc-offline-tip');
+  var reloading = false;
+  function go(){
+    if (reloading) return;
+    reloading = true;
+    location.reload();
+  }
+  btn.addEventListener('click', function(){
+    if (reloading) return;
+    if (navigator.onLine === false) {
+      tip.textContent = '还没有联网，请先连接网络后再点';
+      return;
+    }
+    btn.textContent = '更新中…';
+    tip.textContent = '';
+    try {
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        var mc = new MessageChannel();
+        mc.port1.onmessage = go;
+        navigator.serviceWorker.controller.postMessage({ type: 'yc-clear-cache' }, [mc.port2]);
+      }
+    } catch (e) {}
+    setTimeout(go, 1500);
+  });
+})();
+</script>
+</body>
+</html>

@@ -186,6 +186,12 @@ var CATS = [
   { name:"高频题型混讲", icon:"🔥", c1:"#B91C1C", c2:"#F87171" }
 ];
 
+/* 空分组占位提示（11-26实操测试P2：不允许裸空分组）：制作中＋预计上架时间 */
+var CAT_ETA = {
+  "判断推理": "制作中 · 预计上架：源片交付后 48 小时内",
+  "言语理解": "制作中 · 预计上架：源片交付后 48 小时内"
+};
+
 /* ============ 实时通知（首页内测横幅自动读取） ============
    每次上新视频，在最上面加一条（新在上、旧在下，最多保留3条）：
    d = 上新日期（月-日），t = 上了什么，m = 在哪个模块看
@@ -198,7 +204,7 @@ var YCGK_NEWS = [
 
 var VIDEOS = [
   { oss: ["https://yicheng-video.oss-cn-beijing.aliyuncs.com/zheng300.mp4"],
-    srcs: ["media/zheng300.mp4"],
+    srcs: ["https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/zheng300.mp4"],
     cat: "政治理论", title: "政治理论300题逐题精讲：2小时45分完整版", desc: "政治理论300题逐题精讲，2小时45分钟完整版，配套讲义可保存打印。", pic: "",
     kicker: "政治理论", big: "政治理论300题 逐题精讲", sub: "2小时45分·完整版",
     pdfs: [
@@ -742,8 +748,9 @@ function renderModule(){
   document.getElementById("navBack").style.visibility = "visible";
   document.getElementById("navBack").setAttribute("data-mode", "inner");
   if (!list.length) {
+    var eta = CAT_ETA[c.name] ? '<p class="sub" style="color:' + c.c1 + ';font-weight:700">' + esc(CAT_ETA[c.name]) + '</p>' : '';
     document.getElementById("view").innerHTML = '<div class="empty"><div class="ico">' + c.icon + '</div>' +
-      '<p class="main">' + esc(c.name) + ' · 视频正在整理上传中</p>' +
+      '<p class="main">' + esc(c.name) + ' · 视频正在整理上传中</p>' + eta +
       '<p class="sub">上传好之后会第一时间出现在这里，<br>先去刷题模块练起来吧～</p></div>';
     return;
   }

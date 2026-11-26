@@ -4,7 +4,7 @@
    2) 本站静态资源离线缓存：题库、脚本、样式首次加载后存到本地，
       二次打开不再等国外服务器，秒开；断网也能看已缓存的题。 */
 var VIDEO_HOST = 'yicheng-video.oss-cn-beijing.aliyuncs.com';
-var CACHE = 'yc-static-v87'; /* 修改点：资料页套卷预览+刷题直达深链、问卷页下线官方回复展示、学习码下架日期文案（11-29），v86→v87 清旧缓存 */
+var CACHE = 'yc-static-v88'; /* 修改点：11-26实操测试P1——断网兜底页offline.html入预缓存+导航末级兜底（v87→v88 清旧缓存） */
 var CACHE_MAX = 400; /* 缓存条目上限，防止无限膨胀 */
 /* 主文件：stale-while-revalidate；题库索引/idmap：network-first（防老题复活，失败回退缓存） */
 var SWR_PAT = /(index-b34|yc-enhance)\.js$/;
@@ -32,7 +32,7 @@ self.addEventListener('message', function (e) {
 
 /* P1-3 离线壳：install 预缓存最小离线资源（首页HTML＋base.js＋样式＋图标，约0.5MB），
    断网首开也能渲染出页面与失败提示，不再白屏；逐项容错，任一失败不阻塞安装。 */
-var OFFSHELL = ['./index.html', './base.js', './assets/index-C2M5URtc.css', './assets/ycicon-192-a.png', './assets/yc-track.js', './assets/yc-account.js'];
+var OFFSHELL = ['./index.html', './base.js', './assets/index-C2M5URtc.css', './assets/ycicon-192-a.png', './assets/yc-track.js', './assets/yc-account.js', './offline.html'];
 
 self.addEventListener('install', function (e) {
   /* P1-3：预缓存离线壳（不自动 skipWaiting —— B6：新版本先进入 waiting，由页面底部更新浮条引导用户点击后生效） */
@@ -139,11 +139,13 @@ self.addEventListener('fetch', function (e) {
           }).catch(function () { return null; });
           if (hit) return hit;
           return net.then(function (res) {
-            /* P1-3：兜底链 网络失败 → 预缓存index → 内联离线提示页，任何情况不再白屏 */
+            /* P1-3：兜底链 网络失败 → 预缓存index → 预缓存offline.html → 内联离线提示页，任何情况不再白屏 */
             return res || caches.match('./index.html').then(function (h2) {
-              return h2 || new Response(
+              return h2 || caches.match('./offline.html').then(function (h3) {
+                return h3 || new Response(
                 '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>亿成公考 · 离线</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF8F2;font-family:-apple-system,sans-serif"><div style="text-align:center;padding:24px"><div style="font-size:40px">📡</div><div style="font-size:16px;color:#4A463F;margin:12px 0 6px">当前无网络连接</div><div style="font-size:13px;color:#8A857C">网络恢复后刷新即可继续刷题</div></div></body></html>',
                 { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+              });
             });
           });
         });

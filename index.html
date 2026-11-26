@@ -49,15 +49,50 @@
       var d = document.createElement('div');
       d.id = 'yc-bank-fail';
       d.style.cssText = 'position:fixed;inset:0;z-index:9998;background:#FAF8F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px';
-      d.innerHTML = '<div style="font-size:15px;color:#4A463F">题库加载失败，请检查网络后重试</div>'
-        + '<button id="yc-bank-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
+      /* 11-26实操测试P1：断网冷启动渲染 OFFSHELL 提示（联网后一键更新），不允许裸白屏/误导性重试 */
+      var off = (navigator.onLine === false);
+      if (off) {
+        d.innerHTML = '<div style="font-size:40px">📡</div>'
+          + '<div style="font-size:16px;color:#4A463F;font-weight:700">当前没有网络连接</div>'
+          + '<div style="font-size:13px;color:#8A857C;text-align:center;line-height:1.8">断网状态下无法加载题库。<br>联网后点「一键更新」获取最新题目与功能。</div>'
+          + '<button id="yc-bank-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">一键更新</button>'
+          + '<div id="yc-bank-offtip" style="font-size:12px;color:#B45309;min-height:18px"></div>';
+      } else {
+        d.innerHTML = '<div style="font-size:15px;color:#4A463F">题库加载失败，请检查网络后重试</div>'
+          + '<button id="yc-bank-retry" style="padding:10px 28px;border:none;border-radius:999px;background:#DC2626;color:#fff;font-size:15px;font-weight:600">点击重试</button>';
+      }
       document.body.appendChild(d);
       document.getElementById('yc-bank-retry').addEventListener('click', function(){
+        if (off) {
+          if (navigator.onLine === false) {
+            var tip = document.getElementById('yc-bank-offtip');
+            if (tip) tip.textContent = '还没有联网，请先连接网络后再点';
+            return;
+          }
+          /* 已联网：一键更新＝清静态缓存并刷新，拿最新题库与功能 */
+          try {
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+              var mc = new MessageChannel();
+              mc.port1.onmessage = function(){ location.reload(); };
+              navigator.serviceWorker.controller.postMessage({type:'yc-clear-cache'}, [mc.port2]);
+              setTimeout(function(){ location.reload(); }, 1500);
+            } else { location.reload(); }
+          } catch(eR) { location.reload(); }
+          return;
+        }
         try{ sessionStorage.setItem('yc-skip-cdn','1'); }catch(e){}
         d.parentNode && d.parentNode.removeChild(d);
         retry && retry();
       });
     };
+    /* 离线看门狗：模块JS/索引任一环节静默失败时，6秒后仍离线则主动弹 OFFSHELL 提示，杜绝无限「加载中」 */
+    setTimeout(function(){
+      try{
+        if (!window.__ycBanksReady && navigator.onLine === false && !document.getElementById('yc-bank-fail')) {
+          window.__ycBankFail(null);
+        }
+      }catch(eW){}
+    }, 6000);
     </script>
     <script>
     (function(){
