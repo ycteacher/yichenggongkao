@@ -741,58 +741,53 @@ function refreshReg(){
       renderReg(reg,track);
       renderLive(LIVE_OK,LIVE_DATA); /* 同步刷新「总用户」卡 */
     });
+    renderBk(reg); /* 明文留底折叠视图同步刷新 */
   });
 }
-/* ===== 手机号加密留底：本地解密（私钥只存看板本机，不上传） ===== */
-function bkStr2bin(b64){var s=atob(b64),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
-function bkImportPriv(pem,cb){
-  try{
-    var b64=pem.replace(/-----[A-Z ]+-----/g,'').replace(/\s+/g,'');
-    crypto.subtle.importKey('pkcs8',bkStr2bin(b64),{name:'RSA-OAEP',hash:'SHA-256'},false,['decrypt'])
-      .then(function(k){cb(k)},function(){cb(null)});
-  }catch(e){cb(null)}
-}
-function bkDecryptAll(){
-  var msg=el('bkMsg'),tbl=el('bkTable');
-  var pem=(el('bkKey').value||'').trim();
-  if(!pem){msg.textContent='先粘贴私钥';return}
-  if(!(window.crypto&&crypto.subtle)){msg.textContent='当前浏览器不支持解密';return}
-  msg.textContent='解密中…';
-  bkImportPriv(pem,function(k){
-    if(!k){msg.textContent='私钥格式不对，请粘贴完整 PEM';return}
-    try{localStorage.setItem('yc-dash-bk-key',pem)}catch(e){}
-    fetchPool(REG_URLS,function(reg){
-      var regs=(reg&&reg.r)||{};
-      var rows=Object.keys(regs).map(function(k16){var r=regs[k16]||{};return {k:k16,t:r.t||0,p:r.p||'',e:r.e||''}})
-        .sort(function(a,b){return b.t-a.t});
-      var html='',okN=0,failN=0,skipN=0,done=0;
-      function flush(){
-        tbl.innerHTML='<tr style="color:var(--mut)"><th style="text-align:left;padding:4px 10px">时间</th><th style="text-align:left;padding:4px 10px">省份</th><th style="text-align:left;padding:4px 10px">手机号</th></tr>'+html||
-          '<tr><td colspan="3" style="padding:10px;color:var(--mut)">暂无留底记录</td></tr>';
-        msg.textContent='共 '+rows.length+' 条：明文 '+okN+' · 未留底 '+skipN+' · 解密失败 '+failN;
-      }
-      if(!rows.length){flush();return}
-      rows.forEach(function(r){
-        var d=new Date(r.t),ds=d.toLocaleString('zh-CN',{hour12:false});
-        if(!r.e){skipN++;html+='<tr><td style="padding:4px 10px">'+ds+'</td><td style="padding:4px 10px">'+(r.p||'—')+'</td><td style="padding:4px 10px;color:var(--mut)">未留底（旧版注册）</td></tr>';done++;if(done===rows.length)flush();return}
-        crypto.subtle.decrypt({name:'RSA-OAEP'},k,bkStr2bin(r.e)).then(function(pt){
-          var u=new Uint8Array(pt),s='';for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);
-          okN++;html+='<tr><td style="padding:4px 10px">'+ds+'</td><td style="padding:4px 10px">'+(r.p||'—')+'</td><td style="padding:4px 10px;font-family:monospace">'+s+'</td></tr>';
-          done++;if(done===rows.length)flush();
-        }).catch(function(){failN++;html+='<tr><td style="padding:4px 10px">'+ds+'</td><td style="padding:4px 10px">'+(r.p||'—')+'</td><td style="padding:4px 10px;color:#c0392b">解密失败</td></tr>';done++;if(done===rows.length)flush()});
-      });
+/* ===== 用户明文留底：注册台账(pt手机号/ip) + 用户池(昵称/学习码/尾号) 合并，按类别折叠直读 ===== */
+var BK_USER_URLS=['https://textdb.online/ycgk-user-v1','https://textdb.dev/api/data/ycgk-user-v1'];
+function renderBk(reg){
+  var host=el('bkGroups'); if(!host)return;
+  var regs=(reg&&reg.r)||{};
+  fetchPool(BK_USER_URLS,function(u){
+    var users=(u&&u.u)||{};
+    function mkRow(k,it,rr){
+      it=it||{}; rr=rr||{};
+      var t=rr.t||it.t||(it.s&&it.s.la)||0;
+      return {n:it.n||'',pt:rr.pt||'',ip:rr.ip||'',p:rr.p||it.p||'',c:it.c||'',tl:it.tl||'',t:t,
+              ds:t?new Date(t).toLocaleString('zh-CN',{hour12:false}):'—'};
+    }
+    var stu=[],guests=[],seen={};
+    Object.keys(users).forEach(function(k){
+      var it=users[k]||{};
+      if(it.c||it.tl){ stu.push(mkRow(k,it,regs[k])); seen[k]=1; }
+      else if(!regs[k]){ guests.push(mkRow(k,it,null)); seen[k]=1; }
     });
+    Object.keys(regs).forEach(function(k){ if(!seen[k])stu.push(mkRow(k,users[k]||{},regs[k])); });
+    stu.sort(function(a,b){return b.t-a.t});
+    guests.sort(function(a,b){return b.t-a.t});
+    function tbl(rows){
+      if(!rows.length)return '<div style="padding:8px 4px;color:var(--mut);font-size:12px">暂无</div>';
+      var h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><tr style="color:var(--mut)">'+
+        '<th style="text-align:left;padding:4px 8px">名称</th><th style="text-align:left;padding:4px 8px">手机号</th><th style="text-align:left;padding:4px 8px">IP</th>'+
+        '<th style="text-align:left;padding:4px 8px">省份</th><th style="text-align:left;padding:4px 8px">学习码</th><th style="text-align:left;padding:4px 8px">尾号</th>'+
+        '<th style="text-align:left;padding:4px 8px">时间</th></tr>';
+      rows.forEach(function(r){
+        h+='<tr><td style="padding:4px 8px">'+esc(r.n||'—')+'</td>'+
+           '<td style="padding:4px 8px;font-family:monospace">'+(r.pt||((r.tl||r.c)?'<span style="color:var(--mut)">未留底'+(r.tl?' · 尾号'+esc(r.tl):'')+'</span>':'—'))+'</td>'+
+           '<td style="padding:4px 8px;font-family:monospace">'+esc(r.ip||'—')+'</td>'+
+           '<td style="padding:4px 8px">'+esc(r.p||'—')+'</td>'+
+           '<td style="padding:4px 8px;font-family:monospace">'+esc(r.c||'—')+'</td>'+
+           '<td style="padding:4px 8px">'+esc(r.tl||'—')+'</td>'+
+           '<td style="padding:4px 8px">'+r.ds+'</td></tr>';
+      });
+      return h+'</table></div>';
+    }
+    host.innerHTML='<details open style="margin-bottom:6px"><summary style="cursor:pointer;font-size:13px;padding:6px 0">注册学生（'+stu.length+'）</summary>'+tbl(stu)+'</details>'+
+      '<details style="margin-bottom:6px"><summary style="cursor:pointer;font-size:13px;padding:6px 0">未注册访客（'+guests.length+'）</summary>'+tbl(guests)+'</details>';
+    var cnt=el('bkCnt'); if(cnt)cnt.textContent='注册 '+stu.length+' · 访客 '+guests.length;
   });
 }
-(function(){
-  var go=el('bkGo'),clr=el('bkClear');
-  if(go)go.addEventListener('click',bkDecryptAll);
-  if(clr)clr.addEventListener('click',function(){
-    try{localStorage.removeItem('yc-dash-bk-key')}catch(e){}
-    el('bkKey').value='';el('bkTable').innerHTML='';el('bkMsg').textContent='本机钥匙已清除';
-  });
-  try{var saved=localStorage.getItem('yc-dash-bk-key');if(saved&&el('bkKey')&&!el('bkKey').value)el('bkKey').value=saved}catch(e){}
-})();
 refreshReg();
 setInterval(refreshReg,60000);
 
