@@ -304,6 +304,7 @@ body.yc-ui { padding-top: 60px !important; }
 .yc-topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 900;
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  flex-wrap: wrap; row-gap: 5px;
   padding: 10px max(14px, calc((100% - 768px) / 2)); background: rgba(250,248,242,.92); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--yc-line);
 }
@@ -315,7 +316,7 @@ body.yc-ui { padding-top: 60px !important; }
   .yc-topbar { padding-left: max(14px, calc((100% - 1000px) / 2)) !important; padding-right: max(14px, calc((100% - 1000px) / 2)) !important; }
   .yc-grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
 }
-.yc-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.yc-brand { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
 .yc-logo {
   width: 36px; height: 36px; border-radius: 11px; flex: none;
   background: linear-gradient(135deg, #DC2626, #B91C1C);
@@ -323,7 +324,7 @@ body.yc-ui { padding-top: 60px !important; }
   color: #fff; font-weight: 700; font-size: 17px;
   box-shadow: 0 2px 8px rgba(220,38,38,.3);
 }
-.yc-brand-name { font-size: 16px; font-weight: 800; color: var(--yc-ink); letter-spacing: .5px; line-height: 1.1; }
+.yc-brand-name { font-size: 16px; font-weight: 800; color: var(--yc-ink); letter-spacing: .5px; line-height: 1.1; white-space: nowrap; }
 .yc-brand-sub { font-size: 10px; color: var(--yc-mut); margin-top: 1px; line-height: 1.2; }
 .yc-top-actions { display: flex; align-items: center; gap: 7px; flex: none; }
 .yc-chip {
