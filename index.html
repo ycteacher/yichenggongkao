@@ -4186,7 +4186,7 @@ document.addEventListener('click', function(e){
 (function(){
   /* 修改点（P0-0c）：精简模式跳过增强脚本，降级预案不加载非核心脚本 */
   try{ if(localStorage.getItem('yc-lite')==='1') return; }catch(e){}
-  var V='21';
+  var V='23'; /* v22：yc-draft.js v2 草稿纸设备区分；v23：yc-enhance.js v4 宽屏分栏改像素实测定位，修复带变换父级下整体左偏 */
   function load(src){ var s=document.createElement('script'); s.src=src; s.async=false; document.head.appendChild(s); }
   function loadFallback(name){
     var cos=(window.ycAsset?window.ycAsset('./assets/'+name):'./assets/'+name)+'?v='+V;
@@ -4200,7 +4200,7 @@ document.addEventListener('click', function(e){
     document.head.appendChild(s1);
   }
   loadFallback('yc-enhance.js');
-  loadFallback('yc-draft.js'); /* 做题页草稿纸：默认展开，笔迹与选项事件隔离，防误触 */
+  loadFallback('yc-draft.js'); /* 做题页草稿纸：手机/平板默认展开，电脑端默认收起成小圆钮；笔迹与选项事件隔离，防误触 */
 })();
 </script>
 <script>

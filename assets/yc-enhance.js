@@ -17,8 +17,10 @@
   var style = document.createElement('style');
   /* 修改点：浮条改横排（计时器＋报错两按钮挨在一起），整体靠右对齐，不再竖排堆叠挡题目 */
   style.textContent = '#yc-enh-bar{position:fixed;right:12px;top:60px;z-index:2147483000;display:none;align-items:center;flex-direction:row;gap:8px;font-family:inherit;}';
-  /* 修改点（P2宽屏）：电脑端做题材料常驻左侧，题目选项右移——用户反馈"写题时看不到材料" */
-  style.textContent += '@media (min-width:1400px){.page-shell-compact{margin-left:calc(50% - 104px) !important;margin-right:0 !important;}.page-shell-compact > .mt-5.rounded-3xl{position:fixed;left:calc(50% - 660px);top:80px;width:520px;max-height:calc(100vh - 120px);overflow-y:auto;margin-top:0 !important;}}';
+  /* 修改点（P2宽屏 v4）：电脑端(≥1400px)做题材料常驻左侧、材料+题目整体居中。
+     旧版用 margin/fixed 的 50% 百分比定位，遇到带 transform 的父级容器时百分比参照错乱，
+     导致整体左偏、右侧大片空白；改为 JS 实测像素定位（先置零测参照原点，再写目标像素值），
+     任何父级变换下都严格居中。 */
   document.head.appendChild(style);
   var bar = document.createElement('div');
   bar.id = 'yc-enh-bar';
@@ -116,6 +118,67 @@
   }
   window.addEventListener('scroll', function(){ if (quizEl()) placeBar(); }, { passive: true, capture: true });
   window.addEventListener('resize', function(){ if (quizEl()) placeBar(); });
+
+  /* ---------- 宽屏分栏（v4）：材料常驻左侧 + 材料/题目整体居中，像素实测定位 ---------- */
+  var WIDE_MIN = 1400, MAT_W = 520, GAP = 40, QUIZ_W = 768;
+  var wideShell = null, wideMat = null, wideTm = null;
+  function shellEl(){ return document.querySelector('.page-shell-compact'); }
+  function matElOf(shell){
+    if (!shell) return null;
+    for (var i = 0; i < shell.children.length; i++){
+      var cl = shell.children[i].classList;
+      /* 材料卡特征：mt-5 rounded-3xl bg-white p-5，且无边框（带 border 的是报错横幅，不参与分栏） */
+      if (cl.contains('mt-5') && cl.contains('rounded-3xl') && cl.contains('bg-white') && cl.contains('p-5') && !cl.contains('border')) return shell.children[i];
+    }
+    return null;
+  }
+  function clearWide(shell, mat){
+    if (shell){ shell.style.marginLeft = ''; shell.style.marginRight = ''; }
+    if (mat){ mat.style.position = ''; mat.style.left = ''; mat.style.top = ''; mat.style.width = ''; mat.style.maxHeight = ''; mat.style.overflowY = ''; mat.style.marginTop = ''; }
+  }
+  /* 两遍校正：先按线性假设写入，再实测残差修正一次，父级带缩放变换也能对齐 */
+  function placeTo(el, prop, target, isFixedLeft){
+    el.style[prop] = '0px';
+    var base = el.getBoundingClientRect().left;
+    var v = target - base;
+    el.style[prop] = Math.max(0, v) + 'px';
+    var drift = target - el.getBoundingClientRect().left;
+    if (Math.abs(drift) > 2){ el.style[prop] = Math.max(0, v + drift) + 'px'; }
+  }
+  function applyWide(){
+    var shell = shellEl();
+    if (!shell || !quizEl()){
+      if (wideShell){ clearWide(wideShell, wideMat); wideShell = null; wideMat = null; }
+      return;
+    }
+    var vw = document.documentElement.clientWidth;
+    var mat = matElOf(shell);
+    if (vw < WIDE_MIN){
+      if (wideShell || (mat && mat.style.position === 'fixed')) clearWide(shell, mat || wideMat);
+      wideShell = shell; wideMat = null;
+      return;
+    }
+    var total = (mat ? MAT_W + GAP : 0) + QUIZ_W;
+    var left = Math.max(0, (vw - total) / 2);
+    wideShell = shell; wideMat = mat;
+    /* 题目列：目标左缘 = 分栏起点 +（有材料时）材料宽+间距 */
+    placeTo(shell, 'marginLeft', left + (mat ? MAT_W + GAP : 0));
+    shell.style.marginRight = '0px';
+    if (mat){
+      mat.style.position = 'fixed';
+      mat.style.top = '80px';
+      mat.style.width = MAT_W + 'px';
+      mat.style.maxHeight = 'calc(100vh - 120px)';
+      mat.style.overflowY = 'auto';
+      mat.style.marginTop = '0px';
+      placeTo(mat, 'left', left);
+    }
+  }
+  function scheduleWide(){ clearTimeout(wideTm); wideTm = setTimeout(function(){ applyWide(); if (quizEl()) placeBar(); }, 120); }
+  window.addEventListener('resize', function(){ scheduleWide(); });
+  try {
+    new MutationObserver(scheduleWide).observe(document.body, { childList: true, subtree: true });
+  } catch(e){}
 
   /* ---------- 计时器：作答后才开始 ---------- */
   var tState = null; /* {key, total(分钟), started, end, paused, remain} */
