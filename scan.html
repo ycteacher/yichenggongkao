@@ -57,7 +57,7 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
 <div class="wrap">
   <a class="home" href="./index.html">‹ 返回首页</a>
   <h1>📷 拍题讲解</h1>
-  <p class="sub">拍一道题 → 自动认字 → 题库里找原题 · AI 判答案讲过程。真题卷、练习册、讲义上的题都能拍。</p>
+  <p class="sub">拍一道题 → 自动认字 → 点提交，AI 直接讲：这是什么题、最简单的解法、过程和答案。真题卷、练习册、讲义上的题都能拍。</p>
 
   <div class="card">
     <label class="lb">第 1 步 · 拍题或选照片</label>
@@ -90,11 +90,7 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
   <div class="card" id="step2" style="display:none">
     <label class="lb">第 3 步 · 认出来的题目（识别错了可直接改）</label>
     <textarea id="ocrText" placeholder="题目文字会出现在这里，也可以直接手动粘贴题目"></textarea>
-    <div style="display:flex;gap:10px;margin-top:12px">
-      <button class="btn btn-p" id="goMatch" style="flex:1">🔍 在题库里找原题</button>
-    </div>
-    <button class="btn btn-p" id="goAi" style="margin-top:10px;display:none">✦ AI 判答案 · 讲过程</button>
-    <div id="matchOut"></div>
+    <button class="btn btn-p" id="goAi" style="margin-top:12px;width:100%">✦ 提交 · AI 讲解这道题</button>
     <div id="aiOut"></div>
   </div>
 
@@ -113,8 +109,6 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function track(ev, extra){ try{ if(window.YCTrack&&window.YCTrack.track) window.YCTrack.track(ev, extra||{}); }catch(e){} }
   track('yc_scan_open');
-
-  var MOD_NAMES = {changshi:'常识',panduan:'判断',shuliang:'数量',tuitui:'图推',yanyu:'言语',ziliao:'资料',zhengzhi:'政治理论',jundui:'军队文职',jiaoshi:'教师编',yangqi:'央国企',yiliao:'医疗编',shenlun:'申论',zongying:'综应'};
 
   var pick = document.getElementById('pick'), file = document.getElementById('file');
   pick.addEventListener('click', function(){ file.click(); });
@@ -295,125 +289,6 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
       });
   }
 
-  /* ===== 题库比对 ===== */
-  function norm(s){ return String(s||'').toLowerCase().replace(/[^0-9a-z\u4e00-\u9fff]/g,''); }
-  /* 剥离选项字母标记（A. / A、 / A． / (A) / A: 等形态），使带字母的OCR文本能与题库指纹对齐；
-     仅处理行首或空白后的孤立A-D字母标记，题干中的正常英文单词、维生素A、5G等不受影响 */
-  function stripOptMarks(s){
-    return String(s||'').replace(/(^|\n|\s)[\(（]?[A-Da-d]\s*[\.、．:：)）]\s*/g, '$1');
-  }
-  function h24(s){ var t=s.slice(0,24), h=5381; for(var i=0;i<t.length;i++){ h=((h<<5)+h+t.charCodeAt(i))|0; } return h>>>0; }
-  function dice(a,b){
-    if (a.length<2||b.length<2) return 0;
-    var m=new Map(), n=a.length-1;
-    for(var i=0;i<n;i++){ var g=a.substr(i,2); m.set(g,(m.get(g)||0)+1); }
-    var hit=0, tot=n+(b.length-1);
-    for(var j=0;j<b.length-1;j++){ var g2=b.substr(j,2), c=m.get(g2)||0; if(c>0){hit++;m.set(g2,c-1);} }
-    return 2*hit/tot;
-  }
-  var scanIdx = null, idxLoading = false, hashMap = null;
-  function loadIndex(cb){
-    if (scanIdx) return cb(scanIdx);
-    if (idxLoading) return;
-    idxLoading = true;
-    fetch('./assets/scan-index.json?t=' + Date.now(), {cache:'no-store'})
-      .then(function(r){ return r.json(); })
-      .then(function(j){
-        scanIdx = j;
-        /* e 是 [哈希, 题id, 文件序号] 三元组数组，加载后建哈希→条目 的倒排表 */
-        hashMap = new Map();
-        j.e.forEach(function(e){
-          var a = hashMap.get(e[0]);
-          if (!a) { a = []; hashMap.set(e[0], a); }
-          a.push({ id: e[1], fi: e[2] });
-        });
-        cb(j);
-      })
-      .catch(function(){ idxLoading = false; cb(null); });
-  }
-  var shardCache = {};
-  function loadShard(f, cb){
-    if (shardCache[f]) return cb(shardCache[f]);
-    var s = document.createElement('script');
-    s.src = './assets/' + f + '.js?t=' + Date.now();
-    s.onload = function(){
-      var w = window, arr = [];
-      try{
-        if (Array.isArray(w.YC_MORE_QBANKS)) arr = w.YC_MORE_QBANKS.flat();
-        if (Array.isArray(w.YC_CS_BANK)) arr = arr.concat(w.YC_CS_BANK);
-      }catch(e){}
-      shardCache[f] = arr; cb(arr);
-    };
-    s.onerror = function(){ shardCache[f] = []; cb([]); };
-    document.body.appendChild(s);
-  }
-
-  document.getElementById('goMatch').addEventListener('click', function(){
-    var text = norm(stripOptMarks(document.getElementById('ocrText').value));
-    var out = document.getElementById('matchOut');
-    if (text.length < 10) { out.innerHTML = '<p class="none">题目太短，先补全题干再找。</p>'; return; }
-    out.innerHTML = '<p class="none">正在比对全库 5.7 万题…</p>';
-    track('yc_scan_match');
-    loadIndex(function(idx){
-      if (!idx) { out.innerHTML = '<p class="none">题库索引没加载出来，刷新后再试。</p>'; return; }
-      /* OCR 文本滑窗（步长1、窗长24）取哈希，命中题库指纹即为候选；步长1保证任意前缀长度都能对齐 */
-      var cands = new Map();
-      for (var i = 0; i + 10 <= text.length; i += 1) {
-        var h = h24(text.slice(i));
-        var list = hashMap && hashMap.get(h);
-        if (list) for (var k = 0; k < list.length; k++) {
-          var e = list[k], key = e.fi + ':' + e.id;
-          if (!cands.has(key)) cands.set(key, { id: e.id, fi: e.fi });
-        }
-      }
-      if (!cands.size) { renderNone(); return; }
-      /* 按分片分组，逐片加载后用全文相似度复核 */
-      var byFile = new Map();
-      cands.forEach(function(c){ var a = byFile.get(c.fi) || []; a.push(c.id); byFile.set(c.fi, a); });
-      var fileKeys = Array.from(byFile.keys()).slice(0, 6);
-      var results = [], pending = fileKeys.length;
-      fileKeys.forEach(function(fi){
-        loadShard(idx.files[fi], function(arr){
-          var map = new Map(); arr.forEach(function(q){ map.set(q.id, q); });
-          (byFile.get(fi) || []).forEach(function(id){
-            var q = map.get(id);
-            if (!q || !q.prompt) return;
-            var stem = norm(q.prompt) + norm((q.options||[]).join(''));
-            results.push({ q: q, fi: fi, score: dice(text, stem) });
-          });
-          pending--;
-          if (!pending) finish();
-        });
-      });
-      function finish(){
-        results.sort(function(a,b){ return b.score - a.score; });
-        results = results.filter(function(r){ return r.score >= 0.45; }).slice(0, 3);
-        if (!results.length) { renderNone(); return; }
-        var html = '';
-        results.forEach(function(r, n){
-          var mk = idx.fm[idx.files[r.fi]] || '';
-          var mn = MOD_NAMES[mk] || '题库';
-          var ans = typeof r.q.answer === 'number' && r.q.options ? esc(r.q.options[r.q.answer]) : esc(r.q.answer);
-          html += '<div class="match">' +
-            '<div class="mh"><span class="mt">' + (n===0?'✅ 最可能就是它':'其他可能') + ' · ' + esc(mn) + ' · ' + esc(r.q.id) + '</span>' +
-            '<span class="ms">相似度 ' + Math.round(r.score*100) + '%</span></div>' +
-            '<p class="mq">' + esc(r.q.prompt) + '</p>' +
-            '<div class="ma"><b>答案：</b>' + ans + (r.q.explanation ? '<br><b>解析：</b>' + esc(r.q.explanation) : '') + '</div>' +
-            (mk ? '<p style="margin-top:8px"><a href="./index.html?m=' + esc(mk) + '">去刷这个模块 ›</a></p>' : '') +
-            '</div>';
-        });
-        out.innerHTML = html;
-        track('yc_scan_match_hit', { n: results.length });
-        histUpdateMatch(results, idx);
-      }
-      function renderNone(){
-        out.innerHTML = '<p class="none">题库里没找到这道题（或相似度不够）。' + (aiEp ? '直接点上面「AI 判答案 · 讲过程」，会按题干现场判答案、写过程。' : '') + '</p>';
-        track('yc_scan_match_none');
-        histUpdateNone();
-      }
-    });
-  });
-
   /* ===== 拍题记录：只存在学生自己手机里（localStorage），不上传任何服务器 ===== */
   var HIST_KEY = 'yc_scan_hist_v1', curRec = null;
   function histLoad(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }catch(e){ return []; } }
@@ -421,17 +296,8 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
   function histNewRecord(text){
     if (!text) { curRec = null; return; }
     var a = histLoad();
-    curRec = { t: Date.now(), q: text, hit: null, ai: null };
+    curRec = { t: Date.now(), q: text, ai: null };
     a.push(curRec); histSave(a); histRender();
-  }
-  function histUpdateMatch(results, idx){
-    if (!curRec) return;
-    curRec.hit = results.map(function(r){ return { m: MOD_NAMES[idx.fm[idx.files[r.fi]]] || '题库', id: r.q.id, s: Math.round(r.score*100) }; });
-    histSave(histLoad()); histRender();
-  }
-  function histUpdateNone(){
-    if (!curRec) return;
-    curRec.hit = []; histSave(histLoad()); histRender();
   }
   function histUpdateAi(text){
     if (!curRec) return;
@@ -447,7 +313,7 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
     for (var i = a.length - 1; i >= 0; i--) {
       var r = a[i], d = new Date(r.t);
       var ts = (d.getMonth()+1) + '月' + d.getDate() + '日 ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2);
-      var st = r.hit === null ? '还没找' : (r.hit.length ? '✅ ' + r.hit[0].m + ' · ' + r.hit[0].id + ' · ' + r.hit[0].s + '%' : '题库未收录') + (r.ai ? ' · 已讲' : '');
+      var st = r.ai ? '✓ 已讲解' : '待讲解';
       html += '<div class="hist-item" data-i="' + i + '"><div class="ht">' + esc(r.q.slice(0, 42)) + '</div><div class="hs">' + ts + ' · ' + st + '</div></div>';
     }
     list.innerHTML = html;
@@ -478,11 +344,11 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
   try {
     fetch('./assets/ai-endpoint.json?t=' + Date.now(), {cache:'no-store'})
       .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(j){ if (j && j.url && j.key) { aiEp = j; document.getElementById('goAi').style.display = 'inline-flex'; } })
+      .then(function(j){ if (j && j.url && j.key) aiEp = j; })
       .catch(function(){});
   } catch(e) {}
   function callAI(prompt, ok, fail, btn){
-    if (!aiEp) { fail('讲题功能还没接好'); return; }
+    if (!aiEp) { fail('讲解服务还没接好，正在接入大模型，过几天再来试试'); return; }
     var old = btn.textContent; btn.disabled = true; btn.textContent = '正在讲…';
     var done = false, timer = setTimeout(function(){ if(!done){done=true;btn.disabled=false;btn.textContent=old;fail('超时');} }, 90000);
     fetch(aiEp.url, { method:'POST',
@@ -504,14 +370,14 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
     var out = document.getElementById('aiOut'), btn = this;
     if (q.length < 6) { out.innerHTML = '<p class="none">先把题目文字补全（拍照识别或手动粘贴）。</p>'; return; }
     track('yc_scan_ai');
-    var prompt = '你是公务员考试资深讲师。下面是一道学生拍题识别出来的题目（可能有少量识别错别字，先自行纠正理解）。请严格按以下格式输出：\n' +
+    var prompt = '你是公务员考试资深讲师。下面是一道学生拍题识别出来的题目（可能有少量识别错别字，先自行纠正理解）。请用最简单、最快的方法讲（有秒杀技巧优先），让基础一般的学生一遍看懂。请严格按以下格式输出：\n' +
       '【答案】给出正确答案（如有选项写选项字母和内容）\n' +
       '【过程】一步步写清解题过程，含用到的公式/考点，最后给正确选项\n' +
       '【易错点】一句话点出这类题最容易错在哪\n' +
       '【考点】所属模块与考点名\n题目：\n' + q;
     out.innerHTML = '<p class="none">正在判答案、写过程…</p>';
     callAI(prompt, function(text){
-      out.innerHTML = '<div class="match"><div class="mh"><span class="mt">✦ AI 判答案 · 讲过程</span><span class="ms">由在线大模型生成</span></div>' +
+      out.innerHTML = '<div class="match"><div class="mh"><span class="mt">✦ AI 讲解</span><span class="ms">由在线大模型生成</span></div>' +
         '<div class="ai-out">' + esc(text) + '</div></div>';
       track('yc_scan_ai_done', { len: text.length });
       histUpdateAi(text);
