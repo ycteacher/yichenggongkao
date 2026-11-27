@@ -1,4 +1,4 @@
-/* yc-account.js v4: 手机号登录注册（同号去重：已注册=直接登录接回，不重复注册）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
+/* yc-account.js v5: 手机号登录注册（同号去重：已注册=直接登录接回，不重复注册；老账号登录免填昵称、不覆盖原昵称）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
    v4 变更：注册台账新增来源字段 s={i:邀请码,q:查询串,r:外部来路域名}，首触暂存于 sessionStorage（yc-land-v1），仅聚合上报
    —— 无验证码无密码：仅一个手机号（11位1开头 + 两次输入确认）
    · 明文手机号不落库不外发：本地与云端只存 MD5 摘要（user_key）+ 后4位 + 省份（聚合）
@@ -344,16 +344,25 @@
     if(btn){btn.disabled=true;btn.textContent='提交中…';}
     if(err)err.textContent='';
     nick=sanitizeNick(nick);
+    var prevAcc=getAcc();
     var h=md5(phone), key16=h.slice(0,16), tail=phone.slice(-4);
     provOf(phone,function(prov){
       var oldSync=getSync(), oldCode=oldSync.code||'', adopted=false, bindTs=0;
       /* 去重（v3）：先查云端绑定——同一手机号全站唯一账号。
          已绑定=直接登录接回原账号（即使本机有旧学习码也切到账号码，杜绝一号多码）；
-         未绑定才允许注册；云端不可用时 fail-open（沿用本机码或新生成，联网后 boot 补写绑定）。 */
+         未绑定才允许注册；云端不可用时 fail-open（沿用本机码或新生成，联网后 boot 补写绑定）。
+         v4 修正：昵称只对新注册强制；老账号换设备登录只认手机号，不再强制重填昵称，
+         且登录接回不覆盖云端已有昵称（防止第二台设备随手填的昵称冲掉送分匹配用的原昵称）。 */
       var ensureCode=function(cb){
         cloudGet(BIND_PRE+h,function(e,t){
           var b=null; try{ b=t?JSON.parse(t):null; }catch(ex){}
           if(b&&b.c){ adopted=true; bindTs=b.ts||0; cb(b.c); return; }
+          /* 未绑定=新注册：昵称必填（与送分匹配用）；老账号登录无需重填 */
+          if(!nick||nick.length<2){
+            done();
+            if(err)err.textContent='请填写昵称（新用户注册必填，2-20 字，与送分匹配用；老账号登录不用填）';
+            return;
+          }
           if(oldCode){ cb(oldCode); return; }
           /* 都没有：生成新学习码（防撞号） */
           tryGen(0,function(c){cb(c)});
@@ -367,7 +376,7 @@
           setSyncCode(code);
         }
         /* 本地留底：完整手机号只存学生本机（localStorage），不上传云端；云端仍只存哈希+尾号 */
-        var acc={v:2,md5:h,ph:phone,tail:tail,prov:prov,ts:bindTs||Date.now(),code:code,inv:invParam()||'',nick:nick||''};
+        var acc={v:2,md5:h,ph:phone,tail:tail,prov:prov,ts:bindTs||Date.now(),code:code,inv:invParam()||'',nick:nick||(prevAcc&&prevAcc.nick)||''};
         wr(ACC,acc);
         /* 迁移记录：旧键清点挂载，不删不覆盖 */
         var n=0;
@@ -382,7 +391,8 @@
         });
         /* 用户信息池：注册即建档（昵称/省份/学习码/尾号/计数），失败不阻断 */
         userMutate(key16,function(rec){
-          rec.n=nick||rec.n||'';
+          /* 登录接回：保留云端已有昵称，仅在本记录没昵称时才用本次输入补；新注册：写入本次昵称 */
+          if(adopted){ rec.n=rec.n||nick||''; } else { rec.n=nick||rec.n||''; }
           rec.p=prov||rec.p||'';
           if(!rec.t)rec.t=Date.now();
           rec.c=code;
@@ -542,10 +552,11 @@
     }else{
       card.innerHTML='<h3>注册 / 登录</h3>'+
         '<div class="yc-acc-tip">仅需一个手机号：<b>无验证码、不读取手机信息</b>。手机号是你的唯一身份识别码，也是你的<b>同步码和登录码</b>，<b>注册后不可更改</b>。12月收费前注册 = 永久免费。</div>'+
-        '<div class="yc-acc-li"><b>已有账号？</b>输入同一手机号即直接登录并接回进度；同一手机号全站唯一，<b>不会重复注册</b>。</div>'+
+        '<div class="yc-acc-li"><b>老账号（换设备/平板同步）：</b>只需输入同一手机号，<b>昵称不用再填</b>，点「注册 / 登录」即直接登录并接回进度；同一手机号全站唯一，<b>不会重复注册</b>。</div>'+
+        '<div class="yc-acc-li"><b>新用户：</b>手机号 + 昵称（必填，与老师送分匹配用）。</div>'+
         '<input id="ycAccPh1" placeholder="输入 11 位手机号" inputmode="numeric" maxlength="11" autocomplete="off">'+
         '<input id="ycAccPh2" placeholder="再次输入手机号确认" inputmode="numeric" maxlength="11" autocomplete="off">'+
-        '<input id="ycAccNick" placeholder="昵称（必填，2-20字，与送分匹配用）" maxlength="20" autocomplete="off">'+
+        '<input id="ycAccNick" placeholder="昵称（新用户必填，2-20字；老账号登录不用填）" maxlength="20" autocomplete="off">'+
         '<button class="yc-acc-btn main" id="ycAccOk">注册 / 登录</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccCancel">暂不注册</button>'+
         '<div id="yc-acc-err"></div>'+
@@ -557,7 +568,7 @@
         var nk=sanitizeNick($('ycAccNick')&&$('ycAccNick').value||'');
         if(!/^1\d{10}$/.test(p1)){if(err)err.textContent='请输入 11 位、以 1 开头的手机号';return}
         if(p1!==p2){if(err)err.textContent='两次输入不一致，请重新确认';return}
-        if(!nk||nk.length<2){if(err)err.textContent='请填写昵称（至少 2 个字符，与送分匹配用）';return}
+        /* 昵称校验移入 doRegister：查完云端绑定后，仅新注册强制，老账号登录免填 */
         doRegister(p1,$('ycAccOk'),err,nk);
       });
       $('ycAccCancel') && $('ycAccCancel').addEventListener('click',closePanel);
