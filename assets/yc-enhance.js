@@ -61,6 +61,10 @@
     }
     return null;
   }
+  function quizQid(){
+    var el = document.querySelector('[data-qid]');
+    return el ? (el.getAttribute('data-qid') || '') : '';
+  }
   function quizTitle(){
     var h = document.querySelector('h1');
     return h ? h.textContent.trim() : '';
@@ -272,14 +276,18 @@
     });
   }
   function submitReport(type){
-    var title = quizTitle(), pos = quizCounter(), q = quizPrompt();
+    var title = quizTitle(), pos = quizCounter(), q = quizPrompt(), qid = quizQid();
     if (!q){ q = '（未取到题干）'; }
-    if (!confirm('向亿成老师反馈这道题的问题？\n\n类型：' + type + '\n会一起带上：' + title + ' 第' + (pos || '?') + '题\n「' + q.slice(0, 50) + '…」')) return;
-    var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), type: type, title: title, pos: pos || '', q: q, ua: (navigator.userAgent || '').slice(0, 80) };
+    if (!confirm('向亿成老师反馈这道题的问题？\n\n类型：' + type + '\n会一起带上：' + title + ' 第' + (pos || '?') + '题' + (qid ? '（编号 ' + qid + '）' : '') + '\n「' + q.slice(0, 50) + '…」')) return;
+    var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), type: type, title: title, pos: pos || '', id: qid, q: q, ua: (navigator.userAgent || '').slice(0, 80) };
     errBtn.disabled = true; errBtn.textContent = '提交中…';
     sendReport(rep, function(ok){
       errBtn.disabled = false; errBtn.textContent = '⚠ 一键报错';
-      if (ok){ showToast('已提交，感谢反馈！'); flushPending(); }
+      if (ok){
+        var where = title + ' 第' + (pos || '?') + '题' + (qid ? '（编号 ' + qid + '）' : '');
+        showToast('已提交！您报错的是「' + where + '」，感谢反馈，我们会尽快核实！');
+        flushPending();
+      }
       else {
         try {
           var pend = JSON.parse(localStorage.getItem(PEND_KEY) || '[]');
