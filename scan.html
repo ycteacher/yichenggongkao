@@ -196,12 +196,59 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
     var scale = nat / dispW;
     var sx = cropRect.x * scale, sy = cropRect.y * scale, sw = cropRect.w * scale, sh = cropRect.h * scale;
     var cv = document.createElement('canvas');
-    var maxSide = 1600, k = Math.min(1, maxSide / Math.max(sw, sh));
+    var maxSide = 2000, k = Math.min(1, maxSide / Math.max(sw, sh));
     cv.width = Math.round(sw * k); cv.height = Math.round(sh * k);
     cv.getContext('2d').drawImage(cropImgEl, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
     document.getElementById('cropCard').style.display = 'none';
     runOcr(cv);
   });
+
+  /* 图像预处理：灰度 + 直方图拉伸（4%~96%），提升暗光/低对比照片的识别率 */
+  function preprocess(cv){
+    try {
+      var ctx = cv.getContext('2d');
+      var img = ctx.getImageData(0, 0, cv.width, cv.height);
+      var d = img.data, hist = new Array(256).fill(0), n = d.length / 4, i, g;
+      for (i = 0; i < d.length; i += 4) {
+        g = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) | 0;
+        hist[g]++;
+        d[i] = d[i+1] = d[i+2] = g;
+      }
+      var lo = 0, hi = 255, acc = 0, loCut = n * 0.04, hiCut = n * 0.96;
+      for (i = 0; i < 256; i++) { acc += hist[i]; if (acc >= loCut) { lo = i; break; } }
+      acc = 0;
+      for (i = 255; i >= 0; i--) { acc += hist[i]; if (acc >= n - hiCut) { hi = i; break; } }
+      if (hi <= lo) hi = Math.min(255, lo + 1);
+      var k = 255 / (hi - lo);
+      for (i = 0; i < d.length; i += 4) {
+        g = (d[i] - lo) * k;
+        g = g < 0 ? 0 : (g > 255 ? 255 : g);
+        d[i] = d[i+1] = d[i+2] = g;
+      }
+      ctx.putImageData(img, 0, 0);
+    } catch (err) { /* 预处理失败不影响识别，用原图 */ }
+    return cv;
+  }
+  /* 放大重试版：最长边放大到 maxSide（≤2倍）后再预处理 */
+  function upscale(cv, maxSide){
+    var cur = Math.max(cv.width, cv.height);
+    var k = Math.min(2, maxSide / cur);
+    if (k <= 1.05) return preprocess(cv);
+    var nc = document.createElement('canvas');
+    nc.width = Math.round(cv.width * k); nc.height = Math.round(cv.height * k);
+    var nctx = nc.getContext('2d');
+    nctx.imageSmoothingEnabled = true;
+    nctx.drawImage(cv, 0, 0, nc.width, nc.height);
+    return preprocess(nc);
+  }
+  /* 评估识别质量：置信度 + 有效中文字符数 */
+  function ocrScore(res){
+    var data = res && res.data || {};
+    var conf = typeof data.confidence === 'number' ? data.confidence : 0;
+    var text = data.text || '';
+    var cjk = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+    return { ok: conf >= 65 && cjk >= 6, conf: conf, cjk: cjk, text: text.trim() };
+  }
 
   function runOcr(source){
     var prog = document.getElementById('prog'), bar = document.getElementById('progBar'), hint = document.getElementById('ocrHint');
@@ -213,15 +260,30 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
         if (m.status === 'recognizing text') { bar.style.width = Math.round((m.progress||0)*100) + '%'; }
         else if (m.status && m.progress !== undefined) { bar.style.width = Math.round(m.progress*100) + '%'; hint.textContent = '识别准备中：' + m.status; }
       }})
-      .then(function(w){ worker = w; return w.recognize(source); })
+      .then(function(w){
+        worker = w;
+        w.setParameters({ preserve_interword_spaces: '1' });
+        return w.recognize(preprocess(source));
+      })
       .then(function(res){
-        var text = (res.data && res.data.text || '').trim();
+        var best = ocrScore(res);
+        if (!best.ok) {
+          hint.textContent = '第一遍认得不太好，自动放大重试…';
+          return worker.recognize(upscale(source, 2400)).then(function(res2){
+            var second = ocrScore(res2);
+            return second.conf > best.conf ? second : best;
+          });
+        }
+        return best;
+      })
+      .then(function(best){
+        var text = best.text;
         document.getElementById('ocrText').value = text;
         document.getElementById('step2').style.display = 'block';
-        hint.textContent = text ? ('识别完成，共 ' + text.length + ' 字。识别不准的地方可以直接改。') : '没认出文字，试试框得再准一点，或手动粘贴题目。';
+        hint.textContent = text ? ('识别完成，共 ' + text.length + ' 字。识别不准的地方可以直接改。') : '没认出文字，试试框得再准一点，或手动粘贴题目文字。';
         prog.style.display = 'none';
         document.getElementById('step2').scrollIntoView({behavior:'smooth'});
-        track('yc_scan_ocr_done', { len: text.length });
+        track('yc_scan_ocr_done', { len: text.length, conf: Math.round(best.conf) });
         histNewRecord(text);
         if (worker) worker.terminate();
       })
