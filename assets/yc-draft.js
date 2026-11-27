@@ -1,4 +1,5 @@
-/* yc-draft.js v1 — 做题页草稿纸（双层事件隔离）
+/* yc-draft.js v2 — 做题页草稿纸（双层事件隔离）
+   v2：手机/平板默认展开，电脑端（鼠标设备，含桌面PWA）默认收起成小圆钮，本会话手动展开/收起仍被记住。
    用户反馈：草稿画到选项会误选。方案：草稿是独立浮层，笔迹事件只落在草稿画布上，
    永远不会穿透到选项；主包选项已恢复整行可点（2026-11-27，此前「仅点ABCD徽标可选」导致点选项文字无反应）。
    - 进做题页默认展开（可收起成右侧小圆钮，本次会话记住展开/收起状态）
@@ -89,8 +90,18 @@
     canvas.addEventListener('pointercancel', up);
     canvas.addEventListener('pointerleave', function(e){ if (drawing) up(e); });
 
-    try { open = sessionStorage.getItem('yc-draft-open') !== '0'; } catch(e){ open = true; }
+    try {
+      var saved = sessionStorage.getItem('yc-draft-open');
+      if (saved !== null) open = saved === '1';
+      else open = isTouchDevice(); /* 手机/平板默认展开；电脑端（含桌面PWA）默认收起成小圆钮 */
+    } catch(e){ open = isTouchDevice(); }
     setOpen(open);
+  }
+
+  /* 触屏设备（手机/平板）= 粗指针或多点触控；鼠标设备（电脑网页/桌面PWA）= false */
+  function isTouchDevice(){
+    try { return window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0; }
+    catch(e){ return 'ontouchstart' in window; }
   }
 
   function setOpen(v){
