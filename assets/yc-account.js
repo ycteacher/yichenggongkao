@@ -112,17 +112,31 @@
     fetch('https://textdb.online/update/?key='+encodeURIComponent(key)+'&value='+encodeURIComponent(val)).then(function(){ok=true;fin()},function(){fin()});
     fetch('https://textdb.dev/api/data/'+key,{method:'POST',headers:{'Content-Type':'text/plain'},body:val}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
   }
-  /* 注册台账：读-合并-写（哈希锚点+时间+省份+来源+留底；pt=手机号明文、ip=出口IP，站长看板直读） */
+  /* 注册台账：读-合并-写（哈希锚点+时间+省份+来源+留底；pt=手机号明文、ip=出口IP，站长看板直读）
+     v5 并发修复：整池写回前重读最新池合并，写后回读验证自己的 key16 仍在池中；
+     被并发写挤掉则带随机抖动重试（最多3次），把竞态窗口从整个会话缩到秒级，防两设备同时注册互相覆盖。 */
   function regPut(key16,prov,src,e,extra,cb){
-    cloudGet(REG_KEY,function(err,t){
-      var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
-      if(!pool||typeof pool!=='object'||!pool.r)pool={v:1,r:{}};
-      var old=pool.r[key16]||{};
-      var rec={t:old.t||Date.now(),p:prov||old.p||'',s:(src&&src.pv!==undefined)?src:(old.s||{}),e:e||old.e||''};
-      if(extra){ if(extra.pt)rec.pt=extra.pt; if(extra.ip)rec.ip=extra.ip; }
-      pool.r[key16]=rec;
-      cloudPut(REG_KEY,JSON.stringify(pool),function(){ cb&&cb(); });
-    });
+    var attempt=0;
+    function once(){
+      cloudGet(REG_KEY,function(err,t){
+        var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
+        if(!pool||typeof pool!=='object'||!pool.r)pool={v:1,r:{}};
+        var old=pool.r[key16]||{};
+        var rec={t:old.t||Date.now(),p:prov||old.p||'',s:(src&&src.pv!==undefined)?src:(old.s||{}),e:e||old.e||''};
+        if(extra){ if(extra.pt)rec.pt=extra.pt; if(extra.ip)rec.ip=extra.ip; }
+        pool.r[key16]=rec;
+        cloudPut(REG_KEY,JSON.stringify(pool),function(){
+          cloudGet(REG_KEY,function(e2,t2){
+            var p2=null; try{ p2=t2?JSON.parse(t2):null; }catch(ex2){}
+            if(p2&&p2.r&&p2.r[key16]){ cb&&cb(); return; }
+            attempt++;
+            if(attempt<3){ setTimeout(once,200+Math.floor(Math.random()*600)); return; }
+            cb&&cb();
+          });
+        });
+      });
+    }
+    once();
   }
   /* 出口IP：双源竞速，4秒超时，失败留空不阻断 */
   function fetchIP(cb){
@@ -136,28 +150,41 @@
     }catch(e){ fin(''); }
   }
 
-  /* ---------- 用户信息池（ycgk-user-v1）：读-合并-写，池上限3000按最后活跃淘汰 ---------- */
+  /* ---------- 用户信息池（ycgk-user-v1）：读-合并-写，池上限3000按最后活跃淘汰
+     v5 并发修复：写后回读验证自己的 key16 仍在池中，被并发写挤掉则带随机抖动重试（最多3次），重试期间保持本地锁串行化 ---------- */
   var userBusy=false;
   function userMutate(key16,mutFn,cb){
     if(userBusy){ setTimeout(function(){ userMutate(key16,mutFn,cb); },3000); return; }
     userBusy=true;
-    cloudGet(USER_KEY,function(e,t){
-      function fin(){ userBusy=false; cb&&cb(); }
-      var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
-      if(!pool||typeof pool!=='object'||!pool.u)pool={v:1,u:{}};
-      var rec=pool.u[key16]||{n:'',p:'',t:0,c:'',tl:'',s:{}};
-      if(!rec.s||typeof rec.s!=='object')rec.s={};
-      try{ mutFn(rec); }catch(ex){}
-      rec.s.la=Date.now();
-      pool.u[key16]=rec;
-      var ids=Object.keys(pool.u);
-      if(ids.length>3000){
-        ids.sort(function(a,b){ return (((pool.u[b]||{}).s||{}).la||0)-(((pool.u[a]||{}).s||{}).la||0); });
-        var keep={}; for(var i=0;i<3000;i++)keep[ids[i]]=pool.u[ids[i]];
-        pool.u=keep;
-      }
-      cloudPut(USER_KEY,JSON.stringify(pool),function(){ fin(); });
-    });
+    var attempt=0;
+    function once(){
+      cloudGet(USER_KEY,function(e,t){
+        function fin(){ userBusy=false; cb&&cb(); }
+        var pool=null; try{ pool=t?JSON.parse(t):null; }catch(ex){}
+        if(!pool||typeof pool!=='object'||!pool.u)pool={v:1,u:{}};
+        var rec=pool.u[key16]||{n:'',p:'',t:0,c:'',tl:'',s:{}};
+        if(!rec.s||typeof rec.s!=='object')rec.s={};
+        try{ mutFn(rec); }catch(ex){}
+        rec.s.la=Date.now();
+        pool.u[key16]=rec;
+        var ids=Object.keys(pool.u);
+        if(ids.length>3000){
+          ids.sort(function(a,b){ return (((pool.u[b]||{}).s||{}).la||0)-(((pool.u[a]||{}).s||{}).la||0); });
+          var keep={}; for(var i=0;i<3000;i++)keep[ids[i]]=pool.u[ids[i]];
+          pool.u=keep;
+        }
+        cloudPut(USER_KEY,JSON.stringify(pool),function(){
+          cloudGet(USER_KEY,function(e2,t2){
+            var p2=null; try{ p2=t2?JSON.parse(t2):null; }catch(ex2){}
+            if(p2&&p2.u&&p2.u[key16]){ fin(); return; }
+            attempt++;
+            if(attempt<3){ setTimeout(once,200+Math.floor(Math.random()*600)); return; }
+            fin();
+          });
+        });
+      });
+    }
+    once();
   }
   /* 计数递增（pv 打开 / qz 刷题 / vid 看视频），minEvery 毫秒内节流，避免写风暴 */
   function userBump(field,minEvery){
