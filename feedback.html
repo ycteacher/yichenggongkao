@@ -267,6 +267,16 @@
       a13:answers.a13||"", moan:(document.getElementById("moanTx").value||"").slice(0,800),
       wish:(document.getElementById("wishTx").value||"").slice(0,800),
       other:(document.getElementById("otherTx").value||"").slice(0,500) };
+    /* 申诉通道：定向冻结通知跳转带 ?appeal=订单号，自动打 tag 并预填申诉说明 */
+    try{
+      var __apm=location.search.match(/[?&]appeal=([^&]+)/);
+      if(__apm){
+        payload.tag="appeal";
+        payload.oids=decodeURIComponent(__apm[1]).split(",");
+        if(!payload.other) payload.other="申诉-订单 "+payload.oids.join("、");
+        else if(payload.other.indexOf("申诉-订单")!==0) payload.other="申诉-订单 "+payload.oids.join("、")+"："+payload.other;
+      }
+    }catch(e){}
     loadCloud().then(function(cloud){
       cloud.list=cloud.list||[];
       cloud.list.push(payload);

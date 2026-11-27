@@ -278,8 +278,16 @@
   function submitReport(type){
     var title = quizTitle(), pos = quizCounter(), q = quizPrompt(), qid = quizQid();
     if (!q){ q = '（未取到题干）'; }
+    /* 申诉预填：定向冻结通知跳转后，报错自动带上申诉标记与订单号 */
+    var appeal = null;
+    try { appeal = JSON.parse(localStorage.getItem('yicheng-gk-appeal-prefill-v1') || 'null'); } catch(e){}
+    if (appeal && appeal.tag === 'appeal' && appeal.oids && appeal.oids.length){
+      type = '申诉';
+      q = '申诉-订单 ' + appeal.oids.join('、') + '（请在此补充申诉说明）';
+    }
     if (!confirm('向亿成老师反馈这道题的问题？\n\n类型：' + type + '\n会一起带上：' + title + ' 第' + (pos || '?') + '题' + (qid ? '（编号 ' + qid + '）' : '') + '\n「' + q.slice(0, 50) + '…」')) return;
     var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), type: type, title: title, pos: pos || '', id: qid, q: q, ua: (navigator.userAgent || '').slice(0, 80) };
+    if (appeal && appeal.tag === 'appeal'){ rep.tag = 'appeal'; rep.oids = appeal.oids; try { localStorage.removeItem('yicheng-gk-appeal-prefill-v1'); } catch(e){} }
     errBtn.disabled = true; errBtn.textContent = '提交中…';
     sendReport(rep, function(ok){
       errBtn.disabled = false; errBtn.textContent = '⚠ 一键报错';

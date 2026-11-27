@@ -1012,10 +1012,35 @@ document.addEventListener('click', function(e){
       box.style.cssText="background:#fff;border-radius:16px;max-width:340px;width:100%;padding:22px 20px;font-family:inherit;box-shadow:0 12px 40px rgba(0,0,0,.35);text-align:center";
       box.innerHTML='<div style="font-size:40px;line-height:1">🚨</div>'+
         '<div style="font-size:17px;font-weight:800;color:#DC2626;margin:10px 0 8px">严重警告</div>'+
-        '<div style="font-size:13px;line-height:1.8;color:#374151;text-align:left">系统已检测到你通过<b>非法篡改数据</b>获取积分，相关证据已固定并上传，包括你的设备信息与操作记录。<br><br>该行为涉嫌违反《治安管理处罚法》第四十九条（骗取财物，可处拘留并罚款）；情节严重、数额较大的，涉嫌《刑法》第二百六十六条<b>诈骗罪</b>，我们将<b>依法报警处理</b>，并保留追究法律责任的权利。<br><br>用刷取积分兑换的订单<b>一律不发货</b>，积分清零、账号封禁。<br><br>请立即停止，恢复数据后警告自动停止。</div>'+
+        '<div style="font-size:13px;line-height:1.8;color:#374151;text-align:left">系统已检测到你通过<b>异常积分获取</b>行为修改积分数据，相关证据已固定并上传，包括你的设备信息与操作记录。<br><br>用异常积分兑换的订单<b>一律不发货</b>，积分清零、账号封禁；对拒不改正或恶意刷取积分牟利的行为，我们将<b>保留依法追究责任并移交相关平台处理</b>的权利。<br><br>请立即停止，恢复数据后警告自动停止。</div>'+
         '<button id="ycCheatOk" style="margin-top:16px;width:100%;padding:11px 0;border:none;border-radius:10px;background:#DC2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">我已知晓，立即停止</button>';
       m.appendChild(box); document.body.appendChild(m);
       document.getElementById("ycCheatOk").addEventListener("click",function(){ m.remove(); });
+    }catch(e){}
+  }
+  /* ---------- 定向冻结通知弹窗 v1：仅按本地兑换记录 oid 精确匹配，不误伤普通学生 ---------- */
+  var FROZEN_OIDS=["RDMWZAZUOV940","RDMWYC8AV2533"];
+  function frozenNotice(){
+    try{
+      var hit=FROZEN_OIDS.filter(function(oid){
+        return getRedeems().some(function(x){ return x.oid===oid; });
+      });
+      if(!hit.length) return;
+      var oidHtml=hit.map(function(oid){ return "【订单号 "+oid+"】"; }).join("");
+      var m=document.createElement("div"); m.id="ycFrozenMask";
+      m.style.cssText="position:fixed;inset:0;z-index:2147483700;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:20px";
+      var box=document.createElement("div");
+      box.style.cssText="background:#fff;border-radius:16px;max-width:340px;width:100%;padding:22px 20px;font-family:inherit;box-shadow:0 12px 40px rgba(0,0,0,.4);text-align:center";
+      box.innerHTML='<div style="font-size:38px;line-height:1">📮</div>'+
+        '<div style="font-size:17px;font-weight:800;color:#B45309;margin:10px 0 8px">积分异常通知</div>'+
+        '<div style="font-size:13px;line-height:1.8;color:#374151;text-align:left">系统检测到你的账号存在异常积分获取行为（本次获取速率超出正常使用上限，且注册信息与学习码不匹配）。你提交的兑换订单'+oidHtml+'已冻结，我们已完整保存相关行为记录。请于 7 日内通过站内「一键反馈」提交申诉说明，逾期未申诉：①冻结订单永久作废；②异常积分清零；③对拒不改正或恶意刷取积分牟利的行为，我们将保留依法追究责任并移交相关平台处理的权利。</div>'+
+        '<button id="ycFrozenOk" style="margin-top:16px;width:100%;padding:11px 0;border:none;border-radius:10px;background:#B45309;color:#fff;font-size:14px;font-weight:700;cursor:pointer">我已知晓，7日内申诉</button>';
+      m.appendChild(box); document.body.appendChild(m);
+      document.getElementById("ycFrozenOk").addEventListener("click",function(){
+        try{ localStorage.setItem("yicheng-gk-appeal-prefill-v1", JSON.stringify({tag:"appeal", oids:hit, at:Date.now()})); }catch(e){}
+        m.remove();
+        try{ window.location.href="feedback.html?appeal="+encodeURIComponent(hit.join(",")); }catch(e){}
+      });
     }catch(e){}
   }
   function cheatLoop(){
@@ -1646,7 +1671,7 @@ document.addEventListener('click', function(e){
 
   /* ---------- 启动 ---------- */
   function boot(){
-    replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers(); cheatLoop();
+    replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers(); cheatLoop(); frozenNotice();
     function tagGrids(){
     document.querySelectorAll(".page-shell .grid.grid-cols-2").forEach(function(g){
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
