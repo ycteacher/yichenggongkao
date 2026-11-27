@@ -974,7 +974,57 @@ document.addEventListener('click', function(e){
     p.ledger.unshift({id: "yc-" + Date.now(), time: new Date().toLocaleString("zh-CN", {hour12: false}).slice(0, 16), amount: amount, reason: reason, detail: detail});
     p.ledger = p.ledger.slice(0, 30);
     ls("yicheng-gk-points-v1", p);
+    writeChk(p.balance || 0);
     refreshPtsShort();
+  }
+  /* ---------- 刷积分检测与持续警告 v1 ---------- */
+  var PTS_CHK="yicheng-gk-points-chk-v1", CHEAT_FLAG="yicheng-gk-cheat-flag-v1", CHEAT_POOL="ycgk-cheat-v1";
+  function writeChk(bal){ try{ localStorage.setItem(PTS_CHK, JSON.stringify({bal:bal, t:Date.now()})); }catch(e){} }
+  function detectCheat(){
+    try{
+      var p=ls("yicheng-gk-points-v1"); if(!p) return false;
+      var chk=null; try{ chk=JSON.parse(localStorage.getItem(PTS_CHK)||"null"); }catch(e){ chk=null; }
+      if(!chk){ writeChk(p.balance||0); return false; }
+      return (p.balance||0)!==chk.bal;
+    }catch(e){ return false; }
+  }
+  function reportCheat(){
+    try{
+      var p=getPoints();
+      var chk=null; try{ chk=JSON.parse(localStorage.getItem(PTS_CHK)||"null"); }catch(e){}
+      var rec={code:rdSyncCode(), tail:rdTail(), nick:rdNick(), bal:p.balance||0, expect:(chk&&chk.bal)||0, at:rdTime()};
+      fetch("https://textdb.dev/api/data/"+CHEAT_POOL,{method:"GET"}).then(function(r){return r.text()}).then(function(t){
+        var arr=[]; try{ arr=JSON.parse(t||"[]")||[]; }catch(e){ arr=[]; }
+        if(!Array.isArray(arr)) arr=[];
+        arr.push(rec);
+        var body=JSON.stringify(arr);
+        fetch("https://textdb.dev/api/data/"+CHEAT_POOL,{method:"POST",headers:{"Content-Type":"text/plain"},body:body});
+        if(body.length<1500) fetch("https://textdb.online/update/?key="+encodeURIComponent(CHEAT_POOL)+"&value="+encodeURIComponent(body));
+      });
+    }catch(e){}
+  }
+  function cheatWarn(){
+    try{
+      var old=document.getElementById("ycCheatMask"); if(old) old.remove();
+      var m=document.createElement("div"); m.id="ycCheatMask";
+      m.style.cssText="position:fixed;inset:0;z-index:2147483600;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px";
+      var box=document.createElement("div");
+      box.style.cssText="background:#fff;border-radius:16px;max-width:340px;width:100%;padding:22px 20px;font-family:inherit;box-shadow:0 12px 40px rgba(0,0,0,.35);text-align:center";
+      box.innerHTML='<div style="font-size:40px;line-height:1">⚠️</div>'+
+        '<div style="font-size:17px;font-weight:800;color:#DC2626;margin:10px 0 8px">刷积分行为警告</div>'+
+        '<div style="font-size:13px;line-height:1.8;color:#374151;text-align:left">系统检测到你的<b>积分数据被异常修改</b>（疑似刷积分）。<br><br>该行为已被<b>记录并上报</b>：用刷出来的积分兑换的订单<b>一律不发货</b>，积分将被清零，情节严重者将封禁账号。<br><br>请立即停止，把积分数据恢复正常后警告会自动停止。</div>'+
+        '<button id="ycCheatOk" style="margin-top:16px;width:100%;padding:11px 0;border:none;border-radius:10px;background:#DC2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">我知道了</button>';
+      m.appendChild(box); document.body.appendChild(m);
+      document.getElementById("ycCheatOk").addEventListener("click",function(){ m.remove(); });
+    }catch(e){}
+  }
+  function cheatLoop(){
+    try{
+      if(!detectCheat()) return;
+      if(!ls(CHEAT_FLAG)){ ls(CHEAT_FLAG,"1"); reportCheat(); }
+      cheatWarn();
+      setInterval(function(){ if(detectCheat()) cheatWarn(); }, 45000);
+    }catch(e){}
   }
   function refreshPtsShort(){
     document.getElementById("ycPtsShort").textContent = getPoints().balance || 0;
@@ -1596,7 +1646,7 @@ document.addEventListener('click', function(e){
 
   /* ---------- 启动 ---------- */
   function boot(){
-    replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers();
+    replaceIcons(); hideProfileCard(); refreshChips(); refreshPtsShort(); dailyBonus(); watchAnswers(); cheatLoop();
     function tagGrids(){
     document.querySelectorAll(".page-shell .grid.grid-cols-2").forEach(function(g){
       if (g.textContent.indexOf("国考专题页") > -1) g.classList.add("yc-grid-3");
