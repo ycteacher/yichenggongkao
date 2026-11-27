@@ -297,6 +297,11 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
 
   /* ===== 题库比对 ===== */
   function norm(s){ return String(s||'').toLowerCase().replace(/[^0-9a-z\u4e00-\u9fff]/g,''); }
+  /* 剥离选项字母标记（A. / A、 / A． / (A) / A: 等形态），使带字母的OCR文本能与题库指纹对齐；
+     仅处理行首或空白后的孤立A-D字母标记，题干中的正常英文单词、维生素A、5G等不受影响 */
+  function stripOptMarks(s){
+    return String(s||'').replace(/(^|\n|\s)[\(（]?[A-Da-d]\s*[\.、．:：)）]\s*/g, '$1');
+  }
   function h24(s){ var t=s.slice(0,24), h=5381; for(var i=0;i<t.length;i++){ h=((h<<5)+h+t.charCodeAt(i))|0; } return h>>>0; }
   function dice(a,b){
     if (a.length<2||b.length<2) return 0;
@@ -344,7 +349,7 @@ textarea#ocrText{width:100%;min-height:120px;border:1.5px solid #E4DACA;border-r
   }
 
   document.getElementById('goMatch').addEventListener('click', function(){
-    var text = norm(document.getElementById('ocrText').value);
+    var text = norm(stripOptMarks(document.getElementById('ocrText').value));
     var out = document.getElementById('matchOut');
     if (text.length < 10) { out.innerHTML = '<p class="none">题目太短，先补全题干再找。</p>'; return; }
     out.innerHTML = '<p class="none">正在比对全库 5.7 万题…</p>';

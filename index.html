@@ -1334,11 +1334,18 @@ document.addEventListener('click', function(e){
     checkGrants();
   })();
 
-  /* ---------- 拍题讲解入口卡片（醒目红渐变，置于最上方） ---------- */
+  /* ---------- 拍题讲解入口卡片（醒目红渐变，置于首屏「继续上次练习」之后） ---------- */
   function addScanCard(){
     if (document.getElementById("yc-scan-card")) return;
+    /* 锚点三级回退：①继续上次练习按钮之后（首屏可见）→ ②统计grid之后 → ③资料与卷子区之前（原位） */
+    var resume = document.querySelector('[data-testid="resume-entry"]');
+    var statsGrid = document.querySelector('section.grid.grid-cols-3');
     var entry = document.querySelector('[data-testid="papers-entry"]');
-    if (!entry) return;
+    var anchor = null, mode = null;
+    if (resume && resume.parentNode) { anchor = resume; mode = "after"; }
+    else if (statsGrid && statsGrid.parentNode) { anchor = statsGrid; mode = "after"; }
+    else if (entry && entry.parentNode) { anchor = entry; mode = "before"; }
+    else return;
     var card = document.createElement("div");
     card.id = "yc-scan-card";
     card.style.cssText = "display:flex;align-items:center;gap:12px;padding:14px 16px;margin:10px 0;border-radius:16px;background:linear-gradient(135deg,#B02A2A,#DC2626);color:#fff;box-shadow:0 4px 14px rgba(176,42,42,.35);cursor:pointer";
@@ -1350,7 +1357,8 @@ document.addEventListener('click', function(e){
     card.addEventListener("click", function(){
       window.location.href = "scan.html";
     });
-    entry.parentNode.insertBefore(card, entry);
+    if (mode === "after") anchor.parentNode.insertBefore(card, anchor.nextSibling);
+    else anchor.parentNode.insertBefore(card, anchor);
   }
 
   /* ---------- 考试通告卡片（每天更新，放在资料卡上方） ---------- */
