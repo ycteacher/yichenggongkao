@@ -967,8 +967,9 @@ document.addEventListener('click', function(e){
   function addPoints(amount, reason, detail){
     var p = getPoints();
     p.balance = (p.balance || 0) + amount;
-    p.todayEarned = (p.todayEarned || 0) + amount;
-    p.todayDate = new Date().toISOString().slice(0, 10);
+    var today = new Date().toISOString().slice(0, 10);
+    if (p.todayDate !== today) { p.todayEarned = 0; p.todayDate = today; }
+    if (amount > 0) p.todayEarned = (p.todayEarned || 0) + amount;
     p.ledger = p.ledger || [];
     p.ledger.unshift({id: "yc-" + Date.now(), time: new Date().toLocaleString("zh-CN", {hour12: false}).slice(0, 16), amount: amount, reason: reason, detail: detail});
     p.ledger = p.ledger.slice(0, 30);
@@ -1005,8 +1006,17 @@ document.addEventListener('click', function(e){
           new Image().src="https://visitor-badge.laobi.icu/badge?page_id=ycgk.refstudy&r="+Date.now();
         }
       }catch(e){}
-      if (da > 0) addPoints(da, "完成刷题", "新答 " + da + " 题，每题 +1");
-      if (dc > 0) addPoints(dc, "答对加分", "答对 " + dc + " 题，每题 +1");
+      if (da > 0 || dc > 0) {
+        var gain = da + dc;
+        var p0 = getPoints();
+        var day = new Date().toISOString().slice(0, 10);
+        if (p0.todayDate !== day) { p0.todayEarned = 0; p0.todayDate = day; }
+        var room = 100 - (p0.todayEarned > 0 ? p0.todayEarned : 0);
+        if (room <= 0) { last = t; return; }
+        if (gain > room) gain = room;
+        if (da > 0) addPoints(Math.min(da, gain), "完成刷题", "新答 " + da + " 题，每题 +1（每日上限 100 分）");
+        if (dc > 0) addPoints(Math.min(dc, gain - Math.min(da, gain)), "答对加分", "答对 " + dc + " 题，每题 +1（每日上限 100 分）");
+      }
       last = t;
     }, 4000);
   }
@@ -1039,13 +1049,14 @@ document.addEventListener('click', function(e){
   var SHOP_ITEMS=[
     {id:"s1",name:"一对一申论批改",cost:100,kind:"service",desc:"1 篇精批＋逐条批注讲解"},
     {id:"s2",name:"一对一综应批改",cost:100,kind:"service",desc:"1 篇精批＋逐条批注讲解"},
-    {id:"s3",name:"30分钟一对一咨询",cost:600,kind:"service",desc:"政策 / 选岗 / 报名方向问诊"},
-    {id:"g1",name:"纸质真题卷",cost:500,kind:"goods",desc:"近三年国考/省考真题，包邮到家"},
-    {id:"g2",name:"考公书籍",cost:2000,kind:"goods",desc:"行测/申论教材、题库任选一本"},
-    {id:"g3",name:"加湿器",cost:5000,kind:"goods",desc:"桌面静音款，备考宿舍必备"},
-    {id:"g4",name:"智能电饭煲",cost:10000,kind:"goods",desc:"家用迷你款"},
-    {id:"g5",name:"小米平板",cost:30000,kind:"goods",desc:"刷题看课两不误"},
-    {id:"g6",name:"千元手机",cost:60000,kind:"goods",desc:"红米/荣耀新款，上岸换机"}
+    {id:"s3",name:"30分钟一对一咨询",cost:300,kind:"service",desc:"政策 / 选岗 / 报名方向问诊"},
+    {id:"s4",name:"专属备考计划表",cost:200,kind:"service",desc:"亿成老师按你的基础定制，人手一份"},
+    {id:"g1",name:"纸质真题卷",cost:1500,kind:"goods",desc:"近三年国考/省考真题，包邮到家"},
+    {id:"g2",name:"考公书籍",cost:5000,kind:"goods",desc:"行测/申论教材、题库任选一本"},
+    {id:"g3",name:"加湿器",cost:12000,kind:"goods",desc:"桌面静音款，备考宿舍必备"},
+    {id:"g4",name:"智能电饭煲",cost:25000,kind:"goods",desc:"家用迷你款"},
+    {id:"g5",name:"小米平板",cost:80000,kind:"goods",desc:"刷题看课两不误"},
+    {id:"g6",name:"千元手机",cost:200000,kind:"goods",desc:"红米/荣耀新款，上岸换机"}
   ];
   function getRedeems(){ return ls("yicheng-gk-redeems-v1") || []; }
   function saveRedeems(r){ ls("yicheng-gk-redeems-v1", r); }
@@ -1129,7 +1140,7 @@ document.addEventListener('click', function(e){
     modal.innerHTML=
       '<h3>积分兑换商城</h3><span class="yc-tagline">当前余额 '+bal+' 分 · 每档限兑 1 次</span>'+
       '<div class="yc-shop-list">'+items+'</div>'+
-      '<div class="yc-shop-note">兑换成功后会生成订单号，亿成老师收到后尽快落实：服务类 24 小时内联系你排期；实物类发货前通知你填收货信息，都会通过站内消息通知你。</div>'+
+      '<div class="yc-shop-note">积分怎么来：每天打卡 +2；刷题/答对每题 +1（每天最多 100 分）；邀请同学 +50/人。兑换成功后会生成订单号，亿成老师收到后尽快落实：服务类 24 小时内联系你排期；实物类发货前通知你填收货信息，都会通过站内消息通知你。实物兑换需已注册手机号，老师发放前会核对积分记录。</div>'+
       '<button class="yc-shop-link" id="ycMyRedeems">我的兑换记录 ›</button>'+
       '<button class="yc-close" id="ycShopBack">返回积分中心</button>';
     modal.querySelectorAll(".yc-shop-btn").forEach(function(b){
@@ -1169,8 +1180,27 @@ document.addEventListener('click', function(e){
     var it=shopItem(id); if(!it) return;
     var p=getPoints();
     if((p.balance||0)<it.cost || getRedeems().some(function(x){return x.itemId===id})){ openShop(); return; }
+    /* 实物类需已注册手机号（注册是唯一凭证，老师凭档案核实发放） */
+    if(it.kind==="goods"){
+      var accRd=null;
+      try{ accRd=ls("yicheng-gk-account-v1")||null; }catch(e){}
+      if(!accRd||(!accRd.ph&&!accRd.phone)){
+        var tip=document.createElement("div");
+        tip.style.cssText="position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:2147483002;background:#1f2937;color:#fff;padding:14px 18px;border-radius:12px;font-size:13px;max-width:80vw;text-align:center";
+        tip.innerHTML="实物兑换需要先注册手机号（注册是你唯一的兑换凭证）<br>请在「我的-同步」页完成注册后再来兑换";
+        document.body.appendChild(tip);
+        setTimeout(function(){try{tip.remove()}catch(e){}},4000);
+        return;
+      }
+    }
     addPoints(-it.cost,"积分兑换","兑换「"+it.name+"」");
-    var rec={oid:"RD"+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*900+100), itemId:it.id, item:it.name, cost:it.cost, kind:it.kind, code:rdSyncCode(), tail:rdTail(), nick:rdNick(), at:rdTime(), status:"submitted"};
+    /* 积分流水快照随订单上报：老师后台可核对积分来源，异常订单不发货 */
+    var ptsSnap=null;
+    try{
+      var p2=getPoints();
+      ptsSnap={bal:p2.balance||0, today:p2.todayEarned||0, ledger:(p2.ledger||[]).slice(0,30)};
+    }catch(e){}
+    var rec={oid:"RD"+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*900+100), itemId:it.id, item:it.name, cost:it.cost, kind:it.kind, code:rdSyncCode(), tail:rdTail(), nick:rdNick(), pts:ptsSnap, at:rdTime(), status:"submitted"};
     saveRedeems(getRedeems().concat([rec]));
     rdSubmit(rec,function(ok){ if(!ok) rdQueue(rec); });
     openRedeemDone(rec);
@@ -2360,7 +2390,7 @@ document.addEventListener('click', function(e){
         var un=n-claimed;
         if(un>0){
           lss("ycgk.refClaimed",String(n));
-          if(window.addPoints)addPoints(un*10,"邀请好友","新同学通过你的链接加入 x"+un);
+          if(window.addPoints)addPoints(un*50,"邀请好友","新同学通过你的链接加入 x"+un);
         }
       });
     }catch(e){}

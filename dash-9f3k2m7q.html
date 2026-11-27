@@ -1177,11 +1177,26 @@ function renderRedeems(t){
     }else{
       right='<button class="rd-done-btn" data-oid="'+escRd(r.oid||"")+'" style="flex:none;font-size:12px;border:none;border-radius:8px;background:#B45309;color:#fff;padding:6px 10px;font-weight:700;cursor:pointer">标记已交付</button>';
     }
-    el.innerHTML='<div style="min-width:0"><div style="font-weight:700">'+escRd(r.item)+' · '+kind+' · '+escRd(r.cost)+'分</div><div style="font-size:11px;color:var(--mut);margin-top:2px">'+escRd(r.at)+' · 订单 '+escRd(r.oid)+' · 学习码 '+escRd(r.code||"—")+' · 尾号 '+escRd(r.tail||"—")+(r.nick?(' · '+escRd(r.nick)):'')+'</div></div>'+right;
+    el.innerHTML='<div style="min-width:0"><div style="font-weight:700">'+escRd(r.item)+' · '+kind+' · '+escRd(r.cost)+'分</div><div style="font-size:11px;color:var(--mut);margin-top:2px">'+escRd(r.at)+' · 订单 '+escRd(r.oid)+' · 学习码 '+escRd(r.code||"—")+' · 尾号 '+escRd(r.tail||"—")+(r.nick?(' · '+escRd(r.nick)):'')+'</div>'+(r.pts?('<div style="margin-top:4px"><button class="rd-pts-btn" data-oid="'+escRd(r.oid||"")+'" style="font-size:11px;border:none;border-radius:6px;background:var(--panel2);color:var(--txt);padding:4px 8px;cursor:pointer">查积分来源（余额 '+escRd(r.pts.bal)+' · 当日得 '+escRd(r.pts.today)+'）</button><div class="rd-pts-detail" id="rdpts-'+escRd(r.oid||"")+'" style="display:none;margin-top:6px;font-size:11px;background:var(--panel2);border-radius:8px;padding:8px;max-height:220px;overflow:auto"></div></div>'):'')+'</div>'+right;
     list.appendChild(el);
   });
   list.querySelectorAll(".rd-done-btn").forEach(function(b){
     b.addEventListener("click",function(){ markDone(b.getAttribute("data-oid"),b); });
+  });
+  list.querySelectorAll(".rd-pts-btn").forEach(function(b){
+    b.addEventListener("click",function(){
+      var oid=b.getAttribute("data-oid")||"", box=document.getElementById("rdpts-"+oid);
+      if(!box) return;
+      var show=box.style.display==="none";
+      box.style.display=show?"block":"none";
+      if(!show) return;
+      var rec=null;
+      arr.forEach(function(x){ if((x.oid||"")===oid) rec=x; });
+      var lg=(rec&&rec.pts&&rec.pts.ledger)||[];
+      box.innerHTML=lg.length?lg.map(function(l){
+        return '<div style="padding:2px 0;border-bottom:1px dashed var(--line)">'+escRd(l.time)+' · '+escRd(l.reason)+' · '+escRd(l.detail||"")+' · <b>'+(l.amount>0?'+':'')+escRd(l.amount)+'</b></div>';
+      }).join(""):'流水为空';
+    });
   });
 }
 function rdPut(arr,cb){
