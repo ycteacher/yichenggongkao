@@ -1010,10 +1010,10 @@ document.addEventListener('click', function(e){
       m.style.cssText="position:fixed;inset:0;z-index:2147483600;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px";
       var box=document.createElement("div");
       box.style.cssText="background:#fff;border-radius:16px;max-width:340px;width:100%;padding:22px 20px;font-family:inherit;box-shadow:0 12px 40px rgba(0,0,0,.35);text-align:center";
-      box.innerHTML='<div style="font-size:40px;line-height:1">⚠️</div>'+
-        '<div style="font-size:17px;font-weight:800;color:#DC2626;margin:10px 0 8px">刷积分行为警告</div>'+
-        '<div style="font-size:13px;line-height:1.8;color:#374151;text-align:left">系统检测到你的<b>积分数据被异常修改</b>（疑似刷积分）。<br><br>该行为已被<b>记录并上报</b>：用刷出来的积分兑换的订单<b>一律不发货</b>，积分将被清零，情节严重者将封禁账号。<br><br>请立即停止，把积分数据恢复正常后警告会自动停止。</div>'+
-        '<button id="ycCheatOk" style="margin-top:16px;width:100%;padding:11px 0;border:none;border-radius:10px;background:#DC2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">我知道了</button>';
+      box.innerHTML='<div style="font-size:40px;line-height:1">🚨</div>'+
+        '<div style="font-size:17px;font-weight:800;color:#DC2626;margin:10px 0 8px">严重警告</div>'+
+        '<div style="font-size:13px;line-height:1.8;color:#374151;text-align:left">系统已检测到你通过<b>非法篡改数据</b>获取积分，相关证据已固定并上传，包括你的设备信息与操作记录。<br><br>该行为涉嫌违反《治安管理处罚法》第四十九条（骗取财物，可处拘留并罚款）；情节严重、数额较大的，涉嫌《刑法》第二百六十六条<b>诈骗罪</b>，我们将<b>依法报警处理</b>，并保留追究法律责任的权利。<br><br>用刷取积分兑换的订单<b>一律不发货</b>，积分清零、账号封禁。<br><br>请立即停止，恢复数据后警告自动停止。</div>'+
+        '<button id="ycCheatOk" style="margin-top:16px;width:100%;padding:11px 0;border:none;border-radius:10px;background:#DC2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">我已知晓，立即停止</button>';
       m.appendChild(box); document.body.appendChild(m);
       document.getElementById("ycCheatOk").addEventListener("click",function(){ m.remove(); });
     }catch(e){}
