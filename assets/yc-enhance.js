@@ -287,6 +287,8 @@
     }
     if (!confirm('向亿成老师反馈这道题的问题？\n\n类型：' + type + '\n会一起带上：' + title + ' 第' + (pos || '?') + '题' + (qid ? '（编号 ' + qid + '）' : '') + '\n「' + q.slice(0, 50) + '…」')) return;
     var rep = { t: new Date().toLocaleString('zh-CN', { hour12: false }), type: type, title: title, pos: pos || '', id: qid, q: q, ua: (navigator.userAgent || '').slice(0, 80) };
+    /* 紧急级别自动判定：白屏/打不开/兑换支付类 = 紧急（dash 顶部红幅提醒），题目内容类 = 普通 */
+    rep.sev = /白屏|打不开|无法打开|闪退|兑换|支付/.test(type + ' ' + q) ? 'urgent' : 'normal';
     if (appeal && appeal.tag === 'appeal'){ rep.tag = 'appeal'; rep.oids = appeal.oids; try { localStorage.removeItem('yicheng-gk-appeal-prefill-v1'); } catch(e){} }
     errBtn.disabled = true; errBtn.textContent = '提交中…';
     sendReport(rep, function(ok){

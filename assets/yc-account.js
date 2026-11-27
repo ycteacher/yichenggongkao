@@ -196,6 +196,30 @@
       userMutate(acc.md5.slice(0,16),function(rec){ rec.s[field]=(rec.s[field]||0)+1; });
     }catch(e){}
   }
+  /* 每日登录上报（upsert，fail-open）：累计登录天数 td / 连续登录 st / 云端答题总数 ans
+     由 index.html dailyBonus() 调用，每天首次打卡触发一次；失败不阻塞不重试 */
+  window.ycReportLogin=function(){
+    try{
+      var acc=getAcc(); if(!acc||!acc.md5)return;
+      var today=new Date().toISOString().slice(0,10);
+      var yday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+      userMutate(acc.md5.slice(0,16),function(rec){
+        if(!rec.s||typeof rec.s!=='object')rec.s={};
+        var last=rec.s.ld||'';
+        if(last!==today){
+          rec.s.td=(rec.s.td||0)+1;
+          rec.s.st=(last===yday)?((rec.s.st||0)+1):1;
+          rec.s.ld=today;
+        }
+        try{
+          var st=JSON.parse(localStorage.getItem('yicheng-gk-study-v1')||'{}');
+          var mp=st.moduleProgress||{}, a=0;
+          Object.keys(mp).forEach(function(k){ a+=mp[k].answered||0; });
+          rec.s.ans=a;
+        }catch(e){}
+      });
+    }catch(e){}
+  };
 
   /* ---------- 昵称：清洗（剔除 HTML 敏感字符），2-20 字，必填（与老师送分匹配用） ---------- */
   function sanitizeNick(s){

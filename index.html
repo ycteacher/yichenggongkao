@@ -1061,6 +1061,7 @@ document.addEventListener('click', function(e){
       p.todayEarned = 0; p.todayDate = today;
       ls("yicheng-gk-points-v1", p);
       addPoints(2, "每日打卡", "每日首次打开应用");
+      try{ if(window.ycReportLogin) window.ycReportLogin(); }catch(e){}
     }
   }
   function studyTotals(){
@@ -1338,9 +1339,9 @@ document.addEventListener('click', function(e){
     function appliedGet(){ try{ var a=JSON.parse(localStorage.getItem(APPLIED)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
     function appliedSet(a){ try{ localStorage.setItem(APPLIED,JSON.stringify(a)); }catch(e){} }
     function myGrantIds(){
-      var out={code:"",tail:"",nick:""};
+      var out={code:"",tail:"",nick:"",ph:""};
       try{ var s=JSON.parse(localStorage.getItem("yicheng-gk-sync-v1")||"{}"); out.code=(s&&s.code)||""; }catch(e){}
-      try{ var acc=JSON.parse(localStorage.getItem("yicheng-gk-account-v1")||localStorage.getItem("yicheng-gk-user-v1")||"null"); if(acc&&typeof acc==="object"){ out.tail=acc.tail||acc.tail4||acc.phoneTail||""; out.nick=acc.nick||""; } }catch(e){}
+      try{ var acc=JSON.parse(localStorage.getItem("yicheng-gk-account-v1")||localStorage.getItem("yicheng-gk-user-v1")||"null"); if(acc&&typeof acc==="object"){ out.tail=acc.tail||acc.tail4||acc.phoneTail||""; out.nick=acc.nick||""; out.ph=acc.ph||acc.phone||""; } }catch(e){}
       return out;
     }
     function fetchGrants(cb){
@@ -1423,10 +1424,11 @@ document.addEventListener('click', function(e){
         var nrm=function(s){ return String(s||"").replace(/\s+/g," ").trim(); };
         arr.forEach(function(g){
           if(!g||!g.id||applied.indexOf(g.id)>-1) return;
-          /* 匹配优先级：带学习码的记录按学习码精确匹配（唯一，防尾号+昵称撞车）；
-             其次尾号+昵称双字段；旧记录保持兼容——仅尾号或学习码匹配 */
+          /* 匹配优先级（1128 起手机号优先）：注册手机号精确匹配 > 学习码精确匹配（唯一）>
+             尾号+昵称双字段兜底；旧记录保持兼容——仅尾号或学习码匹配 */
           var hit;
-          if(g.code){ hit=!!ids.code&&String(g.code)===String(ids.code); }
+          if(g.ph){ hit=!!ids.ph&&String(g.ph)===String(ids.ph); }
+          else if(g.code){ hit=!!ids.code&&String(g.code)===String(ids.code); }
           else if(g.nick){ hit=String(g.tail)===String(ids.tail)&&nrm(g.nick)===nrm(ids.nick); }
           else{ hit=g.tail?String(g.tail)===String(ids.tail):(!g.tail&&g.code&&g.code===ids.code); }
           if(!hit) return;
@@ -2131,15 +2133,9 @@ document.addEventListener('click', function(e){
       var hasAcc=!!(accSync&&accSync.code);
       card.innerHTML='<h3>学习账号 · 多设备同步</h3>'+
         (hasAcc
-          ?'<div class="yc-sync-tip">你的手机号就是同步码（尾号 '+esc(accSync.tail||'')+'）。同步刚被退出，点下面一键恢复，进度自动接上。</div>'
-          :'<div class="yc-sync-tip"><b>📢 学习码 11 月 29 日下架：</b>注册手机号后，<b>手机号就是你的同步码和登录码</b>，换设备登录同一手机号即可自动同步，无需记任何码，请抓紧注册。</div>')+
-        '<button class="yc-sync-btn main" id="ycSyncPhone">'+(hasAcc?'恢复同步（手机号用户）':'用手机号注册 / 登录（推荐）')+'</button>'+
-        '<div class="yc-sync-div"'+(hasAcc?' style="display:none"':'')+'><span>过渡期通道（即将下线）</span></div>'+
-        '<div'+(hasAcc?' style="display:none"':'')+'>'+
-        '<input class="yc-sync-in" id="ycSyncIn" placeholder="输入学习码" maxlength="12" autocomplete="off">'+
-        '<button class="yc-sync-btn" id="ycSyncLogin">用学习码登录</button>'+
-        '<button class="yc-sync-btn" id="ycSyncGen">生成我的学习码</button>'+
-        '</div>'+
+          ?'<div class="yc-sync-tip">你的手机号就是同步凭证（尾号 '+esc(accSync.tail||'')+'）。同步刚被退出，点下面一键恢复，进度自动接上。</div>'
+          :'<div class="yc-sync-tip"><b>注册手机号 = 你的同步凭证</b>：换手机、换平板，用同一手机号登录即可自动同步刷题进度，无需记任何码。</div>')+
+        '<button class="yc-sync-btn main" id="ycSyncPhone">'+(hasAcc?'恢复同步（手机号用户）':'用手机号注册 / 登录')+'</button>'+
         '<button class="yc-sync-btn" id="ycSyncPaste">用同步数据导入（不用网络）</button>'+
         '<button class="yc-sync-btn" id="ycSyncTest">检测云端连接</button>'+
         '<div class="yc-sync-err" id="ycSyncErr"></div>';
@@ -2159,21 +2155,6 @@ document.addEventListener('click', function(e){
           if(window.ycOpenAccount)window.ycOpenAccount("reg");
         }
       });
-      card.querySelector("#ycSyncGen").addEventListener("click",function(){
-        var btn=this;btn.disabled=true;btn.textContent="生成中…";
-        tryGen(0,function(code){
-          btn.disabled=false;
-          card.innerHTML='<h3>你的专属学习码</h3>'+
-            '<div class="yc-sync-code">'+code+'</div>'+
-            '<div class="yc-sync-tip"><b>这个码就是你的专属账号！</b>换手机、换平板全靠它，弄丢了就找不回刷题进度。请立刻截图保存！</div>'+
-            '<button class="yc-sync-btn main" id="ycSyncSave">我已保存，开启同步</button>';
-          card.querySelector("#ycSyncSave").addEventListener("click",function(){
-            setSync({code:code,appliedTs:0,lastLocalTs:Date.now()});
-            ov.classList.remove("on");setChip("busy");
-            push(function(e){setChip(e?"err":"ok")});
-          });
-        });
-      });
       card.querySelector("#ycSyncTest").addEventListener("click",function(){
         var btn=this;btn.disabled=true;btn.textContent="检测中…";
         var err=card.querySelector("#ycSyncErr");
@@ -2182,9 +2163,9 @@ document.addEventListener('click', function(e){
         var left=2;
         var timer=setTimeout(function(){if(left>0){left=0;err.textContent="✗ 两条线路都没连上（10 秒超时）。请换个浏览器（如 Safari）或换 WiFi/流量再试";btn.disabled=false;btn.textContent="重新检测"}},10000);
         function fin(){left--;if(left===0){clearTimeout(timer);var a=res[0],b=res[1];
-          if(a&&b){err.textContent="✓ 两条线路都正常，网络没问题，请重新输入学习码登录"}
+          if(a&&b){err.textContent="✓ 两条线路都正常，网络没问题，请重新登录"}
           else if(a){err.textContent="✓ 主线路正常（备用不通）。可以正常登录同步"}
-          else if(b){err.textContent="✓ 备用线路正常（主线路不通）。已可自动切换，请重新输入学习码登录"}
+          else if(b){err.textContent="✓ 备用线路正常（主线路不通）。已可自动切换，请重新登录"}
           else{err.textContent="✗ 两条线路都连不上。请换个浏览器（如 Safari）或换 WiFi/流量再试"}
           btn.disabled=false;btn.textContent="重新检测"}}
         fetch("https://textdb.online/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[0]=true;fin()})}).catch(function(e){res[0]=false;fin()});
@@ -2212,28 +2193,15 @@ document.addEventListener('click', function(e){
           else{err.textContent="本机已是最新，无需导入"}
         });
       });
-      card.querySelector("#ycSyncLogin").addEventListener("click",function(){
-        var v=(card.querySelector("#ycSyncIn").value||"").replace(/\s/g,"").toUpperCase();
-        var err=card.querySelector("#ycSyncErr");
-        if(v.length<6){err.textContent="学习码至少 6 位";return}
-        err.textContent="登录中…";
-        setSync({code:v,appliedTs:0,lastLocalTs:Date.now()});
-        pull(function(e,cloud){
-          if(e){err.textContent="云端连接失败（v8）："+(e&&e.message||e)+"。可点「检测云端连接」查原因";setSync({});return}
-          var changed=cloud?applyCloud(cloud):false;
-          ov.classList.remove("on");setChip("ok");
-          if(changed){sessionStorage.setItem("yc-sync-reload",String(Date.now()));location.reload()}
-        });
-      });
     }else{
       var s=getSync();
       var t=s.lastPush?new Date(s.lastPush).toLocaleString("zh-CN",{hour12:false}):"尚未同步";
       var accSync2=null;try{accSync2=JSON.parse(localStorage.getItem('yicheng-gk-account-v1')||'null')}catch(e){}
+      function maskPh(p){ p=String(p||''); return (p.length===11&&/^1\d{10}$/.test(p))?(p.slice(0,3)+'****'+p.slice(7)):p; }
       card.innerHTML='<h3>学习账号</h3>'+
         (accSync2
-          ?'<div class="yc-sync-tip">已绑定：<b>手机尾号 '+esc(accSync2.tail||'')+'</b><br><b>你的手机号就是同步码</b>：换手机、平板，用同一手机号登录即可自动同步，无需记任何码。<br>最近同步：'+esc(t)+'</div>'
-          :'<div class="yc-sync-code">'+esc(c)+'</div>'+
-           '<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>换设备时输入这个学习码，进度自动接上。请务必保存好这个码，弄丢就找不回进度。<br><b>📢 学习码 11 月 29 日下架：</b>注册手机号后，手机号就是你的同步码，请抓紧注册。</div>')+
+          ?'<div class="yc-sync-tip">已绑定：<b>'+esc(maskPh(accSync2.ph||accSync2.phone)||('手机尾号 '+esc(accSync2.tail||'')))+'</b><br><b>你的注册手机号就是同步凭证</b>：换手机、平板，用同一手机号登录即可自动同步，无需记任何码。<br>最近同步：'+esc(t)+'</div>'
+          :'<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>当前使用早期同步账号（仅本机保留）。<b>注册手机号后即升级为手机号同步</b>，换设备登录同一手机号即可自动同步。</div>')+
         '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
         '<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>'+
         '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
@@ -2307,10 +2275,10 @@ document.addEventListener('click', function(e){
       if(c){
         var s=getSync();
         if(Date.now()-(s.lastRemind||0)<REMIND_GAP)return;
-        showBar('<span>你的学习码：<b>'+esc(c)+'</b>｜换手机平板全靠它，记得截图保存（学习码 11 月 29 日下架，注册手机号后由手机号替代，请抓紧注册）</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
+        showBar('<span>注册手机号后，手机号就是你的同步凭证，多设备自动同步，无需记任何码。点右上角「注册领永久免费」</span>',"",function(){var s2=getSync();s2.lastRemind=Date.now();setSync(s2)});
       }else{
         if(Date.now()-tsFlag(HINT_FLAG)<REMIND_GAP)return;
-        showBar('<span>注册手机号，手机号就是你的同步码，多设备自动同步。点右上角「注册领永久免费」</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
+        showBar('<span>注册手机号，手机号就是你的同步凭证，多设备自动同步。点右上角「注册领永久免费」</span>',"",function(){try{localStorage.setItem(HINT_FLAG,String(Date.now()))}catch(e){}});
       }
     },4000);
   }
