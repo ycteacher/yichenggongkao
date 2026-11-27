@@ -178,6 +178,51 @@
     font-size:14px; font-weight:700; box-shadow:0 6px 22px rgba(0,0,0,.35);
     white-space:nowrap; font-family:inherit;
   }
+  /* ---- 本页刷题区（一键刷题不再跳转，题目在当前页展开） ---- */
+  .quiz-panel {
+    background:#fff; border:1px solid #EDE9E0; border-radius:20px;
+    padding:16px 16px 14px; margin-top:14px; box-shadow:0 4px 14px rgba(32,32,32,.06);
+  }
+  .quiz-panel .qp-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .quiz-panel .qp-title { font-size:15px; font-weight:800; color:#202020; }
+  .quiz-panel .qp-stat { font-size:12px; color:#8A8378; margin-top:2px; }
+  .quiz-panel .qp-close {
+    border:1px solid #EDE9E0; background:#F7F4EF; color:#6B6558;
+    font-size:12px; font-weight:600; padding:6px 12px; border-radius:999px; cursor:pointer; font-family:inherit;
+  }
+  .quiz-panel .qp-barwrap { height:6px; background:#F3EFE7; border-radius:999px; margin-top:10px; overflow:hidden; }
+  .quiz-panel .qp-bar { height:100%; background:#15803D; border-radius:999px; transition:width .3s; }
+  .quiz-panel .qp-no { font-size:12px; color:#8A8378; margin-top:14px; font-weight:600; }
+  .quiz-panel .qp-no b { color:#15803D; }
+  .quiz-panel .qp-prompt { font-size:15px; color:#202020; line-height:1.75; margin:8px 0 0; font-weight:600; }
+  .quiz-panel .qp-opt {
+    display:flex; align-items:flex-start; gap:8px; width:100%; text-align:left;
+    border:1.5px solid #EDE9E0; background:#fff; border-radius:14px;
+    padding:12px 14px; margin-top:10px; font-size:14px; color:#3A362F;
+    line-height:1.6; cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .quiz-panel .qp-opt .abc { font-weight:800; color:#8A8378; flex:none; }
+  .quiz-panel .qp-opt.picked { border-color:#B02A2A; background:#FDF3F3; }
+  .quiz-panel .qp-opt.right { border-color:#15803D; background:#F0F9F1; }
+  .quiz-panel .qp-opt.wrong { border-color:#B02A2A; background:#FDF3F3; }
+  .quiz-panel .qp-opt.dim { opacity:.55; }
+  .quiz-panel .qp-opt:disabled { cursor:default; }
+  .quiz-panel .qp-exp {
+    display:none; margin-top:12px; background:#F7F4EF; border-radius:14px;
+    padding:12px 14px; font-size:13px; color:#5A5548; line-height:1.75;
+  }
+  .quiz-panel .qp-exp.show { display:block; }
+  .quiz-panel .qp-exp b { color:#15803D; }
+  .quiz-panel .qp-nav { display:flex; gap:10px; margin-top:14px; }
+  .quiz-panel .qp-nav button {
+    flex:1; min-height:44px; border:none; border-radius:12px;
+    font-size:14px; font-weight:700; font-family:inherit; cursor:pointer;
+  }
+  .quiz-panel .qp-prev { background:#F3EFE7; color:#4A463F; }
+  .quiz-panel .qp-prev:disabled { opacity:.4; cursor:default; }
+  .quiz-panel .qp-next { background:#15803D; color:#fff; }
+  .quiz-panel .qp-next.done { background:#B02A2A; }
   .speed-bar {
     display:flex; align-items:center; gap:8px; margin-top:14px; flex-wrap:wrap;
   }
@@ -809,29 +854,203 @@ function renderHome(){
   window.scrollTo(0, 0);
 }
 
-/* ===== 一键刷题（视频配套练习） =====
+/* ===== 一键刷题（视频配套练习 · 本页作答版） =====
+   点击后在当前页展开刷题区，不再跳转主站；刷的就是配套文档里的那组题。
    无做题记录 → 轻提示后直接开始；有做题记录 → 弹「继续上次进度 / 重新开始」，绝不静默清进度。
-   做题记录由主包 __ycStartBank 写入 yc-video-quiz-v1（题号清单），这里实时比对 yc-quiz-progress-v2。 */
-function bankInfo(bank){
+   进度写入与主站相同的 yc-quiz-progress-v2 / yicheng-gk-study-v1 / yc-video-quiz-v1，两边数据一致。 */
+var quizShards = {};   /* bank -> 题目数组缓存 */
+var quizPanel = null;  /* 当前展开的刷题区状态 */
+function loadQuizShard(bank, cb){
+  if (quizShards[bank]) return cb(quizShards[bank]);
+  var s = document.createElement('script');
+  s.src = './assets/' + bank + '.js';
+  s.onload = function(){
+    var qs = [];
+    try {
+      (window.YC_MORE_QBANKS || []).forEach(function(arr){
+        (arr || []).forEach(function(q){ if (q && q._shard === bank) qs.push(q); });
+      });
+    } catch(e){}
+    qs.sort(function(a,b){ return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });
+    quizShards[bank] = qs;
+    cb(qs);
+  };
+  s.onerror = function(){ cb([]); };
+  document.body.appendChild(s);
+}
+function quizReadProgress(){
+  try { var po = JSON.parse(localStorage.getItem('yc-quiz-progress-v2') || 'null'); if (po && po.done) return po; } catch(e){}
+  return { done: {} };
+}
+function quizWriteProgress(po){ try { localStorage.setItem('yc-quiz-progress-v2', JSON.stringify(po)); } catch(e){} }
+function quizCountAnswered(bank, qs){
+  var po = quizReadProgress(), n = 0;
+  for (var i = 0; i < qs.length; i++) {
+    var d = po.done[qs[i].id];
+    if (d && ((d.c || 0) + (d.w || 0) > 0)) n++;
+  }
+  return n;
+}
+/* 答一次题：进度 + 主站学习统计同步累加（与主站做题口径一致，重复作答按新的一次练习计） */
+function quizRecordAnswer(q, isCorrect){
+  var po = quizReadProgress();
+  if (!po.done) po.done = {};
+  var d = po.done[q.id] || { c: 0, w: 0 };
+  if (isCorrect) d.c = (d.c || 0) + 1; else d.w = (d.w || 0) + 1;
+  po.done[q.id] = d;
+  quizWriteProgress(po);
   try {
-    var vq = JSON.parse(localStorage.getItem('yc-video-quiz-v1') || '{}');
-    var rec = vq[bank];
-    if (!rec || !rec.ids || !rec.ids.length) return null;
-    var po = null;
-    try { po = JSON.parse(localStorage.getItem('yc-quiz-progress-v2') || 'null'); } catch (e2) { po = null; }
-    var n = 0;
-    if (po && po.done) {
-      for (var i = 0; i < rec.ids.length; i++) {
-        var d = po.done[rec.ids[i]];
-        if (d && ((d.c || 0) + (d.w || 0) > 0)) n++;
+    var st = JSON.parse(localStorage.getItem('yicheng-gk-study-v1') || 'null') || {};
+    var td = new Date();
+    var ymd = td.getFullYear() + '-' + (td.getMonth() + 1) + '-' + td.getDate();
+    if (st.todayDate !== ymd) { st.todayAnswered = 0; st.todayCorrect = 0; st.todayDate = ymd; }
+    st.totalAnswered = (st.totalAnswered || 0) + 1;
+    if (isCorrect) st.totalCorrect = (st.totalCorrect || 0) + 1;
+    st.todayAnswered = (st.todayAnswered || 0) + 1;
+    if (isCorrect) st.todayCorrect = (st.todayCorrect || 0) + 1;
+    if (!st.moduleProgress || typeof st.moduleProgress !== 'object' || Array.isArray(st.moduleProgress)) st.moduleProgress = {};
+    var mp = st.moduleProgress[q.module] || { answered: 0, correct: 0 };
+    mp.answered = (mp.answered || 0) + 1;
+    if (isCorrect) mp.correct = (mp.correct || 0) + 1;
+    st.moduleProgress[q.module] = mp;
+    if (!isCorrect) {
+      var wq = Array.isArray(st.wrongQuestions) ? st.wrongQuestions : [];
+      if (wq.indexOf(q.id) < 0) { wq.push(q.id); st.wrongQuestions = wq.slice(-200); }
+    }
+    localStorage.setItem('yicheng-gk-study-v1', JSON.stringify(st));
+  } catch(e){}
+}
+function quizClearBank(bank, qs){
+  var po = quizReadProgress();
+  if (!po.done) po.done = {};
+  for (var i = 0; i < qs.length; i++) delete po.done[qs[i].id];
+  quizWriteProgress(po);
+  try {
+    var st = JSON.parse(localStorage.getItem('yicheng-gk-study-v1') || 'null');
+    if (st && Array.isArray(st.wrongQuestions) && st.wrongQuestions.length) {
+      var ids = {};
+      for (var j = 0; j < qs.length; j++) ids[qs[j].id] = 1;
+      st.wrongQuestions = st.wrongQuestions.filter(function(id){ return !ids[id]; });
+      localStorage.setItem('yicheng-gk-study-v1', JSON.stringify(st));
+    }
+  } catch(e){}
+}
+function closeQuizPanel(){
+  quizPanel = null;
+  var p = document.getElementById('ycQuizPanel');
+  if (p && p.parentNode) p.parentNode.removeChild(p);
+}
+function quizPanelHtml(v, qs, answered){
+  var label = esc(v.quiz.label || "配套刷题");
+  return '<div class="quiz-panel" id="ycQuizPanel">' +
+    '<div class="qp-head">' +
+      '<div><div class="qp-title">📝 ' + label + ' · 本页刷题</div>' +
+      '<div class="qp-stat" id="qpStat">已答 ' + answered + ' / ' + qs.length + ' 题，答完自动记进度</div></div>' +
+      '<button type="button" class="qp-close" id="qpClose">收起</button>' +
+    '</div>' +
+    '<div class="qp-barwrap"><div class="qp-bar" id="qpBar" style="width:' + (qs.length ? Math.round(answered / qs.length * 100) : 0) + '%"></div></div>' +
+    '<div id="qpBody"></div>' +
+  '</div>';
+}
+function renderQuizQ(v, qs, idx){
+  var body = document.getElementById('qpBody');
+  if (!body || !quizPanel) return;
+  var q = qs[idx];
+  var po = quizReadProgress();
+  var d = po.done[q.id] || { c: 0, w: 0 };
+  var answeredBefore = ((d.c || 0) + (d.w || 0)) > 0;
+  var abc = ['A', 'B', 'C', 'D', 'E', 'F'];
+  var optsHtml = '';
+  for (var i = 0; i < (q.options || []).length; i++) {
+    optsHtml += '<button type="button" class="qp-opt" data-i="' + i + '">' +
+      '<span class="abc">' + abc[i] + '.</span><span>' + esc(q.options[i]) + '</span></button>';
+  }
+  var ans = (typeof q.answer === 'number') ? q.answer : (q.options || []).indexOf(q.answer);
+  var ansLetter = ans >= 0 ? abc[ans] : '';
+  body.innerHTML =
+    '<div class="qp-no">第 <b>' + (idx + 1) + '</b> 题 / 共 ' + qs.length + ' 题' +
+      (answeredBefore ? ' · <b>已练过</b>（再答一遍按新练习计）' : '') + '</div>' +
+    '<p class="qp-prompt">' + esc(q.prompt) + '</p>' +
+    '<div id="qpOpts">' + optsHtml + '</div>' +
+    '<div class="qp-exp" id="qpExp"><b>答案 ' + ansLetter + '：</b>' + esc(q.explanation || '略') + '</div>' +
+    '<div class="qp-nav">' +
+      '<button type="button" class="qp-prev" id="qpPrev"' + (idx <= 0 ? ' disabled' : '') + '>← 上一题</button>' +
+      '<button type="button" class="qp-next" id="qpNext">' + (idx >= qs.length - 1 ? '完成 ✓' : '下一题 →') + '</button>' +
+    '</div>';
+  var picked = false;
+  var optBtns = body.querySelectorAll('.qp-opt');
+  for (var k = 0; k < optBtns.length; k++) {
+    optBtns[k].addEventListener('click', function(){
+      if (picked) return;
+      picked = true;
+      var i = parseInt(this.getAttribute('data-i'), 10);
+      var ok = (i === ans);
+      for (var m = 0; m < optBtns.length; m++) {
+        var mi = parseInt(optBtns[m].getAttribute('data-i'), 10);
+        optBtns[m].disabled = true;
+        if (mi === ans) optBtns[m].classList.add('right');
+        else if (mi === i) optBtns[m].classList.add('wrong');
+        else optBtns[m].classList.add('dim');
+      }
+      document.getElementById('qpExp').classList.add('show');
+      quizRecordAnswer(q, ok);
+      updateQuizStat(v, qs);
+    });
+  }
+  document.getElementById('qpPrev').addEventListener('click', function(){
+    if (idx > 0) { quizPanel.idx = idx - 1; renderQuizQ(v, qs, idx - 1); }
+  });
+  document.getElementById('qpNext').addEventListener('click', function(){
+    if (idx >= qs.length - 1) {
+      quizLightToast('这一组刷完了，真棒！再做一遍或换个视频继续');
+      return;
+    }
+    quizPanel.idx = idx + 1;
+    renderQuizQ(v, qs, idx + 1);
+  });
+}
+function updateQuizStat(v, qs){
+  var answered = quizCountAnswered(v.quiz.bank, qs);
+  var stat = document.getElementById('qpStat');
+  var bar = document.getElementById('qpBar');
+  if (stat) stat.textContent = '已答 ' + answered + ' / ' + qs.length + ' 题，答完自动记进度';
+  if (bar) bar.style.width = (qs.length ? Math.round(answered / qs.length * 100) : 0) + '%';
+}
+function openQuizPanel(v, mode){
+  if (!v || !v.quiz) return;
+  closeQuizPanel();
+  quizLightToast('题目加载中…');
+  loadQuizShard(v.quiz.bank, function(qs){
+    if (!qs.length) { quizLightToast('这组题还在整理中，先看视频吧'); return; }
+    /* 登记题号清单（与主站一键刷题同一份记录，主站也能看到这组题） */
+    try {
+      var vq = JSON.parse(localStorage.getItem('yc-video-quiz-v1') || '{}');
+      var ids = [];
+      for (var i = 0; i < qs.length; i++) ids.push(qs[i].id);
+      vq[v.quiz.bank] = { total: qs.length, ids: ids, at: Date.now() };
+      localStorage.setItem('yc-video-quiz-v1', JSON.stringify(vq));
+    } catch(e){}
+    if (mode === 'fresh') quizClearBank(v.quiz.bank, qs);
+    var answered = quizCountAnswered(v.quiz.bank, qs);
+    var host = document.getElementById('quizPanelHost');
+    if (!host) return;
+    host.innerHTML = quizPanelHtml(v, qs, answered);
+    quizPanel = { bank: v.quiz.bank, idx: 0 };
+    if (mode !== 'fresh') {
+      /* 继续进度：跳到第一道没答过的题 */
+      var po = quizReadProgress();
+      for (var j = 0; j < qs.length; j++) {
+        var dd = po.done[qs[j].id];
+        if (!(dd && ((dd.c || 0) + (dd.w || 0) > 0))) { quizPanel.idx = j; break; }
       }
     }
-    return { total: rec.total || rec.ids.length, answered: n };
-  } catch (e) { return null; }
-}
-function goBankQuiz(v, mode){
-  location.href = './index.html?bank=' + encodeURIComponent(v.quiz.bank) +
-    '&from=video&mode=' + mode + '&label=' + encodeURIComponent(v.quiz.label || '');
+    renderQuizQ(v, qs, quizPanel.idx);
+    try { vtrack.add("quiz"); } catch(e){}
+    var panel = document.getElementById('ycQuizPanel');
+    if (panel && panel.scrollIntoView) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var closeBtn = document.getElementById('qpClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeQuizPanel);
+  });
 }
 function quizLightToast(msg){
   var t = document.createElement('div');
@@ -851,19 +1070,38 @@ function showQuizModal(v, info){
       '<button type="button" class="qm-fresh">重新开始（清掉本组答题记录）</button>' +
       '<button type="button" class="qm-cancel">先不了</button>' +
     '</div>';
-  mask.querySelector('.qm-resume').addEventListener('click', function(){ goBankQuiz(v, 'resume'); });
-  mask.querySelector('.qm-fresh').addEventListener('click', function(){ goBankQuiz(v, 'fresh'); });
+  mask.querySelector('.qm-resume').addEventListener('click', function(){ if (mask.parentNode) mask.parentNode.removeChild(mask); openQuizPanel(v, 'resume'); });
+  mask.querySelector('.qm-fresh').addEventListener('click', function(){ if (mask.parentNode) mask.parentNode.removeChild(mask); openQuizPanel(v, 'fresh'); });
   mask.querySelector('.qm-cancel').addEventListener('click', function(){ if (mask.parentNode) mask.parentNode.removeChild(mask); });
   document.body.appendChild(mask);
 }
+/* 实时比对 yc-video-quiz-v1（题号清单）与 yc-quiz-progress-v2（做题记录），算这组题答了几道 */
+function bankInfo(bank){
+  try {
+    var vq = JSON.parse(localStorage.getItem('yc-video-quiz-v1') || '{}');
+    var rec = vq[bank];
+    if (!rec || !rec.ids || !rec.ids.length) return null;
+    var po = null;
+    try { po = JSON.parse(localStorage.getItem('yc-quiz-progress-v2') || 'null'); } catch (e2) { po = null; }
+    var n = 0;
+    if (po && po.done) {
+      for (var i = 0; i < rec.ids.length; i++) {
+        var d = po.done[rec.ids[i]];
+        if (d && ((d.c || 0) + (d.w || 0) > 0)) n++;
+      }
+    }
+    return { total: rec.total || rec.ids.length, answered: n };
+  } catch (e) { return null; }
+}
 function quizBtnGo(v){
-  if (!v || !v.quiz) return;
+  /* 规则：一键刷题刷的是配套文档里的题；没有配套文档的视频不出现这个按钮 */
+  if (!v || !v.quiz || !((v.pdfs && v.pdfs.length) || v.pdf)) return;
   var info = bankInfo(v.quiz.bank);
   if (info && info.answered > 0) {
     showQuizModal(v, info);
   } else {
     quizLightToast('知道了，开始刷题');
-    setTimeout(function(){ goBankQuiz(v, 'fresh'); }, 700);
+    setTimeout(function(){ openQuizPanel(v, 'fresh'); }, 700);
   }
 }
 
@@ -906,7 +1144,7 @@ function renderModule(){
         (hasPdf ? '<span class="pdf-tag">配试卷</span>' : '') +
       '</div>' +
       '<div class="vt"><h3>' + esc(v.title || "视频讲解") + '</h3>' +
-        (v.quiz ? '<button type="button" class="quiz-btn" data-idx="' + list[k] + '">📝 一键刷题 · ' + esc(v.quiz.label || "") + '</button>' : '') +
+        (v.quiz && hasPdf ? '<button type="button" class="quiz-btn" data-idx="' + list[k] + '">📝 一键刷题 · ' + esc(v.quiz.label || "") + '</button>' : '') +
       '</div></div>';
   }
   html += '</div>';
@@ -919,7 +1157,11 @@ function renderModule(){
   for (var q1 = 0; q1 < qbtns.length; q1++) {
     qbtns[q1].addEventListener("click", function(ev){
       ev.stopPropagation();
-      quizBtnGo(VIDEOS[parseInt(this.getAttribute("data-idx"), 10)]);
+      /* 列表页点一键刷题：进入播放页并在页内展开刷题区，不跳转其他页面 */
+      state.pendingQuiz = parseInt(this.getAttribute("data-idx"), 10);
+      state.view = "play";
+      state.idx = state.pendingQuiz;
+      render();
     });
   }
   window.scrollTo(0, 0);
@@ -980,7 +1222,8 @@ function renderPlay(){
     '</div>' : '';
   var tipHtml = (v.oss || v.srcs) ?
     '<p class="play-tip">💡 第一次打开要缓冲几秒钟，缓冲完播放就很顺畅了；<b>建议横屏观看</b>——点上面「⛶ 全屏」再把手机横过来，字更大更清楚。</p>' : '';
-  var quizHtml = v.quiz ? '<button type="button" class="quiz-btn big" id="playQuizBtn">📝 一键刷题 · ' + esc(v.quiz.label || "") + '</button>' : '';
+  var hasDoc = !!(v.pdfs && v.pdfs.length) || !!v.pdf;
+  var quizHtml = (v.quiz && hasDoc) ? '<button type="button" class="quiz-btn big" id="playQuizBtn">📝 一键刷题 · ' + esc(v.quiz.label || "") + '</button>' : '';
   document.getElementById("view").innerHTML =
     '<div class="card">' +
       '<div class="video-box" oncontextmenu="return false">' + playerHtml + '</div>' +
@@ -991,10 +1234,16 @@ function renderPlay(){
         tipHtml +
         quizHtml +
         pdfHtml +
-      '</div></div>';
-  if (v.quiz) {
+      '</div></div>' +
+      '<div id="quizPanelHost"></div>';
+  if (v.quiz && hasDoc) {
     var pqb = document.getElementById("playQuizBtn");
     if (pqb) pqb.addEventListener("click", function(){ quizBtnGo(v); });
+  }
+  /* 列表页点「一键刷题」带过来的：进入播放页后自动展开本页刷题区 */
+  if (state.pendingQuiz != null && state.pendingQuiz === state.idx) {
+    state.pendingQuiz = null;
+    quizBtnGo(v);
   }
   if (v.oss || v.srcs) {
     var player = document.getElementById("localPlayer");
