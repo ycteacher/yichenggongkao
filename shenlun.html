@@ -124,8 +124,30 @@
     }
     return i === needle.length;
   }
+  // 近似子序列匹配：允许至多 k 个字符失配（替换），容忍近义词换字
+  // best[i] = 按顺序匹配 needle 前 i 个字符所需的最少失配数；i 降序遍历避免同一 hay 字符复用
+  function fuzzySubseq(needle, hay, k){
+    var n = needle.length, m = hay.length;
+    if(n === 0) return true;
+    if(k == null) k = Math.max(1, Math.floor(n*0.2));
+    var best = new Array(n+1);
+    for(var i = 0; i <= n; i++) best[i] = Infinity;
+    best[0] = 0;
+    for(var j = 0; j < m; j++){
+      var imax = Math.min(n, j+1);
+      for(var i2 = imax; i2 >= 1; i2--){
+        if(best[i2-1] === Infinity) continue;
+        var cost = (hay[j] === needle[i2-1]) ? 0 : 1;
+        if(best[i2-1] + cost < best[i2]) best[i2] = best[i2-1] + cost;
+      }
+    }
+    return best[n] <= k;
+  }
   function matchOne(key, ans){
-    return ans.indexOf(key) >= 0 || (key.length >= 4 && isSubseq(key, ans));
+    if(ans.indexOf(key) >= 0) return true;
+    if(key.length >= 4 && isSubseq(key, ans)) return true;
+    if(key.length >= 6 && fuzzySubseq(key, ans)) return true;
+    return false;
   }
 
   // ===== 真实考试标准评分 =====
