@@ -5,13 +5,11 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6412","module":"changshi","prompt":"人体中负责产生泪液的腺体是：","options":["泪腺","甲状腺","汗腺","唾液腺"],"answer":0,"explanation":"泪腺位于眼眶外上方，分泌泪液湿润眼球并具有杀菌作用。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6413","module":"changshi","prompt":"水的沸点在标准大气压下是：","options":["110℃","120℃","100℃","90℃"],"answer":2,"explanation":"标准大气压下水的沸点为100℃，气压降低沸点也随之降低。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6414","module":"changshi","prompt":"水的密度最大时的温度是：","options":["0℃","20℃","4℃","10℃"],"answer":2,"explanation":"水在4℃时密度最大（约1克/立方厘米），这是水的反常膨胀特性。","diff":1});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6415","module":"changshi","prompt":"下列属于化学变化的是：","options":["玻璃破碎","冰融化成水","铁生锈","酒精挥发"],"answer":2,"explanation":"铁生锈生成了新物质氧化铁，属于化学变化；其余为物理变化。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6416","module":"changshi","prompt":"人体中最多的金属元素是：","options":["铁","钾","钙","钠"],"answer":2,"explanation":"钙是人体内含量最多的金属元素，约占总重的1.5%-2%，主要存在于骨骼和牙齿中。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6417","module":"changshi","prompt":"地壳中含量最多的元素是：","options":["铁","氧","硅","铝"],"answer":1,"explanation":"地壳中氧元素含量约占48.6%，居第一位；硅居第二位。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6418","module":"changshi","prompt":"地壳中含量最多的金属元素是：","options":["铁","铝","钠","钙"],"answer":1,"explanation":"地壳中铝元素含量约占8%，是含量最多的金属元素。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6419","module":"changshi","prompt":"被称为'启明星'的是：","options":["土星","金星","火星","木星"],"answer":1,"explanation":"金星是夜空中最亮的行星，黎明时出现在东方称'启明星'，黄昏时称'长庚星'。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6420","module":"changshi","prompt":"月球的公转周期约为：","options":["27天","30天","15天","60天"],"answer":0,"explanation":"月球绕地球公转周期约为27.3天（恒星月），朔望月约29.5天。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6421","module":"changshi","prompt":"日食发生时，太阳、月球、地球的位置关系是：","options":["地球在太阳和月球之间","月球在太阳和地球之间","太阳在月球和地球之间","三者成直角"],"answer":1,"explanation":"日食是月球运行到太阳和地球之间，月球影子投在地球上形成的现象。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6422","module":"changshi","prompt":"月食发生时，太阳、月球、地球的位置关系是：","options":["太阳在月球和地球之间","地球在太阳和月球之间","三者成直角","月球在太阳和地球之间"],"answer":1,"explanation":"月食是地球运行到太阳和月球之间，地球影子遮住月球形成的现象。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6423","module":"changshi","prompt":"产生潮汐现象的主要原因是：","options":["地球自转","风的作用","月球和太阳的引力","洋流"],"answer":2,"explanation":"潮汐主要由月球引力引起，太阳引力也有影响，朔望时日月引力叠加形成大潮。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6424","module":"changshi","prompt":"北斗七星属于哪个星座？","options":["猎户座","大熊座","小熊座","仙后座"],"answer":1,"explanation":"北斗七星是大熊座的七颗亮星，可用来指示北方方向。","diff":1});
@@ -67,7 +65,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6474","module":"changshi","prompt":"京剧脸谱中红色代表：","options":["忠勇正义","阴险狡猾","刚烈暴躁","奸诈多疑"],"answer":0,"explanation":"京剧脸谱中红色象征忠勇正义，如关羽；白色象征奸诈，黑色象征刚正。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6475","module":"changshi","prompt":"我国国粹京剧的形成时期是：","options":["唐朝","元朝","明朝","清朝"],"answer":3,"explanation":"京剧形成于清朝乾隆末年至道光年间，由徽班进京后融合发展而成。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6476","module":"changshi","prompt":"'路漫漫其修远兮，吾将上下而求索'出自：","options":["《离骚》","《论语》","《出师表》","《史记》"],"answer":0,"explanation":"此句出自屈原《离骚》，表达了不懈追求真理的精神。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6477","module":"changshi","prompt":"'但愿人长久，千里共婵娟'的作者是：","options":["李白","苏轼","杜甫","白居易"],"answer":1,"explanation":"此句出自苏轼《水调歌头·明月几时有》，表达对亲人的思念。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6478","module":"changshi","prompt":"'先天下之忧而忧，后天下之乐而乐'出自：","options":["《岳阳楼记》","《赤壁赋》","《滕王阁序》","《醉翁亭记》"],"answer":0,"explanation":"此句出自范仲淹《岳阳楼记》，表达了忧国忧民的情怀。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6479","module":"changshi","prompt":"'横眉冷对千夫指，俯首甘为孺子牛'的作者是：","options":["郭沫若","鲁迅","巴金","茅盾"],"answer":1,"explanation":"此句出自鲁迅《自嘲》，表现了对敌人和人民的不同态度。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6480","module":"changshi","prompt":"我国古典四大名著不包括：","options":["《三国演义》","《聊斋志异》","《红楼梦》","《西游记》"],"answer":1,"explanation":"四大名著为《红楼梦》《西游记》《水浒传》《三国演义》；《聊斋志异》是文言短篇小说集。","diff":2});
@@ -83,8 +80,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6490","module":"changshi","prompt":"'问君能有几多愁，恰似一江春水向东流'的作者是：","options":["柳永","李清照","李煜","晏殊"],"answer":2,"explanation":"此句出自南唐后主李煜《虞美人》，抒发亡国之痛。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6491","module":"changshi","prompt":"'生当作人杰，死亦为鬼雄'的作者是：","options":["欧阳修","辛弃疾","苏轼","李清照"],"answer":3,"explanation":"此句出自李清照《夏日绝句》，赞颂项羽的气节。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6492","module":"changshi","prompt":"'人生得意须尽欢，莫使金樽空对月'出自：","options":["《行路难》","《蜀道难》","《静夜思》","《将进酒》"],"answer":3,"explanation":"此句出自李白《将进酒》，表达及时行乐的人生态度。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6493","module":"changshi","prompt":"'大江东去，浪淘尽，千古风流人物'的作者是：","options":["辛弃疾","李清照","柳永","苏轼"],"answer":3,"explanation":"此句出自苏轼《念奴娇·赤壁怀古》，是豪放词代表作。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6494","module":"changshi","prompt":"'海内存知己，天涯若比邻'的作者是：","options":["李白","王勃","王维","杜甫"],"answer":1,"explanation":"此句出自王勃《送杜少府之任蜀州》，表达友情不受距离限制。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6495","module":"changshi","prompt":"'谁言寸草心，报得三春晖'歌颂的是：","options":["友情","母爱","师生情","爱国情"],"answer":1,"explanation":"此句出自孟郊《游子吟》，歌颂了伟大的母爱。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6496","module":"changshi","prompt":"'欲穷千里目，更上一层楼'的作者是：","options":["王之涣","李白","王昌龄","王维"],"answer":0,"explanation":"此句出自王之涣《登鹳雀楼》，寓意站得高看得远。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6497","module":"changshi","prompt":"'两个黄鹂鸣翠柳'的下一句是：","options":["万条垂下绿丝绦","春风送暖入屠苏","草色遥看近却无","一行白鹭上青天"],"answer":3,"explanation":"杜甫《绝句》：'两个黄鹂鸣翠柳，一行白鹭上青天。'","diff":3});
@@ -172,10 +167,7 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6579","module":"changshi","prompt":"我国古代'察举制'盛行于：","options":["唐朝","宋朝","明朝","汉朝"],"answer":3,"explanation":"察举制是汉朝选拔官员的制度，由地方推荐人才。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6580","module":"changshi","prompt":"'九品中正制'创立于：","options":["西汉","隋朝","曹魏","东晋"],"answer":2,"explanation":"曹魏时期创立九品中正制，由中正官品评人才，后成为门阀工具。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6581","module":"changshi","prompt":"'王安石变法'发生在哪个皇帝时期？","options":["宋仁宗","宋高宗","宋徽宗","宋神宗"],"answer":3,"explanation":"北宋神宗时期王安石主持变法，推行青苗法、募役法等。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6582","module":"changshi","prompt":"我国最大的经济特区是：","options":["珠海","海南","汕头","深圳"],"answer":1,"explanation":"1988年设立的海南省是我国最大的经济特区。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6583","module":"changshi","prompt":"我国第一个经济特区是：","options":["厦门","海南","浦东","深圳"],"answer":3,"explanation":"1980年深圳、珠海、汕头、厦门成为我国首批经济特区，深圳发展最快。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6584","module":"changshi","prompt":"'一国两制'构想的提出者是：","options":["毛泽东","周恩来","邓小平","江泽民"],"answer":2,"explanation":"邓小平提出'一国两制'构想，用于解决香港、澳门、台湾问题。","diff":1});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6585","module":"changshi","prompt":"澳门回归祖国的时间是：","options":["1997年7月1日","1999年12月20日","1998年12月20日","2000年1月1日"],"answer":1,"explanation":"1999年12月20日中国政府恢复对澳门行使主权。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6586","module":"changshi","prompt":"我国自主建造的首艘弹射型航空母舰是：","options":["福建舰","海南舰","山东舰","辽宁舰"],"answer":0,"explanation":"福建舰2022年下水，采用电磁弹射技术，是我国首艘弹射型航母。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6587","module":"changshi","prompt":"我国第一颗氢弹爆炸成功是在：","options":["1957年","1967年","1970年","1964年"],"answer":1,"explanation":"1967年6月17日，我国第一颗氢弹空爆试验成功。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6588","module":"changshi","prompt":"我国第一颗人造卫星发射成功是在：","options":["1964年","1980年","1975年","1970年"],"answer":3,"explanation":"1970年4月24日，'东方红一号'卫星发射成功，我国成为第五个发射卫星的国家。","diff":1});
@@ -251,7 +243,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6658","module":"changshi","prompt":"我国古代'四大书院'中位于湖南的是：","options":["嵩阳书院","应天书院","白鹿洞书院","岳麓书院"],"answer":3,"explanation":"岳麓书院位于湖南长沙，创建于北宋，是四大书院之一。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6659","module":"changshi","prompt":"我国古代'四大书院'中位于江西的是：","options":["白鹿洞书院","应天书院","嵩阳书院","岳麓书院"],"answer":0,"explanation":"白鹿洞书院位于江西庐山，是宋代著名书院。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6660","module":"changshi","prompt":"我国古代'四大书院'中位于河南的是：","options":["应天书院","岳麓书院","白鹿洞书院","嵩阳书院"],"answer":3,"explanation":"嵩阳书院位于河南登封嵩山南麓，是四大书院之一。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6661","module":"changshi","prompt":"我国古代'四大书院'中位于河南商丘的是：","options":["嵩阳书院","白鹿洞书院","应天书院","岳麓书院"],"answer":2,"explanation":"应天书院位于河南商丘，又称睢阳书院，是四大书院之一。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6662","module":"changshi","prompt":"我国古代'四大名楼'不包括：","options":["滕王阁","蓬莱阁","黄鹤楼","岳阳楼"],"answer":1,"explanation":"四大名楼为黄鹤楼、岳阳楼、滕王阁、鹳雀楼（一说蓬莱阁）；通常以鹳雀楼为四。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6663","module":"changshi","prompt":"黄鹤楼位于哪个城市？","options":["南京","南昌","武汉","岳阳"],"answer":2,"explanation":"黄鹤楼位于湖北武汉长江南岸蛇山，是江南三大名楼之一。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6664","module":"changshi","prompt":"岳阳楼位于哪个省份？","options":["湖南","江西","安徽","湖北"],"answer":0,"explanation":"岳阳楼位于湖南岳阳洞庭湖畔，因范仲淹《岳阳楼记》闻名。","diff":1});
@@ -466,7 +457,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6873","module":"changshi","prompt":"我国古代'四大发明'中，指南针的前身是：","options":["浑天仪","司南","日晷","罗盘"],"answer":1,"explanation":"战国时期的司南是指南针的前身，用天然磁石制成。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6874","module":"changshi","prompt":"我国古代'四大发明'中，造纸术改进前的书写材料不包括：","options":["竹简","宣纸","甲骨","帛书"],"answer":1,"explanation":"造纸术改进前主要用竹简、帛书、甲骨等书写；宣纸是改进后的产物。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6875","module":"changshi","prompt":"我国古代'四大发明'中，对世界文明传播影响最深远的是：","options":["火药","造纸术和印刷术","指南针","以上都不是"],"answer":1,"explanation":"造纸术和印刷术使知识得以大规模记录和传播，对文明影响最深远。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6876","module":"changshi","prompt":"我国古代'四大发明'中，沈括在《梦溪笔谈》中记载的是：","options":["地动仪","活字印刷术","火药配方","造纸术"],"answer":1,"explanation":"沈括在《梦溪笔谈》中详细记载了毕昇的活字印刷术。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6877","module":"changshi","prompt":"我国古代'四大发明'中，火药用于军事始于：","options":["汉朝","明朝","唐末","清朝"],"answer":2,"explanation":"唐末火药开始用于军事，宋代广泛使用火器。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6878","module":"changshi","prompt":"我国古代'四大发明'中，指南针用于航海始于：","options":["明朝","汉朝","唐朝","北宋"],"answer":3,"explanation":"北宋时指南针开始应用于航海，大大促进了航海事业。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-6879","module":"changshi","prompt":"我国古代'四大发明'中，造纸术传播到欧洲是在：","options":["16世纪","6世纪","8世纪","12世纪"],"answer":3,"explanation":"造纸术经阿拉伯传入欧洲约在12世纪，推动欧洲文化发展。","diff":2});
@@ -1059,7 +1049,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7466","module":"changshi","prompt":"大规模开凿隋朝大运河的皇帝是？","options":["隋炀帝","唐太宗","隋恭帝","隋文帝"],"answer":0,"explanation":"隋炀帝时期开凿贯通南北的大运河，以洛阳为中心，北达涿郡，南至余杭。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7467","module":"changshi","prompt":"玄奘西行天竺取经发生在哪个皇帝在位时期？","options":["唐玄宗","武则天","隋炀帝","唐太宗"],"answer":3,"explanation":"玄奘于唐太宗贞观年间西行取经，归国后著《大唐西域记》。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7468","module":"changshi","prompt":"鉴真东渡的目的地是？","options":["波斯","新罗","天竺","日本"],"answer":3,"explanation":"唐代高僧鉴真六次东渡日本，传播佛法与中华文化，被尊为日本律宗初祖。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7469","module":"changshi","prompt":"安史之乱发生在哪个朝代？","options":["元朝","唐朝","隋朝","宋朝"],"answer":1,"explanation":"安史之乱（755—763年）由安禄山、史思明发动，是唐朝由盛转衰的转折点。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7470","module":"changshi","prompt":"\"陈桥兵变、黄袍加身\"的主角是？","options":["赵光义","李渊","朱元璋","赵匡胤"],"answer":3,"explanation":"960年赵匡胤在陈桥驿发动兵变，建立北宋，是为宋太祖。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7471","module":"changshi","prompt":"\"靖康之变\"中被金军掳走的北宋皇帝是？","options":["宋徽宗、宋钦宗","宋真宗、宋仁宗","宋太祖、宋太宗","宋高宗、宋孝宗"],"answer":0,"explanation":"1127年金军攻破开封，掳走宋徽宗、宋钦宗父子，北宋灭亡。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7472","module":"changshi","prompt":"岳飞抗金的作战对象是哪个政权？","options":["金朝","辽朝","元朝","西夏"],"answer":0,"explanation":"岳飞是南宋抗金名将，率岳家军多次大败金军，后被以\"莫须有\"罪名杀害。","diff":3});
@@ -1126,7 +1115,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7533","module":"changshi","prompt":"我国地势最高、被称为\"世界屋脊\"的高原是？","options":["黄土高原","内蒙古高原","青藏高原","云贵高原"],"answer":2,"explanation":"青藏高原平均海拔4000米以上，是世界上海拔最高的大高原。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7534","module":"changshi","prompt":"黄土高原主要的地貌特征是？","options":["沙漠连绵","冰川广布","沟壑纵横、水土流失严重","喀斯特地貌"],"answer":2,"explanation":"黄土高原土质疏松、植被稀少，夏季暴雨冲刷形成千沟万壑的景观。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7535","module":"changshi","prompt":"云贵高原上典型的喀斯特地貌景观是？","options":["风蚀蘑菇","石林、溶洞","丹霞地貌","雅丹地貌"],"answer":1,"explanation":"云贵高原石灰岩广布，流水溶蚀形成石林、溶洞、天坑等喀斯特景观。","diff":3});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7536","module":"changshi","prompt":"被称为\"天府之国\"的平原是？","options":["河套平原","成都平原","渭河平原","珠江三角洲"],"answer":1,"explanation":"成都平原因都江堰灌溉之利，农业发达，素有\"天府之国\"美誉。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7537","module":"changshi","prompt":"我国海拔最低的盆地是？","options":["吐鲁番盆地","哈密盆地","准噶尔盆地","柴达木盆地"],"answer":0,"explanation":"吐鲁番盆地的艾丁湖湖面低于海平面约154米，是我国陆地最低点。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7538","module":"changshi","prompt":"我国最大的丘陵集中分布区位于？","options":["黄土丘陵","山东丘陵","辽东丘陵","东南丘陵"],"answer":3,"explanation":"东南丘陵是我国面积最大的丘陵，分布在长江以南的南方地区。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7539","module":"changshi","prompt":"我国地势西高东低，呈几级阶梯分布？","options":["三级","两级","四级","五级"],"answer":0,"explanation":"我国地势呈三级阶梯分布：青藏高原为第一级，高原盆地为第二级，平原丘陵为第三级。","diff":1});
@@ -1181,7 +1169,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7588","module":"changshi","prompt":"世界地球日是每年的哪一天？","options":["4月22日","6月5日","3月12日","10月4日"],"answer":0,"explanation":"每年4月22日是世界地球日，起源于1970年的美国环保运动。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7589","module":"changshi","prompt":"我国植树节是每年的哪一天？","options":["4月5日","6月1日","3月12日","5月1日"],"answer":2,"explanation":"1979年我国将每年3月12日定为植树节，以纪念孙中山先生。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7590","module":"changshi","prompt":"臭氧层被破坏的主要原因是？","options":["森林砍伐","水土流失","氟氯烃（氟利昂）等物质的使用","二氧化碳排放"],"answer":2,"explanation":"氟氯烃类物质在平流层分解出氯原子，催化分解臭氧，导致臭氧层空洞。","diff":3});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7591","module":"changshi","prompt":"造成温室效应的主要气体是？","options":["二氧化碳","氮气","氢气","氧气"],"answer":0,"explanation":"二氧化碳是最主要的温室气体，能吸收地面长波辐射使大气增温。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7592","module":"changshi","prompt":"酸雨的pH值一般小于？","options":["7.0","5.6","6.5","4.5"],"answer":1,"explanation":"pH值小于5.6的降水称为酸雨，主要由二氧化硫和氮氧化物排放引起。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7593","module":"changshi","prompt":"形成酸雨的主要污染物是？","options":["臭氧和氟利昂","二氧化硫和氮氧化物","粉尘和颗粒物","二氧化碳和甲烷"],"answer":1,"explanation":"二氧化硫和氮氧化物在大气中转化为硫酸和硝酸，随降水落下形成酸雨。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-7594","module":"changshi","prompt":"\"白色污染\"主要指的是？","options":["建筑垃圾","塑料垃圾污染","白色粉尘","纸张污染"],"answer":1,"explanation":"\"白色污染\"指废弃塑料制品（如塑料袋、一次性餐具）造成的环境污染。","diff":2});

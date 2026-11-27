@@ -918,9 +918,6 @@
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8724","module":"changshi","prompt":"青海省的省会城市是？","options":["兰州","格尔木","海东","西宁"],"answer":3,"explanation":"西宁是青海省省会，简称\"青\"。","diff":1});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8725","module":"changshi","prompt":"台湾省的省会城市是？","options":["台北","台中","台南","高雄"],"answer":0,"explanation":"台北是台湾省省会，简称\"北\"。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8726","module":"changshi","prompt":"我国人口最多的省级行政区是？","options":["四川省","山东省","河南省","广东省"],"answer":3,"explanation":"广东省常住人口超过1.2亿，是我国人口最多的省级行政区。","diff":2});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8727","module":"changshi","prompt":"被称为\"火山国\"的东南亚国家是？","options":["泰国","印度尼西亚","越南","马来西亚"],"answer":1,"explanation":"印度尼西亚地处环太平洋火山地震带，活火山众多。","diff":3});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8728","module":"changshi","prompt":"被称为\"骑在羊背上的国家\"的是？","options":["澳大利亚","新西兰","阿根廷","南非"],"answer":0,"explanation":"澳大利亚羊毛产量和出口量居世界首位。","diff":3});
-(window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8729","module":"changshi","prompt":"被称为\"坐在矿车上的国家\"的是？","options":["智利","巴西","加拿大","澳大利亚"],"answer":3,"explanation":"澳大利亚矿产资源丰富，被称为\"坐在矿车上的国家\"。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8730","module":"changshi","prompt":"世界上最大的沙漠（撒哈拉）位于哪个大洲？","options":["亚洲","大洋洲","非洲","南美洲"],"answer":2,"explanation":"撒哈拉沙漠位于非洲北部。","diff":3});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8731","module":"changshi","prompt":"世界上最大的热带雨林（亚马孙雨林）位于哪个大洲？","options":["南美洲","亚洲","非洲","大洋洲"],"answer":0,"explanation":"亚马孙雨林位于南美洲北部。","diff":2});
 (window.YC_CS_BANK=window.YC_CS_BANK||[]).push({"id":"cs-8732","module":"changshi","prompt":"我国传统节日春节的习俗不包括？","options":["赛龙舟","拜年","贴春联","放鞭炮"],"answer":0,"explanation":"赛龙舟是端午节的习俗；春节有贴春联、放鞭炮、拜年等习俗。","diff":1});
