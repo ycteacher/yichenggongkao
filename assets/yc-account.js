@@ -1,4 +1,5 @@
-/* yc-account.js v5: 手机号登录注册（同号去重：已注册=直接登录接回，不重复注册；老账号登录免填昵称、不覆盖原昵称）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
+/* yc-account.js v9: 账号体系改造 v2——①同步码/识别码/邀请码 2026-11-30 23:59:59（北京时间）自动下架（内置时间戳，入口/展示/生成/使用全停，历史数据一律保留不删除）；②注册提示文案统一为催促注册口径（识别码=手机号本身）＋名额紧迫提示（仅文案，无真实收费/人数拦截逻辑）；③到点弹提示（未注册）：同步码已下线，请用手机号注册；④邀请码使用停用（attachInvite 不再新增挂载，台账历史保留）
+   v5-v8 历史变更：手机号登录注册（同号去重：已注册=直接登录接回，不重复注册；老账号登录免填昵称、不覆盖原昵称）+ 公告强推 + 旧数据迁移 + 多端同步绑定 + 分享强化
    v4 变更：注册台账新增来源字段 s={i:邀请码,q:查询串,r:外部来路域名}，首触暂存于 sessionStorage（yc-land-v1），仅聚合上报
    —— 无验证码无密码：仅一个手机号（11位1开头 + 两次输入确认）
    · 明文手机号不落库不外发：本地与云端只存 MD5 摘要（user_key）+ 后4位 + 省份（聚合）
@@ -22,6 +23,10 @@
   var MSG_KEY = 'ycgk-msg-v1';
   var MSG_READ = 'ycgk.msg.read.v1';
   var GEO_LIBS = ['https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-geo.js', './assets/yc-geo.js'];
+  /* 账号体系改造 v2：同步码/识别码/邀请码下架时间 = 2026-11-30 23:59:59 北京时间（内置时间戳自动切换，历史数据一律保留不删除）
+     ycofftest 为质检测试参数：URL 带 ?ycofftest 可提前看到点后的表现，不影响真实时间判断 */
+  var CODE_OFF_TS = Date.UTC(2026,10,30,15,59,59); /* = 北京时间 2026-11-30 23:59:59 */
+  function codeOff(){ try{ if(new URLSearchParams(location.search).has('ycofftest')) return true; }catch(e){} return Date.now() >= CODE_OFF_TS; }
   /* 邀请模块对接（与 yc-invite.js v4 同格式） */
   var INV_REC = 'yc-invite-v1';
   var INV_LEDGER = 'ycgk-inv-ledger-v1';
@@ -308,6 +313,7 @@
     }
   }catch(e){} })();
   function landSrc(){ try{
+    if(codeOff())return {i:'',q:(function(){try{return (JSON.parse(sessionStorage.getItem(LAND_KEY)||'{}').q||'').slice(0,150)}catch(e){return ''}})(),r:''}; /* 下架后不再采集邀请码，仅保留查询串与来路 */
     var l=JSON.parse(sessionStorage.getItem(LAND_KEY)||'{}');
     var f=''; try{ var us=JSON.parse(localStorage.getItem('yc-user-source')||'null'); if(us&&us.key)f=String(us.key).slice(0,32); }catch(e){}
     return { i:(l.i||invParam()||''), q:(l.q||'').slice(0,150), r:(l.r||'').slice(0,60), f:f };
@@ -315,6 +321,7 @@
   function ALPHABET(){ return '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; }
   function codeToNum(code){ var A=ALPHABET(),n=0; for(var i=0;i<code.length;i++){var v=A.indexOf(code[i]);if(v<0)return -1;n=n*32+v;} return n>0&&n<100000?n:-1; }
   function attachInvite(phone,myNo){
+    if(codeOff())return Promise.resolve(); /* 同步码/邀请码下架后：不再新增挂载，历史台账保留 */
     var ic=invParam();
     if(!ic)return Promise.resolve();
     var inviterNo=codeToNum(ic);
@@ -461,12 +468,20 @@
   function showAnnounce(){
     if(getAcc())return; /* 注册后永久不弹 */
     track('see_announce');
+    if(codeOff()){ /* 同步码/识别码下架后：到点提示（原文口径），仅未注册可见 */
+      card.innerHTML='<h3>亿成公考 · 重要通知</h3>'+
+        '<div class="yc-acc-tip">同步码已下线，还没注册的同学请尽快用手机号注册——手机号就是你唯一的识别码，注册后手机、电脑、平板通用，进度自动同步。</div>'+
+        '<button class="yc-acc-btn main" id="ycAccGo">立即注册 / 登录</button>'+
+        '<button class="yc-acc-btn ghost" id="ycAccLater">暂不注册</button>';
+      var goBtn=$('ycAccGo'); if(goBtn) goBtn.addEventListener('click',function(){ track('click_register'); openPanel('reg'); });
+      var laterBtn=$('ycAccLater'); if(laterBtn) laterBtn.addEventListener('click',closePanel); /* 关闭不阻断刷题 */
+      ov.classList.add('on');
+      return;
+    }
     card.innerHTML='<h3>亿成公考 · 重要通知</h3>'+
       '<div class="yc-acc-tip">为了把你的刷题数据保存得更稳，请花 10 秒完成注册：</div>'+
-      '<div class="yc-acc-li">备案申请已提交、正在办理；服务器迁移同步进行，近两天趋于稳定</div>'+
-      '<div class="yc-acc-li">注册后数据保存在你的手机号账号下，换设备不丢</div>'+
-      '<div class="yc-acc-li"><b>12月收费前注册 = 永久免费</b></div>'+
-      '<div class="yc-acc-li"><b>学习码 11 月 29 日下架：注册后手机号就是你的同步码和登录码</b>，换设备自动同步，无需记码，请抓紧注册</div>'+
+      '<div class="yc-acc-li">注册只为留一个识别码，我们不读取你的任何信息；手机号就是你唯一的识别码，注册后三端通用、进度自动同步，全部免费。</div>'+
+      '<div class="yc-acc-li"><b>前 1000 名注册免费，满 1000 人后就要付费了，请尽快注册。</b></div>'+
       '<div class="yc-acc-li"><b>已有账号？</b>点下方按钮输入同一手机号即直接登录，同一手机号全站只有一个账号，不会重复注册</div>'+
       '<button class="yc-acc-btn main" id="ycAccGo">注册 / 登录（10 秒完成）</button>'+
       '<button class="yc-acc-btn ghost" id="ycAccLater">暂不注册，先刷题</button>'+
@@ -542,7 +557,7 @@
       card.innerHTML='<h3>我的账号</h3>'+
         '<div class="yc-acc-tip">已注册：<b>手机尾号 '+esc(acc.tail)+'</b>'+(d?('（'+esc(d)+'）'):'')+(acc.nick?(' · 昵称 <b>'+esc(acc.nick)+'</b>'):'')+'<br>数据已挂到手机号账号下，其他设备用同一手机号登录即可自动同步。</div>'+
         '<div class="yc-acc-li">12月收费前注册 = 永久免费</div>'+
-        '<div class="yc-acc-li">手机号就是你的同步码和登录码，换设备登录同一手机号即可同步（学习码 11 月 29 日下架）</div>'+
+        '<div class="yc-acc-li">手机号就是你的唯一识别码，换设备登录同一手机号即可自动同步</div>'+
         '<button class="yc-acc-btn main" id="ycAccClose">好的</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccNickBtn">修改昵称</button>'+
         '<button class="yc-acc-btn ghost" id="ycAccMsgBtn">我的消息</button>';
@@ -551,7 +566,8 @@
       $('ycAccMsgBtn').addEventListener('click',showMsgs);
     }else{
       card.innerHTML='<h3>注册 / 登录</h3>'+
-        '<div class="yc-acc-tip">仅需一个手机号：<b>无验证码、不读取手机信息</b>。手机号是你的唯一身份识别码，也是你的<b>同步码和登录码</b>，<b>注册后不可更改</b>。12月收费前注册 = 永久免费。</div>'+
+        '<div class="yc-acc-tip">注册只为留一个识别码，我们不读取你的任何信息；手机号就是你唯一的识别码，注册后三端通用、进度自动同步，全部免费。</div>'+
+        '<div class="yc-acc-li"><b>前 1000 名注册免费，满 1000 人后就要付费了，请尽快注册。</b></div>'+
         '<div class="yc-acc-li"><b>老账号（换设备/平板同步）：</b>只需输入同一手机号，<b>昵称不用再填</b>，点「注册 / 登录」即直接登录并接回进度；同一手机号全站唯一，<b>不会重复注册</b>。</div>'+
         '<div class="yc-acc-li"><b>新用户：</b>手机号 + 昵称（必填，与老师送分匹配用）。</div>'+
         '<input id="ycAccPh1" placeholder="输入 11 位手机号" inputmode="numeric" maxlength="11" autocomplete="off">'+
@@ -598,6 +614,7 @@
   }
   /* ---------- 分享强化：顶栏固定显眼分享入口 ---------- */
   function addShareEntry(){
+    if(codeOff())return false; /* 同步码/邀请码下架后：不再注入分享入口 */
     var bar=document.querySelector('.yc-top-actions');
     if(!bar||$('ycShareEntry'))return false;
     var b=document.createElement('button');

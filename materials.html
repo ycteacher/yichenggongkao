@@ -1135,6 +1135,7 @@ document.addEventListener('click', function(e){
 </div>
 <script>window.__YC_GQR_PAGE='materials';</script>
 <script src="./assets/yc-group-qr.js?v=2" defer></script><!-- 内测群二维码投放：数据源 assets/group_qr_config.json -->
+<script src="./assets/yc-guestcap.js?v=1" defer></script><!-- 访客三档限制 v1（账号体系改造 v2）：领资料累计 3 份软锁 -->
 
 <script>
 /* ===== 领资料接住钩子 v1：保存后引导刷题（积分钩子）+ 安装引导 + 转化统计 =====
@@ -1174,6 +1175,13 @@ function closeHookBar(){ var bar=document.getElementById('matHookBar'); if(bar)b
 document.addEventListener('click',function(e){
   var a=e.target.closest?e.target.closest('a.op-save[data-file]'):null;
   if(!a)return;
+  /* 访客领资料上限 v1（账号体系改造 v2）：未注册累计 3 份软锁；capture 阶段拦截，超限不放行下载 */
+  try{
+    if(window.YCGuestCap&&!window.YCGuestCap.isReg()){
+      if(window.YCGuestCap.over('mat')){ e.preventDefault(); e.stopPropagation(); window.YCGuestCap.showLock('mat'); return; }
+      window.YCGuestCap.add('mat',1);
+    }
+  }catch(err){}
   setTimeout(showHookBar,700); // 让下载先启动，再轻提示
 },true);
 /* 提示条按钮：点击计转化后放行默认跳转 */

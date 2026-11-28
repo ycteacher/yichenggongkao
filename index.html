@@ -1103,8 +1103,31 @@ document.addEventListener('click', function(e){
       });
     }catch(e){}
   }
+  /* 访客刷题上限 v1（账号体系改造 v2）：未注册累计答 30 道 → 做题视图内全屏软锁提示注册；
+     计数走 YCGuestCap（ycgk.guestcap.v1，累计不按天重置）；已注册不计数不锁 */
+  function inQuizView(){
+    var sels=['[data-testid="quiz-exit"]','[data-testid="pick-exit"]','[data-testid="essay-exit"]','[data-testid="mixpick-exit"]','[data-testid="topic-exit"]'];
+    for(var i=0;i<sels.length;i++){
+      var el=document.querySelector(sels[i]);
+      /* getClientRects 兼容 fixed 定位元素（offsetParent 对 fixed 返回 null） */
+      if(el&&el.getClientRects&&el.getClientRects().length>0)return true;
+    }
+    return false;
+  }
+  function guestQuizWatch(da){
+    try{
+      if(!window.YCGuestCap||window.YCGuestCap.isReg())return;
+      if(da>0)window.YCGuestCap.add('qz',da);
+      if(window.YCGuestCap.over('qz')&&inQuizView())window.YCGuestCap.showLock('qz');
+    }catch(e){}
+  }
   function watchAnswers(){
     var last = studyTotals();
+    /* 做题视图变化监听：超限访客进入做题视图立即软锁（下方 4 秒轮询兜底） */
+    try{
+      var mo=new MutationObserver(function(){ guestQuizWatch(0); });
+      mo.observe(document.body,{childList:true,subtree:true});
+    }catch(e){}
     setInterval(function(){
       var t = studyTotals();
       var da = t.a - last.a, dc = t.c - last.c;
@@ -1126,6 +1149,7 @@ document.addEventListener('click', function(e){
         if (dc > 0) addPoints(Math.min(dc, gain - Math.min(da, gain)), "答对加分", "答对 " + dc + " 题，每题 +1（每日上限 100 分）");
         regNudge(da);
       }
+      guestQuizWatch(da);
       last = t;
     }, 4000);
   }
@@ -1994,6 +2018,9 @@ document.addEventListener('click', function(e){
   var BASE="https://textdb.online", PRE="ycgkS1-", CHUNK_ENC=5000;
   var KEYS=["yicheng-gk-fav-v1","yicheng-gk-last-v1","yicheng-gk-profile-v1","yicheng-gk-study-v1","yicheng-gk-speed-v1","yicheng-gk-points-v1"];
   var CODE_CHARS="0123456789";
+  /* 账号体系改造 v2：同步码/识别码 2026-11-30 23:59:59（北京时间）下架；ycofftest 为质检测试参数 */
+  var CODE_OFF_TS=Date.UTC(2026,10,30,15,59,59);
+  function codeOff(){ try{ if(new URLSearchParams(location.search).has("ycofftest")) return true; }catch(e){} return Date.now()>=CODE_OFF_TS; }
   function rd(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
   function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   function getSync(){return rd(SYNC_FLAG)||{}}
@@ -2169,7 +2196,7 @@ document.addEventListener('click', function(e){
           ?'<div class="yc-sync-tip">你的手机号就是同步凭证（尾号 '+esc(accSync.tail||'')+'）。同步刚被退出，点下面一键恢复，进度自动接上。</div>'
           :'<div class="yc-sync-tip"><b>注册手机号 = 你的同步凭证</b>：换手机、换平板，用同一手机号登录即可自动同步刷题进度，无需记任何码。</div>')+
         '<button class="yc-sync-btn main" id="ycSyncPhone">'+(hasAcc?'恢复同步（手机号用户）':'用手机号注册 / 登录')+'</button>'+
-        '<button class="yc-sync-btn" id="ycSyncPaste">用同步数据导入（不用网络）</button>'+
+        (codeOff()?'':'<button class="yc-sync-btn" id="ycSyncPaste">用同步数据导入（不用网络）</button>')+
         '<button class="yc-sync-btn" id="ycSyncTest">检测云端连接</button>'+
         '<div class="yc-sync-err" id="ycSyncErr"></div>';
       card.querySelector("#ycSyncPhone").addEventListener("click",function(){
@@ -2204,7 +2231,8 @@ document.addEventListener('click', function(e){
         fetch("https://textdb.online/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[0]=true;fin()})}).catch(function(e){res[0]=false;fin()});
         fetch("https://textdb.dev/api/data/ycgkS1-selftest",{cache:"no-store"}).then(function(r){return r.text().then(function(){res[1]=true;fin()})}).catch(function(e){res[1]=false;fin()});
       });
-      card.querySelector("#ycSyncPaste").addEventListener("click",function(){
+      var pasteBtn=card.querySelector("#ycSyncPaste"); /* 下架后按钮不渲染，handler 一并停用 */
+      if(pasteBtn) pasteBtn.addEventListener("click",function(){
         card.innerHTML='<h3>粘贴同步数据</h3>'+
           '<div class="yc-sync-tip">在存有刷题记录的设备上：点右上角「登录同步」→「复制同步数据」，把发过来的整段内容粘贴到下面。</div>'+
           '<textarea class="yc-sync-in" id="ycSyncPayload" style="height:90px;font-size:12px;letter-spacing:0;text-transform:none" placeholder="粘贴 YCSYNC1 开头的内容"></textarea>'+
@@ -2236,8 +2264,8 @@ document.addEventListener('click', function(e){
           ?'<div class="yc-sync-tip">已绑定：<b>'+esc(maskPh(accSync2.ph||accSync2.phone)||('手机尾号 '+esc(accSync2.tail||'')))+'</b><br><b>你的注册手机号就是同步凭证</b>：换手机、平板，用同一手机号登录即可自动同步，无需记任何码。<br>最近同步：'+esc(t)+'</div>'
           :'<div class="yc-sync-tip">最近同步：'+esc(t)+'<br>当前使用早期同步账号（仅本机保留）。<b>注册手机号后即升级为手机号同步</b>，换设备登录同一手机号即可自动同步。</div>')+
         '<button class="yc-sync-btn main" id="ycSyncNow">立即同步</button>'+
-        '<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>'+
-        '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（保留本机数据）</button>';
+        (codeOff()?'':'<button class="yc-sync-btn" id="ycSyncCopy">复制同步数据（发到另一台设备）</button>')+
+        '<button class="yc-sync-btn danger" id="ycSyncOut">退出登录（清除本机登录状态）</button>';
       card.querySelector("#ycSyncNow").addEventListener("click",function(){
         this.textContent="同步中…";this.disabled=true;
         push(function(e){
@@ -2254,7 +2282,8 @@ document.addEventListener('click', function(e){
           });
         });
       });
-      card.querySelector("#ycSyncCopy").addEventListener("click",function(){
+      var copyBtn=card.querySelector("#ycSyncCopy"); /* 下架后按钮不渲染，handler 一并停用 */
+      if(copyBtn) copyBtn.addEventListener("click",function(){
         var btn=this;
         var data={};KEYS.forEach(function(k){data[k]=rd(k)});
         var payload="YCSYNC1:"+toB64(JSON.stringify(data));
@@ -2266,7 +2295,15 @@ document.addEventListener('click', function(e){
         }catch(e){fail()}
       });
       card.querySelector("#ycSyncOut").addEventListener("click",function(){
-        if(confirm("退出后本机数据保留，但不再同步到云端。确定退出？")){setSync({});ov.classList.remove("on");setChip("")}
+        /* 账号体系改造 v2 真退出：清除本机登录态，再次进入变访客；
+           同一手机号重新登录，进度自动接回。保留本机刷题进度与邀请/消息已读记录。 */
+        if(confirm("退出后清除本机登录状态，再次进入将变为访客；用同一手机号重新登录，进度自动接回。确定退出？")){
+          var outKeys=["yicheng-gk-account-v1","yicheng-gk-sync-v1","yicheng-gk-mig-v1","ycgk-bk2","ycgk.user.bump.pv","ycgk.user.bump.qz","ycgk.user.bump.vid"];
+          outKeys.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+          try{ sessionStorage.removeItem("yc-acc-welcome"); }catch(e){}
+          ov.classList.remove("on");setChip("");
+          location.reload();
+        }
       });
     }
     ov.classList.add("on");
@@ -2417,6 +2454,7 @@ document.addEventListener('click', function(e){
   }
   /* 新访客带邀请链接进来：同一设备只记一次 */
   function handleRef(){
+    if(codeOff())return; /* 邀请码下架后：不再处理 ?ref= 邀请链路，历史计数保留 */
     try{
       var q=new URLSearchParams(location.search);
       var ref=q.get("ref");
@@ -2455,6 +2493,7 @@ document.addEventListener('click', function(e){
   }
   /* 首页邀请卡片 */
   function addShareCard(){
+    if(codeOff())return; /* 邀请码下架后：不再注入首页邀请卡片 */
     if(document.getElementById("yc-share-card"))return;
     var entry=document.getElementById("yc-materials-card");
     if(!entry)return;
@@ -2484,6 +2523,7 @@ document.addEventListener('click', function(e){
     }catch(e){fail()}
   }
   function openShare(){
+    if(codeOff())return; /* 邀请码下架后：分享弹层停用（creditReferrals 历史到账保留在调用链内不受影响） */
     ensureOv();
     var card=shOv.firstChild;
     card.innerHTML='<h3>邀请好友 · 得积分</h3>'+
@@ -4144,9 +4184,10 @@ document.addEventListener('click', function(e){
 
 
 
-<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-invite.js?v=4" onerror="var s=document.createElement('script');s.src='./assets/yc-invite.js?v=4';document.head.appendChild(s);"></script>
+<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-invite.js?v=5" onerror="var s=document.createElement('script');s.src='./assets/yc-invite.js?v=5';document.head.appendChild(s);"></script>
 <script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-track.js?v=3" onerror="var s=document.createElement('script');s.src='./assets/yc-track.js?v=3';document.head.appendChild(s);"></script>
-<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-account.js?v=8" onerror="var s=document.createElement('script');s.src='./assets/yc-account.js?v=8';document.head.appendChild(s);"></script>
+<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-guestcap.js?v=1" onerror="var s=document.createElement('script');s.src='./assets/yc-guestcap.js?v=1';document.head.appendChild(s);"></script>
+<script src="https://yichenggongkao-1538963435.cos.ap-beijing.myqcloud.com/assets/yc-account.js?v=9" onerror="var s=document.createElement('script');s.src='./assets/yc-account.js?v=9';document.head.appendChild(s);"></script>
 <script src="./assets/yc-paper-link.js?v=3" defer></script><!-- 深链：?paper=<id> 直达套卷；?bank=<分片>&from=video 视频配套一键刷题（v3） -->
 <script src="./assets/yc-group-qr.js?v=3" defer></script><!-- 内测群二维码投放：数据源 assets/group_qr_config.json，改配置即全站换码 -->
 <script src="./assets/yc-notice.js?v=2" defer></script><!-- 通用强推通知栏：云端 ycgk-notice-v1 单一数据源，强推一次+两按钮反馈+点击统计，后台看板「通知反馈」卡展示 -->
@@ -4176,12 +4217,12 @@ document.addEventListener('click', function(e){
 </script>
 <script>
 /* ===== 国考冲刺 banner（同步码取消倒计时）=====
-   1) 2026-11-29 23:59:59 同步码正式取消；倒计时精确到秒，从上架即开始走；
+   1) 2026-11-30 23:59:59 同步码正式取消；倒计时精确到秒，从上架即开始走；
    2) 文案明确：还没注册手机号的同学抓紧注册——注册是你唯一的凭证，防止忘掉；
-   3) 11-30 00:00 起整条 banner 不再渲染；只在首页显示（沿用原判定，fail-open）；
+   3) 12-01 00:00 起整条 banner 不再渲染；只在首页显示（沿用原判定，fail-open）；
    4) 点击进入 sprint.html 国考冲刺专区。 */
 (function(){
-  var DEADLINE = new Date(2026, 10, 29, 23, 59, 59); /* 2026-11-29 23:59:59 */
+  var DEADLINE = new Date(2026, 10, 30, 23, 59, 59); /* 2026-11-30 23:59:59（账号体系改造 v2：与 yc-account.js v9 / yc-invite.js v5 下架时间戳对齐） */
   function pad(n){ return (n < 10 ? '0' : '') + n; }
   function tick(){
     var ms = DEADLINE - new Date();
@@ -4201,7 +4242,7 @@ document.addEventListener('click', function(e){
   banner.setAttribute('aria-label', '同步码取消倒计时，还没注册手机号的同学请抓紧注册，进入国考冲刺专区');
   banner.innerHTML = '<span class="yc-sb-fire">⏳</span>' +
     '<span class="yc-sb-txt"><b id="yc-sb-cd"></b>' +
-    '<i>11月29日 23:59:59 同步码正式取消 · 还没注册手机号的同学请抓紧注册——注册是你唯一的凭证，防止忘掉</i></span>' +
+    '<i>11月30日 23:59:59 同步码正式取消 · 还没注册手机号的同学请抓紧注册——注册是你唯一的凭证，防止忘掉</i></span>' +
     '<span class="yc-sb-go">›</span>';
   document.body.insertBefore(banner, document.getElementById('root'));
   tick();

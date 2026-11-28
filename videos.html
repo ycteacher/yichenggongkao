@@ -1393,6 +1393,32 @@ function renderPlay(){
       if (d && player.currentTime > 0) vposSave(player.currentTime, d, partIdx);
     });
 
+    /* 访客看视频上限 v1（账号体系改造 v2）：未注册累计 60 秒软锁；
+       timeupdate 累计播放秒数（约 0.25s 粒度，跳段/换 Part 负增量不计）；已注册不计时 */
+    var gLastT = -1;
+    player.addEventListener("timeupdate", function(){
+      try{
+        if(!window.YCGuestCap || window.YCGuestCap.isReg()) return;
+        var t = player.currentTime || 0;
+        if(gLastT >= 0){
+          var dv = t - gLastT;
+          if(dv > 0 && dv < 5) window.YCGuestCap.add('vid', dv);
+        }
+        gLastT = t;
+        if(window.YCGuestCap.over('vid')){ try{ player.pause(); }catch(e){} window.YCGuestCap.showLock('vid'); }
+      }catch(e){}
+    });
+    player.addEventListener("play", function(){
+      try{
+        if(window.YCGuestCap && !window.YCGuestCap.isReg() && window.YCGuestCap.over('vid')){
+          try{ player.pause(); }catch(e){}
+          window.YCGuestCap.showLock('vid');
+        }else{
+          gLastT = player.currentTime || 0; /* 每次起播重置累计基准 */
+        }
+      }catch(e){}
+    });
+
     player.addEventListener("ended", function(){
       if (partIdx < parts.length - 1) loadPart(partIdx + 1, true);
       else vposClear();
@@ -1488,5 +1514,6 @@ render();
 </script>
 <script>window.__YC_GQR_PAGE='videos';</script>
 <script src="./assets/yc-group-qr.js?v=2" defer></script><!-- 内测群二维码投放：数据源 assets/group_qr_config.json -->
+<script src="./assets/yc-guestcap.js?v=1" defer></script><!-- 访客三档限制 v1（账号体系改造 v2）：看视频累计 1 分钟软锁 -->
 </body>
 </html>

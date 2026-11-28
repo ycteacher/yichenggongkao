@@ -1,4 +1,7 @@
-/* 亿成公考 · 内测邀请模块 v4（方案三·无验证码版·邀请裂变改造）
+/* 亿成公考 · 内测邀请模块 v5（方案三·无验证码版·邀请裂变改造）
+   v5 变更（账号体系改造 v2）：同步码/识别码/邀请码 2026-11-30 23:59:59（北京时间）自动下架——
+   start() 顶部 codeOff() 早退：不再弹任何弹层、不挂悬浮按钮、不处理 ?inv= 参数；历史台账（ycgk-inv-ledger-v1）与编号记录一律保留不删除。
+   下架后三端同步由手机号承担（见 yc-account.js v9）。ycofftest 为质检测试参数：URL 带 ?ycofftest 可提前看到点后的表现。
    —— 每位用户一个专属邀请链接/邀请码，好友经链接填手机号登记即完成邀请绑定
    本版范围（按实施单）：
    · 老用户（本机有历史刷题进度）静默授予元老身份，只弹一次欢迎页（元老段编号 NO.0001-0500＋永久免费已生效）；
@@ -347,7 +350,11 @@
   }
 
   /* ---------- 启动 ---------- */
+  /* 账号体系改造 v2：下架时间戳 = 2026-11-30 23:59:59 北京时间；ycofftest 为质检测试参数 */
+  var CODE_OFF_TS = Date.UTC(2026,10,30,15,59,59);
+  function codeOff(){ try{ if(new URLSearchParams(location.search).has('ycofftest')) return true; }catch(e){} return Date.now() >= CODE_OFF_TS; }
   function start(){
+    if (codeOff()) return; /* 同步码/识别码/邀请码下架后：整个邀请模块停用（无 UI、不处理 ?inv=），历史数据保留 */
     try{ if (sessionStorage.getItem(SKIP_KEY) === '1'){ var r0 = getRec(); if (r0) showFab(r0); return; } }catch(e){}
     migrateOld().then(function(mig){
       var rec = getRec();
