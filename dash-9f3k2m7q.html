@@ -396,9 +396,9 @@ td b{color:var(--txt)}
   </div>
   <div class="card" style="margin-top:14px" id="sec-grant">
     <h3>手动送积分 <span class="hint">手机号/学习码定位 · 学生点确定后到账 · 未确认会重新弹窗</span></h3>
-    <div class="desc"><b>第一步</b>：输入学生<b>完整手机号（11 位）或学习码</b>，自动识别并实时匹配注册档案（昵称/省份/注册时间）；匹配不到会红字提示「档案中无此手机号」，新同学仍可强制赠送。<b>第二步</b>：输入赠送积分数量，点「确认赠送」后二次确认。赠送成功自动附带默认消息，随积分写进学生的「积分明细」。</div>
+    <div class="desc"><b>第一步</b>：输入学生<b>完整手机号（11 位）、学习码或手机尾号（后 4 位）</b>，自动识别并实时匹配注册档案（昵称/省份/注册时间）；尾号匹配到多位同学时会提示补全手机号；匹配不到会红字提示，新同学仍可强制赠送。<b>第二步</b>：输入赠送积分数量，点「确认赠送」后二次确认。赠送成功自动附带默认消息，随积分写进学生的「积分明细」。</div>
     <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
-      <input id="gtWho" placeholder="完整手机号（11位）或学习码" maxlength="20" style="width:230px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
+      <input id="gtWho" placeholder="手机号（11位）/ 学习码 / 尾号后4位" maxlength="20" style="width:230px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <input id="gtAmt" type="number" placeholder="赠送积分数量" min="1" style="width:130px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt);box-sizing:border-box">
       <button id="gtGo" style="background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">确认赠送</button>
     </div>
@@ -1495,6 +1495,19 @@ function gtFind(v,users,regs){
     Object.keys(regs).forEach(function(k){
       if(String((regs[k]||{}).pt||"")===v) hit={k:k,u:users[k]||{},reg:regs[k]||{},by:"ph"};
     });
+  }else if(/^\d{4}$/.test(v)){
+    /* 1128 尾号匹配：注册台账手机尾号 + 用户池尾号，唯一命中直接匹配，多位命中提示补全手机号 */
+    var hits=[];
+    Object.keys(regs).forEach(function(k){
+      var pt=String((regs[k]||{}).pt||"");
+      if(pt.length===11&&pt.slice(-4)===v) hits.push({k:k,u:users[k]||{},reg:regs[k]||{},by:"ph4"});
+    });
+    Object.keys(users).forEach(function(k){
+      var tl=String((users[k]||{}).tl||"");
+      if(tl.length>=4&&tl.slice(-4)===v&&!hits.some(function(h){return h.k===k})) hits.push({k:k,u:users[k]||{},reg:(regs||{})[k]||null,by:"tl4"});
+    });
+    if(hits.length===1) hit=hits[0];
+    else if(hits.length>1) hit={multi:hits};
   }else{
     Object.keys(users).forEach(function(k){
       if(String((users[k]||{}).c||"")===v) hit={k:k,u:users[k]||{},reg:(regs||{})[k]||null,by:"code"};
@@ -1511,12 +1524,16 @@ if(gtWhoEl){
       var regs=(reg&&reg.r)||{};
       gtLoadUsers(function(users){
         var hit=gtFind(v,users,regs);
-        if(hit){
+        if(hit&&hit.multi){
+          var names=hit.multi.map(function(h){return h.u.n||'未填昵称'}).slice(0,4).join('、');
+          gtProfileEl.innerHTML='⚠ 尾号 '+esc(v)+' 匹配到 '+hit.multi.length+' 位同学：'+esc(names)+'。请输入完整 11 位手机号确认，避免送错人。';
+          gtProfileEl.style.color="#D97706";
+        }else if(hit){
           var u=hit.u, rg=hit.reg||{};
           gtProfileEl.innerHTML='✓ 已匹配：<b>'+esc(u.n||'—')+'</b> · 省份 '+esc(rg.p||u.p||'—')+' · 注册时间 '+esc(rg.t?new Date(rg.t).toLocaleString("zh-CN",{hour12:false}):'—')+(u.tl?(' · 尾号 '+esc(u.tl)):'');
           gtProfileEl.style.color="#16A34A";
         }else{
-          gtProfileEl.textContent=(/^1\d{10}$/.test(v)?"档案中无此手机号":"该学习码未在注册档案中找到")+"（新同学可强制赠送，直接填数量点确认）";
+          gtProfileEl.textContent=(/^1\d{10}$/.test(v)?"档案中无此手机号":(/^\d{4}$/.test(v)?"档案中没有尾号 "+v+" 的注册记录":"该学习码未在注册档案中找到"))+"（新同学可强制赠送，直接填数量点确认）";
           gtProfileEl.style.color="#DC2626";
         }
       });
@@ -1528,13 +1545,14 @@ if(gtGoBtn) gtGoBtn.addEventListener("click",function(){
   var msg=document.getElementById("gtMsg");
   var who=(gtWhoEl.value||"").trim();
   var amt=parseInt(document.getElementById("gtAmt").value,10);
-  if(!who){ msg.textContent="请先输入学生完整手机号（11 位）或学习码"; return; }
+  if(!who){ msg.textContent="请先输入学生完整手机号（11 位）、学习码或手机尾号（后 4 位）"; return; }
   if(!amt||isNaN(amt)||amt<=0||Math.floor(amt)!==amt){ msg.textContent="请输入赠送积分数量（正整数）"; return; }
   msg.textContent="";
   fetchPool(REG_URLS,function(reg){
     var regs=(reg&&reg.r)||{};
     gtLoadUsers(function(users){
       var hit=gtFind(who,users,regs);
+      if(hit&&hit.multi){ msg.textContent="尾号匹配到多位同学，请输入完整 11 位手机号确认后再赠送"; return; }
       var isPh=/^1\d{10}$/.test(who);
       var grant={id:"G"+Date.now()+Math.floor(Math.random()*900+100),amount:amt,at:new Date().toLocaleString("zh-CN",{hour12:false}).slice(0,16)};
       var label;

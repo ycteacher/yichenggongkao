@@ -1071,6 +1071,38 @@ document.addEventListener('click', function(e){
     Object.keys(mp).forEach(function(k){ a += mp[k].answered || 0; c += mp[k].correct || 0; });
     return {a: a, c: c};
   }
+  /* 软注册提醒 v1（1128）：未注册累计新答 15 题 → 底部提示条（3 天频控），文案绑定进度保护；
+     不锁题不打断，注册入口走账号面板；已注册（本地有尾号）永久静默 */
+  var K_REGNUDGE = "ycgk.regNudge.v1";
+  function regNudge(da){
+    try{
+      if(!da || da <= 0) return;
+      var acc = null;
+      try{ acc = JSON.parse(localStorage.getItem("yicheng-gk-account-v1") || "null"); }catch(e){}
+      if(acc && acc.tail) return; /* 已注册：不再提醒 */
+      var s = null;
+      try{ s = JSON.parse(localStorage.getItem(K_REGNUDGE) || "null"); }catch(e){}
+      if(!s || typeof s !== "object") s = {n:0};
+      if(s.off && Date.now() - s.off < 3*86400000) return; /* 叉掉 3 天内不再弹 */
+      s.n = (s.n || 0) + da;
+      if(s.n < 15){ ls(K_REGNUDGE, s); return; }
+      s.n = 0; s.off = Date.now(); ls(K_REGNUDGE, s);
+      if(document.getElementById("ycRegNudgeBar")) return;
+      var bar = document.createElement("div");
+      bar.id = "ycRegNudgeBar";
+      bar.style.cssText = "position:fixed;left:12px;right:12px;bottom:76px;z-index:2147483600;background:#111827;color:#e5e7eb;border:1px solid rgba(56,189,248,.4);border-radius:12px;padding:11px 14px;font-size:13px;line-height:1.6;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:10px;align-items:center;font-family:inherit";
+      bar.innerHTML = '<span style="flex:1">💡 你已经刷了不少题，但进度还<b style="color:#38bdf8">只存在这台手机上</b>。花 10 秒注册手机号，进度云端永久保存，换设备不丢。</span>'
+        + '<button id="ycRegNudgeGo" style="flex:none;background:#38bdf8;border:none;border-radius:8px;padding:7px 12px;font-weight:700;color:#06202a;cursor:pointer">去注册</button>'
+        + '<span id="ycRegNudgeX" style="flex:none;color:#9ca3af;cursor:pointer;padding:4px">✕</span>';
+      document.body.appendChild(bar);
+      document.getElementById("ycRegNudgeX").addEventListener("click", function(){ bar.remove(); });
+      document.getElementById("ycRegNudgeGo").addEventListener("click", function(){
+        bar.remove();
+        try{ if(typeof window.ycOpenAccount === "function"){ window.ycOpenAccount("reg"); return; } }catch(e){}
+        try{ localStorage.setItem("yicheng-gk-sync-hint-v1", String(Date.now())); }catch(e){}
+      });
+    }catch(e){}
+  }
   function watchAnswers(){
     var last = studyTotals();
     setInterval(function(){
@@ -1092,6 +1124,7 @@ document.addEventListener('click', function(e){
         if (gain > room) gain = room;
         if (da > 0) addPoints(Math.min(da, gain), "完成刷题", "新答 " + da + " 题，每题 +1（每日上限 100 分）");
         if (dc > 0) addPoints(Math.min(dc, gain - Math.min(da, gain)), "答对加分", "答对 " + dc + " 题，每题 +1（每日上限 100 分）");
+        regNudge(da);
       }
       last = t;
     }, 4000);
