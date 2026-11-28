@@ -1679,19 +1679,24 @@ function renderErrPrecheck(){
     var arr=[]; if(!e&&t){ try{ arr=JSON.parse(t)||[]; }catch(x){} }
     if(!Array.isArray(arr)) arr=[];
     var host=document.getElementById('errList'); if(!host) return;
-    var urgent=arr.filter(function(x){ return x&&x.sev==='urgent'; });
+    var urgent=arr.filter(function(x){ return x&&x.sev==='urgent'&&x.status!=='已处理'; });
     var ban=document.getElementById('urgentBanner');
     if(ban){
       if(urgent.length){ ban.style.display='block'; ban.innerHTML='🚨 '+urgent.length+' 条紧急报错待处理（白屏/打不开/兑换支付类）——<a href="#sec-err" style="color:#FCA5A5">立即查看</a>'; }
       else ban.style.display='none';
     }
-    var cnt=document.getElementById('errCnt'); if(cnt)cnt.textContent='共 '+arr.length+' 条 · 紧急 '+urgent.length+' 条';
+    var pendN=arr.filter(function(x){ return x&&x.status!=='已处理'; }).length;
+    var doneN=arr.length-pendN;
+    var cnt=document.getElementById('errCnt'); if(cnt)cnt.textContent='共 '+arr.length+' 条 · 待处理 '+pendN+' 条 · 已处理 '+doneN+' 条 · 紧急 '+urgent.length+' 条';
     if(!arr.length){ host.innerHTML='<div class="hint">还没有学生报错记录</div>'; return; }
     var recent=arr.slice(-20).reverse();
     host.innerHTML=recent.map(function(x,i){
       var sevTag=x.sev==='urgent'?'<span style="display:inline-block;background:#DC2626;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:4px">紧急</span>':'';
-      return '<div style="padding:5px 0;border-bottom:1px dashed var(--line)" data-ei="'+i+'"><div>'+sevTag+escE(x.t||'')+' · '+escE(x.type||'')+' · '+escE(x.title||'')+' '+(x.pos?('第'+escE(x.pos)+'题'):'')+(x.id?('（'+escE(x.id)+'）'):'')+'</div>'+
+      var st=x.status||'';
+      var stTag=st==='已处理'?'<span style="display:inline-block;background:#16A34A;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:4px">已处理</span>':st==='需人工核实'?'<span style="display:inline-block;background:#D97706;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:4px">需人工核实</span>':'<span style="display:inline-block;background:#64748B;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:4px">待处理</span>';
+      return '<div style="padding:5px 0;border-bottom:1px dashed var(--line)'+(st==='已处理'?';opacity:.62':'')+'" data-ei="'+i+'"><div>'+stTag+sevTag+escE(x.t||'')+' · '+escE(x.type||'')+' · '+escE(x.title||'')+' '+(x.pos?('第'+escE(x.pos)+'题'):'')+(x.id?('（'+escE(x.id)+'）'):'')+'</div>'+
         '<div style="color:var(--mut);font-size:11px;margin:2px 0">'+escE((x.q||'').slice(0,60))+'</div>'+
+        (x.note?'<div style="font-size:11px;color:#A7F3D0;margin:2px 0">处理说明：'+escE(x.note)+'</div>':'')+
         '<div class="err-pre" style="font-size:11px;color:#38bdf8">预检中…</div></div>';
     }).join('');
     recent.forEach(function(x,i){
