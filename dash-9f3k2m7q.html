@@ -395,6 +395,11 @@ td b{color:var(--txt)}
     <div id="bkGroups" style="margin-top:6px"></div>
     <div id="topActive" style="margin-top:12px"></div>
   </div>
+  <div class="card" style="margin-top:14px" id="sec-notice">
+    <h3>通知反馈 <span class="hint">强推通知 · 阅读与选择统计</span></h3>
+    <div class="desc">每条强推通知的触达与反馈：多少人看了（弹窗展示即计入）、两个按钮各多少人点、占比。发新通知改云端 ycgk-notice-v1 的 list 追加一条即可，统计自动累积。</div>
+    <div id="noticeList" style="font-size:12.5px;margin-top:6px">加载中…</div>
+  </div>
   <div class="card" style="margin-top:14px" id="sec-err">
     <h3>一键报错 · 预检 <span class="hint">只读预检 · 不改任何数据</span></h3>
     <div class="desc">学生报错提交后自动做只读预检：题目类报错按题号检索题库，核对题号在库、题干与库内一致、图片可访问，结论直接展示（题号+根因摘要），修与不修仍由你判断。<span id="errCnt"></span></div>
@@ -818,6 +823,37 @@ function renderBk(reg){
 }
 refreshReg();
 setInterval(refreshReg,60000);
+
+/* ===== 通知反馈：ycgk-notice-v1 每条通知的按钮统计 ===== */
+function renderNotice(data){
+  var host=el('noticeList'); if(!host)return;
+  if(!data||!Array.isArray(data.list)||!data.list.length){host.innerHTML='<span class="hint">暂无通知数据</span>';return;}
+  var h='';
+  data.list.slice().reverse().forEach(function(n){
+    var s=n.stats||{}, sup=s.support||0, stop=s.stop||0, tot=sup+stop;
+    var btns=(n.btns||[]).map(function(b){return esc(b.t||b.k);}).join(' / ');
+    h+='<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--panel2)">'+
+      '<div style="font-weight:700;font-size:13.5px">'+esc(n.title||n.id)+' <span class="hint">· '+(n.at||'')+'</span></div>'+
+      '<div style="margin:4px 0 8px" class="hint">按钮：'+(btns||'—')+'</div>'+
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px">'+
+      '<span>💪 支持更新：<b style="color:#15803D">'+sup+'</b> 人'+(tot?'（'+Math.round(sup/tot*100)+'%）':'')+'</span>'+
+      '<span>😐 帮助不大：<b style="color:#b45309">'+stop+'</b> 人'+(tot?'（'+Math.round(stop/tot*100)+'%）':'')+'</span>'+
+      '<span class="hint">已反馈合计 '+tot+' 人</span>'+
+      '</div></div>';
+  });
+  host.innerHTML=h;
+}
+function refreshNotice(){
+  fetch('https://textdb.dev/api/data/ycgk-notice-v1?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.json()})
+    .then(function(d){renderNotice(d)})
+    .catch(function(){
+      fetch('https://textdb.online/ycgk-notice-v1?t='+Date.now(),{cache:'no-store'})
+        .then(function(r){return r.json()}).then(function(d){renderNotice(d)}).catch(function(){});
+    });
+}
+refreshNotice();
+setInterval(refreshNotice,60000);
 
 function refreshFb(){
   function tryUrls(urls,i){if(i>=urls.length)return;fetch(urls[i]+(urls[i].indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.list){FB=d;renderFb(d)}}).catch(function(){tryUrls(urls,i+1)})}
