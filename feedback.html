@@ -52,6 +52,11 @@
   .sec-t { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:#8A8378; letter-spacing:1px; margin:24px 0 10px; }
   .sec-t::before { content:""; width:4px; height:14px; border-radius:2px; background:#DC2626; }
   .sec-note { font-size:12px; color:#8A8378; margin:-4px 0 10px; line-height:1.7; }
+  .prog-wrap { position:sticky; top:0; z-index:9; background:rgba(247,244,239,.94); backdrop-filter:blur(6px); margin:0 -16px; padding:10px 16px 8px; border-bottom:1px solid #EDEAE3; }
+  .prog-bar { height:8px; border-radius:99px; background:#E9E4D9; overflow:hidden; }
+  .prog-fill { height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#DC2626,#B91C1C); transition:width .3s; }
+  .prog-txt { font-size:11px; color:#8A8378; margin-top:5px; }
+  .q-no { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; border-radius:6px; background:#F1EDE4; color:#6B655B; font-size:11px; font-weight:800; margin-right:6px; padding:0 5px; }
 </style>
 </head>
 <body>
@@ -63,6 +68,11 @@
   </div>
 
   <div id="formBox">
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-txt" id="progTxt">必答题 0/10 · 选答题随意，填了改得更快</div>
+    </div>
+
     <div class="sec-t">一 · 快速打分（点选即可）</div>
 
     <div class="card">
@@ -102,65 +112,93 @@
       </div>
     </div>
     <div class="card">
-      <div class="q-t">7. 你在备考哪类考试 <span class="req">*</span></div>
-      <div class="opts" data-q="a7">
+      <div class="q-t"><span class="q-no">7</span>你在备考哪类考试 <span class="req">*</span><span class="q-hint">可多选，同时备考几类都选上</span></div>
+      <div class="opts" data-q="a7" data-multi="1">
         <span class="opt">国考</span><span class="opt">省考</span><span class="opt">事业编</span><span class="opt">军队文职</span><span class="opt">教师编</span><span class="opt">医疗编</span><span class="opt">三支一扶</span><span class="opt">银行/国企</span><span class="opt">选调生</span><span class="opt">其他</span>
       </div>
     </div>
     <div class="card">
-      <div class="q-t">8. 最常用的功能是哪个 <span class="req">*</span></div>
-      <div class="opts" data-q="a8">
+      <div class="q-t"><span class="q-no">8</span>最常用的功能是哪些 <span class="req">*</span><span class="q-hint">可多选，挑常用的 2~3 个</span></div>
+      <div class="opts" data-q="a8" data-multi="1">
         <span class="opt">专项刷题</span><span class="opt">整套卷子</span><span class="opt">错题本</span><span class="opt">速算特训</span><span class="opt">领资料</span><span class="opt">申论批改</span><span class="opt">视频课程</span><span class="opt">考试通告</span>
       </div>
     </div>
     <div class="card">
-      <div class="q-t">9. 最希望优先补充哪类题 <span class="req">*</span></div>
-      <div class="opts" data-q="a9">
+      <div class="q-t"><span class="q-no">9</span>最希望优先补充哪类题 <span class="req">*</span><span class="q-hint">可多选，按急迫程度选</span></div>
+      <div class="opts" data-q="a9" data-multi="1">
         <span class="opt">图形推理</span><span class="opt">资料分析</span><span class="opt">言语理解</span><span class="opt">判断推理</span><span class="opt">数量关系</span><span class="opt">常识</span><span class="opt">申论</span><span class="opt">综应</span><span class="opt">面试</span>
       </div>
     </div>
     <div class="card">
-      <div class="q-t">10. 会推荐给一起备考的同学吗 <span class="req">*</span></div>
+      <div class="q-t"><span class="q-no">10</span>会推荐给一起备考的同学吗 <span class="req">*</span></div>
       <div class="opts" data-q="a10">
         <span class="opt">肯定会</span><span class="opt">可能会</span><span class="opt">不好说</span>
       </div>
     </div>
 
-    <div class="sec-t">二 · 遇到的问题（选了尽量写两句，我们改得更快）</div>
+    <div class="sec-t">二 · 备考画像（选答，帮我们把内容做对口）</div>
+    <p class="sec-note">全部选填，选了就是帮大忙。</p>
+
+    <div class="card">
+      <div class="q-t"><span class="q-no">11</span>你现在处于哪个备考阶段<span class="q-hint">单选</span></div>
+      <div class="opts" data-q="a14">
+        <span class="opt">刚开始准备</span><span class="opt">系统学习中</span><span class="opt">刷题冲刺期</span><span class="opt">进面备考</span><span class="opt">已上岸/在职提升</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t"><span class="q-no">12</span>每天大概花多少时间在备考上<span class="q-hint">单选</span></div>
+      <div class="opts" data-q="a15">
+        <span class="opt">不到半小时</span><span class="opt">半小时到1小时</span><span class="opt">1~3小时</span><span class="opt">3小时以上</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t"><span class="q-no">13</span>你从哪里知道亿成公考的？<span class="q-hint">可多选</span></div>
+      <div class="opts" data-q="a16" data-multi="1">
+        <span class="opt">朋友/同学推荐</span><span class="opt">微信群</span><span class="opt">抖音</span><span class="opt">小红书</span><span class="opt">B站</span><span class="opt">搜索引擎</span><span class="opt">其他</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-t"><span class="q-no">14</span>内测结束后会推出付费增值内容，你的态度是？<span class="q-hint">单选，如实选就行，不影响积分</span></div>
+      <div class="opts" data-q="a17">
+        <span class="opt">只要实用就愿意支持</span><span class="opt">看价格，实惠就考虑</span><span class="opt">希望基础功能一直免费</span><span class="opt">暂时不考虑付费</span>
+      </div>
+    </div>
+
+    <div class="sec-t">三 · 遇到的问题（选了尽量写两句，我们改得更快）</div>
     <p class="sec-note">这部分全部选填，不影响积分；写得越具体，修复越快。</p>
 
     <div class="card">
-      <div class="q-t">11. 你遇到了哪些问题？<span class="q-hint">可多选，点一下选中、再点取消</span></div>
+      <div class="q-t"><span class="q-no">15</span>你遇到了哪些问题？<span class="q-hint">可多选，点一下选中、再点取消</span></div>
       <div class="opts" data-q="a11" data-multi="1">
         <span class="opt">打不开 / 白屏</span><span class="opt">加载慢或卡顿</span><span class="opt">按钮点不动</span><span class="opt">题目或答案显示错误</span><span class="opt">解析看不懂</span><span class="opt">视频播放不了</span><span class="opt">资料提取失败</span><span class="opt">积分 / 兑换问题</span><span class="opt">安装到桌面失败</span><span class="opt">其他</span>
       </div>
     </div>
 
     <div class="card">
-      <div class="q-t">12. 具体说说这个问题</div>
+      <div class="q-t"><span class="q-no">16</span>具体说说这个问题</div>
       <p class="q-hint">照着「在哪个页面 → 做了什么 → 出现了什么」写就行，一句话也很有用：</p>
       <textarea id="bugTx" placeholder="在哪个页面 → 做了什么 → 出现了什么"></textarea>
       <div class="ex"><b>例子：</b>刷图形推理第 5 题，点「提交」后卡住不动，退出重进还是那样；<br><b>例子：</b>资料领取点「保存」没反应，手机是小米浏览器。</div>
     </div>
 
     <div class="card">
-      <div class="q-t">13. 哪个板块让你最想吐槽？<span class="q-hint">可多选</span></div>
+      <div class="q-t"><span class="q-no">17</span>哪个板块让你最想吐槽？<span class="q-hint">可多选</span></div>
       <div class="opts" data-q="a13" data-multi="1">
         <span class="opt">专项刷题</span><span class="opt">整套卷子</span><span class="opt">错题本</span><span class="opt">速算特训</span><span class="opt">申论批改</span><span class="opt">视频</span><span class="opt">资料领取</span><span class="opt">考试通告</span><span class="opt">积分商城</span>
       </div>
       <textarea id="moanTx" placeholder="它哪里让你难受了？比如：题目太挤、字太小、翻页麻烦……"></textarea>
     </div>
 
-    <div class="sec-t">三 · 你的想法（想到什么写什么）</div>
+    <div class="sec-t">四 · 你的想法（想到什么写什么）</div>
 
     <div class="card">
-      <div class="q-t">14. 最想要的新功能或新内容</div>
+      <div class="q-t"><span class="q-no">18</span>最想要的新功能或新内容</div>
       <textarea id="wishTx" placeholder="想要什么直接写，比如：申论范文合集、政治理论专项、夜间模式、题目收藏夹……"></textarea>
       <div class="ex"><b>提示：</b>写「我想要××，用来看 / 用来刷」这种，我们照着做。</div>
     </div>
 
     <div class="card">
-      <div class="q-t">15. 其他意见或想对亿成说的话（选填）</div>
+      <div class="q-t"><span class="q-no">19</span>其他意见或想对亿成说的话（选填）</div>
       <textarea id="otherTx" placeholder="夸的、骂的、建议的，都欢迎"></textarea>
     </div>
 
@@ -217,6 +255,14 @@
 
   /* 选项点选：普通题单选，data-multi="1" 的题可多选 */
   var answers={};
+  function updateProg(){
+    var done=0;
+    for(var i=1;i<=10;i++){ if(answers["a"+i]) done++; }
+    document.getElementById("progFill").style.width=(done/10*100)+"%";
+    document.getElementById("progTxt").textContent = done>=10
+      ? "必答题已全部完成，可以直接提交 ✓"
+      : "必答题 "+done+"/10 · 选答题随意，填了改得更快";
+  }
   document.querySelectorAll(".opts").forEach(function(box){
     box.addEventListener("click", function(e){
       var el=e.target;
@@ -234,6 +280,7 @@
         el.classList.add("on");
         answers[box.dataset.q]=el.textContent;
       }
+      updateProg();
     });
   });
 
@@ -263,6 +310,7 @@
     var __ua=navigator.userAgent||"";
     var __dev=/iPad|Tablet/i.test(__ua)?"平板":(/iPhone|iPod/i.test(__ua)?"苹果":(/Android|Mobile/i.test(__ua)?"安卓":"电脑"));
     var payload={ ts:Date.now(), dev:__dev, a1:answers.a1, a2:answers.a2, a3:answers.a3, a4:answers.a4, a5:answers.a5, a6:answers.a6, a7:answers.a7, a8:answers.a8, a9:answers.a9, a10:answers.a10,
+      a14:answers.a14||"", a15:answers.a15||"", a16:answers.a16||"", a17:answers.a17||"",
       a11:answers.a11||"", bug:(document.getElementById("bugTx").value||"").slice(0,800),
       a13:answers.a13||"", moan:(document.getElementById("moanTx").value||"").slice(0,800),
       wish:(document.getElementById("wishTx").value||"").slice(0,800),

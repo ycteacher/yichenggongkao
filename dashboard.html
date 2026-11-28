@@ -1100,11 +1100,12 @@ function renderFb(){
   if(dks.length>1){
     svgLine('praiseTrend',[{name:'好评率',color:'var(--green)',vals:dks.map(function(k){return Math.round(byDay[k].p/byDay[k].n*100)})}],dks.map(fmtDay),120);
   } else el('praiseTrend').innerHTML='<div class="empty">至少两个提交日后显示趋势</div>';
-  /* 各题分布 */
+  /* 各题分布（a7/a8/a9 为多选题，按「、」拆分统计各选项） */
   var qDefs=[['a2','整体节奏'],['a3','网速'],['a4','提取速度'],['a5','题目质量'],['a6','bug 情况'],['a7','备考类型'],['a8','常用功能'],['a9','想补的题'],['a10','推荐意愿']];
+  var qMulti={a7:1,a8:1,a9:1};
   var qh='<tr><th>题目</th><th>分布（选项 · 次数）</th></tr>';
   qDefs.forEach(function(q){
-    var m={};list.forEach(function(x){var v=x[q[0]];if(v)m[v]=(m[v]||0)+1});
+    var m={};list.forEach(function(x){var v=x[q[0]];if(!v)return;if(qMulti[q[0]]){v.split('、').forEach(function(p){p=p.trim();if(p)m[p]=(m[p]||0)+1})}else{m[v]=(m[v]||0)+1}});
     var ks=Object.keys(m).sort(function(a,b){return m[b]-m[a]});
     qh+='<tr><td><b>'+q[1]+'</b></td><td>'+ks.map(function(k){return '<span class="tag">'+esc(k)+' ×'+m[k]+'</span>'}).join('')+'</td></tr>';
   });
