@@ -1,0 +1,16 @@
+{
+  "name": "亿成公考 · 数据后台",
+  "short_name": "数据后台",
+  "description": "亿成公考数据后台：实时监测、数据库存与数据驾驶舱。",
+  "start_url": "./dashboard.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "icons": [
+    { "src": "./assets/ycicon-192-a.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/ycicon-512-a.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/ycicon-512-a.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

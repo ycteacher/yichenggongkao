@@ -3,27 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0e17">
-<title>亿成公考 · 运营看板</title>
-<meta name="description" content="亿成公考运营数据看板：实时监测与数据库存。">
+<meta name="theme-color" content="#0d1117">
+<title>亿成公考 · 数据后台</title>
+<meta name="description" content="亿成公考数据后台：实时监测、数据库存与数据驾驶舱。">
+<link rel="manifest" href="dashboard.webmanifest">
+<link rel="apple-touch-icon" href="./assets/ycicon-512-a.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="数据后台">
 <style>
 :root{
-  --bg:#0a0e17; --panel:#111827; --panel2:#0c1220; --line:#1f2937; --line2:#1a2332;
-  --txt:#e5e7eb; --sub:#9ca3af; --mut:#6b7280;
-  --cyan:#22d3ee; --green:#34d399; --amber:#fbbf24; --red:#f87171; --violet:#a78bfa; --pink:#f472b6;
-  --r:12px;
+  --bg:#0d1117; --panel:#151b26; --panel2:#1a2230; --line:rgba(148,163,184,.14); --line2:rgba(148,163,184,.09);
+  --txt:#e8edf5; --sub:#93a2b8; --mut:#64748b;
+  --brand:#dc2626; --cyan:#38bdf8; --green:#22c55e; --amber:#fbbf24; --red:#f87171; --violet:#a78bfa; --pink:#f472b6;
+  --r:14px;
   --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt);font-size:14.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1440px;margin:0 auto;padding:18px 22px 60px}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(900px 420px at 12% -8%,rgba(56,189,248,.09),transparent 60%),
+             radial-gradient(800px 400px at 88% -6%,rgba(220,38,38,.07),transparent 60%),
+             radial-gradient(700px 500px at 50% 110%,rgba(167,139,250,.05),transparent 60%)}
+.wrap{max-width:1440px;margin:0 auto;padding:18px 22px 60px;position:relative;z-index:1}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,.22);border-radius:99px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:rgba(148,163,184,.4)}
 /* 顶部 */
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px 16px;margin:-6px -6px 0;border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:40;background:rgba(13,17,23,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:0 0 16px 16px}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#22d3ee,#0e7490);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#06202a;box-shadow:0 4px 14px rgba(34,211,238,.25)}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#ef4444,#b91c1c);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#fff;box-shadow:0 4px 16px rgba(220,38,38,.35)}
 .brand h1{font-size:19px;font-weight:800;letter-spacing:.3px}
-.brand .sub{font-size:11px;color:var(--mut);margin-top:1px}
+.brand .sub{font-size:11px;color:var(--mut);margin-top:1px;letter-spacing:.5px}
 .topmid{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);padding:4px 11px;border-radius:99px;font-weight:600}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.6s infinite}
@@ -41,32 +56,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .abtn{background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:9px;padding:6px 11px;font-size:12px;cursor:pointer}
 .abtn:hover{color:var(--cyan);border-color:var(--cyan)}
 .abtn.a{background:var(--cyan);border-color:var(--cyan);color:#06202a;font-weight:600}
+/* 主导航（看板 / 驾驶舱） */
+.mnav{display:flex;gap:10px;margin:16px 0 4px;position:relative;z-index:2}
+.mnav button{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,rgba(21,27,38,.9),rgba(13,17,23,.9));border:1px solid var(--line);color:var(--sub);border-radius:14px;padding:13px 18px;font-size:15.5px;font-weight:800;cursor:pointer;transition:.2s;letter-spacing:.4px}
+.mnav button .ic{font-size:17px}
+.mnav button:hover{color:var(--txt);border-color:rgba(56,189,248,.45)}
+.mnav button.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(220,38,38,.16));box-shadow:inset 0 0 0 1px rgba(56,189,248,.5),0 6px 22px rgba(56,189,248,.12)}
+.mnav button.on .ic{filter:drop-shadow(0 0 6px rgba(56,189,248,.7))}
+.mview{display:none}.mview.on{display:block}
+/* 驾驶舱内嵌 */
+.dashframe{display:block;width:100%;height:calc(100dvh - 150px);min-height:560px;border:1px solid var(--line);border-radius:16px;background:var(--bg);margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
 /* KPI */
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin:16px 0 4px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;position:relative;overflow:hidden;transition:.2s;min-width:0}
-.kpi:hover{border-color:rgba(34,211,238,.4);transform:translateY(-2px)}
-.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--cyan));opacity:.85}
-.kpi .t{font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi{background:linear-gradient(180deg,rgba(26,34,48,.55),rgba(21,27,38,.9));border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;position:relative;overflow:hidden;transition:.2s;min-width:0;box-shadow:0 2px 12px rgba(0,0,0,.22)}
+.kpi:hover{border-color:rgba(56,189,248,.45);transform:translateY(-2px);box-shadow:0 8px 26px rgba(56,189,248,.1)}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--c,var(--cyan)),transparent);opacity:.9}
+.kpi .t{font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
 .kpi .n{font-size:25px;font-weight:900;color:var(--c,var(--txt));font-family:var(--mono);font-variant-numeric:tabular-nums;line-height:1.25;margin-top:4px}
 .kpi .x{font-size:10px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .x b{color:var(--green);font-family:var(--mono)}
 .kpi .x b.down{color:var(--amber)}
 /* 双层 + 标签页 */
 .lyrs{display:flex;gap:10px;margin:18px 0 10px}
-.lyr{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:11px;padding:10px 26px;font-size:15px;font-weight:700;cursor:pointer;transition:.18s}
-.lyr.on{background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(34,211,238,.06));border-color:var(--cyan);color:var(--cyan)}
+.lyr{flex:none;background:linear-gradient(180deg,rgba(26,34,48,.6),rgba(21,27,38,.9));border:1px solid var(--line);color:var(--sub);border-radius:12px;padding:10px 26px;font-size:15px;font-weight:700;cursor:pointer;transition:.18s}
+.lyr.on{background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(56,189,248,.05));border-color:rgba(56,189,248,.55);color:var(--cyan);box-shadow:0 4px 18px rgba(56,189,248,.12)}
 .tabs{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-.tab{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:99px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:.18s}
-.tab.on{background:var(--cyan);border-color:var(--cyan);color:#06202a}
+.tab{flex:none;background:linear-gradient(180deg,rgba(26,34,48,.6),rgba(21,27,38,.9));border:1px solid var(--line);color:var(--sub);border-radius:99px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:.18s}
+.tab.on{background:linear-gradient(135deg,#38bdf8,#0ea5e9);border-color:transparent;color:#06202a;box-shadow:0 4px 16px rgba(56,189,248,.3)}
 .panel{display:none}.panel.on{display:block}
 /* 网格与卡片 */
 .grid{display:grid;gap:13px}
 .g2{grid-template-columns:repeat(2,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g4{grid-template-columns:repeat(4,1fr)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;min-width:0}
+.card{background:linear-gradient(180deg,rgba(26,34,48,.5),rgba(21,27,38,.92));border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;min-width:0;box-shadow:0 2px 12px rgba(0,0,0,.2);transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:rgba(148,163,184,.26)}
 .card.w2{grid-column:span 2}.card.w3{grid-column:span 3}.card.w4{grid-column:span 4}
-.card h3{font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card h3{font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px;letter-spacing:.3px}
+.card h3:before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;background:linear-gradient(135deg,var(--cyan),var(--violet));margin-right:2px;flex:none;box-shadow:0 0 8px rgba(56,189,248,.5)}
 .card h3 .hint{font-size:10.5px;color:var(--mut);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .desc{font-size:11px;color:var(--mut);margin:2px 0 12px}
 .card .desc .na{color:var(--amber);font-weight:600}
@@ -133,6 +160,9 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
 @media (max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(2,1fr)}.card.w4{grid-column:span 2}}
 @media (max-width:760px){
   .wrap{padding:14px 13px 50px}
+  .mnav{gap:8px}
+  .mnav button{padding:11px 10px;font-size:14px}
+  .dashframe{height:calc(100dvh - 130px);min-height:480px;border-radius:12px}
   .kpis{grid-template-columns:repeat(2,1fr);gap:9px}
   .kpi .n{font-size:21px}
   .g2,.g3,.g4{grid-template-columns:1fr}
@@ -151,7 +181,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
   <div class="top">
     <div class="brand">
       <div class="logo">亿</div>
-      <div><h1>亿成公考 · 运营看板</h1><div class="sub">实时监测 · 数据库存</div></div>
+      <div><h1>亿成公考 · 数据后台</h1><div class="sub">实时监测 · 数据库存 · 驾驶舱</div></div>
     </div>
     <div class="topmid">
       <span class="live"><i></i><span id="liveState">连接中</span></span>
@@ -166,9 +196,16 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
       <button class="abtn" id="manualBtn">手动刷新</button>
       <button class="abtn" id="specBtn">口径说明</button>
       <a class="abtn" style="text-decoration:none" href="#recon" id="reconBtn">对账入口</a>
-      <a class="abtn" style="text-decoration:none" href="./dash-9f3k2m7q.html" title="数据驾驶舱（注册漏斗/来源/用户后台/反馈明细）">驾驶舱 ›</a>
     </div>
   </div>
+
+  <!-- 主导航：看板 / 驾驶舱 -->
+  <div class="mnav" id="mnav">
+    <button class="on" data-mv="live"><span class="ic">📡</span>实时看板</button>
+    <button data-mv="dash"><span class="ic">🚀</span>数据驾驶舱</button>
+  </div>
+
+  <div class="mview on" id="mv-live">
 
   <!-- 核心指标（9卡） -->
   <div class="kpis" id="kpis"></div>
@@ -343,6 +380,12 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
     <div class="grid g2" style="margin-top:13px">
       <div class="card w2"><h3>低分反馈下钻 <span class="hint">第1题选「一般 / 不太好」的原话</span></h3><div class="desc" id="lowNote">—</div><div id="fbLow"><div class="skel"></div></div></div>
     </div>
+  </div><!-- /p-fb -->
+  </div><!-- /mv-live -->
+
+  <!-- 数据驾驶舱（内嵌） -->
+  <div class="mview" id="mv-dash">
+    <iframe id="dashFrame" class="dashframe" title="数据驾驶舱" loading="lazy" referrerpolicy="same-origin"></iframe>
   </div>
 
   <!-- 口径说明弹层 -->
@@ -1245,6 +1288,25 @@ el('reconBtn').addEventListener('click',function(){el('specMask').classList.add(
       fetch('https://textdb.online/update/?key=ycgk-live-v1&value='+encodeURIComponent(JSON.stringify(p))).catch(function(){});
     }).catch(function(){});
   }catch(e){}
+})();
+
+/* ===== 主导航：看板 / 驾驶舱 ===== */
+(function(){
+  var loaded=false;
+  Array.prototype.forEach.call(document.querySelectorAll('#mnav button'),function(b){
+    b.addEventListener('click',function(){
+      Array.prototype.forEach.call(document.querySelectorAll('#mnav button'),function(x){x.classList.remove('on')});
+      b.classList.add('on');
+      var v=b.getAttribute('data-mv');
+      Array.prototype.forEach.call(document.querySelectorAll('.mview'),function(x){x.classList.toggle('on',x.id==='mv-'+v)});
+      if(v==='dash'&&!loaded){
+        var f=el('dashFrame');
+        f.src='./dash-9f3k2m7q.html';
+        loaded=true;
+      }
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
 })();
 
 /* ===== 启动 ===== */
