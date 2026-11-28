@@ -251,8 +251,8 @@ td b{color:var(--txt)}
 
   <div class="sec-h" id="sec-overview"><span class="bar"></span><h2>总览大数</h2><span class="note">云端档案实时口径</span></div>
   <div class="core4" id="big3">
-    <div class="core" style="--c:var(--green)"><div class="ic">👤</div><div class="t">注册用户总数</div><div class="n" id="bigUsers">—</div><div class="x">ycgk-user-v1 档案数</div></div>
-    <div class="core" style="--c:var(--cyan)"><div class="ic">🔄</div><div class="t">有同步数据用户</div><div class="n" id="bigSync">—</div><div class="x">档案含学习码/同步数据</div></div>
+    <div class="core" style="--c:var(--green)"><div class="ic">👤</div><div class="t">注册用户总数</div><div class="n" id="bigUsers">—</div><div class="x">注册台账 · 每次注册一条</div></div>
+    <div class="core" style="--c:var(--cyan)"><div class="ic">🔄</div><div class="t">学习码档案</div><div class="n" id="bigSync">—</div><div class="x">已建学习码/同步数据档案</div></div>
     <div class="core" style="--c:var(--amber)"><div class="ic">🧾</div><div class="t">累计兑换订单</div><div class="n" id="bigOrders">—</div><div class="x">ycgk-redeem-v1 全部订单</div></div>
   </div>
 
@@ -423,24 +423,10 @@ td b{color:var(--txt)}
     <div id="errList" style="font-size:12.5px;margin-top:6px"></div>
   </div>
 
-  <div class="sec-h"><span class="bar"></span><h2>用户信息后台</h2><span class="note" id="userNote">云端用户池 · 每 60 秒刷新</span></div>
+  <div class="sec-h"><span class="bar"></span><h2>学生档案</h2><span class="note">已迁移</span></div>
   <div class="card">
-    <h3>用户列表 <span class="hint">按昵称搜索 · 点击行展开个人数据</span></h3>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-      <input id="userSearch" placeholder="按昵称搜索…" style="flex:1;min-width:160px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;box-sizing:border-box">
-      <span class="hint" id="userCnt">—</span>
-    </div>
-    <div style="overflow-x:auto"><table id="userTable"></table></div>
-    <div id="userDetail"></div>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <h3>定向推送 <span class="hint">写入消息池 · 学生端 5 分钟内收到</span></h3>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <select id="msgTo" style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:13px;max-width:220px"></select>
-      <input id="msgText" maxlength="200" placeholder="消息内容（纯文本，限 200 字）" style="flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;box-sizing:border-box">
-      <button class="refresher" id="msgSend" type="button">发送</button>
-    </div>
-    <div class="desc" id="msgNote" style="margin-top:8px">选择接收人（或全体用户），输入内容后点发送；学生端打开或每 5 分钟拉取一次。</div>
+    <h3>已移至站长后台 <span class="hint">数据后台 · 学生档案页签</span></h3>
+    <div class="desc">用户列表、个人数据展开与定向推送已整体迁到「数据后台 → 学生档案」，以后主要在那里看；本页保留注册台账口径的总览大数、送积分、用户明文留底与活跃学生榜。</div>
   </div>
 
   <div class="sec-h"><span class="bar"></span><h2>每日明细与反馈</h2><span class="note">按日增量 · 真实问卷</span></div>
@@ -1118,101 +1104,7 @@ fetchBank();refreshMetrics();refreshFb();
 setInterval(refreshMetrics,30000);setInterval(refreshFb,300000);setInterval(fetchBank,300000);
 el('refreshBtn').addEventListener('click',function(){fetchBank();refreshMetrics();refreshFb();loadLive();loadMat()});
 
-/* ===== 用户信息后台（ycgk-user-v1 用户池 + ycgk-msg-v1 消息池） ===== */
-var USER_URLS=['https://textdb.online/ycgk-user-v1','https://textdb.dev/api/data/ycgk-user-v1'];
-var MSG_URLS=['https://textdb.online/ycgk-msg-v1','https://textdb.dev/api/data/ycgk-msg-v1'];
-var USER_DATA=null,MSG_DATA=null,USER_OPEN=null;
-function fmtTs(t){
-  if(!t)return '—';
-  var d=new Date(t);if(isNaN(d.getTime()))return '—';
-  return (d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,5);
-}
-function dualPut(urls,key,val,cb){
-  var s=JSON.stringify(val),done=0,ok=false;
-  function fin(){done++;if(done===2)cb(ok)}
-  fetch('https://textdb.online/update/?key='+encodeURIComponent(key)+'&value='+encodeURIComponent(s)).then(function(){ok=true;fin()},function(){fin()});
-  fetch('https://textdb.dev/api/data/'+key,{method:'POST',headers:{'Content-Type':'text/plain'},body:s}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
-}
-function userRows(){
-  var u=(USER_DATA&&USER_DATA.u)||{};
-  return Object.keys(u).map(function(k){
-    var r=u[k]||{};r.k=k;if(!r.s||typeof r.s!=='object')r.s={};
-    return r;
-  }).sort(function(a,b){ return ((b.s||{}).la||0)-((a.s||{}).la||0); });
-}
-function renderUsers(){
-  var rows=userRows();
-  var q=(el('userSearch').value||'').trim().toLowerCase();
-  var shown=q?rows.filter(function(r){ return String(r.n||'').toLowerCase().indexOf(q)>=0; }):rows;
-  txt('userCnt','共 '+rows.length+' 人'+(q?(' · 匹配 '+shown.length+' 人'):''));
-  txt('userNote','云端用户池 '+rows.length+' 人 · 刷新于 '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));
-  var head='<tr><th>昵称</th><th>省份</th><th>注册</th><th>最后活跃</th><th>打开</th><th>刷题</th><th>看视频</th><th>尾号</th></tr>';
-  el('userTable').innerHTML=head+(shown.length?shown.map(function(r){
-    var nick=r.n||'';
-    return '<tr class="urow" data-k="'+r.k+'" style="cursor:pointer" title="点击展开个人数据">'+
-      '<td>'+(nick?esc(nick):'<span style="color:var(--mut)">未起名</span>')+'</td>'+
-      '<td>'+esc(r.p||'未知')+'</td>'+
-      '<td>'+fmtTs(r.t)+'</td>'+
-      '<td>'+fmtTs(r.s.la)+'</td>'+
-      '<td>'+(r.s.pv||0)+'</td><td>'+(r.s.qz||0)+'</td><td>'+(r.s.vid||0)+'</td>'+
-      '<td>'+(r.tl?esc(r.tl):'—')+'</td></tr>';
-  }).join(''):'<tr><td colspan="8" style="color:var(--mut);padding:10px 0">'+(q?'没有匹配的用户':'暂无用户（学生端注册后出现）')+'</td></tr>');
-  /* 详情展开 */
-  var det=el('userDetail');
-  if(USER_OPEN){
-    var r=null;
-    rows.forEach(function(x){ if(x.k===USER_OPEN)r=x; });
-    if(r){
-      det.innerHTML='<div style="margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">'+
-        '<div style="font-weight:800;margin-bottom:6px">👤 '+esc(r.n||'未起名')+' <span class="hint">尾号 '+(r.tl?esc(r.tl):'—')+' · 学习码 '+(r.c?esc(r.c):'—')+'</span></div>'+
-        '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--txt)">'+
-        '<span>省份：'+esc(r.p||'未知')+'</span><span>注册：'+fmtTs(r.t)+'</span><span>最后活跃：'+fmtTs(r.s.la)+'</span>'+
-        '<span>打开 '+(r.s.pv||0)+' 次</span><span>刷题 '+(r.s.qz||0)+' 次</span><span>看视频 '+(r.s.vid||0)+' 次</span></div></div>';
-    } else det.innerHTML='';
-  } else det.innerHTML='';
-  /* 推送下拉框 */
-  var sel=el('msgTo'),cur=sel.value;
-  sel.innerHTML='<option value="all">📢 全体用户</option>'+rows.map(function(r){
-    return '<option value="'+r.k+'">'+(r.n?esc(r.n):'未起名')+(r.tl?('（尾号'+esc(r.tl)+'）'):'')+'</option>';
-  }).join('');
-  if(cur&&Array.prototype.some.call(sel.options,function(o){return o.value===cur}))sel.value=cur;
-}
-function loadUsers(){
-  fetchPool(USER_URLS,function(d){
-    USER_DATA=(d&&d.u)?d:null;
-    renderUsers();
-  });
-}
-function loadMsgs(){
-  fetchPool(MSG_URLS,function(d){ MSG_DATA=Array.isArray(d)?d:null; });
-}
-el('userSearch').addEventListener('input',renderUsers);
-el('userTable').addEventListener('click',function(e){
-  var tr=e.target&&e.target.closest?e.target.closest('tr.urow'):null;
-  if(!tr)return;
-  USER_OPEN=(USER_OPEN===tr.getAttribute('data-k'))?null:tr.getAttribute('data-k');
-  renderUsers();
-});
-el('msgSend').addEventListener('click',function(){
-  var t=(el('msgText').value||'').trim();
-  if(!t){ txt('msgNote','⚠️ 请先输入消息内容'); return; }
-  var to=el('msgTo').value;
-  var b=el('msgSend'); b.disabled=true; b.textContent='发送中…';
-  fetchPool(MSG_URLS,function(pool){
-    var arr=Array.isArray(pool)?pool:[];
-    arr.push({id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),to:to,text:t.slice(0,200),ts:Date.now()});
-    dualPut(MSG_URLS,'ycgk-msg-v1',arr.slice(-500),function(ok){
-      b.disabled=false; b.textContent='发送';
-      var rows=userRows(),toName='全体用户';
-      if(to!=='all'){ rows.forEach(function(r){ if(r.k===to)toName=(r.n||'未起名')+(r.tl?('（尾号'+r.tl+'）'):''); }); }
-      txt('msgNote',ok?('✅ 已发送给 '+toName+' · 学生端 5 分钟内收到'):'❌ 发送失败，请重试');
-      if(ok)el('msgText').value='';
-      loadMsgs();
-    });
-  });
-});
-loadUsers();setInterval(loadUsers,60000);
-loadMsgs();setInterval(loadMsgs,60000);
+/* 学生档案已迁至站长后台 dashboard.html（用户列表/定向推送），此处不再加载用户池与消息池 */
 
 /* ===== 视频观察（ycgk-vid-v1 聚合池 + ycgk-vid-dev-v1 个人明细池） ===== */
 var VID_URLS=['https://textdb.online/ycgk-vid-v1','https://textdb.dev/api/data/ycgk-vid-v1'];
@@ -1587,6 +1479,7 @@ loadGrants();
 
 /* ===== 1128 总览大数 + 活跃学生榜 + 一键报错预检 ===== */
 var BIG_USER_URLS=['https://textdb.online/ycgk-user-v1','https://textdb.dev/api/data/ycgk-user-v1'];
+var BIG_REG_URLS=['https://textdb.online/ycgk-reg-v1','https://textdb.dev/api/data/ycgk-reg-v1'];
 var BIG_RD_URLS=['https://textdb.dev/api/data/ycgk-redeem-v1','https://textdb.online/ycgk-redeem-v1'];
 function bigFetch(urls,cb){
   var done=0,got=false;
@@ -1594,11 +1487,15 @@ function bigFetch(urls,cb){
   urls.forEach(function(u){ fetch(u,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){fin((t||"").trim()||null)}).catch(function(){fin(null)}); });
 }
 function renderBig3(){
+  bigFetch(BIG_REG_URLS,function(e,t){
+    var pool=null; if(!e&&t){ try{ pool=JSON.parse(t); }catch(x){} }
+    var reg=(pool&&pool.r)||{};
+    var el1=document.getElementById("bigUsers"); if(el1)el1.textContent=Object.keys(reg).length;
+  });
   bigFetch(BIG_USER_URLS,function(e,t){
     var pool=null; if(!e&&t){ try{ pool=JSON.parse(t); }catch(x){} }
     var users=(pool&&pool.u)||{};
     var ks=Object.keys(users);
-    var el1=document.getElementById("bigUsers"); if(el1)el1.textContent=ks.length;
     var syncN=ks.filter(function(k){ var it=users[k]||{}; return it.c||it.tl; }).length;
     var el2=document.getElementById("bigSync"); if(el2)el2.textContent=syncN;
     /* 活跃学生榜：云端答题总数 Top10 */

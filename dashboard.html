@@ -203,6 +203,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
   <div class="mnav" id="mnav">
     <button class="on" data-mv="live"><span class="ic">📡</span>实时看板</button>
     <button data-mv="dash"><span class="ic">🚀</span>数据驾驶舱</button>
+    <button data-mv="stu"><span class="ic">👥</span>学生档案</button>
   </div>
 
   <div class="mview on" id="mv-live">
@@ -388,6 +389,39 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
     <iframe id="dashFrame" class="dashframe" title="数据驾驶舱" loading="lazy" referrerpolicy="same-origin"></iframe>
   </div>
 
+  <!-- 学生档案 -->
+  <div class="mview" id="mv-stu">
+    <div class="grid g4">
+      <div class="card"><h3>注册用户总数</h3><div class="n" id="stuRegN" style="font-size:26px;font-weight:900;color:var(--green)">—</div><div class="desc" style="margin:2px 0 0">注册台账 · 每次注册记一条</div></div>
+      <div class="card"><h3>今日注册</h3><div class="n" id="stuRegToday" style="font-size:26px;font-weight:900;color:var(--cyan)">—</div><div class="desc" style="margin:2px 0 0">按台账注册时间</div></div>
+      <div class="card"><h3>学习码档案</h3><div class="n" id="stuUserN" style="font-size:26px;font-weight:900;color:var(--violet)">—</div><div class="desc" style="margin:2px 0 0">已建学习码/同步数据档案</div></div>
+      <div class="card"><h3>消息池存量</h3><div class="n" id="stuMsgN" style="font-size:26px;font-weight:900;color:var(--amber)">—</div><div class="desc" style="margin:2px 0 0">定向推送历史条数</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card w2"><h3>注册台账 <span class="hint" id="stuRegNote">—</span></h3><div class="desc">每次注册一条记录，按时间倒序；手机号脱敏显示，完整号在驾驶舱「用户明文留底」</div><div class="tscroll"><table id="stuRegTable"></table></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card w2"><h3>用户列表 <span class="hint">按昵称搜索 · 点击行展开个人数据</span></h3>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+          <input id="stuSearch" placeholder="按昵称搜索…" style="flex:1;min-width:160px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;box-sizing:border-box">
+          <span class="hint" id="stuCnt">—</span>
+        </div>
+        <div class="tscroll"><table id="stuTable"></table></div>
+        <div id="stuDetail"></div>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:13px">
+      <div class="card w2"><h3>定向推送 <span class="hint">写入消息池 · 学生端 5 分钟内收到</span></h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="stuMsgTo" style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:13px;max-width:220px"></select>
+          <input id="stuMsgText" maxlength="200" placeholder="消息内容（纯文本，限 200 字）" style="flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;box-sizing:border-box">
+          <button class="refresher" id="stuMsgSend" type="button">发送</button>
+        </div>
+        <div class="desc" id="stuMsgNote" style="margin-top:8px">选择接收人（或全体用户），输入内容后点发送；学生端打开或每 5 分钟拉取一次。</div>
+      </div>
+    </div>
+  </div>
+
   <!-- 口径说明弹层 -->
   <div class="mask" id="specMask">
     <div class="modal">
@@ -400,6 +434,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:rgba(34,211,238,.07)}
         <li><b>会话</b>：同一设备超过30分钟无心跳后再次出现，算一次新会话。</li>
         <li><b>PV</b>：页面打开次数（心跳上报累计）。</li>
         <li><b>今日打开次数</b>：今日会话数，来自学生端新埋点（上线后逐步积累）。</li>
+        <li><b>注册用户</b>：以注册台账为准，学生每次注册记一条；「学习码档案」是已建同步档案数，两者可以不同。</li>
       </ul>
       <h4>库存积累</h4>
       <ul>
@@ -607,7 +642,18 @@ function arrow(cur,prev){
   return ' <b class="'+(up?'':'down')+'">'+(up?'↑':'↓')+Math.abs(Math.round(d))+'%</b>';
 }
 
-/* ===== 核心指标（9卡） ===== */
+/* ===== 注册台账口径 ===== */
+function regToday(){
+  if(!S.ok.reg||!S.reg||!S.reg.r)return 0;
+  var d=new Date(),tk=''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()),n=0;
+  Object.keys(S.reg.r).forEach(function(k){
+    var t=new Date((S.reg.r[k]||{}).t||0);
+    if(!isNaN(t.getTime())&&(''+t.getFullYear()+pad2(t.getMonth()+1)+pad2(t.getDate()))===tk)n++;
+  });
+  return n;
+}
+
+/* ===== 核心指标（10卡） ===== */
 function renderKpis(){
   var L=aggLive(),V=vidAgg(),fb=fbList();
   var praise=fb.filter(function(x){return x.a1==='非常好'||x.a1==='还不错'}).length;
@@ -624,6 +670,7 @@ function renderKpis(){
     {t:'今日打开次数',n:opens==null?'—':opens,c:'var(--cyan)',x:opens==null?'会话数 · 待新埋点':'会话数'+arrow(opens,opensY)},
     {t:'累计PV',n:L.pv,c:'var(--cyan)',x:'今日 +'+L.todayPv+(H&&H.pv?' · 昨日 +'+H.pv:'')},
     {t:'累计设备',n:L.devN,c:'var(--cyan)',x:'今日 +'+L.todayNew+(H&&H.dev?' · 昨日 +'+H.dev:'')},
+    {t:'注册用户',n:(S.ok.reg&&S.reg&&S.reg.r)?Object.keys(S.reg.r).length:'—',c:'var(--green)',x:'注册台账 · 今日 +'+regToday()},
     {t:'视频总播放',n:V.play,c:'var(--violet)',x:'今日 +'+(V.today.play||0)+(H&&H.cumPlay!=null?' · 截昨日累计 '+num(H.cumPlay):'')},
     {t:'正在看视频（实时）',n:Math.min(L.vidNow||0,L.online||0),c:'var(--violet)',x:'近5分钟 · 累计 '+V.uv+' 台看过'},
     {t:'好评率',n:pct(praise,fb.length),c:'var(--green)',x:'问卷 '+fb.length+' 份'}
@@ -1224,6 +1271,7 @@ function refreshAll(){
     fetchFb().then(function(d){S.fb=d;S.ok.fb=true}).catch(function(){S.ok.fb=false}),
     fetchJson(METRICS_URL).then(function(d){S.metrics=d;S.ok.metrics=true}).catch(function(){S.ok.metrics=false}),
     fetchPool('ycgk-mat-v1').then(function(d){S.mat=d;S.ok.mat=true}).catch(function(){S.ok.mat=false}),
+    fetchPool('ycgk-reg-v1').then(function(d){S.reg=d;S.ok.reg=true}).catch(function(){S.ok.reg=false}),
     fetchPoolText('ycgk-stat').then(function(d){S.stat=d;S.ok.stat=!!d;S.statEmpty=!d}).catch(function(){S.ok.stat=false;S.statEmpty=false})
   ];
   Promise.all(jobs).then(function(){
@@ -1231,6 +1279,7 @@ function refreshAll(){
     el('updAt').textContent='更新 '+pad2(n.getHours())+':'+pad2(n.getMinutes())+':'+pad2(n.getSeconds());
     ensureHistData().then(function(){
       renderKpis();renderLive();renderVid();renderDev();renderStab();renderQuiz();renderHist();renderFb();
+      loadStuPools();
       ensureHist();
     });
   });
@@ -1289,6 +1338,105 @@ el('reconBtn').addEventListener('click',function(){el('specMask').classList.add(
     }).catch(function(){});
   }catch(e){}
 })();
+
+/* ===== 学生档案（注册台账 + 用户池 + 消息池） ===== */
+var STU_REG=null,STU_USER=null,STU_MSG=null,STU_OPEN=null;
+function stuFmtTs(t){
+  if(!t)return '—';
+  var d=new Date(t);if(isNaN(d.getTime()))return '—';
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,5);
+}
+function stuMaskPh(p){
+  p=String(p||'').trim();
+  if(p.length===11)return p.slice(0,3)+'****'+p.slice(7);
+  if(p.length>4)return p.slice(0,p.length-4).replace(/./g,'*')+p.slice(-4);
+  return p||'—';
+}
+function stuDualPut(key,val,cb){
+  var s=JSON.stringify(val),done=0,ok=false;
+  function fin(){done++;if(done===2)cb(ok)}
+  fetch('https://textdb.online/update/?key='+encodeURIComponent(key)+'&value='+encodeURIComponent(s)).then(function(){ok=true;fin()},function(){fin()});
+  fetch('https://textdb.dev/api/data/'+key,{method:'POST',headers:{'Content-Type':'text/plain'},body:s}).then(function(r){if(r.ok)ok=true;fin()},function(){fin()});
+}
+function stuUserRows(){
+  var u=(STU_USER&&STU_USER.u)||{};
+  return Object.keys(u).map(function(k){var r=u[k]||{};r.k=k;if(!r.s||typeof r.s!=='object')r.s={};return r;})
+    .sort(function(a,b){return ((b.s||{}).la||0)-((a.s||{}).la||0);});
+}
+function stuRegRows(){
+  var r=(STU_REG&&STU_REG.r)||{};
+  return Object.keys(r).map(function(k){var it=r[k]||{};it.k=k;return it;})
+    .sort(function(a,b){return (b.t||0)-(a.t||0);});
+}
+function renderStu(){
+  var regs=stuRegRows(),users=stuUserRows();
+  var d=new Date(),tk=''+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate());
+  var todayN=regs.filter(function(x){var t=new Date(x.t||0);return !isNaN(t.getTime())&&(''+t.getFullYear()+pad2(t.getMonth()+1)+pad2(t.getDate()))===tk;}).length;
+  el('stuRegN').textContent=regs.length;
+  el('stuRegToday').textContent=todayN;
+  el('stuUserN').textContent=users.length;
+  el('stuMsgN').textContent=Array.isArray(STU_MSG)?STU_MSG.length:'—';
+  el('stuRegNote').textContent='共 '+regs.length+' 条 · 刷新于 '+new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  el('stuRegTable').innerHTML='<tr><th>注册时间</th><th>省份</th><th>手机号</th><th>尾号</th></tr>'+(regs.length?regs.map(function(x){
+    var ph=String(x.pt||'');
+    return '<tr><td>'+stuFmtTs(x.t)+'</td><td>'+esc(x.p||'未知')+'</td><td style="font-family:monospace">'+esc(stuMaskPh(ph))+'</td><td style="font-family:monospace">'+esc(ph?ph.slice(-4):'—')+'</td></tr>';
+  }).join(''):'<tr><td colspan="4" style="color:var(--mut);padding:10px 0">暂无注册记录</td></tr>');
+  var q=(el('stuSearch').value||'').trim().toLowerCase();
+  var shown=q?users.filter(function(r){return String(r.n||'').toLowerCase().indexOf(q)>=0;}):users;
+  el('stuCnt').textContent='共 '+users.length+' 人'+(q?(' · 匹配 '+shown.length+' 人'):'');
+  var head='<tr><th>昵称</th><th>省份</th><th>注册</th><th>最后活跃</th><th>打开</th><th>刷题</th><th>看视频</th><th>尾号</th></tr>';
+  el('stuTable').innerHTML=head+(shown.length?shown.map(function(r){
+    return '<tr class="urow" data-k="'+r.k+'" style="cursor:pointer" title="点击展开个人数据">'+
+      '<td>'+(r.n?esc(r.n):'<span style="color:var(--mut)">未起名</span>')+'</td>'+
+      '<td>'+esc(r.p||'未知')+'</td><td>'+stuFmtTs(r.t)+'</td><td>'+stuFmtTs(r.s.la)+'</td>'+
+      '<td>'+(r.s.pv||0)+'</td><td>'+(r.s.qz||0)+'</td><td>'+(r.s.vid||0)+'</td>'+
+      '<td style="font-family:monospace">'+(r.tl?esc(r.tl):'—')+'</td></tr>';
+  }).join(''):'<tr><td colspan="8" style="color:var(--mut);padding:10px 0">'+(q?'没有匹配的用户':'暂无用户（学生端注册后出现）')+'</td></tr>');
+  var det=el('stuDetail');
+  if(STU_OPEN){
+    var r=null;users.forEach(function(x){if(x.k===STU_OPEN)r=x;});
+    det.innerHTML=r?('<div style="margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">'+
+      '<div style="font-weight:800;margin-bottom:6px">👤 '+esc(r.n||'未起名')+' <span class="hint">尾号 '+(r.tl?esc(r.tl):'—')+' · 学习码 '+(r.c?esc(r.c):'—')+'</span></div>'+
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--txt)">'+
+      '<span>省份：'+esc(r.p||'未知')+'</span><span>注册：'+stuFmtTs(r.t)+'</span><span>最后活跃：'+stuFmtTs(r.s.la)+'</span>'+
+      '<span>打开 '+(r.s.pv||0)+' 次</span><span>刷题 '+(r.s.qz||0)+' 次</span><span>看视频 '+(r.s.vid||0)+' 次</span></div></div>'):'';
+  } else det.innerHTML='';
+  var sel=el('stuMsgTo'),cur=sel.value;
+  sel.innerHTML='<option value="all">📢 全体用户</option>'+users.map(function(r){
+    return '<option value="'+r.k+'">'+(r.n?esc(r.n):'未起名')+(r.tl?('（尾号'+esc(r.tl)+'）'):'')+'</option>';
+  }).join('');
+  if(cur&&Array.prototype.some.call(sel.options,function(o){return o.value===cur}))sel.value=cur;
+}
+function loadStuPools(){
+  fetchPool('ycgk-reg-v1').then(function(d){STU_REG=(d&&d.r)?d:null;renderStu();}).catch(function(){});
+  fetchPool('ycgk-user-v1').then(function(d){STU_USER=(d&&d.u)?d:null;renderStu();}).catch(function(){});
+  fetchPool('ycgk-msg-v1').then(function(d){STU_MSG=Array.isArray(d)?d:null;renderStu();}).catch(function(){});
+}
+el('stuSearch').addEventListener('input',renderStu);
+el('stuTable').addEventListener('click',function(e){
+  var tr=e.target&&e.target.closest?e.target.closest('tr.urow'):null;
+  if(!tr)return;
+  STU_OPEN=(STU_OPEN===tr.getAttribute('data-k'))?null:tr.getAttribute('data-k');
+  renderStu();
+});
+el('stuMsgSend').addEventListener('click',function(){
+  var t=(el('stuMsgText').value||'').trim();
+  if(!t){el('stuMsgNote').textContent='⚠️ 请先输入消息内容';return;}
+  var to=el('stuMsgTo').value,b=el('stuMsgSend');
+  b.disabled=true;b.textContent='发送中…';
+  fetchPool('ycgk-msg-v1').then(function(pool){
+    var arr=Array.isArray(pool)?pool:[];
+    arr.push({id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),to:to,text:t.slice(0,200),ts:Date.now()});
+    stuDualPut('ycgk-msg-v1',arr.slice(-500),function(ok){
+      b.disabled=false;b.textContent='发送';
+      var toName='全体用户';
+      if(to!=='all'){stuUserRows().forEach(function(r){if(r.k===to)toName=(r.n||'未起名')+(r.tl?('（尾号'+r.tl+'）'):'');});}
+      el('stuMsgNote').textContent=ok?('✅ 已发送给 '+toName+' · 学生端 5 分钟内收到'):'❌ 发送失败，请重试';
+      if(ok)el('stuMsgText').value='';
+      loadStuPools();
+    });
+  }).catch(function(){b.disabled=false;b.textContent='发送';el('stuMsgNote').textContent='❌ 读取消息池失败，请重试';});
+});
 
 /* ===== 主导航：看板 / 驾驶舱 ===== */
 (function(){
