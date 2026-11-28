@@ -42,7 +42,7 @@
     if(document.getElementById('ycNoticeMask'))return;
     var mask=document.createElement('div');
     mask.id='ycNoticeMask';
-    mask.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:14px;';
+    mask.style.cssText='position:fixed;inset:0;z-index:2147483800;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:14px;';
     var box=document.createElement('div');
     box.style.cssText='background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,.4)';
     var img=document.createElement('img');
