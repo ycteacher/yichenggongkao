@@ -87,8 +87,8 @@
   <div id="loading" style="text-align:center;padding:80px 0;color:#8A8378;">题库加载中…</div>
 </div>
 
-<script src="./assets/shl-bank-2.js?v=slb3"></script>
-<script src="./assets/zy-bank-2.js?v=zyb2"></script>
+<script src="./assets/shl-bank-2.js?v=slb4"></script>
+<script src="./assets/zy-bank-2.js?v=zyb3"></script>
 <script>
 (function(){
   var SHL = window.YC_SHL_BANK || [];
@@ -143,12 +143,15 @@
     }
     return best[n] <= k;
   }
-  function matchOne(key, ans){
-    if(ans.indexOf(key) >= 0) return true;
-    if(key.length >= 4 && isSubseq(key, ans)) return true;
-    if(key.length >= 6 && fuzzySubseq(key, ans)) return true;
-    return false;
+  // 命中层级：exact=连续子串（精确）；fuzzy=子序列/近似（模糊）；null=未命中
+  function matchKind(key, ans){
+    if(!key) return null;
+    if(ans.indexOf(key) >= 0) return 'exact';
+    if(key.length >= 4 && isSubseq(key, ans)) return 'fuzzy';
+    if(key.length >= 6 && fuzzySubseq(key, ans)) return 'fuzzy';
+    return null;
   }
+  function matchOne(key, ans){ return matchKind(key, ans) !== null; }
 
   // ===== 真实考试标准评分 =====
   // 维度：①采分点命中（按点给分）②结构分条 ③字数合规 ④语言规范
@@ -166,14 +169,16 @@
       var mainKey = norm(sp.point);
       var hitMain = mainKey && matchOne(mainKey, ans);
       if(hitMain) hitWords.push(sp.point);
-      var synHits = 0;
+      var synHits = 0, synExact = false;
       (sp.synonyms||[]).forEach(function(c){
         var key = norm(c);
-        if(key && matchOne(key, ans)){ synHits++; hitWords.push(c); }
+        var kind = key && matchKind(key, ans);
+        if(kind){ synHits++; hitWords.push(c); if(kind === 'exact') synExact = true; }
       });
       hitWords = dedupe(hitWords);
-      var status = (hitMain || synHits >= 2) ? 'hit' : (synHits === 1 ? 'half' : 'miss');
-      // 真实阅卷：主表述命中或≥2同义=满分；1个同义=半分；否则0
+      var status = (hitMain || synExact) ? 'hit' : (synHits >= 1 ? 'half' : 'miss');
+      // 真实阅卷：主表述命中或任一同义精确命中=满分；仅模糊命中=半分；否则0
+      // v2修复：原规则须≥2个同义才给满分，参考答案自己都只能拿半分，造成「答案一致却不给分」
       var got = status === 'hit' ? sp.score : (status === 'half' ? Math.ceil(sp.score/2) : 0);
       return {point:sp.point, synonyms:sp.synonyms||[], score:sp.score, got:got, status:status, hitWords:hitWords};
     });
