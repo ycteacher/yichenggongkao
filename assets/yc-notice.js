@@ -1,4 +1,4 @@
-/* yc-notice.js v1: 通用强推通知栏（长期复用）
+/* yc-notice.js v2: 通用强推通知栏（长期复用）
    数据源：云端 ycgk-notice-v1（textdb），站长后台/看板可增发通知
    格式：{list:[{id,title,img,btns:[{k,t}],stats:{},at}]}
    行为：打开应用延迟拉取 → 最新一条未确认通知强推全屏弹层（图片+按钮）
@@ -19,12 +19,21 @@
   }
 
   /* textdb 读写（与 yc-account.js 同款双源） */
+  /* v2 修复：textdb.online 对无数据 key 返回 200+空体，空响应视为失败继续尝试下一源；单源请求加 6 秒超时防挂起 */
+  function fetchT(u,ms){
+    var ctl=new AbortController();
+    var to=setTimeout(function(){ctl.abort()},ms||6000);
+    return fetch(u,{cache:'no-store',signal:ctl.signal}).then(function(r){clearTimeout(to);return r},function(e){clearTimeout(to);throw e});
+  }
   function cloudGet(key,cb){
     var urls=['https://textdb.online/'+key,'https://textdb.dev/api/data/'+key];
     var i=0,done=false;
     (function next(){
       if(i>=urls.length){cb(true,null);return}
-      fetch(urls[i++],{cache:'no-store'}).then(function(r){return r.ok?r.text():Promise.reject()}).then(function(t){if(!done){done=true;cb(false,t)}},next);
+      fetchT(urls[i++],6000).then(function(r){return r.ok?r.text():Promise.reject()}).then(function(t){
+        if(done)return;
+        if(t&&t.trim()){done=true;cb(false,t);}else{next();}
+      },next);
     })();
   }
   function cloudPut(key,val,cb){
