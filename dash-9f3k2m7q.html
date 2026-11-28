@@ -323,6 +323,22 @@ td b{color:var(--txt)}
     </div>
   </div>
 
+  <div class="sec-h" id="sec-vid"><span class="bar"></span><h2>视频观察</h2><span class="note" id="vidNote">谁在看、看了多久、在哪退出 · 60 秒刷新</span></div>
+  <div class="grid g2">
+    <div class="card w2">
+      <h3>视频留存明细 <span class="hint">按播放人数排序 · 点「看名单」查到人</span></h3>
+      <div class="desc" id="vidSum">—</div>
+      <div style="overflow-x:auto"><table id="vidTbl" style="width:100%;border-collapse:collapse;font-size:13px"></table></div>
+      <div class="desc" style="margin-top:8px">退出分布（每人最后一次离开的位置）：<span style="color:#ef4444">■</span>开头30秒内 <span style="color:#f97316">■</span>不到1/4 <span style="color:#eab308">■</span>1/4-1/2 <span style="color:#3b82f6">■</span>1/2-3/4 <span style="color:#22c55e">■</span>看到最后</div>
+      <div id="vidViewers" style="display:none;margin-top:10px;border-top:1px dashed #e5e1d8;padding-top:8px"></div>
+    </div>
+    <div class="card">
+      <h3>每日观看 <span class="hint">按天 · 播放/完播/时长</span></h3>
+      <div class="desc">每天有多少人点开视频、看完几个、看了多久</div>
+      <div style="overflow-x:auto"><table id="vidDaily" style="width:100%;border-collapse:collapse;font-size:13px"></table></div>
+    </div>
+  </div>
+
   <div class="sec-h" id="sec-src"><span class="bar"></span><h2>分享与裂变</h2><span class="note">邀请链路逐层拆解</span></div>
   <div class="grid g2">
     <div class="card"><h3>用户来源 <span class="hint">首触归因 · 11-27 起</span></h3><div class="desc">各来源的访问用户、安装与注册数；来源名用映射表中文标签，不带参数进入计为自然流量</div><table id="srcTbl" style="width:100%;border-collapse:collapse;font-size:13px"></table></div>
@@ -1196,6 +1212,104 @@ el('msgSend').addEventListener('click',function(){
 });
 loadUsers();setInterval(loadUsers,60000);
 loadMsgs();setInterval(loadMsgs,60000);
+
+/* ===== 视频观察（ycgk-vid-v1 聚合池 + ycgk-vid-dev-v1 个人明细池） ===== */
+var VID_URLS=['https://textdb.online/ycgk-vid-v1','https://textdb.dev/api/data/ycgk-vid-v1'];
+var VIDDEV_URLS=['https://textdb.online/ycgk-vid-dev-v1','https://textdb.dev/api/data/ycgk-vid-dev-v1'];
+var VID_DATA=null,VIDDEV_DATA=null,VID_OPEN_KEY=null;
+function fetchPool(urls,cb){
+  var i=0;
+  (function next(){
+    if(i>=urls.length){cb(null);return}
+    fetch(urls[i++],{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+      if(!t||t.charAt(0)!=='{'&&t.charAt(0)!=='['){next();return}
+      try{cb(JSON.parse(t))}catch(e){next()}
+    }).catch(function(){next()});
+  })();
+}
+function vidExitBar(exit){
+  var order=['<30s','0-25','25-50','50-75','75-100'],colors=['#ef4444','#f97316','#eab308','#3b82f6','#22c55e'];
+  var tot=0;order.forEach(function(b){tot+=exit[b]||0});
+  if(!tot)return '<span style="color:var(--mut)">—</span>';
+  return '<div style="display:flex;height:14px;border-radius:4px;overflow:hidden;min-width:110px">'+order.map(function(b,i){
+    var v=exit[b]||0;if(!v)return '';
+    return '<span style="width:'+Math.max(6,Math.round(v/tot*100))+'%;background:'+colors[i]+'" title="'+b+'：'+v+'人"></span>';
+  }).join('')+'</div>';
+}
+function vidMin(sec){return sec>=60?(Math.round(sec/60*10)/10)+'分':(sec||0)+'秒'}
+function renderVid(){
+  if(!VID_DATA)return;
+  var vids=(VID_DATA.videos||{}),meta=(VID_DATA.meta||{}),days=(VID_DATA.days||{});
+  var rows=Object.keys(vids).map(function(k){
+    var v=vids[k]||{};v.k=k;v.title=meta[k]||k;
+    v.uidN=Object.keys(v.uids||{}).length;
+    return v;
+  }).filter(function(v){return (v.play||0)>0});
+  rows.sort(function(a,b){return (b.play||0)-(a.play||0)});
+  var totPlay=0,totDone=0,totSec=0,totUid={};
+  rows.forEach(function(v){totPlay+=v.play||0;totDone+=v.done||0;totSec+=v.sec||0;Object.keys(v.uids||{}).forEach(function(u){totUid[u]=1})});
+  txt('vidSum','共 '+rows.length+' 个视频有播放 · '+totPlay+' 次播放 · '+Object.keys(totUid).length+' 台设备看过 · 总时长 '+vidMin(totSec)+' · 完播 '+(totPlay?Math.round(totDone/totPlay*100):0)+'%');
+  txt('vidNote','刷新于 '+new Date().toLocaleTimeString('zh-CN',{hour12:false})+' · 60 秒自动刷新');
+  var head='<tr style="color:var(--mut)"><th style="text-align:left">视频</th><th>人数</th><th>播放</th><th>完播率</th><th>人均</th><th>退出分布</th><th></th></tr>';
+  el('vidTbl').innerHTML=head+(rows.length?rows.map(function(v){
+    var wcl=v.play?Math.round((v.done||0)/v.play*100)+'%':'—';
+    var avg=v.uidN?vidMin(Math.round((v.sec||0)/v.uidN)):'—';
+    return '<tr>'+
+      '<td style="max-width:220px">'+escRd(v.title.slice(0,26))+(v.title.length>26?'…':'')+'</td>'+
+      '<td style="text-align:center">'+(v.uidN||0)+'</td>'+
+      '<td style="text-align:center">'+(v.play||0)+'</td>'+
+      '<td style="text-align:center;font-weight:700;'+((v.done||0)/(v.play||1)<0.2?'color:#ef4444':'color:#22c55e')+'">'+wcl+'</td>'+
+      '<td style="text-align:center">'+avg+'</td>'+
+      '<td>'+vidExitBar(v.exit||{})+'</td>'+
+      '<td><button class="refresher" data-vk="'+escRd(v.k)+'" style="padding:3px 8px;font-size:11px">看名单</button></td>'+
+    '</tr>';
+  }).join(''):'<tr><td colspan="7" style="color:var(--mut)">还没有播放记录</td></tr>');
+  /* 每日观看 */
+  var dk=Object.keys(days).sort().slice(-14),dh='<tr style="color:var(--mut)"><th style="text-align:left">日期</th><th>播放</th><th>完播</th><th>人数</th><th>时长</th></tr>';
+  el('vidDaily').innerHTML=dh+(dk.length?dk.map(function(d){
+    var x=days[d]||{};
+    return '<tr><td>'+d.slice(4,6)+'/'+d.slice(6,8)+'</td><td style="text-align:center">'+(x.play||0)+'</td><td style="text-align:center">'+(x.done||0)+'</td><td style="text-align:center">'+Object.keys(x.uids||{}).length+'</td><td style="text-align:center">'+vidMin(x.sec||0)+'</td></tr>';
+  }).join(''):'<tr><td colspan="5" style="color:var(--mut)">—</td></tr>');
+}
+function vidViewerName(rec){
+  if(rec&&rec.k16){
+    var u=(USER_DATA&&USER_DATA.u)||{};
+    var hit=u[rec.k16];
+    if(hit&&hit.n)return {name:hit.n,reg:true};
+  }
+  return null;
+}
+function renderVidViewers(vk){
+  var box=el('vidViewers');
+  if(VID_OPEN_KEY===vk&&box.style.display!=='none'){box.style.display='none';VID_OPEN_KEY=null;return}
+  VID_OPEN_KEY=vk;
+  var devs=(VIDDEV_DATA&&VIDDEV_DATA.devs)||{};
+  var list=Object.keys(devs).map(function(did){
+    var d=devs[did]||{};var v=(d.vids||{})[vk];
+    return v?{did:did,k16:d.k16,v:v}:null;
+  }).filter(Boolean).sort(function(a,b){return (b.v.s||0)-(a.v.s||0)});
+  var meta=(VID_DATA&&VID_DATA.meta||{})[vk]||vk;
+  var html='<b style="font-size:13px">「'+escRd(String(meta).slice(0,24))+'」看过的人（'+list.length+'）</b>';
+  if(!VIDDEV_DATA)html+='<div class="desc" style="margin-top:6px">个人明细刚上线，老记录要等同学再看一次视频才会补上</div>';
+  html+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px"><tr style="color:var(--mut)"><th style="text-align:left">谁</th><th>看了多久</th><th>看到</th><th>次数</th><th>最后观看</th></tr>';
+  html+=list.length?list.map(function(x){
+    var nm=vidViewerName(x);
+    var who=nm?escRd(nm.name):'<span style="color:var(--mut)">游客·'+escRd(x.did.slice(-4))+'</span>';
+    var pct=x.v.p?('<b style="color:'+(x.v.p>=60?'#22c55e':x.v.p>=25?'#eab308':'#ef4444')+'">'+x.v.p+'%</b>'):'—';
+    return '<tr><td>'+who+'</td><td style="text-align:center">'+vidMin(x.v.s||0)+'</td><td style="text-align:center">'+pct+'</td><td style="text-align:center">'+(x.v.n||0)+'</td><td style="text-align:center">'+fmtTs(x.v.t)+'</td></tr>';
+  }).join(''):'<tr><td colspan="5" style="color:var(--mut)">这个视频还没有个人明细记录</td></tr>';
+  html+='</table>';
+  box.innerHTML=html;box.style.display='block';
+}
+function loadVid(){
+  fetchPool(VID_URLS,function(d){VID_DATA=d;renderVid()});
+  fetchPool(VIDDEV_URLS,function(d){VIDDEV_DATA=d;if(VID_OPEN_KEY)renderVidViewers(VID_OPEN_KEY)});
+}
+el('vidTbl').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-vk]');
+  if(b)renderVidViewers(b.getAttribute('data-vk'));
+});
+loadVid();setInterval(loadVid,60000);
 
 /* 保存长图 */
 var btn=el('saveImgBtn');

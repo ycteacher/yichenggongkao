@@ -612,6 +612,8 @@ var vtrack = (function(){
     if (!pending[k]) pending[k] = { open:0, play:0, done:0, sec:0, pdf:0, fail:0, exit:{}, exit3:{} };
     if (kind === 'exit' && extra != null) { pending[k].exit[extra] = (pending[k].exit[extra]||0)+1; flushSoon(); return; }
     if (kind === 'exit3' && extra != null) { if (!pending[k].exit3) pending[k].exit3 = {}; pending[k].exit3[extra] = (pending[k].exit3[extra]||0)+1; flushSoon(); return; }
+    /* 个人最大进度：只写进个人池，不进聚合池 */
+    if (kind === 'pos' && extra != null) { devAcc(k, 0, extra, 0, 0); flushSoon(); return; }
     pending[k][kind] = (pending[k][kind] || 0) + n;
     if (kind === 'play') { pending[k]._uid = DID; dayUids[d] = dayUids[d] || {}; dayUids[d][DID] = 1; ucntPend[DID] = (ucntPend[DID]||0)+1; }
     var d = today();
@@ -619,12 +621,73 @@ var vtrack = (function(){
     if (kind === 'sec') dayPend[d].sec += n;
     else if (kind === 'done') dayPend[d].done += n;
     else if (kind === 'play') dayPend[d].play += n;
+    /* 同步累计到个人池：sec 累计秒数 / play 次数 / done 完播次数 */
+    devAcc(k, kind === 'sec' ? n : 0, 0, kind === 'play' ? 1 : 0, kind === 'done' ? 1 : 0);
     flushSoon();
+  }
+
+  /* ============ 个人观看明细池（key=ycgk-vid-dev-v1）：谁看了哪个视频、看了多久、看到百分之几 ============
+     结构 {v:1, devs:{设备号:{k16, vids:{视频key:{s:累计秒,p:最大进度%,n:播放次数,d:完播次数,t:最后观看时间}}}}, ts}
+     上限500台设备（按最后观看时间淘汰），注册用户带 k16 供看板对昵称。 */
+  var DEV_KEY = 'ycgk-vid-dev-v1';
+  var devPend = {};
+  function accK16(){
+    try{ var a = JSON.parse(localStorage.getItem('yicheng-gk-account-v1')||'null'); return (a && a.md5) ? String(a.md5).slice(0,16) : ''; }catch(e){ return ''; }
+  }
+  function devAcc(k, secN, posP, playN, doneN){
+    if (!secN && !posP && !playN && !doneN) return;
+    var dv = devPend[DID] || (devPend[DID] = { k16: accK16(), vids: {} });
+    if (!dv.k16) dv.k16 = accK16();
+    var vv = dv.vids[k] || (dv.vids[k] = { s:0, p:0, n:0, d:0, t:0 });
+    vv.s += secN; if (posP > vv.p) vv.p = posP; vv.n += playN; vv.d += doneN; vv.t = Date.now();
+  }
+  function devFlush(done){
+    if (!Object.keys(devPend).length) { done && done(true); return; }
+    get2(function(pool){
+      var p = pool && typeof pool === 'object' ? pool : {};
+      if (!p.devs || typeof p.devs !== 'object') p.devs = {};
+      Object.keys(devPend).forEach(function(did){
+        var inc = devPend[did];
+        var cur = p.devs[did] || { k16:'', vids:{} };
+        if (inc.k16) cur.k16 = inc.k16;
+        if (!cur.vids || typeof cur.vids !== 'object') cur.vids = {};
+        Object.keys(inc.vids).forEach(function(k){
+          var v = inc.vids[k], c = cur.vids[k] || { s:0, p:0, n:0, d:0, t:0 };
+          c.s += v.s; if (v.p > c.p) c.p = v.p; c.n += v.n; c.d += v.d; if (v.t > c.t) c.t = v.t;
+          cur.vids[k] = c;
+        });
+        p.devs[did] = cur;
+      });
+      /* 上限500台：按最后观看时间淘汰最久未看的 */
+      var dks = Object.keys(p.devs);
+      if (dks.length > 500) {
+        dks.sort(function(a,b){ return ((p.devs[a].vids&&lastT(p.devs[a]))||0) - ((p.devs[b].vids&&lastT(p.devs[b]))||0); });
+        for (var i = 0; i < dks.length - 500; i++) delete p.devs[dks[i]];
+      }
+      p.v = 1; p.ts = Date.now();
+      put2(p, function(ok){ if (ok) devPend = {}; done && done(ok); });
+    });
+  }
+  function lastT(dev){ var m=0; Object.keys(dev.vids||{}).forEach(function(k){ if((dev.vids[k].t||0)>m)m=dev.vids[k].t; }); return m; }
+  function get2(cb){
+    var i = 0;
+    (function next(){
+      if (i >= GETS.length) { cb(null); return; }
+      fetch(GETS[i++] + DEV_KEY, { cache: 'no-store' }).then(function(r){ return r.text(); }).then(function(t){
+        if (!t || t.charAt(0) !== '{') { next(); return; }
+        try { cb(JSON.parse(t)); } catch(e) { next(); }
+      }).catch(function(){ next(); });
+    })();
+  }
+  function put2(val, cb){
+    fetch('https://textdb.dev/api/data/' + DEV_KEY, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(val) })
+      .then(function(r){ cb(!!r.ok); }, function(){ cb(false); });
   }
 
   function flushSoon(){ if (!flushT) flushT = setTimeout(function(){ flushT = null; flush(); }, 4000); }
 
   function flush(){
+    try { devFlush(); } catch(eDF) {}
     if (!Object.keys(pending).length) return;
     get(function(pool){
       var p = pool && typeof pool === 'object' ? pool : {};
@@ -780,14 +843,16 @@ var vtrack = (function(){
     }
     function stopWatch(){ if (watchT) { clearInterval(watchT); watchT = null; } }
     function exitBucket(){
-      /* 退出节点：按已看进度分四档（<25% / 25-50% / 50-75% / 75-100%） */
+      /* 退出节点：按已看进度分五档（<30秒 / <25% / 25-50% / 50-75% / 75-100%）
+         修改点：原口径只记30秒以上的退出，开头秒退全部漏记，补 <30s 档 */
       try{
         var d = player.duration, c = player.currentTime || 0;
         if (c > maxPos) maxPos = c;
         if (!d || d <= 0) return '0-25';
+        if (maxPos <= 30) return '<30s';
         var r = maxPos / d;
         return r < 0.25 ? '0-25' : r < 0.5 ? '25-50' : r < 0.75 ? '50-75' : '75-100';
-      }catch(e){ return '0-25'; }
+      }catch(e){ return '<30s'; }
     }
     function exit3Bucket(){
       /* 退出三桶（新口径）：开头30秒内 / 中段 / 结尾（距片尾30秒内） */
@@ -805,16 +870,24 @@ var vtrack = (function(){
     });
     player.addEventListener('pause', function(){
       stopWatch();
-      if (started && !player.ended && player.currentTime > 30) { add('exit', 1, exitBucket()); add('exit3', 1, exit3Bucket()); }
+      /* 修改点：退出记录门槛 30秒→5秒，秒退也计入；并上报个人最大进度百分比 */
+      if (started && !player.ended && player.currentTime > 5) {
+        add('exit', 1, exitBucket()); add('exit3', 1, exit3Bucket());
+        try{ var dP=player.duration; add('pos', 1, dP>0?Math.min(100,Math.round(maxPos/dP*100)):0); }catch(eP){}
+      }
     });
     player.addEventListener('error', function(){ if (started || player.currentTime > 0) add('fail'); });
     player.addEventListener('ended', function(){
       stopWatch();
       endCount++;
+      add('pos', 1, 100);
       if (endCount >= nParts) add('done');
     });
     window.addEventListener('pagehide', function(){
-      if (started && !player.ended && player.currentTime > 30) { add('exit', 1, exitBucket()); add('exit3', 1, exit3Bucket()); }
+      if (started && !player.ended && player.currentTime > 5) {
+        add('exit', 1, exitBucket()); add('exit3', 1, exit3Bucket());
+        try{ var dH=player.duration; add('pos', 1, dH>0?Math.min(100,Math.round(maxPos/dH*100)):0); }catch(eH){}
+      }
     });
   }
   return { add: add, bindPlayer: bindPlayer };
