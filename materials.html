@@ -88,6 +88,23 @@
   .dlg .hint{font-size:12px;color:#888;margin-top:10px;text-align:center;line-height:1.7}
   .dlg .url-box{margin-top:12px;background:#F4F8F3;border:1px solid #DCEADC;border-radius:10px;padding:10px 12px;font-size:11px;color:#2F5D3C;word-break:break-all;line-height:1.6;user-select:all;-webkit-user-select:all}
   .dlg .ok-msg{display:none;margin-top:10px;background:#DCFCE7;color:#15803D;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;text-align:center}
+  /* ===== 领资料接住钩子：顶部横幅 + 保存后提示条 ===== */
+  .mat-hook-banner{display:flex;align-items:center;gap:10px;margin:0 0 14px;background:linear-gradient(135deg,#FFF7E6,#FDEBD2);border:1px solid #F1D9A8;border-radius:12px;padding:10px 12px;font-size:12.5px;color:#7C5A11;line-height:1.6}
+  .mat-hook-banner .mh-tx{flex:1;min-width:0}
+  .mat-hook-banner b{color:#B45309}
+  .mat-hook-banner .mh-go{flex:none;background:#B45309;color:#fff;text-decoration:none;font-weight:800;font-size:12.5px;border-radius:9px;padding:7px 12px;white-space:nowrap}
+  .mat-hook-banner .mh-go:active{transform:scale(.97)}
+  .mat-hook-banner .mh-x{flex:none;background:none;border:none;color:#B08A3E;font-size:18px;line-height:1;padding:2px 4px;cursor:pointer}
+  #matHookBar{position:fixed;left:12px;right:12px;bottom:14px;z-index:9000;background:#fff;border:1px solid #E5D5B8;border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.22);padding:14px 16px;transform:translateY(130%);transition:transform .35s ease;max-width:430px;margin:0 auto}
+  #matHookBar.show{transform:translateY(0)}
+  #matHookBar .hb-t{font-size:14.5px;font-weight:800;color:#15803D}
+  #matHookBar .hb-d{font-size:12.5px;color:#544a3f;line-height:1.7;margin-top:5px}
+  #matHookBar .hb-d b{color:#B45309}
+  #matHookBar .hb-btns{display:flex;gap:10px;margin-top:10px}
+  #matHookBar .hb-quiz{flex:1.4;background:#15803D;color:#fff;border:none;border-radius:11px;padding:11px 0;font-size:14px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer}
+  #matHookBar .hb-inst{flex:1;background:#fff;color:#15803D;border:2px solid #15803D;border-radius:11px;padding:9px 0;font-size:13px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer}
+  #matHookBar .hb-quiz:active,#matHookBar .hb-inst:active{transform:scale(.98)}
+  #matHookBar .hb-x{position:absolute;top:8px;right:12px;background:none;border:none;font-size:20px;color:#999;cursor:pointer;line-height:1}
 </style>
 </head>
 <body>
@@ -96,6 +113,12 @@
     <a class="back" href="./index.html">‹ 返回刷题</a>
     <h1>资料领取专区</h1>
     <p>点「保存」存到手机/电脑，点「打开」直接预览打印 · 全部免费</p>
+  </div>
+
+  <div class="mat-hook-banner" id="matHookBanner">
+    <div class="mh-tx">领完资料别走：题库 <b>5.7 万题</b>免费刷，答对每题涨积分，积分能兑换礼品</div>
+    <a class="mh-go" href="./index.html" id="mhBannerGo">去刷题 ›</a>
+    <button class="mh-x" id="mhBannerX" aria-label="关闭">×</button>
   </div>
 
   <div class="sec-t" id="sec-gk">国考 · 27国考</div>
@@ -1101,7 +1124,72 @@ document.addEventListener('click', function(e){
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePv(); });
 })();
 </script>
+<div id="matHookBar" role="dialog" aria-label="刷题引导">
+  <button class="hb-x" id="mhBarX" aria-label="关闭">×</button>
+  <div class="hb-t">✓ 资料已保存</div>
+  <div class="hb-d">光看资料容易忘——去题库刷 10 道题检验一下：<b>答对每题 +1 积分</b>，攒积分能兑换 AI批改 / 一对一咨询 / 实物好礼</div>
+  <div class="hb-btns">
+    <a class="hb-quiz" href="./index.html" id="mhGoQuiz">马上去刷题 ›</a>
+    <a class="hb-inst" href="./install.html" id="mhGoInst">装到桌面</a>
+  </div>
+</div>
 <script>window.__YC_GQR_PAGE='materials';</script>
 <script src="./assets/yc-group-qr.js?v=2" defer></script><!-- 内测群二维码投放：数据源 assets/group_qr_config.json -->
+
+<script>
+/* ===== 领资料接住钩子 v1：保存后引导刷题（积分钩子）+ 安装引导 + 转化统计 =====
+   池 ycgk-mat-hook-v1 契约: {shown:N, goQuiz:N, goInstall:N, days:{YYYYMMDD:{shown:N,goQuiz:N,goInstall:N}}, ts:ms}
+   只统计不记人，与 ycgk-mat-v1 分池互不影响 */
+var HOOK_KEY='ycgk-mat-hook-v1';
+function hookPad(n){return ('0'+n).slice(-2)}
+function hookDay(){var d=new Date();return ''+d.getFullYear()+hookPad(d.getMonth()+1)+hookPad(d.getDate())}
+function hookStat(kind){
+  try{
+    var lk='ycgk.mat.hook.'+kind,now=Date.now();
+    var last=parseInt(localStorage.getItem(lk)||'0',10)||0;
+    if(now-last<20000)return; // 20秒节流，防连点灌水
+    localStorage.setItem(lk,String(now));
+  }catch(e){}
+  fetch('https://textdb.dev/api/data/'+HOOK_KEY,{cache:'no-store'})
+    .then(function(r){return r.text()})
+    .then(function(t){
+      var p={};try{p=(t&&t.charAt(0)==='{')?JSON.parse(t):{}}catch(e){p={}}
+      ['shown','goQuiz','goInstall'].forEach(function(k){p[k]=parseInt(p[k],10)||0;});
+      if(!p.days||typeof p.days!=='object')p.days={};
+      var d=hookDay();if(!p.days[d]||typeof p.days[d]!=='object')p.days[d]={shown:0,goQuiz:0,goInstall:0};
+      p[kind]=(p[kind]||0)+1; p.days[d][kind]=(p.days[d][kind]||0)+1;
+      var ks=Object.keys(p.days).sort();if(ks.length>30){for(var i=0;i<ks.length-30;i++)delete p.days[ks[i]];}
+      p.ts=Date.now();
+      return fetch('https://textdb.dev/api/data/'+HOOK_KEY,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)});
+    }).catch(function(){});
+}
+function showHookBar(){
+  try{ if(sessionStorage.getItem('ycgk.mat.hook.shown')==='1')return; sessionStorage.setItem('ycgk.mat.hook.shown','1'); }catch(e){}
+  var bar=document.getElementById('matHookBar'); if(!bar)return;
+  bar.classList.add('show');
+  hookStat('shown');
+}
+function closeHookBar(){ var bar=document.getElementById('matHookBar'); if(bar)bar.classList.remove('show'); }
+/* 保存动作触发（含微信/苹果引导弹窗场景，弹窗关闭后提示条仍在） */
+document.addEventListener('click',function(e){
+  var a=e.target.closest?e.target.closest('a.op-save[data-file]'):null;
+  if(!a)return;
+  setTimeout(showHookBar,700); // 让下载先启动，再轻提示
+},true);
+/* 提示条按钮：点击计转化后放行默认跳转 */
+document.getElementById('mhGoQuiz').addEventListener('click',function(){ hookStat('goQuiz'); });
+document.getElementById('mhGoInst').addEventListener('click',function(){ hookStat('goInstall'); });
+document.getElementById('mhBarX').addEventListener('click',closeHookBar);
+/* 顶部横幅：关闭后永久记住；去刷题计转化 */
+(function(){
+  var bn=document.getElementById('matHookBanner'); if(!bn)return;
+  try{ if(localStorage.getItem('ycgk.matbanner.closed.v1')==='1'){ bn.style.display='none'; return; } }catch(e){}
+  document.getElementById('mhBannerX').addEventListener('click',function(){
+    bn.style.display='none';
+    try{ localStorage.setItem('ycgk.matbanner.closed.v1','1'); }catch(e){}
+  });
+  document.getElementById('mhBannerGo').addEventListener('click',function(){ hookStat('goQuiz'); });
+})();
+</script>
 </body>
 </html>
